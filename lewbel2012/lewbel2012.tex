@@ -1,0 +1,175 @@
+\documentclass{article}
+\usepackage{amsmath,amssymb,amsthm,geometry}
+\geometry{margin=1in}
+
+% ---------- shortcuts ----------
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\cov}{\operatorname{Cov}}
+\newcommand{\corr}{\operatorname{Corr}}
+\newcommand{\var}{\operatorname{Var}}
+
+% ---------- theorem environments ----------
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+
+\begin{document}
+
+\section*{Heteroscedasticity‐Based Identification (Lewbel, 2012)}
+
+\vspace{-0.8em}
+\paragraph{Notation.}
+Let $(Y_1,Y_2)'$ be endogenous, $X$ exogenous (contains a constant), and the $r\times 1$
+vector $Z=g(X)$ any \emph{mean‑zero} function of~$X$ with $\E(ZZ')$ full rank.\footnote{%
+Centring $Z$ rules out a constant in~$Z$ and guarantees
+$\cov(Z,\varepsilon_j)=0$ while allowing $\cov(Z,\varepsilon_j^{2})\neq0$.
+}
+Define the \emph{linear‑projection residuals}
+\[
+W_j \;=\; Y_j-X'\E(XX')^{-1}\E(XY_j), \qquad
+\varepsilon_j \;=\; Y_j-\beta_j'X-\gamma_jY_{3-j}, \quad j=1,2.
+\]
+
+% ---------- structural models ----------
+\subsection*{1. Structural Forms}
+\begin{align*}
+\textbf{Measurement error:}\quad 
+&Y_1 = X'\beta_1 + Y_2^*\gamma_1 + V_1, & Y_2 = Y_2^* + U,\\[2pt]
+\textbf{Triangular:}\quad
+&Y_1 = X'\beta_1+\gamma_1Y_2+\varepsilon_1, &
+Y_2 = X'\beta_2+\varepsilon_2,\\[2pt]
+\textbf{Simultaneous:}\quad
+&Y_1 = X'\beta_1+\gamma_1Y_2+\varepsilon_1, &
+Y_2 = X'\beta_2+\gamma_2Y_1+\varepsilon_2.
+\end{align*}
+
+\textbf{Note:} The measurement error model is rewritten as a triangular system with
+$\varepsilon_1 = -\gamma_1 U + V_1$ and $\varepsilon_2 = U + V_2$, where $V_2$ is the 
+residual from projecting $Y_2^*$ on $X$.
+
+% ---------- core assumptions ----------
+\subsection*{2. Core Assumptions}
+\begin{enumerate}
+\item[(A1)] $\E|ZZ'|<\infty$ and $\E(ZZ')$ nonsingular.
+\item[(A2)] $\E(Z\varepsilon_j)=0$ and $\cov(Z,\varepsilon_1\varepsilon_2)=0$.
+\item[(A3)] (Simultaneous case) the $r\times3$ matrix
+      $\bigl[\cov(Z,W_1W_2)\;\;\cov(Z,W_1^{2})\;\;\cov(Z,W_2^{2})\bigr]$ has
+      rank $2$.
+\item[(A4)] $(\gamma_1,\gamma_2)$ and $(1/\gamma_2,1/\gamma_1)$ cannot both
+      lie in the parameter space unless $\gamma_1\gamma_2=1$.
+\end{enumerate}
+\smallskip
+\emph{Additional model‑specific conditions}
+\begin{itemize}
+\item Measurement error: $U$ is independent of $(X, Y_1, Y_2^*)$, $\E(XV_2) = 0$,
+      $\cov(Z,V_2^{2})\neq0$.
+\item Triangular: $\cov(Z,\varepsilon_2^{2})\neq0$.
+\item Simultaneous: $\cov(Z,\varepsilon_j^{2})\neq0$ for at least one~$j$.
+\end{itemize}
+
+% ---------- internal instruments ----------
+\subsection*{3. Internal Instruments (Two-Stage Least Squares)}
+For the triangular system (including measurement error as a special case):
+\[
+\text{Instruments for } Y_2: \quad X \text{ and } (Z-\bar{Z})\hat{\varepsilon}_2
+\]
+where $\hat{\varepsilon}_2$ are residuals from regressing $Y_2$ on $X$.
+
+% ---------- identification ----------
+\subsection*{4. Point Identification}
+\begin{theorem}[Triangular/Measurement Error] 
+Under (A1)–(A2) and $\cov(Z,\varepsilon_2^{2})\neq0$,
+$(\beta_1,\beta_2,\gamma_1)$ are point identified.
+\end{theorem}
+
+\begin{theorem}[Simultaneous] 
+Under (A1)–(A4) and non‑degenerate $\cov(Z,\varepsilon_j^{2})$,
+$(\beta_1,\beta_2,\gamma_1,\gamma_2)$ are point identified.
+\end{theorem}
+
+% ---------- GMM moments ----------
+\subsection*{5. GMM Moment Conditions}
+
+\paragraph{Parameter notation:}
+\begin{itemize}
+\item $\mu = \E[Z]$ is the population mean of $Z$ (unknown parameter)
+\item $\bar{Z} = \frac{1}{n}\sum_{i=1}^n Z_i$ is the sample mean of $Z$ (observable)
+\item In GMM: $\mu$ is estimated jointly with other parameters
+\item In 2SLS: $(Z - \bar{Z})\hat{\varepsilon}_2$ is used directly as an instrument
+\end{itemize}
+
+\paragraph{(i) Triangular system (includes measurement error)}
+\[
+Q_{\text{TRI}}(\theta)=
+  \begin{pmatrix}
+    X\varepsilon_1\\ 
+    X\varepsilon_2\\
+    Z - \mu\\
+    (Z-\mu)\varepsilon_1\varepsilon_2
+  \end{pmatrix},
+\quad
+\E\bigl[Q_{\text{TRI}}(\theta)\bigr]=0,
+\quad
+\theta=(\beta_1,\beta_2,\gamma_1,\mu)'.
+\]
+
+\paragraph{(ii) Simultaneous system}
+\[
+Q_{\text{SIM}}(\theta)=
+  \begin{pmatrix}
+    X\varepsilon_1\\ 
+    X\varepsilon_2\\
+    Z - \mu\\
+    (Z-\mu)\varepsilon_1\varepsilon_2
+  \end{pmatrix},
+\quad
+\E\bigl[Q_{\text{SIM}}(\theta)\bigr]=0,
+\quad
+\theta=(\beta_1,\beta_2,\gamma_1,\gamma_2,\mu)'.
+\]
+
+\textbf{Special case:} If $\E[\varepsilon_1\varepsilon_2] = 0$, then $\mu$ can be dropped from $\theta$,
+and the moment condition simplifies to $\E[Z\varepsilon_1\varepsilon_2] = 0$.
+
+% ---------- set identification ----------
+\section*{6. Set Identification (Relaxed A2)}
+
+\paragraph{Relaxed moment.}
+Allow
+\[
+|\corr(Z,\varepsilon_1\varepsilon_2)|
+  \;\le\;
+  \tau\,|\corr(Z,\varepsilon_2^{2})|,
+  \qquad 0\le\tau<1.
+\]
+
+\begin{theorem}[Bounds for the triangular model]
+\label{thm:bounds}
+Assume conditions for the triangular model hold except that the above relaxed moment
+replaces $\cov(Z,\varepsilon_1\varepsilon_2)=0$ and that
+$\cov(Z,W_2^{2})\neq0$, $\var(W_2^{2})>0$.
+Then $\gamma_1$ lies in the closed interval $\Gamma_1$ whose endpoints are the
+(real) roots of
+\begin{align}\label{eq:quad}
+\frac{\bigl[\cov(Z,W_1W_2)\bigr]^{2}}{\bigl[\cov(Z,W_2^{2})\bigr]^{2}}
+-\frac{\var(W_1W_2)}{\var(W_2^{2})}\tau^{2}
++2\Bigl(\frac{\cov(W_1W_2,W_2^{2})}{\var(W_2^{2})}\tau^{2}
+      -\frac{\cov(Z,W_1W_2)}{\cov(Z,W_2^{2})}\Bigr)\gamma_1
++(1-\tau^{2})\gamma_1^{2}=0.
+\end{align}
+\end{theorem}
+
+\paragraph{Properties.}
+\begin{itemize}\itemsep0pt
+\item $\tau=0\;\Rightarrow\;$ $\Gamma_1$ collapses to the
+      point‑identified $\gamma_1$ of the triangular model.
+\item $\Gamma_1$ widens monotonically in $\tau$.
+\item For any $\gamma_1\in\Gamma_1$,
+      $\beta_1=\E(XX')^{-1}\E\!\bigl[X(Y_1-Y_2\gamma_1)\bigr]$.
+\end{itemize}
+
+\paragraph{Estimation.}
+Replace population moments in \eqref{eq:quad} by sample moments,
+solve the quadratic for the two roots, and obtain standard errors by the
+delta method.
+
+\end{document}
