@@ -64,6 +64,12 @@ rsconnect/
 
 ### Project-specific files ###
 
+# Development planning/notes (local only)
+code_to_do.md
+TODO.txt
+notes.md
+scratch/
+
 # Temporary monitoring scripts
 monitor_pr_checks.sh
 check_monitor_status.sh

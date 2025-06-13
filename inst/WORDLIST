@@ -160,3 +160,13 @@ Rbuildignore
 RData
 Rhistory
 commit's
+codebase
+codecov
+econometric
+gitignore
+Lewbel
+pkgdown
+Rbuildignore
+roxygen
+testthat
+tidyverse

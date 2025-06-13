@@ -18,36 +18,71 @@ You can install the development version of hetid from GitHub with:
 devtools::install_github("fernando-duarte/heteroskedasticity_identification")
 ```
 
-## Contents
+## Project Structure
 
-- `R/` - R functions implementing the methodology
-- `lewbel2012/` - Implementation and analysis related to Lewbel (2012) methodology
-  - `lewbel2012.tex` - LaTeX source file
-  - `lewbel2012.pdf` - Compiled PDF document
-  - Supporting files (`.aux`, `.log`, `.synctex.gz`)
-- `tests/` - Unit tests
-- `vignettes/` - Package vignettes
+```
+heteroskedasticity_identification/
+├── R/                    # R functions implementing the methodology
+│   ├── messager.R       # Utility functions for messaging
+│   └── stopper.R        # Utility functions for error handling
+├── lewbel2012/          # Implementation and analysis of Lewbel (2012)
+│   ├── lewbel2012.tex   # LaTeX source file
+│   ├── lewbel2012.pdf   # Compiled PDF document
+│   └── ...              # Supporting LaTeX files
+├── tests/               # Unit tests
+│   └── testthat/        # testthat test files
+├── vignettes/           # Package vignettes
+│   └── getting-started.Rmd
+├── man/                 # Documentation (generated)
+├── docs/                # pkgdown site (generated)
+├── .github/             # GitHub Actions workflows
+│   └── workflows/
+│       └── rworkflows.yml
+└── inst/                # Installed files
+    └── hooks/           # Pre-commit hook scripts
+```
 
 ## Development
 
-This package uses pre-commit hooks to ensure code quality and consistency.
+This package uses modern development practices to ensure code quality and consistency.
 
-### Setting up pre-commit hooks
+### Development Environment Setup
 
-1. Install pre-commit (requires Python):
+1. **Clone the repository**:
    ```bash
-   pip install pre-commit
+   git clone https://github.com/fernando-duarte/heteroskedasticity_identification.git
+   cd heteroskedasticity_identification
    ```
 
-2. Install the git hooks:
+2. **Install development dependencies**:
+   ```r
+   # Install devtools if not already installed
+   install.packages("devtools")
+
+   # Install package dependencies
+   devtools::install_deps(dependencies = TRUE)
+   ```
+
+3. **Install pre-commit hooks** (requires Python):
    ```bash
+   pip install pre-commit
    pre-commit install
    ```
 
-3. (Optional) Run hooks on all files:
-   ```bash
-   pre-commit run --all-files
-   ```
+4. **(Optional) For Cursor AI users**: The repository includes a `.cursorignore` file that prevents the AI from accessing sensitive files and improves performance by excluding large generated files.
+
+5. **(Optional) For Docker users**: A `.dockerignore` file is included to optimize Docker builds.
+
+### Code Quality Tools
+
+The project uses several tools to maintain code quality:
+
+- **Pre-commit hooks**: Automatically format code, check for issues, and ensure consistency
+- **R CMD check**: Standard R package checks via GitHub Actions
+- **Code coverage**: Test coverage reporting (to be implemented)
+- **pkgdown**: Automatic documentation website generation
+
+### Pre-commit Hooks
 
 The pre-commit hooks will automatically:
 - Format R code using the tidyverse style guide (`styler`)
@@ -56,14 +91,58 @@ The pre-commit hooks will automatically:
 - Ensure R code is parsable
 - Remove trailing whitespace and fix file endings
 - Prevent committing large files or common R artifacts
+- Sort entries in `.Rbuildignore`
 
-### Contributing
+To manually run hooks on all files:
+```bash
+pre-commit run --all-files
+```
 
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+### Ignore Files
+
+The project includes comprehensive ignore files following 2025 best practices:
+
+- **`.gitignore`**: Excludes common R, OS-specific, and IDE files from version control
+- **`.Rbuildignore`**: Excludes development files from the built R package
+- **`.cursorignore`**: Controls which files Cursor AI can access (security & performance)
+- **`.dockerignore`**: Optimizes Docker build context
+
+## Usage
+
+(To be expanded as more functions are implemented)
+
+```r
+library(hetid)
+
+# Example usage will be added as functions are developed
+```
+
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on:
+- Our development workflow
+- Coding standards
+- How to submit pull requests
+- Setting up your development environment
 
 ## Research Focus
 
-This project explores various approaches to identifying and testing for heteroskedasticity in econometric models, with particular attention to modern identification strategies.
+This project explores various approaches to identifying and testing for heteroskedasticity in econometric models, with particular attention to modern identification strategies. The package aims to provide:
+
+- Implementation of Lewbel (2012) methodology
+- Tools for heteroskedasticity testing
+- Methods for identification through heteroskedasticity
+- Time-series specific adaptations
+
+## Current Status
+
+The package is in early development. Current priorities include:
+- Implementing core Lewbel (2012) estimators
+- Adding comprehensive tests
+- Developing user-friendly vignettes
+- Creating simulation studies
+
+See the issues page on GitHub for specific development tasks.
 
 ## References
 
@@ -72,3 +151,7 @@ This project explores various approaches to identifying and testing for heterosk
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgments
+
+This package is part of ongoing research in econometric identification strategies.
