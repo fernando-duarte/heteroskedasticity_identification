@@ -100,15 +100,58 @@
 <div class="section level3">
 <h3 id="development-environment-setup">Development Environment Setup<a class="anchor" aria-label="anchor" href="#development-environment-setup"></a>
 </h3>
+<p>Choose your preferred development environment:</p>
+<div class="section level4">
+<h4 id="option-1-github-codespaces-recommended-for-quick-start-️">Option 1: GitHub Codespaces (Recommended for Quick Start) ☁️<a class="anchor" aria-label="anchor" href="#option-1-github-codespaces-recommended-for-quick-start-%EF%B8%8F"></a>
+</h4>
+<p><strong>Zero setup required</strong> - fully configured cloud development environment:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Launch Codespace</strong>:
+<ul>
+<li>Click “Code” → “Codespaces” → “Create codespace on main”</li>
+<li>Wait 2-3 minutes for automatic setup</li>
+</ul>
+</li>
+<li>
+<strong>Start Developing</strong>:
+<ul>
+<li>RStudio Server auto-opens on port 8787</li>
+<li>Package pre-loaded and ready to use</li>
+<li>All tools and dependencies included</li>
+</ul>
+</li>
+</ol>
+<p><strong>Features</strong>: RStudio Server, VS Code, R 4.5.0, all dependencies, Git integration, Docker support</p>
+</div>
+<div class="section level4">
+<h4 id="option-2-local-docker-development-">Option 2: Local Docker Development 🐳<a class="anchor" aria-label="anchor" href="#option-2-local-docker-development-"></a>
+</h4>
+<p><strong>Consistent environment</strong> across all machines:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Prerequisites</strong>: Docker Engine 28.0+ and docker-compose</p></li>
+<li>
+<p><strong>Quick Start</strong>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/fernando-duarte/heteroskedasticity_identification.git</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="bu">cd</span> heteroskedasticity_identification</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">make</span> dev-start  <span class="co"># Launches RStudio at http://localhost:8787</span></span></code></pre></div>
+</li>
+</ol>
+<p>See <a href="DOCKER.html">DOCKER.md</a> for comprehensive Docker documentation.</p>
+</div>
+<div class="section level4">
+<h4 id="option-3-local-r-installation-">Option 3: Local R Installation 💻<a class="anchor" aria-label="anchor" href="#option-3-local-r-installation-"></a>
+</h4>
+<p><strong>Traditional setup</strong> for local development:</p>
 <ol style="list-style-type: decimal">
 <li>
 <p><strong>Clone the repository</strong>:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/fernando-duarte/heteroskedasticity_identification.git</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="bu">cd</span> heteroskedasticity_identification</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/fernando-duarte/heteroskedasticity_identification.git</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="bu">cd</span> heteroskedasticity_identification</span></code></pre></div>
 </li>
 <li>
 <p><strong>Install development dependencies</strong>:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Install devtools if not already installed</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
 <span></span>
@@ -117,12 +160,19 @@
 </li>
 <li>
 <p><strong>Install pre-commit hooks</strong> (requires Python):</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="ex">pip</span> install pre-commit</span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="ex">pre-commit</span> install</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="ex">pip</span> install pre-commit</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="ex">pre-commit</span> install</span></code></pre></div>
 </li>
-<li><p><strong>(Optional) For Cursor AI users</strong>: The repository includes a <code>.cursorignore</code> file that prevents the AI from accessing sensitive files and improves performance by excluding large generated files.</p></li>
-<li><p><strong>(Optional) For Docker users</strong>: A <code>.dockerignore</code> file is included to optimize Docker builds.</p></li>
 </ol>
+</div>
+<div class="section level4">
+<h4 id="additional-tools">Additional Tools<a class="anchor" aria-label="anchor" href="#additional-tools"></a>
+</h4>
+<ul>
+<li>
+<strong>(Optional) For Cursor AI users</strong>: The repository includes a <code>.cursorignore</code> file that prevents the AI from accessing sensitive files and improves performance by excluding large generated files.</li>
+</ul>
+</div>
 </div>
 <div class="section level3">
 <h3 id="code-quality-tools">Code Quality Tools<a class="anchor" aria-label="anchor" href="#code-quality-tools"></a>
@@ -144,7 +194,7 @@
 </h3>
 <p>The pre-commit hooks will automatically: - Format R code using the tidyverse style guide (<code>styler</code>) - Check for code quality issues (<code>lintr</code>) - Check spelling - Ensure R code is parsable - Remove trailing whitespace and fix file endings - Prevent committing large files or common R artifacts - Sort entries in <code>.Rbuildignore</code></p>
 <p>To manually run hooks on all files:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="ex">pre-commit</span> run <span class="at">--all-files</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="ex">pre-commit</span> run <span class="at">--all-files</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="ignore-files">Ignore Files<a class="anchor" aria-label="anchor" href="#ignore-files"></a>
@@ -165,11 +215,111 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>(To be expanded as more functions are implemented)</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="section level3">
+<h3 id="github-codespaces-easiest-️">GitHub Codespaces (Easiest) ☁️<a class="anchor" aria-label="anchor" href="#github-codespaces-easiest-%EF%B8%8F"></a>
+</h3>
+<p><strong>Zero-setup cloud development</strong>:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Launch</strong>: Click “Code” → “Codespaces” → “Create codespace”</li>
+<li>
+<strong>Access RStudio</strong>: Click port 8787 in VS Code Ports tab</li>
+<li>
+<strong>Start coding</strong>: Package pre-loaded, all tools ready</li>
+</ol>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># In Codespaces terminal - helpful shortcuts available:</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="ex">hetid_demo</span>    <span class="co"># Run package demonstration</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="ex">hetid_test</span>    <span class="co"># Run comprehensive tests</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="ex">hetid_sim</span>     <span class="co"># Run quick Monte Carlo simulation</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="ex">rdev</span>          <span class="co"># Load package in development mode</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="local-installation">Local Installation<a class="anchor" aria-label="anchor" href="#local-installation"></a>
+</h3>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/fernando-duarte/heteroskedasticity_identification" class="external-link">hetid</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Example usage will be added as functions are developed</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="docker-usage-recommended-for-local-development">Docker Usage (Recommended for Local Development)<a class="anchor" aria-label="anchor" href="#docker-usage-recommended-for-local-development"></a>
+</h3>
+<p>The package includes a complete Docker setup with 2025 best practices for easy development and deployment.</p>
+<div class="section level4">
+<h4 id="quick-start-guide">Quick Start Guide<a class="anchor" aria-label="anchor" href="#quick-start-guide"></a>
+</h4>
+<p><strong>Prerequisites</strong>: Docker Engine 28.0+ and docker-compose</p>
+<ol style="list-style-type: decimal">
+<li>
+<p><strong>Start Development Environment</strong>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">make</span> dev-start</span></code></pre></div>
+<p>This launches RStudio Server at <a href="http://localhost:8787" class="external-link uri">http://localhost:8787</a> with the package pre-loaded.</p>
+</li>
+<li>
+<p><strong>Run Package Tests</strong>:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">make</span> test</span></code></pre></div>
+</li>
+<li>
+<p><strong>Execute Monte Carlo Simulations</strong>:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Quick simulation (100 iterations)</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">make</span> simulation-quick</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co"># Full simulation (1000 iterations)</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="fu">make</span> simulation</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co"># Sensitivity analysis</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="fu">make</span> simulation-sensitivity</span></code></pre></div>
+</li>
+<li>
+<p><strong>Interactive Development</strong>:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Open R console in container</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">make</span> dev-r</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co"># Open bash shell</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="fu">make</span> dev-shell</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co"># View logs</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="fu">make</span> dev-logs</span></code></pre></div>
+</li>
+<li>
+<p><strong>Stop Environment</strong>:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">make</span> dev-stop</span></code></pre></div>
+</li>
+</ol>
+</div>
+<div class="section level4">
+<h4 id="alternative-commands">Alternative Commands<a class="anchor" aria-label="anchor" href="#alternative-commands"></a>
+</h4>
+<p>If you prefer direct Docker commands:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Development with RStudio</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="ex">docker-compose</span> <span class="at">-f</span> docker-compose.yml <span class="at">-f</span> docker-compose.dev.yml up <span class="at">-d</span> hetid-dev</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co"># Run production simulation</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">--rm</span> hetid:latest R <span class="at">-e</span> <span class="st">"library(hetid); run_lewbel_monte_carlo()"</span></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co"># Build production image</span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> hetid:latest <span class="at">--target</span> production .</span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="docker-features">Docker Features<a class="anchor" aria-label="anchor" href="#docker-features"></a>
+</h4>
+<ul>
+<li>
+<strong>Multi-stage builds</strong> for optimized production images</li>
+<li>
+<strong>RStudio Server</strong> for interactive development</li>
+<li>
+<strong>Parallel processing</strong> optimized for simulations</li>
+<li>
+<strong>Automated testing</strong> and quality checks</li>
+<li>
+<strong>Security hardened</strong> with non-root users</li>
+<li>
+<strong>Multi-platform</strong> support (AMD64/ARM64)</li>
+</ul>
+<p>See <a href="DOCKER.html">DOCKER.md</a> for comprehensive documentation, troubleshooting, and advanced usage.</p>
+</div>
+</div>
 </div>
 <div class="section level2">
 <h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
