@@ -4,13 +4,13 @@ test_that("verify_lewbel_assumptions error handling works", {
   # Test with missing parameters
   expect_error(
     verify_lewbel_assumptions(),
-    "Must provide either \\(data, config\\) or \\(n, params\\)"
+    "Must provide either \\(data, config\\) or \\(n_obs, params\\)"
   )
 
   # Test with incomplete parameters
   expect_error(
-    verify_lewbel_assumptions(n = 100),
-    "Must provide either \\(data, config\\) or \\(n, params\\)"
+    verify_lewbel_assumptions(n_obs = 100),
+    "Must provide either \\(data, config\\) or \\(n_obs, params\\)"
   )
 })
 
@@ -48,8 +48,8 @@ test_that("create_default_config with extreme values works", {
   expect_equal(config_small$num_simulations, 1)
 
   # Test with very small sample size
-  config_tiny_n <- create_default_config(n = 10)
-  expect_equal(config_tiny_n$n, 10)
+  config_tiny_n <- create_default_config(main_sample_size = 10)
+  expect_equal(config_tiny_n$main_sample_size, 10)
 })
 
 test_that("generate_seed_matrix with edge cases works", {
@@ -99,7 +99,7 @@ test_that("analysis functions handle minimal data", {
 
 test_that("print functions handle various input types", {
   # Test print_simulation_summary with different verbose types
-  expect_silent(print_simulation_summary(verbose = c(TRUE, FALSE))) # Vector input
-  expect_silent(print_simulation_summary(verbose = list(TRUE))) # List input
+  expect_output(print_simulation_summary(verbose = c(TRUE, FALSE))) # Vector input
+  expect_output(print_simulation_summary(verbose = list(TRUE))) # List input
   expect_silent(print_simulation_summary(verbose = 1)) # Numeric input
 })
