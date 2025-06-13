@@ -170,3 +170,11 @@ Rbuildignore
 roxygen
 testthat
 tidyverse
+heteroskedastic
+γ
+fontface
+png
+rect
+ymax
+ymin
+dplyr
