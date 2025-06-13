@@ -6,3 +6,4 @@ monitor_pr_checks.sh
 check_monitor_status.sh
 pr_logs/
 monitor.log
+..Rcheck
