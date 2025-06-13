@@ -1,0 +1,192 @@
+# Cursor AI ignore file - Updated June 2025
+# This file makes a best-effort attempt to exclude files from both AI features and indexing
+# Syntax follows .gitignore patterns
+
+### Security - Sensitive files to exclude from AI ###
+# Environment and secrets
+.env
+.env.*
+.Renviron
+.Renviron.*
+*.key
+*.pem
+*.pfx
+*.p12
+.secrets/
+credentials/
+config/secrets.*
+auth/
+
+# API keys and tokens
+.httr-oauth
+*.token
+*_token.*
+*_key.*
+*_secret.*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+### Performance - Large/generated files to exclude ###
+# Build outputs
+*.tar.gz
+*.Rcheck/
+docs/
+pkgdown/
+_book/
+_site/
+dist/
+build/
+*.Rproj.user/
+
+# Large data files
+*.RData
+*.rds
+*.Rds
+*.csv
+*.tsv
+*.xlsx
+*.xls
+data-raw/
+inst/extdata/
+
+# Cache and temporary files
+*_cache/
+*_files/
+*.utf8.md
+*.knit.md
+.cache/
+tmp/
+temp/
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Dependencies
+renv/
+packrat/
+node_modules/
+venv/
+.venv/
+__pycache__/
+
+### Binary and compiled files ###
+*.so
+*.o
+*.dll
+*.dylib
+*.exe
+*.out
+*.app
+*.pyc
+*.pyo
+
+### Media files ###
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.ico
+*.mp4
+*.mp3
+*.wav
+*.pdf
+
+### Archives ###
+*.zip
+*.tar
+*.gz
+*.bz2
+*.7z
+*.rar
+
+### Version control ###
+.git/
+.svn/
+.hg/
+
+### IDE and editor files ###
+.idea/
+.vscode/
+*.sublime-*
+.project
+.settings/
+
+### OS-specific files ###
+.DS_Store
+Thumbs.db
+desktop.ini
+.Trash-*
+
+### LaTeX build files ###
+*.aux
+*.log
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+*.toc
+
+### Logs and reports ###
+*.log
+logs/
+*.Rout
+*.Rout.save
+
+### Test outputs ###
+tests/testthat/_snaps/
+test-results/
+junit/
+
+### Documentation source that's not useful for AI ###
+man/*.Rd
+inst/doc/*.R
+vignettes/*.R
+
+### Project-specific exclusions ###
+lewbel2012/
+pr_logs/
+monitor_pr_checks.sh
+check_monitor_status.sh
+enable_github_pages.sh
+setup_env.sh
+
+### Development planning/notes (local only) ###
+code_to_do.md
+TODO.txt
+TODO.md
+notes.md
+notes.txt
+scratch/
+misc/
+planning/
+planning.md
+ideas.md
+ideas.txt
+diary.md
+journal.md
+local-todo.md
+.notes/
+
+### Pre-commit and CI/CD ###
+.pre-commit-config*.yaml
+.github/workflows/
+.gitlab-ci.yml
+.travis.yml
+appveyor.yml
+
+### Backup files ###
+*.bak
+*.backup
+*.tmp
+*.temp
+*~
+\#*\#
+.#*

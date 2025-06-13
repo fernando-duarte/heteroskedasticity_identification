@@ -1,0 +1,138 @@
+# Pre-commit configuration using local R hooks
+# This bypasses the renv isolation issues by using your system R installation
+repos:
+# Local R hooks that use system R (with digest 0.6.37)
+- repo: local
+  hooks:
+    # Style files using styler
+    - id: style-files
+      name: Style R files
+      entry: Rscript inst/hooks/style-files.R
+      language: system
+      files: '\.(R|r|Rmd|rmd|Rnw|rnw|Rprofile|qmd)$'
+      exclude: |
+        (?x)^(
+          renv/.*|
+          packrat/.*|
+          \.Rprofile
+        )$
+
+    # Run lintr
+    - id: lintr
+      name: Lint R files
+      entry: Rscript inst/hooks/lintr.R
+      language: system
+      files: '\.(R|r|Rmd|rmd|Rnw|rnw)$'
+      exclude: |
+        (?x)^(
+          renv/.*|
+          packrat/.*
+        )$
+
+    # Check if R code is parsable
+    - id: parsable-R
+      name: Check R parsable
+      entry: Rscript inst/hooks/parsable-R.R
+      language: system
+      files: '\.(R|r)$'
+
+    # Update roxygen documentation
+    - id: roxygenize
+      name: Update roxygen documentation
+      entry: Rscript inst/hooks/roxygenize.R
+      language: system
+      files: '\.(R|r)$'
+      pass_filenames: false
+
+    # Keep DESCRIPTION tidy
+    - id: use-tidy-description
+      name: Tidy DESCRIPTION
+      entry: Rscript inst/hooks/use-tidy-description.R
+      language: system
+      files: '^DESCRIPTION$'
+      pass_filenames: false
+
+    # Spell check
+    - id: spell-check
+      name: Spell check
+      entry: Rscript inst/hooks/spell-check.R
+      language: system
+      files: '\.(R|r|Rmd|rmd|Rnw|rnw|md)$'
+      exclude: |
+        (?x)^(
+          .*\\.Rproj|
+          NAMESPACE|
+          data/.*|
+          man/.*|
+          tests/testthat/_snaps/.*
+        )$
+
+    # Ensure README.Rmd and README.md are in sync
+    - id: readme-rmd-rendered
+      name: Check README.Rmd rendered
+      entry: Rscript inst/hooks/readme-rmd-rendered.R
+      language: system
+      files: '^README\.(Rmd|md)$'
+      pass_filenames: false
+
+        # No browser() statements
+    - id: no-browser-statement
+      name: Check for browser()
+      entry: Rscript inst/hooks/no-browser-statement.R
+      language: system
+      files: '\.(R|r|Rmd|rmd|Rnw|rnw)$'
+      exclude: |
+        (?x)^(
+          inst/hooks/.*
+        )$
+
+    # No debug() statements
+    - id: no-debug-statement
+      name: Check for debug()
+      entry: Rscript inst/hooks/no-debug-statement.R
+      language: system
+      files: '\.(R|r|Rmd|rmd|Rnw|rnw)$'
+      exclude: |
+        (?x)^(
+          inst/hooks/.*
+        )$
+
+    # Check dependencies are in DESCRIPTION
+    - id: deps-in-desc
+      name: Check dependencies in DESCRIPTION
+      entry: Rscript inst/hooks/deps-in-desc.R
+      language: system
+      files: '^R/.*\.(R|r)$'
+
+    # Don't commit common R artifacts
+    - id: forbid-to-commit
+      name: Don't commit common R artifacts
+      entry: Cannot commit .Rhistory, .RData, .Rds or .rds
+      language: fail
+      files: '\.(Rhistory|RData|Rds|rds)$'
+      exclude: |
+        (?x)^(
+          inst/extdata/.*|
+          data/.*
+        )$
+
+# Standard pre-commit hooks (these work fine)
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+    - id: trailing-whitespace
+    - id: end-of-file-fixer
+      exclude: '\.Rd'
+    - id: check-case-conflict
+    - id: check-merge-conflict
+    - id: check-yaml
+    - id: check-added-large-files
+      args: ['--maxkb=1000']
+    - id: mixed-line-ending
+      args: ['--fix=lf']
+    - id: file-contents-sorter
+      files: '^\.Rbuildignore$'
+
+# pre-commit CI config
+ci:
+  autoupdate_schedule: monthly

@@ -1,23 +1,19 @@
 Package: hetid
-Title: A package for identification through heteroskedasticity a la Lewbel (2012)
+Title: A package for identification through heteroskedasticity a la Lewbel
+    (2012)
 Version: 0.1.0
-Author: Fernando Duarte <duarte@alum.mit.edu>
-Maintainer: Fernando Duarte <duarte@alum.mit.edu>
-Authors@R: person("Fernando", "Duarte",
-                      email = "duarte@alum.mit.edu",
-                      role = c("aut", "cre"))
-Description: This package implements the identification through heteroskedasticity 
-    method of Lewbel (2012) for time-series models with endogenous regressors. 
-    It provides tools for estimation and inference when traditional instruments 
-    are not available.
+Authors@R:
+    person("Fernando", "Duarte", , "duarte@alum.mit.edu", role = c("aut", "cre"))
+Description: This package implements the identification through
+    heteroskedasticity method of Lewbel (2012) for time-series models with
+    endogenous regressors.  It provides tools for estimation and inference
+    when traditional instruments are not available.
 License: MIT + file LICENSE
-Encoding: UTF-8
-LazyData: true
-Roxygen: list(markdown = TRUE)
 URL: https://github.com/fernando-duarte/heteroskedasticity_identification
-BugReports: https://github.com/fernando-duarte/heteroskedasticity_identification/issues
-Depends: R (>= 4.1)
-biocViews:
+BugReports:
+    https://github.com/fernando-duarte/heteroskedasticity_identification/issues
+Depends:
+    R (>= 4.2)
 Imports:
     AER,
     boot,
@@ -33,8 +29,13 @@ Imports:
     tidyr,
     utils
 Suggests:
-    testthat (>= 3.0.0),
-    rmarkdown
-RoxygenNote: 7.3.2
-VignetteBuilder: knitr
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+VignetteBuilder:
+    knitr
 Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2

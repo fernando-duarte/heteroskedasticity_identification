@@ -15,18 +15,21 @@
 messager <- function(...,
                      v = Sys.getenv("VERBOSE") != "FALSE",
                      parallel = FALSE) {
-
   message_parallel <- function(...) {
     system(sprintf('echo "%s"', paste0(..., collapse = "")))
   }
   if (isTRUE(parallel)) {
-    if (v) try({
-      message_parallel(...)
-    })
+    if (v) {
+      try({
+        message_parallel(...)
+      })
+    }
   } else {
     msg <- paste(...)
-    if (v) try({
-      message(msg)
-    })
+    if (v) {
+      try({
+        message(msg)
+      })
+    }
   }
 }
