@@ -1,0 +1,198 @@
+# Docker ignore file for R package - Updated June 2025
+# Reduces build context size and improves security
+
+### Version control ###
+.git/
+.gitignore
+.gitattributes
+.svn/
+.hg/
+
+### Development files ###
+.github/
+.gitlab/
+.travis.yml
+appveyor.yml
+.circleci/
+azure-pipelines.yml
+
+### R development ###
+.Rproj.user/
+*.Rproj
+.Rhistory
+.RData
+.Ruserdata
+.Rapp.history
+
+### Documentation (unless needed in container) ###
+README.md
+README.Rmd
+README.html
+NEWS.md
+NEWS
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+TODO.md
+TODO
+CHANGELOG.md
+*.Rmd
+vignettes/
+docs/
+pkgdown/
+_pkgdown.yml
+man/*.Rd
+
+### Testing ###
+tests/
+testthat/
+test/
+spec/
+coverage/
+.coverage
+htmlcov/
+
+### IDE and editors ###
+.vscode/
+.idea/
+*.sublime-*
+.project
+.settings/
+*.swp
+*.swo
+*~
+.#*
+\#*\#
+
+### Package management ###
+renv/
+packrat/
+.Rprofile
+
+### Build artifacts ###
+*.tar.gz
+*.Rcheck/
+dist/
+build/
+*.log
+
+### Cache and temporary files ###
+*_cache/
+*_files/
+.cache/
+tmp/
+temp/
+*.tmp
+*.temp
+*.bak
+*.backup
+
+### OS files ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+### Environment and secrets ###
+.env
+.env.*
+.Renviron
+.Renviron.*
+*.key
+*.pem
+*.pfx
+*.p12
+.secrets/
+credentials/
+
+### Large data files (unless needed) ###
+*.RData
+*.rds
+*.Rds
+data-raw/
+*.csv
+*.tsv
+*.xlsx
+*.xls
+
+### Binary files ###
+*.so
+*.o
+*.dll
+*.dylib
+*.exe
+*.out
+*.app
+
+### Media files ###
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.ico
+*.mp4
+*.mp3
+*.wav
+*.pdf
+
+### Archives ###
+*.zip
+*.tar
+*.gz
+*.bz2
+*.7z
+*.rar
+
+### LaTeX ###
+*.aux
+*.log
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+*.toc
+
+### Python (if using reticulate) ###
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+pip-log.txt
+
+### Node.js (if using htmlwidgets) ###
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+### Project-specific ###
+lewbel2012/
+pr_logs/
+monitor_pr_checks.sh
+check_monitor_status.sh
+enable_github_pages.sh
+setup_env.sh
+code_to_do.md
+
+### Pre-commit ###
+.pre-commit-config*.yaml
+.lintr
+
+### Cursor AI ###
+.cursorrules
+.cursorignore
+
+### Additional Docker-specific ignores ###
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+*.pid
+*.seed
+*.pid.lock
