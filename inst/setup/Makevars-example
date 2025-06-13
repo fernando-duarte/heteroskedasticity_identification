@@ -1,0 +1,20 @@
+# ~/.R/Makevars configuration for macOS
+# This fixes R package compilation issues with modern Clang
+
+# Suppress implicit function declaration errors
+CFLAGS = -Wno-implicit-function-declaration
+CXXFLAGS = -Wno-implicit-function-declaration
+
+# For M1/M2 Macs, you might also need:
+# FC = /opt/homebrew/bin/gfortran
+# F77 = /opt/homebrew/bin/gfortran
+# FLIBS = -L/opt/homebrew/lib/gcc/13
+
+# Alternative if you have Homebrew GCC installed:
+# CC = /opt/homebrew/bin/gcc-13
+# CXX = /opt/homebrew/bin/g++-13
+
+# For Intel Macs with older gfortran:
+# FC = /usr/local/gfortran/bin/gfortran
+# F77 = /usr/local/gfortran/bin/gfortran
+# FLIBS = -L/usr/local/gfortran/lib 

@@ -58,6 +58,23 @@ devtools::test()
 devtools::document()
 ```
 
+#### Pre-commit Hooks
+
+This project uses pre-commit hooks to maintain code quality. After cloning:
+
+```bash
+# Install pre-commit (requires Python)
+pip install pre-commit
+
+# Install the git hooks
+pre-commit install
+
+# (Optional) Run hooks on all files to check
+pre-commit run --all-files
+```
+
+The hooks will automatically format your code and check for common issues before each commit.
+
 ### 5. Commit Your Changes
 
 ```bash
@@ -94,7 +111,8 @@ Include:
 ### PR Checklist
 
 Before submitting, ensure:
-- [ ] Code follows tidyverse style guide
+- [ ] Pre-commit hooks pass (`pre-commit run --all-files`)
+- [ ] Code follows tidyverse style guide (enforced by styler)
 - [ ] All tests pass (`devtools::test()`)
 - [ ] R CMD check passes (`devtools::check()`)
 - [ ] Documentation is updated
@@ -157,4 +175,4 @@ If you need help:
 
 Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
-Thank you for contributing! 🎉 
+Thank you for contributing! 🎉
