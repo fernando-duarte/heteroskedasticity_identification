@@ -49,7 +49,7 @@ errors for the bounds.</p>
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calculate_lewbel_bounds</span><span class="op">(</span><span class="va">data</span>, <span class="va">tau</span>, compute_se <span class="op">=</span> <span class="cn">FALSE</span>, B <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calculate_lewbel_bounds</span><span class="op">(</span><span class="va">data</span>, <span class="va">tau</span>, compute_se <span class="op">=</span> <span class="cn">FALSE</span>, b_reps <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -61,26 +61,30 @@ errors for the bounds.</p>
 
 
 <dt id="arg-tau">tau<a class="anchor" aria-label="anchor" href="#arg-tau"></a></dt>
-<dd><p>Numeric. Relaxation parameter for covariance restriction (0 &lt;= tau &lt; 1).
-When tau = 0, gives point identification.</p></dd>
+<dd><p>Numeric. Relaxation parameter for covariance restriction
+(0 &lt;= tau &lt; 1). When tau = 0, gives point identification.</p></dd>
 
 
 <dt id="arg-compute-se">compute_se<a class="anchor" aria-label="anchor" href="#arg-compute-se"></a></dt>
-<dd><p>Logical. Whether to compute bootstrap standard errors (default: FALSE).</p></dd>
+<dd><p>Logical. Whether to compute bootstrap standard errors
+(default: FALSE).</p></dd>
 
 
-<dt id="arg-b">B<a class="anchor" aria-label="anchor" href="#arg-b"></a></dt>
-<dd><p>Integer. Number of bootstrap replications if compute_se = TRUE (default: 100).</p></dd>
+<dt id="arg-b-reps">b_reps<a class="anchor" aria-label="anchor" href="#arg-b-reps"></a></dt>
+<dd><p>Integer. Number of bootstrap replications if compute_se = TRUE
+(default: 100).</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A list containing:</p><ul><li><p>bounds: Numeric vector of length 2 with lower and upper bounds</p></li>
-<li><p>se: Numeric vector of length 2 with bootstrap standard errors (if requested)</p></li>
+<li><p>se: Numeric vector of length 2 with bootstrap standard errors
+(if requested)</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Under the relaxed assumption |Corr(Z, \(\epsilon_1 \epsilon_2\))| &lt;= tau |Corr(Z, \(\epsilon_2^2\))|,
+    <p>Under the relaxed assumption
+|Corr(Z, \(\epsilon_1 \epsilon_2\))| &lt;= tau |Corr(Z, \(\epsilon_2^2\))|,
 the parameter gamma_1 is set-identified. The bounds are computed as the
 real roots of a quadratic equation in gamma_1.</p>
     </div>
@@ -93,13 +97,18 @@ real roots of a quadratic equation in gamma_1.</p>
 <span class="r-in"><span>  beta2_0 <span class="op">=</span> <span class="fl">1.0</span>, beta2_1 <span class="op">=</span> <span class="op">-</span><span class="fl">1.0</span>,</span></span>
 <span class="r-in"><span>  alpha1 <span class="op">=</span> <span class="op">-</span><span class="fl">0.5</span>, alpha2 <span class="op">=</span> <span class="fl">1.0</span>, delta_het <span class="op">=</span> <span class="fl">1.2</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># TODO: Update generate_lewbel_data call if its return columns change to</span></span></span>
+<span class="r-in"><span><span class="co"># snake_case</span></span></span>
 <span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="generate_lewbel_data.html">generate_lewbel_data</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="va">params</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Point identification (tau = 0)</span></span></span>
 <span class="r-in"><span><span class="va">bounds_point</span> <span class="op">&lt;-</span> <span class="fu">calculate_lewbel_bounds</span><span class="op">(</span><span class="va">data</span>, tau <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Set identification with bootstrap SE</span></span></span>
-<span class="r-in"><span><span class="va">bounds_set</span> <span class="op">&lt;-</span> <span class="fu">calculate_lewbel_bounds</span><span class="op">(</span><span class="va">data</span>, tau <span class="op">=</span> <span class="fl">0.2</span>, compute_se <span class="op">=</span> <span class="cn">TRUE</span>, B <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bounds_set</span> <span class="op">&lt;-</span> <span class="fu">calculate_lewbel_bounds</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">data</span>,</span></span>
+<span class="r-in"><span>  tau <span class="op">=</span> <span class="fl">0.2</span>, compute_se <span class="op">=</span> <span class="cn">TRUE</span>, b_reps <span class="op">=</span> <span class="fl">100</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>

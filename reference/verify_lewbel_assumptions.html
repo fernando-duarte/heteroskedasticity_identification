@@ -52,7 +52,7 @@ the covariance restriction and instrument relevance condition.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">verify_lewbel_assumptions</span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  config <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  n <span class="op">=</span> <span class="fl">10000</span>,</span>
+<span>  n_obs <span class="op">=</span> <span class="fl">10000</span>,</span>
 <span>  params <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -63,19 +63,23 @@ the covariance restriction and instrument relevance condition.</p>
 
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>Data.frame. Optional. Pre-generated data to verify (alternative to n/params).</p></dd>
+<dd><p>Data.frame. Optional. Pre-generated data to verify (alternative
+to n_obs/params).</p></dd>
 
 
 <dt id="arg-config">config<a class="anchor" aria-label="anchor" href="#arg-config"></a></dt>
-<dd><p>List. Optional. Configuration object (used with data parameter).</p></dd>
+<dd><p>List. Optional. Configuration object (used with data
+parameter).</p></dd>
 
 
-<dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
-<dd><p>Integer. Sample size for verification (default: 10000, used with params).</p></dd>
+<dt id="arg-n-obs">n_obs<a class="anchor" aria-label="anchor" href="#arg-n-obs"></a></dt>
+<dd><p>Integer. Sample size for verification (default: 10000, used
+with params).</p></dd>
 
 
 <dt id="arg-params">params<a class="anchor" aria-label="anchor" href="#arg-params"></a></dt>
-<dd><p>List. Parameters for the DGP (same format as generate_lewbel_data).</p></dd>
+<dd><p>List. Parameters for the DGP (same format as
+generate_lewbel_data).</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
@@ -88,11 +92,13 @@ the covariance restriction and instrument relevance condition.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The function tests:</p><ul><li><p>Assumption A2: Cov(Z, \(\epsilon_1 \epsilon_2\)) = 0 (covariance restriction)</p></li>
+    <p>The function tests:</p><ul><li><p>Assumption A2: Cov(Z, \(\epsilon_1 \epsilon_2\)) = 0 (covariance
+restriction)</p></li>
 <li><p>Assumption A3: Cov(Z, \(\epsilon_2^2\)) != 0 (instrument relevance)</p></li>
 <li><p>Endogeneity: Cov(\(\epsilon_1\), \(\epsilon_2\)) != 0</p></li>
 </ul><p>Can be called in two ways:</p><ol><li><p>verify_lewbel_assumptions(data, config) - using pre-generated data</p></li>
-<li><p>verify_lewbel_assumptions(n = 10000, params = params) - generating new data</p></li>
+<li><p>verify_lewbel_assumptions(n_obs = 10000, params = params) - generating
+new data</p></li>
 </ol></div>
 
     <div class="section level2">
@@ -102,7 +108,8 @@ the covariance restriction and instrument relevance condition.</p>
 <span class="r-in"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  beta1_0 <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">beta1_0</span>, beta1_1 <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">beta1_1</span>, gamma1 <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">gamma1</span>,</span></span>
 <span class="r-in"><span>  beta2_0 <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">beta2_0</span>, beta2_1 <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">beta2_1</span>,</span></span>
-<span class="r-in"><span>  alpha1 <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">alpha1</span>, alpha2 <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">alpha2</span>, delta_het <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">delta_het</span></span></span>
+<span class="r-in"><span>  alpha1 <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">alpha1</span>, alpha2 <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">alpha2</span>,</span></span>
+<span class="r-in"><span>  delta_het <span class="op">=</span> <span class="va">config</span><span class="op">$</span><span class="va">delta_het</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">verify_lewbel_assumptions</span><span class="op">(</span>params <span class="op">=</span> <span class="va">params</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>

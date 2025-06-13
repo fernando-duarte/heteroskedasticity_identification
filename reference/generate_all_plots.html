@@ -96,7 +96,9 @@
 <span class="r-in"><span><span class="va">results_by_n</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_sample_size_analysis.html">run_sample_size_analysis</a></span><span class="op">(</span><span class="va">config</span>, <span class="va">seeds</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">results_by_delta</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_sensitivity_analysis.html">run_sensitivity_analysis</a></span><span class="op">(</span><span class="va">config</span>, <span class="va">seeds</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">bootstrap_demo</span> <span class="op">&lt;-</span> <span class="fu"><a href="run_bootstrap_demonstration.html">run_bootstrap_demonstration</a></span><span class="op">(</span><span class="va">config</span>, <span class="va">seeds</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">bootstrap_examples</span> <span class="op">&lt;-</span> <span class="fu"><a href="analyze_bootstrap_results.html">analyze_bootstrap_results</a></span><span class="op">(</span><span class="va">results_main</span>, <span class="va">bootstrap_demo</span>, <span class="va">config</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bootstrap_examples</span> <span class="op">&lt;-</span> <span class="fu"><a href="analyze_bootstrap_results.html">analyze_bootstrap_results</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="va">results_main</span>, <span class="va">bootstrap_demo</span>, <span class="va">config</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">plots</span> <span class="op">&lt;-</span> <span class="fu">generate_all_plots</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="va">results_main</span>, <span class="va">results_by_n</span>, <span class="va">results_by_delta</span>,</span></span>
