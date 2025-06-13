@@ -205,9 +205,7 @@ local-todo.md
 .cursorrules
 .cursorignore
 
-### Additional Docker-specific ignores ###
-Dockerfile*
-docker-compose*.yml
+### Additional ignores ###
 .dockerignore
 *.pid
 *.seed
