@@ -25,8 +25,12 @@ run_main_simulation <- function(config, seeds, verbose = TRUE) {
   # Set the base seed for reproducibility
   set.seed(seeds$main[1])
 
-  # Set up parallel processing
-  future::plan(future::multisession, workers = future::availableCores() - 1)
+  # Set up parallel processing (disable during testing)
+  if (Sys.getenv("TESTTHAT") == "true") {
+    future::plan(future::sequential)
+  } else {
+    future::plan(future::multisession, workers = future::availableCores() - 1)
+  }
 
   # Run main simulation with bootstrap for first few runs
   results <- furrr::future_map_dfr(
@@ -92,8 +96,12 @@ run_bootstrap_demonstration <- function(config, seeds, verbose = TRUE) {
   # Set the base seed for reproducibility
   set.seed(seeds$bootstrap_demo[1])
 
-  # Set up parallel processing
-  future::plan(future::multisession, workers = future::availableCores() - 1)
+  # Set up parallel processing (disable during testing)
+  if (Sys.getenv("TESTTHAT") == "true") {
+    future::plan(future::sequential)
+  } else {
+    future::plan(future::multisession, workers = future::availableCores() - 1)
+  }
 
   bootstrap_demo <- furrr::future_map_dfr(
     1:config$bootstrap_demo_size,
@@ -152,8 +160,12 @@ run_sample_size_analysis <- function(config, seeds, verbose = TRUE) {
     cat("\nRunning sample size consistency analysis...\n")
   }
 
-  # Set up parallel processing
-  future::plan(future::multisession, workers = future::availableCores() - 1)
+  # Set up parallel processing (disable during testing)
+  if (Sys.getenv("TESTTHAT") == "true") {
+    future::plan(future::sequential)
+  } else {
+    future::plan(future::multisession, workers = future::availableCores() - 1)
+  }
 
   results_by_n <- purrr::map2_dfr(
     config$sample_sizes, seq_along(config$sample_sizes),
@@ -224,8 +236,12 @@ run_sensitivity_analysis <- function(config, seeds, verbose = TRUE) {
     cat("\nRunning heteroscedasticity sensitivity analysis...\n")
   }
 
-  # Set up parallel processing
-  future::plan(future::multisession, workers = future::availableCores() - 1)
+  # Set up parallel processing (disable during testing)
+  if (Sys.getenv("TESTTHAT") == "true") {
+    future::plan(future::sequential)
+  } else {
+    future::plan(future::multisession, workers = future::availableCores() - 1)
+  }
 
   results_by_delta <- purrr::map2_dfr(
     config$delta_het_values, seq_along(config$delta_het_values),

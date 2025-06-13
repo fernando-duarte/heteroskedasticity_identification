@@ -3,12 +3,21 @@
 test_that("run_single_lewbel_simulation works", {
   config <- create_default_config()
 
-  single_sim <- run_single_lewbel_simulation(1, config)
+  params <- list(
+    sample_size = config$main_sample_size,
+    beta1_0 = config$beta1_0, beta1_1 = config$beta1_1, gamma1 = config$gamma1,
+    beta2_0 = config$beta2_0, beta2_1 = config$beta2_1,
+    alpha1 = config$alpha1, alpha2 = config$alpha2,
+    delta_het = config$delta_het, tau_set_id = config$tau_set_id,
+    bootstrap_reps = config$bootstrap_reps
+  )
+
+  single_sim <- run_single_lewbel_simulation(1, params)
 
   expect_type(single_sim, "list")
   expect_true(all(c(
-    "ols_gamma1", "tsls_gamma1", "first_stage_F", "set_id_lower",
-    "set_id_upper", "set_id_width", "point_in_set"
+    "ols_gamma1", "tsls_gamma1", "first_stage_F", "bound_lower_tau_set",
+    "bound_upper_tau_set"
   ) %in% names(single_sim)))
   expect_type(single_sim$ols_gamma1, "double")
   expect_type(single_sim$tsls_gamma1, "double")
@@ -69,9 +78,9 @@ test_that("run_bootstrap_demonstration works", {
   })
 
   expect_s3_class(bootstrap_demo, "data.frame")
-  expect_true("bootstrap_rep" %in% names(bootstrap_demo))
-  expect_true(nrow(bootstrap_demo) >= 10) # At least 2 demo_size * 5 bootstrap_reps
-  expect_true(all(c("set_id_lower", "set_id_upper") %in% names(bootstrap_demo)))
+  expect_true(nrow(bootstrap_demo) >= 2) # At least bootstrap_demo_size
+  expect_true(all(c("bound_lower_tau_set", "bound_upper_tau_set") %in% names(bootstrap_demo)))
+  expect_true(all(c("bound_se_lower", "bound_se_upper") %in% names(bootstrap_demo)))
 })
 
 test_that("run_lewbel_demo works", {
@@ -80,7 +89,7 @@ test_that("run_lewbel_demo works", {
   })
 
   expect_type(demo_results, "list")
-  expect_true(all(c("main_results", "main_analysis") %in% names(demo_results)))
-  expect_s3_class(demo_results$main_results, "data.frame")
-  expect_type(demo_results$main_analysis, "list")
+  expect_true(all(c("results_main", "analysis") %in% names(demo_results)))
+  expect_s3_class(demo_results$results_main, "data.frame")
+  expect_type(demo_results$analysis, "list")
 })

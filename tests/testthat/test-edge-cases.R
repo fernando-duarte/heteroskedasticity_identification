@@ -48,8 +48,8 @@ test_that("create_default_config with extreme values works", {
   expect_equal(config_small$num_simulations, 1)
 
   # Test with very small sample size
-  config_tiny_n <- create_default_config(n = 10)
-  expect_equal(config_tiny_n$n, 10)
+  config_tiny_n <- create_default_config(main_sample_size = 10)
+  expect_equal(config_tiny_n$main_sample_size, 10)
 })
 
 test_that("generate_seed_matrix with edge cases works", {
@@ -70,8 +70,17 @@ test_that("simulation functions handle minimal configurations", {
   # Test with minimal simulation configuration
   config_minimal <- create_default_config(num_simulations = 1)
 
+  params_minimal <- list(
+    sample_size = config_minimal$main_sample_size,
+    beta1_0 = config_minimal$beta1_0, beta1_1 = config_minimal$beta1_1, gamma1 = config_minimal$gamma1,
+    beta2_0 = config_minimal$beta2_0, beta2_1 = config_minimal$beta2_1,
+    alpha1 = config_minimal$alpha1, alpha2 = config_minimal$alpha2,
+    delta_het = config_minimal$delta_het, tau_set_id = config_minimal$tau_set_id,
+    bootstrap_reps = config_minimal$bootstrap_reps
+  )
+
   # Test single simulation
-  single_result <- run_single_lewbel_simulation(1, config_minimal)
+  single_result <- run_single_lewbel_simulation(1, params_minimal)
   expect_type(single_result, "list")
   expect_true(all(c("ols_gamma1", "tsls_gamma1") %in% names(single_result)))
 
@@ -99,7 +108,11 @@ test_that("analysis functions handle minimal data", {
 
 test_that("print functions handle various input types", {
   # Test print_simulation_summary with different verbose types
-  expect_silent(print_simulation_summary(verbose = c(TRUE, FALSE))) # Vector input
-  expect_silent(print_simulation_summary(verbose = list(TRUE))) # List input
-  expect_silent(print_simulation_summary(verbose = 1)) # Numeric input
+  # These should produce output since they get converted to TRUE
+  expect_output(print_simulation_summary(verbose = c(TRUE, FALSE))) # Vector input
+  expect_output(print_simulation_summary(verbose = list(TRUE))) # List input
+  expect_output(print_simulation_summary(verbose = 1)) # Numeric input
+
+  # Test that FALSE still works as expected
+  expect_silent(print_simulation_summary(verbose = FALSE))
 })

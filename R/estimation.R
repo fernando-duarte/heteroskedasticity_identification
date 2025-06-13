@@ -198,22 +198,43 @@ run_single_lewbel_simulation <- function(sim_id, params,
           first_stage_f <- summary(first_stage)$fstatistic[1]
         }
 
-        # 2SLS estimation using AER::ivreg
-        iv_formula <- stats::as.formula(paste(
-          "Y1 ~", endog_var, "+", paste(exog_vars, collapse = " + "),
-          "|", paste(exog_vars, collapse = " + "), "+ lewbel_iv"
-        ))
-        tsls_model <- tryCatch(AER::ivreg(iv_formula, data = df),
-          error = function(e) NULL
-        )
+        # 2SLS estimation using manual implementation
+        tsls_model <- tryCatch({
+          # First stage: regress endogenous variable on instruments
+          first_stage_formula <- stats::as.formula(paste(
+            endog_var, "~", paste(exog_vars, collapse = " + "), "+ lewbel_iv"
+          ))
+          first_stage_model <- stats::lm(first_stage_formula, data = df)
+
+          # Get fitted values from first stage
+          df[[paste0(endog_var, "_fitted")]] <- stats::fitted(first_stage_model)
+
+          # Second stage: regress Y1 on fitted values and exogenous variables
+          second_stage_formula <- stats::as.formula(paste(
+            "Y1 ~", paste0(endog_var, "_fitted"), "+", paste(exog_vars, collapse = " + ")
+          ))
+          second_stage_model <- stats::lm(second_stage_formula, data = df)
+
+          # Create a simple list to mimic ivreg output
+          list(
+            coefficients = stats::coef(second_stage_model),
+            fitted.values = stats::fitted(second_stage_model),
+            residuals = stats::residuals(second_stage_model),
+            model = df,
+            first_stage = first_stage_model,
+            second_stage = second_stage_model
+          )
+        }, error = function(e) NULL)
 
         if (is.null(tsls_model)) {
           tsls_est <- NA
           tsls_se <- NA
           tsls_covers <- NA
         } else {
-          tsls_coef <- tryCatch(stats::coef(tsls_model)[endog_var], error = function(e) NA)
-          tsls_summary <- tryCatch(summary(tsls_model), error = function(e) NULL)
+          # Extract coefficient for the fitted endogenous variable
+          fitted_var_name <- paste0(endog_var, "_fitted")
+          tsls_coef <- tryCatch(stats::coef(tsls_model$second_stage)[fitted_var_name], error = function(e) NA)
+          tsls_summary <- tryCatch(summary(tsls_model$second_stage), error = function(e) NULL)
 
           if (is.na(tsls_coef) || is.null(tsls_summary)) {
             tsls_est <- NA
@@ -221,7 +242,7 @@ run_single_lewbel_simulation <- function(sim_id, params,
             tsls_covers <- NA
           } else {
             tsls_est <- tsls_coef
-            tsls_se <- tsls_summary$coefficients[endog_var, "Std. Error"]
+            tsls_se <- tsls_summary$coefficients[fitted_var_name, "Std. Error"]
             tsls_covers <- (params$gamma1 >= tsls_est - 1.96 * tsls_se &&
               params$gamma1 <= tsls_est + 1.96 * tsls_se)
           }

@@ -15,7 +15,6 @@ BugReports:
 Depends:
     R (>= 4.2)
 Imports:
-    AER,
     boot,
     dplyr,
     furrr,

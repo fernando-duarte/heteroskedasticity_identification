@@ -239,7 +239,7 @@ analyze_sensitivity_results <- function(results_by_delta, config, verbose = TRUE
 #' @export
 print_simulation_summary <- function(analysis = NULL, config = NULL, verbose = TRUE) {
   # Handle different calling patterns - ensure verbose is a single logical value
-  if (is.list(verbose) || length(verbose) > 1) {
+  if (is.list(verbose) || length(verbose) > 1 || !is.logical(verbose)) {
     verbose <- TRUE # Default to TRUE if verbose is not a single logical
   }
 

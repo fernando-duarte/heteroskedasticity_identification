@@ -35,10 +35,10 @@ test_that("verify_lewbel_assumptions with data and config works", {
 
   expect_type(verification, "list")
   expect_true(all(c(
-    "cov_Z_e1e2", "cov_Z_e2sq", "cov_e1_e2", "test_stat",
+    "cov_z_e1e2", "cov_z_e2sq", "cov_e1_e2", "test_stat",
     "p_value", "data"
   ) %in% names(verification)))
-  expect_type(verification$cov_Z_e1e2, "double")
+  expect_type(verification$cov_z_e1e2, "double")
   expect_type(verification$p_value, "double")
   expect_s3_class(verification$data, "data.frame")
 })
@@ -53,7 +53,7 @@ test_that("verify_lewbel_assumptions with params works", {
   verification <- verify_lewbel_assumptions(n = 100, params = params, verbose = FALSE)
 
   expect_type(verification, "list")
-  expect_true(all(c("cov_Z_e1e2", "cov_Z_e2sq", "cov_e1_e2") %in% names(verification)))
+  expect_true(all(c("cov_z_e1e2", "cov_z_e2sq", "cov_e1_e2") %in% names(verification)))
   expect_equal(nrow(verification$data), 100)
 })
 
