@@ -1,5 +1,5 @@
 name: rworkflows
-'on':
+on:
   push:
     branches:
     - master
@@ -38,9 +38,7 @@ jobs:
           cont: ~
           rspm: ~
     steps:
-      - name: Install R package dependencies
-        run: |
-          R -e "options(repos = c(CRAN = 'https://cloud.r-project.org')); install.packages(c('AER', 'tidyverse', 'knitr', 'future', 'furrr', 'boot'))"
+      - uses: actions/checkout@v4
       - uses: neurogenomics/rworkflows@master
         with:
           run_bioccheck: ${{ false }}
