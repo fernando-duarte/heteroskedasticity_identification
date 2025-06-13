@@ -52,13 +52,29 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="heteroskedasticity-identification">Heteroskedasticity Identification<a class="anchor" aria-label="anchor" href="#heteroskedasticity-identification"></a>
+<div class="page-header"><h1 id="hetid-heteroskedasticity-identification">hetid: Heteroskedasticity Identification<a class="anchor" aria-label="anchor" href="#hetid-heteroskedasticity-identification"></a>
 </h1></div>
-<p>This repository contains research on heteroskedasticity identification methods.</p>
+<!-- badges: start -->
+
+<div class="section level2">
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+</h2>
+<p>The <code>hetid</code> package implements the identification through heteroskedasticity method of Lewbel (2012) for time-series models with endogenous regressors. It provides tools for estimation and inference when traditional instruments are not available.</p>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>You can install the development version of hetid from GitHub with:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"fernando-duarte/heteroskedasticity_identification"</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level2">
 <h2 id="contents">Contents<a class="anchor" aria-label="anchor" href="#contents"></a>
 </h2>
 <ul>
+<li>
+<code>R/</code> - R functions implementing the methodology</li>
 <li>
 <code>lewbel2012/</code> - Implementation and analysis related to Lewbel (2012) methodology
 <ul>
@@ -69,7 +85,40 @@
 <li>Supporting files (<code>.aux</code>, <code>.log</code>, <code>.synctex.gz</code>)</li>
 </ul>
 </li>
+<li>
+<code>tests/</code> - Unit tests</li>
+<li>
+<code>vignettes/</code> - Package vignettes</li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
+</h2>
+<p>This package uses pre-commit hooks to ensure code quality and consistency.</p>
+<div class="section level3">
+<h3 id="setting-up-pre-commit-hooks">Setting up pre-commit hooks<a class="anchor" aria-label="anchor" href="#setting-up-pre-commit-hooks"></a>
+</h3>
+<ol style="list-style-type: decimal">
+<li>
+<p>Install pre-commit (requires Python):</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ex">pip</span> install pre-commit</span></code></pre></div>
+</li>
+<li>
+<p>Install the git hooks:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="ex">pre-commit</span> install</span></code></pre></div>
+</li>
+<li>
+<p>(Optional) Run hooks on all files:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="ex">pre-commit</span> run <span class="at">--all-files</span></span></code></pre></div>
+</li>
+</ol>
+<p>The pre-commit hooks will automatically: - Format R code using the tidyverse style guide (<code>styler</code>) - Check for code quality issues (<code>lintr</code>) - Check spelling - Ensure R code is parsable - Remove trailing whitespace and fix file endings - Prevent committing large files or common R artifacts</p>
+</div>
+<div class="section level3">
+<h3 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+</h3>
+<p>Please see <a href="CONTRIBUTING.html">CONTRIBUTING.md</a> for details on our code of conduct and the process for submitting pull requests.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="research-focus">Research Focus<a class="anchor" aria-label="anchor" href="#research-focus"></a>
@@ -77,16 +126,16 @@
 <p>This project explores various approaches to identifying and testing for heteroskedasticity in econometric models, with particular attention to modern identification strategies.</p>
 </div>
 <div class="section level2">
-<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
-</h2>
-<p>The main research documents are contained in the respective subdirectories. LaTeX files can be compiled using standard LaTeX distributions.</p>
-</div>
-<div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <ul>
 <li>Lewbel, A. (2012). Using heteroscedasticity to identify and estimate mismeasured and endogenous regressor models. <em>Journal of Business &amp; Economic Statistics</em>, 30(1), 67-80.</li>
 </ul>
+</div>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>This project is licensed under the MIT License - see the <a href="LICENSE">LICENSE</a> file for details.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -126,7 +175,13 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/rworkflows.yml" class="external-link"><img src="https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/rworkflows.yml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/pre-commit/pre-commit" class="external-link"><img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&amp;logoColor=white" alt="pre-commit"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>

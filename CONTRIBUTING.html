@@ -93,17 +93,30 @@
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="pre-commit-hooks">Pre-commit Hooks<a class="anchor" aria-label="anchor" href="#pre-commit-hooks"></a></h4>
+<p>This project uses pre-commit hooks to maintain code quality. After cloning:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Install pre-commit (requires Python)</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">pip</span> install pre-commit</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Install the git hooks</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="ex">pre-commit</span> install</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># (Optional) Run hooks on all files to check</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="ex">pre-commit</span> run <span class="at">--all-files</span></span></code></pre></div>
+<p>The hooks will automatically format your code and check for common issues before each commit.</p>
+</div>
 </div>
 <div class="section level3">
 <h3 id="id_5-commit-your-changes">5. Commit Your Changes<a class="anchor" aria-label="anchor" href="#id_5-commit-your-changes"></a></h3>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Stage and commit with a clear message</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">git</span> add .</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"Add feature: brief description of changes"</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Stage and commit with a clear message</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">git</span> add .</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"Add feature: brief description of changes"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="id_6-push-and-create-pull-request">6. Push and Create Pull Request<a class="anchor" aria-label="anchor" href="#id_6-push-and-create-pull-request"></a></h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Push to your fork</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">git</span> push origin feature/your-feature-name</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Push to your fork</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">git</span> push origin feature/your-feature-name</span></code></pre></div>
 <p>Then create a pull request on GitHub from your branch to <code>main</code>.</p>
 </div>
 </div>
@@ -119,7 +132,7 @@
 </div>
 <div class="section level3">
 <h3 id="pr-checklist">PR Checklist<a class="anchor" aria-label="anchor" href="#pr-checklist"></a></h3>
-<p>Before submitting, ensure: - [ ] Code follows tidyverse style guide - [ ] All tests pass (<code>devtools::test()</code>) - [ ] R CMD check passes (<code>devtools::check()</code>) - [ ] Documentation is updated - [ ] NEWS.md is updated (for user-facing changes) - [ ] Examples work correctly</p>
+<p>Before submitting, ensure: - [ ] Pre-commit hooks pass (<code>pre-commit run --all-files</code>) - [ ] Code follows tidyverse style guide (enforced by styler) - [ ] All tests pass (<code>devtools::test()</code>) - [ ] R CMD check passes (<code>devtools::check()</code>) - [ ] Documentation is updated - [ ] NEWS.md is updated (for user-facing changes) - [ ] Examples work correctly</p>
 </div>
 </div>
 <div class="section level2">
