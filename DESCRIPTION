@@ -1,6 +1,8 @@
 Package: hetid
 Title: A package for identification through heteroskedasticity a la Lewbel (2012)
 Version: 0.1.0
+Author: Fernando Duarte <duarte@alum.mit.edu>
+Maintainer: Fernando Duarte <duarte@alum.mit.edu>
 Authors@R: person("Fernando", "Duarte",
                       email = "duarte@alum.mit.edu",
                       role = c("aut", "cre"))
@@ -14,12 +16,24 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 URL: https://github.com/fernando-duarte/heteroskedasticity_identification
 BugReports: https://github.com/fernando-duarte/heteroskedasticity_identification/issues
-Depends: R (>= 4.2)
+Depends: R (>= 4.1)
 biocViews:
 Imports:
+    AER,
+    boot,
+    dplyr,
+    furrr,
+    future,
+    ggplot2,
+    knitr,
+    magrittr,
+    purrr,
+    rlang,
+    stats,
+    tidyr,
+    utils
 Suggests:
     testthat (>= 3.0.0),
-    knitr,
     rmarkdown
 RoxygenNote: 7.3.2
 VignetteBuilder: knitr
