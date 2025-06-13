@@ -20,6 +20,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="articles/getting-started.html">getting-started</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/fernando-duarte/heteroskedasticity_identification/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -71,52 +72,86 @@
 <span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">git</span> remote add upstream https://github.com/fernando-duarte/heteroskedasticity_identification.git</span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="id_2-create-a-feature-branch">2. Create a Feature Branch<a class="anchor" aria-label="anchor" href="#id_2-create-a-feature-branch"></a></h3>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Ensure your main branch is up to date</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">git</span> checkout main</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">git</span> pull upstream main</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># Create a new branch for your feature</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> feature/your-feature-name</span></code></pre></div>
+<h3 id="id_2-set-up-development-environment">2. Set Up Development Environment<a class="anchor" aria-label="anchor" href="#id_2-set-up-development-environment"></a></h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Install R package dependencies</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">-e</span> <span class="st">"devtools::install_deps(dependencies = TRUE)"</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># Install pre-commit (requires Python)</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="ex">pip</span> install pre-commit</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="ex">pre-commit</span> install</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># Verify setup</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="ex">pre-commit</span> run <span class="at">--all-files</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="development-tools">Development Tools<a class="anchor" aria-label="anchor" href="#development-tools"></a></h4>
+<p>The project uses several modern development tools:</p>
+<ul><li>
+<strong>Cursor AI</strong>: If using Cursor, the <code>.cursorignore</code> file prevents AI access to sensitive files</li>
+<li>
+<strong>Docker</strong>: Optional <code>.dockerignore</code> file is included for containerized development</li>
+<li>
+<strong>Pre-commit hooks</strong>: Automated code quality checks</li>
+</ul></div>
 </div>
 <div class="section level3">
-<h3 id="id_3-make-your-changes">3. Make Your Changes<a class="anchor" aria-label="anchor" href="#id_3-make-your-changes"></a></h3>
+<h3 id="id_3-create-a-feature-branch">3. Create a Feature Branch<a class="anchor" aria-label="anchor" href="#id_3-create-a-feature-branch"></a></h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Ensure your main branch is up to date</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">git</span> checkout main</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">git</span> pull upstream main</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co"># Create a new branch for your feature</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">git</span> checkout <span class="at">-b</span> feature/your-feature-name</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="id_4-make-your-changes">4. Make Your Changes<a class="anchor" aria-label="anchor" href="#id_4-make-your-changes"></a></h3>
 <ul><li>Write clear, documented code following the tidyverse style guide</li>
 <li>Add or update tests for new functionality</li>
 <li>Update documentation (roxygen2 comments, vignettes, NEWS.md)</li>
 <li>Ensure your code passes all checks</li>
 </ul></div>
 <div class="section level3">
-<h3 id="id_4-test-locally">4. Test Locally<a class="anchor" aria-label="anchor" href="#id_4-test-locally"></a></h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<h3 id="id_5-test-locally">5. Test Locally<a class="anchor" aria-label="anchor" href="#id_5-test-locally"></a></h3>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run checks locally before pushing</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">check</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">test</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">document</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check code coverage (if covr is installed)</span></span>
+<span><span class="fu">covr</span><span class="fu">::</span><span class="fu">package_coverage</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="pre-commit-hooks">Pre-commit Hooks<a class="anchor" aria-label="anchor" href="#pre-commit-hooks"></a></h4>
-<p>This project uses pre-commit hooks to maintain code quality. After cloning:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Install pre-commit (requires Python)</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="ex">pip</span> install pre-commit</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Install the git hooks</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="ex">pre-commit</span> install</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># (Optional) Run hooks on all files to check</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="ex">pre-commit</span> run <span class="at">--all-files</span></span></code></pre></div>
-<p>The hooks will automatically format your code and check for common issues before each commit.</p>
+<p>This project uses pre-commit hooks to maintain code quality. The hooks will automatically:</p>
+<ul><li>Format R code using <code>styler</code> (tidyverse style guide)</li>
+<li>Check code quality with <code>lintr</code>
+</li>
+<li>Check spelling</li>
+<li>Ensure R code is parsable</li>
+<li>Remove trailing whitespace and fix file endings</li>
+<li>Sort <code>.Rbuildignore</code> entries</li>
+<li>Prevent committing large files or common R artifacts</li>
+</ul><p>To manually run hooks:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Run on staged files</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="ex">pre-commit</span> run</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># Run on all files</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="ex">pre-commit</span> run <span class="at">--all-files</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># Run specific hook</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="ex">pre-commit</span> run styler <span class="at">--all-files</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
-<h3 id="id_5-commit-your-changes">5. Commit Your Changes<a class="anchor" aria-label="anchor" href="#id_5-commit-your-changes"></a></h3>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Stage and commit with a clear message</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">git</span> add .</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"Add feature: brief description of changes"</span></span></code></pre></div>
+<h3 id="id_6-commit-your-changes">6. Commit Your Changes<a class="anchor" aria-label="anchor" href="#id_6-commit-your-changes"></a></h3>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Stage and commit with a clear message</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">git</span> add .</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">git</span> commit <span class="at">-m</span> <span class="st">"Add feature: brief description of changes"</span></span></code></pre></div>
+<p>The pre-commit hooks will run automatically. If they make changes, review them and commit again.</p>
 </div>
 <div class="section level3">
-<h3 id="id_6-push-and-create-pull-request">6. Push and Create Pull Request<a class="anchor" aria-label="anchor" href="#id_6-push-and-create-pull-request"></a></h3>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Push to your fork</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">git</span> push origin feature/your-feature-name</span></code></pre></div>
+<h3 id="id_7-push-and-create-pull-request">7. Push and Create Pull Request<a class="anchor" aria-label="anchor" href="#id_7-push-and-create-pull-request"></a></h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Push to your fork</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">git</span> push origin feature/your-feature-name</span></code></pre></div>
 <p>Then create a pull request on GitHub from your branch to <code>main</code>.</p>
 </div>
 </div>
@@ -124,20 +159,20 @@
 <h2 id="pull-request-guidelines">Pull Request Guidelines<a class="anchor" aria-label="anchor" href="#pull-request-guidelines"></a></h2>
 <div class="section level3">
 <h3 id="pr-title">PR Title<a class="anchor" aria-label="anchor" href="#pr-title"></a></h3>
-<p>Use a clear, descriptive title: - ✅ “Add function for White’s heteroskedasticity test” - ❌ “Update code”</p>
+<p>Use a clear, descriptive title: - ✅ “Add function for White’s heteroskedasticity test” - ✅ “Fix: Correct variance calculation in lewbel_estimator()” - ❌ “Update code” - ❌ “Fixed stuff”</p>
 </div>
 <div class="section level3">
 <h3 id="pr-description">PR Description<a class="anchor" aria-label="anchor" href="#pr-description"></a></h3>
-<p>Include: - Summary of changes - Related issue numbers (fixes #123) - Testing performed - Any breaking changes</p>
+<p>Include: - Summary of changes - Related issue numbers (fixes #123) - Testing performed - Any breaking changes - Screenshots/examples if applicable</p>
 </div>
 <div class="section level3">
 <h3 id="pr-checklist">PR Checklist<a class="anchor" aria-label="anchor" href="#pr-checklist"></a></h3>
-<p>Before submitting, ensure: - [ ] Pre-commit hooks pass (<code>pre-commit run --all-files</code>) - [ ] Code follows tidyverse style guide (enforced by styler) - [ ] All tests pass (<code>devtools::test()</code>) - [ ] R CMD check passes (<code>devtools::check()</code>) - [ ] Documentation is updated - [ ] NEWS.md is updated (for user-facing changes) - [ ] Examples work correctly</p>
+<p>Before submitting, ensure: - [ ] Pre-commit hooks pass (<code>pre-commit run --all-files</code>) - [ ] Code follows tidyverse style guide (enforced by styler) - [ ] All tests pass (<code>devtools::test()</code>) - [ ] R CMD check passes (<code>devtools::check()</code>) - [ ] Documentation is updated - [ ] NEWS.md is updated (for user-facing changes) - [ ] Examples work correctly - [ ] No sensitive information in code or comments</p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="automated-checks">Automated Checks<a class="anchor" aria-label="anchor" href="#automated-checks"></a></h2>
-<p>When you open a PR, GitHub Actions will automatically: - Run R CMD check on multiple platforms (Windows, macOS, Linux) - Run tests with coverage reporting - Check code coverage - Build documentation</p>
+<p>When you open a PR, GitHub Actions will automatically: - Run R CMD check on multiple platforms (Windows, macOS, Linux) - Run tests with coverage reporting - Check code coverage - Build documentation - Deploy pkgdown site (for merged PRs)</p>
 <p>All checks must pass before merging.</p>
 </div>
 <div class="section level2">
@@ -145,23 +180,73 @@
 <p>We follow the <a href="https://style.tidyverse.org/" class="external-link">tidyverse style guide</a>. Key points:</p>
 <ul><li>Use <code>&lt;-</code> for assignment (not <code>=</code>)</li>
 <li>Use spaces around operators</li>
-<li>Use descriptive variable names</li>
+<li>Use descriptive variable names (prefer <code>heteroskedasticity_test</code> over <code>het_test</code>)</li>
 <li>Document all exported functions with roxygen2</li>
+<li>Include examples in documentation</li>
 </ul></div>
 <div class="section level2">
 <h2 id="testing">Testing<a class="anchor" aria-label="anchor" href="#testing"></a></h2>
-<ul><li>Write tests for all new functionality</li>
-<li>Use <code>testthat</code> for unit tests</li>
-<li>Aim for high test coverage</li>
+<ul><li>Write tests for all new functionality using <code>testthat</code>
+</li>
+<li>Test files should be named <code>test-&lt;functionality&gt;.R</code>
+</li>
+<li>Aim for high test coverage (&gt;80%)</li>
 <li>Test edge cases and error conditions</li>
-</ul></div>
+<li>Use meaningful test descriptions</li>
+</ul><p>Example test structure:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">test_that</span><span class="op">(</span><span class="st">"lewbel_estimator handles missing data correctly"</span>, <span class="op">{</span></span>
+<span>  <span class="co"># Test setup</span></span>
+<span>  <span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">generate_test_data</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># Test expectation</span></span>
+<span>  <span class="fu">expect_error</span><span class="op">(</span></span>
+<span>    <span class="fu">lewbel_estimator</span><span class="op">(</span><span class="va">data_with_na</span><span class="op">)</span>,</span>
+<span>    <span class="st">"Data contains missing values"</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a></h2>
 <ul><li>Use roxygen2 for function documentation</li>
-<li>Include examples in function documentation</li>
+<li>Include <code>@examples</code> in all exported functions</li>
 <li>Update vignettes for major features</li>
 <li>Keep README.md current</li>
-</ul></div>
+<li>Document any breaking changes in NEWS.md</li>
+</ul><p>Example documentation:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' Estimate model using Lewbel (2012) method</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @param y Numeric vector of dependent variable</span></span>
+<span><span class="co">#' @param X Matrix of explanatory variables</span></span>
+<span><span class="co">#' @param Z Matrix of instruments (optional)</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @return A list of class "lewbel" containing estimates</span></span>
+<span><span class="co">#' @export</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="co">#' @examples</span></span>
+<span><span class="co">#' data &lt;- generate_lewbel_data(n = 100)</span></span>
+<span><span class="co">#' fit &lt;- lewbel_estimator(data$y, data$X)</span></span>
+<span><span class="co">#' summary(fit)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="project-structure">Project Structure<a class="anchor" aria-label="anchor" href="#project-structure"></a></h2>
+<p>Understanding the project structure helps navigate the codebase:</p>
+<pre><code>.
+├── R/                    # R source code
+├── tests/               # Test files
+│   └── testthat/       # testthat tests
+├── man/                # Documentation (generated)
+├── vignettes/          # Long-form documentation
+├── inst/               # Installed files
+├── data/               # Package data (if any)
+├── .github/            # GitHub Actions workflows
+└── ignore files:       # Development configuration
+    ├── .gitignore      # Git ignore patterns
+    ├── .Rbuildignore   # R build ignore patterns
+    ├── .cursorignore   # Cursor AI ignore patterns
+    └── .dockerignore   # Docker ignore patterns</code></pre>
+</div>
 <div class="section level2">
 <h2 id="release-process">Release Process<a class="anchor" aria-label="anchor" href="#release-process"></a></h2>
 <p>Releases are managed by maintainers:</p>
@@ -169,18 +254,26 @@
 <li>PRs are merged to <code>main</code> after review</li>
 <li>When ready for release:
 <ul><li>Version is bumped in DESCRIPTION</li>
-<li>NEWS.md is updated</li>
+<li>NEWS.md is updated with all changes</li>
+<li>R CMD check passes on all platforms</li>
 <li>GitHub release is created with tag</li>
+<li>Package is submitted to CRAN (if applicable)</li>
 <li>pkgdown site is automatically updated</li>
 </ul></li>
 </ol></div>
 <div class="section level2">
 <h2 id="getting-help">Getting Help<a class="anchor" aria-label="anchor" href="#getting-help"></a></h2>
-<p>If you need help: - Check existing issues and discussions - Open a new issue with a minimal reproducible example - Ask questions in discussions</p>
+<p>If you need help: - Check existing issues and discussions - Review the package documentation - Open a new issue with a minimal reproducible example - Ask questions in discussions</p>
+<p>For bugs, please include: - Your R version and OS - Minimal code to reproduce the issue - Expected vs actual behavior - Any error messages</p>
 </div>
 <div class="section level2">
 <h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a></h2>
-<p>Please note that this project is released with a <a href="CODE_OF_CONDUCT.html">Contributor Code of Conduct</a>. By participating in this project you agree to abide by its terms.</p>
+<p>Please note that this project follows a Contributor Code of Conduct. By participating in this project you agree to: - Use welcoming and inclusive language - Be respectful of differing viewpoints - Gracefully accept constructive criticism - Focus on what is best for the community - Show empathy towards other community members</p>
+</div>
+<div class="section level2">
+<h2 id="current-development-priorities">Current Development Priorities<a class="anchor" aria-label="anchor" href="#current-development-priorities"></a></h2>
+<p>Key areas include: - Implementing core Lewbel (2012) functionality - Adding comprehensive test coverage - Creating user-friendly vignettes - Performance optimization for large datasets</p>
+<p>For detailed tasks and priorities, check the GitHub issues page.</p>
 <p>Thank you for contributing! 🎉</p>
 </div>
 </div>
