@@ -54,6 +54,12 @@ gh run list --workflow=rworkflows.yml
 
 ## Project-Specific Rules
 
+### Problem-Solving Approach
+- **Before asking the user for help**: If something is not working or you can't figure out how to do something after 2-3 attempts, use Exa and Context7 to search for solutions
+- Use `mcp_exa_web_search_exa` for current information, error messages, and troubleshooting
+- Use `mcp_context7_resolve-library-id` and `mcp_context7_get-library-docs` for library-specific documentation
+- Only ask the user if you've exhausted research options or need clarification on their specific requirements
+
 ### R Package Development
 - Follow tidyverse style guide
 - Use roxygen2 for documentation
