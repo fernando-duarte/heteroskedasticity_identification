@@ -179,7 +179,23 @@ monitor_pr_checks.sh
 check_monitor_status.sh
 enable_github_pages.sh
 setup_env.sh
+
+### Development planning/notes (local only) ###
 code_to_do.md
+TODO.txt
+TODO.md
+notes.md
+notes.txt
+scratch/
+misc/
+planning/
+planning.md
+ideas.md
+ideas.txt
+diary.md
+journal.md
+local-todo.md
+.notes/
 
 ### Pre-commit ###
 .pre-commit-config*.yaml
