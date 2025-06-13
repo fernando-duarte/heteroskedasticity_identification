@@ -25,7 +25,7 @@ A data.frame with columns Y1, Y2, Xk, Z, epsilon1, epsilon2.
 Creates a dataset based on the triangular model with single-factor error structure
 that satisfies Lewbel's identifying assumptions. The data generating process uses
 a common factor structure for the errors to ensure the covariance restriction
-Cov(Z, \epsilon_1 \epsilon_2) = 0 is satisfied.
+Cov(Z, \eqn{\epsilon_1 \epsilon_2}) = 0 is satisfied.
 }
 \details{
 The triangular model is:
@@ -36,7 +36,7 @@ The error structure follows a single-factor model:
 \deqn{\epsilon_1 = \alpha_1 U + V_1}
 \deqn{\epsilon_2 = \alpha_2 U + V_2}
 
-where U, V_1 are independent standard normal, and V_2 ~ N(0, exp(\delta Z))
+where U, V_1 are independent standard normal, and V_2 ~ N(0, exp(\eqn{\delta} Z))
 with Z = X^2 - E\link{X^2} being the heteroscedasticity driver.
 }
 \examples{

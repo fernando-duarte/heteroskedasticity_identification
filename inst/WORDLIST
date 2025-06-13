@@ -114,6 +114,7 @@ hexSticker
 args
 commandArgs
 env
+eqn
 requireNamespace
 Rscript
 trailingOnly

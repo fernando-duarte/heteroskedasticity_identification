@@ -34,9 +34,9 @@ the covariance restriction and instrument relevance condition.
 \details{
 The function tests:
 \itemize{
-\item Assumption A2: Cov(Z, \epsilon_1 \epsilon_2) = 0 (covariance restriction)
-\item Assumption A3: Cov(Z, \epsilon_2^2) != 0 (instrument relevance)
-\item Endogeneity: Cov(\epsilon_1, \epsilon_2) != 0
+\item Assumption A2: Cov(Z, \eqn{\epsilon_1 \epsilon_2}) = 0 (covariance restriction)
+\item Assumption A3: Cov(Z, \eqn{\epsilon_2^2}) != 0 (instrument relevance)
+\item Endogeneity: Cov(\eqn{\epsilon_1}, \eqn{\epsilon_2}) != 0
 }
 
 Can be called in two ways:

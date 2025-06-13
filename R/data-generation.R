@@ -3,7 +3,7 @@
 #' Creates a dataset based on the triangular model with single-factor error structure
 #' that satisfies Lewbel's identifying assumptions. The data generating process uses
 #' a common factor structure for the errors to ensure the covariance restriction
-#' Cov(Z, \epsilon_1 \epsilon_2) = 0 is satisfied.
+#' Cov(Z, \eqn{\epsilon_1 \epsilon_2}) = 0 is satisfied.
 #'
 #' @param n Integer. Sample size.
 #' @param params List. Parameters for the data generating process containing:
@@ -24,7 +24,7 @@
 #' \deqn{\epsilon_1 = \alpha_1 U + V_1}
 #' \deqn{\epsilon_2 = \alpha_2 U + V_2}
 #'
-#' where U, V_1 are independent standard normal, and V_2 ~ N(0, exp(\delta Z))
+#' where U, V_1 are independent standard normal, and V_2 ~ N(0, exp(\eqn{\delta} Z))
 #' with Z = X^2 - E[X^2] being the heteroscedasticity driver.
 #'
 #' @return A data.frame with columns Y1, Y2, Xk, Z, epsilon1, epsilon2.
@@ -83,9 +83,9 @@ generate_lewbel_data <- function(n, params) {
 #' @details
 #' The function tests:
 #' \itemize{
-#'   \item Assumption A2: Cov(Z, \epsilon_1 \epsilon_2) = 0 (covariance restriction)
-#'   \item Assumption A3: Cov(Z, \epsilon_2^2) != 0 (instrument relevance)
-#'   \item Endogeneity: Cov(\epsilon_1, \epsilon_2) != 0
+#'   \item Assumption A2: Cov(Z, \eqn{\epsilon_1 \epsilon_2}) = 0 (covariance restriction)
+#'   \item Assumption A3: Cov(Z, \eqn{\epsilon_2^2}) != 0 (instrument relevance)
+#'   \item Endogeneity: Cov(\eqn{\epsilon_1}, \eqn{\epsilon_2}) != 0
 #' }
 #'
 #' Can be called in two ways:

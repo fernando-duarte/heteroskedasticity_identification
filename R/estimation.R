@@ -11,7 +11,7 @@
 #' @param B Integer. Number of bootstrap replications if compute_se = TRUE (default: 100).
 #'
 #' @details
-#' Under the relaxed assumption |Corr(Z, epsilon_1 epsilon_2)| <= tau |Corr(Z, epsilon_2^2)|,
+#' Under the relaxed assumption |Corr(Z, \eqn{\epsilon_1 \epsilon_2})| <= tau |Corr(Z, \eqn{\epsilon_2^2})|,
 #' the parameter gamma_1 is set-identified. The bounds are computed as the
 #' real roots of a quadratic equation in gamma_1.
 #'
