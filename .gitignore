@@ -180,6 +180,12 @@ $RECYCLE.BIN/
 .vscode/
 *.code-workspace
 
+# Cursor AI
+.cursorrules
+.cursorignore
+.augmentignore
+.augmentrules
+
 # JetBrains IDEs
 .idea/
 *.iml
