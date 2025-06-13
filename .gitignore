@@ -70,12 +70,18 @@ rsconnect/
 *.backup.yaml
 .pre-commit-config.backup.yaml
 
-# LaTeX/LyX temporary files
+# LaTeX/LyX files
 *.lyx~
 *#*.lyx#
+*.lyx
+
+# LaTeX auxiliary files
 *.aux
 *.log
 *.synctex.gz
+
+# PDF outputs in lewbel2012
+lewbel2012/*.pdf
 
 # Temporary R files
 *~
