@@ -53,6 +53,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 # Install comprehensive R development packages
 RUN --mount=type=cache,target=/usr/local/lib/R/site-library \
+    R -e "install.packages('littler', repos='https://cloud.r-project.org/')" && \
+    ln -s /usr/local/lib/R/site-library/littler/bin/r /usr/local/bin/r && \
     install2.r --error --skipinstalled \
     # Core development tools
     devtools \
