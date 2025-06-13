@@ -70,7 +70,7 @@
 <div class="section level3">
 <h3 id="id_2-rdata-generationr---data-generation">2. <code>R/data-generation.R</code> - Data Generation<a class="anchor" aria-label="anchor" href="#id_2-rdata-generationr---data-generation"></a></h3>
 <ul><li>
-<code>generate_lewbel_data()</code>: Main data generating process for triangular model</li>
+<code><a href="reference/generate_lewbel_data.html">generate_lewbel_data()</a></code>: Main data generating process for triangular model</li>
 <li>
 <code>verify_lewbel_assumptions()</code>: Verification of Lewbel’s identifying assumptions</li>
 </ul></div>
@@ -200,7 +200,7 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Generate data</span></span>
 <span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>beta1_0 <span class="op">=</span> <span class="fl">0.5</span>, beta1_1 <span class="op">=</span> <span class="fl">1.5</span>, gamma1 <span class="op">=</span> <span class="op">-</span><span class="fl">0.8</span>, <span class="va">...</span><span class="op">)</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">generate_lewbel_data</span><span class="op">(</span><span class="fl">1000</span>, <span class="va">params</span><span class="op">)</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_lewbel_data.html">generate_lewbel_data</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="va">params</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Calculate bounds</span></span>
 <span><span class="va">bounds</span> <span class="op">&lt;-</span> <span class="fu">calculate_lewbel_bounds</span><span class="op">(</span><span class="va">data</span>, tau <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span>
