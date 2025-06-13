@@ -37,7 +37,31 @@
 
 <div id="enable-github-pages-for-documentation" class="section level1">
 
-<p>To enable GitHub Pages and make your documentation publicly accessible:</p>
+<p>You can enable GitHub Pages either via the API or manually through the web interface.</p>
+<div class="section level2">
+<h2 id="option-1-using-the-script-easiest">Option 1: Using the Script (Easiest)<a class="anchor" aria-label="anchor" href="#option-1-using-the-script-easiest"></a></h2>
+<p>I’ve created a script to enable GitHub Pages for you:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># First, create a personal access token:</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co"># 1. Go to https://github.com/settings/tokens</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># 2. Click "Generate new token (classic)"</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co"># 3. Give it a name and select the `repo` scope</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="co"># 4. Click "Generate token" and copy it</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co"># Then run:</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="bu">export</span> <span class="va">GITHUB_TOKEN</span><span class="op">=</span><span class="st">'your_token_here'</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a><span class="ex">./enable_github_pages.sh</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="option-2-using-github-api-directly">Option 2: Using GitHub API Directly<a class="anchor" aria-label="anchor" href="#option-2-using-github-api-directly"></a></h2>
+<p>If you prefer to run the API command directly:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-X</span> POST <span class="dt">\</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">"Accept: application/vnd.github+json"</span> <span class="dt">\</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">-H</span> <span class="st">"Authorization: Bearer YOUR_GITHUB_TOKEN"</span> <span class="dt">\</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="st">"https://api.github.com/repos/fernando-duarte/heteroskedasticity_identification/pages"</span> <span class="dt">\</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="at">-d</span> <span class="st">'{"source":{"branch":"gh-pages","path":"/"}}'</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="option-3-manual-setup">Option 3: Manual Setup<a class="anchor" aria-label="anchor" href="#option-3-manual-setup"></a></h2>
 <ol style="list-style-type: decimal"><li><p>Go to your repository: <a href="https://github.com/fernando-duarte/heteroskedasticity_identification" class="external-link uri">https://github.com/fernando-duarte/heteroskedasticity_identification</a></p></li>
 <li><p>Click on <strong>Settings</strong> (in the repository navigation)</p></li>
 <li><p>Scroll down to <strong>Pages</strong> section (in the left sidebar under “Code and automation”)</p></li>
@@ -51,19 +75,24 @@
 <li><strong>/ (root)</strong></li>
 </ul></li>
 <li><p>Click <strong>Save</strong></p></li>
-<li><p>Wait a few minutes for the site to build</p></li>
-<li><p>Your documentation will be available at: <a href="https://fernando-duarte.github.io/heteroskedasticity_identification/" class="uri">https://fernando-duarte.github.io/heteroskedasticity_identification/</a></p></li>
-</ol><div class="section level2">
+</ol></div>
+<div class="section level2">
+<h2 id="access-your-documentation">Access Your Documentation<a class="anchor" aria-label="anchor" href="#access-your-documentation"></a></h2>
+<p>After enabling (either method), wait a few minutes for the site to build.</p>
+<p>Your documentation will be available at: <a href="https://fernando-duarte.github.io/heteroskedasticity_identification/" class="uri">https://fernando-duarte.github.io/heteroskedasticity_identification/</a></p>
+</div>
+<div class="section level2">
 <h2 id="automatic-updates">Automatic Updates<a class="anchor" aria-label="anchor" href="#automatic-updates"></a></h2>
 <p>The documentation in the <code>gh-pages</code> branch was built from your <code>main</code> branch. To update it in the future:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># In R, from your package directory</span></span>
 <span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">build_site</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Then push the updated <code>docs/</code> folder to your <code>main</code> branch. You can manually update the <code>gh-pages</code> branch when you want to publish new documentation.</p>
 </div>
 </div>
 
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
