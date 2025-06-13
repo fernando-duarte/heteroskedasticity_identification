@@ -21,57 +21,69 @@
 analyze_main_results <- function(results, config, verbose = TRUE) {
   # Clean results
   results_clean <- stats::na.omit(results)
-  
+
   if (verbose) {
-    cat(sprintf("\nMain simulation: %d out of %d runs completed successfully\n", 
-                nrow(results_clean), config$num_simulations))
-    
+    cat(sprintf(
+      "\nMain simulation: %d out of %d runs completed successfully\n",
+      nrow(results_clean), config$num_simulations
+    ))
+
     # Main results table
     cat("\n--- Performance of Point Estimators for gamma1 ---\n")
     cat(sprintf("True value of gamma1: %.2f\n\n", config$gamma1))
   }
-  
+
   # Calculate performance metrics
-  summary_table <- results_clean %>%
-    dplyr::summarise(
-      Estimator = c("OLS", "2SLS (Lewbel)"),
-      Bias = c(mean(ols_gamma1) - config$gamma1, mean(tsls_gamma1) - config$gamma1),
-      RMSE = c(sqrt(mean((ols_gamma1 - config$gamma1)^2)), 
-               sqrt(mean((tsls_gamma1 - config$gamma1)^2))),
-      Coverage = c(mean(ols_coverage), mean(tsls_coverage)),
-      `Avg First-Stage F` = c(NA, mean(first_stage_F))
-    )
-  
+  summary_table <- data.frame(
+    Estimator = c("OLS", "2SLS (Lewbel)"),
+    Bias = c(
+      mean(results_clean$ols_gamma1) - config$gamma1,
+      mean(results_clean$tsls_gamma1) - config$gamma1
+    ),
+    RMSE = c(
+      sqrt(mean((results_clean$ols_gamma1 - config$gamma1)^2)),
+      sqrt(mean((results_clean$tsls_gamma1 - config$gamma1)^2))
+    ),
+    Coverage = c(mean(results_clean$ols_coverage), mean(results_clean$tsls_coverage)),
+    `Avg First-Stage F` = c(NA, mean(results_clean$first_stage_F)),
+    check.names = FALSE
+  )
+
   if (verbose) {
     print(knitr::kable(summary_table, digits = 4))
-    
+
     # Weak instrument diagnostics
     weak_iv_pct <- mean(results_clean$first_stage_F < 10) * 100
-    cat(sprintf("\nWeak instrument diagnostic: %.1f%% of simulations have first-stage F < 10\n", 
-                weak_iv_pct))
+    cat(sprintf(
+      "\nWeak instrument diagnostic: %.1f%% of simulations have first-stage F < 10\n",
+      weak_iv_pct
+    ))
   }
-  
+
   # Set identification results
-  bounds_summary <- results_clean %>%
-    dplyr::summarise(
-      Scenario = sprintf("Set ID (tau=%.2f)", config$tau_set_id),
-      `Avg Width` = mean(bound_upper_tau_set - bound_lower_tau_set),
-      Coverage = mean(config$gamma1 >= bound_lower_tau_set & config$gamma1 <= bound_upper_tau_set),
-      `Point ID Check` = stats::cor((bound_upper_tau0 + bound_lower_tau0) / 2, tsls_gamma1, 
-                                   use = "complete.obs")
-    )
-  
+  bounds_summary <- data.frame(
+    Scenario = sprintf("Set ID (tau=%.2f)", config$tau_set_id),
+    `Avg Width` = mean(results_clean$bound_upper_tau_set - results_clean$bound_lower_tau_set),
+    Coverage = mean(config$gamma1 >= results_clean$bound_lower_tau_set &
+      config$gamma1 <= results_clean$bound_upper_tau_set),
+    `Point ID Check` = stats::cor((results_clean$bound_upper_tau0 + results_clean$bound_lower_tau0) / 2,
+      results_clean$tsls_gamma1,
+      use = "complete.obs"
+    ),
+    check.names = FALSE
+  )
+
   if (verbose) {
     cat("\n--- Performance of Set Identification ---\n")
     print(knitr::kable(bounds_summary, digits = 4))
   }
-  
-  return(list(
+
+  list(
     summary_table = summary_table,
     bounds_summary = bounds_summary,
     weak_iv_pct = mean(results_clean$first_stage_F < 10) * 100,
     results_clean = results_clean
-  ))
+  )
 }
 
 
@@ -98,32 +110,41 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
 #' @export
 analyze_bootstrap_results <- function(results_main, bootstrap_demo, config, verbose = TRUE) {
   # Combine bootstrap examples
-  bootstrap_examples <- dplyr::bind_rows(
-    results_main %>% 
-      dplyr::filter(!is.na(bound_se_lower)) %>% 
-      dplyr::slice_head(n = config$bootstrap_subset_size),
-    bootstrap_demo
-  ) %>%
-    dplyr::distinct()
-  
+  # First filter results_main
+  filtered_main <- dplyr::filter(results_main, !is.na(bound_se_lower))
+  sliced_main <- dplyr::slice_head(filtered_main, n = config$bootstrap_subset_size)
+
+  # Combine with bootstrap_demo
+  bootstrap_examples <- dplyr::bind_rows(sliced_main, bootstrap_demo)
+  bootstrap_examples <- dplyr::distinct(bootstrap_examples)
+
   if (nrow(bootstrap_examples) > 0 && verbose) {
     cat("\n--- Bootstrap Standard Errors for Set Identification Bounds ---\n")
-    cat(sprintf("Showing %d examples with bootstrap SEs (B = %d)\n\n", 
-                nrow(bootstrap_examples), config$bootstrap_reps))
-    
-    bootstrap_table <- bootstrap_examples %>%
-      dplyr::select(sim_id, 
-                   lower = bound_lower_tau_set, 
-                   upper = bound_upper_tau_set,
-                   se_lower = bound_se_lower,
-                   se_upper = bound_se_upper) %>%
-      dplyr::slice_head(n = 10) %>%
-      dplyr::mutate(dplyr::across(dplyr::where(is.numeric) & !sim_id, ~round(., 4)))
-    
+    cat(sprintf(
+      "Showing %d examples with bootstrap SEs (B = %d)\n\n",
+      nrow(bootstrap_examples), config$bootstrap_reps
+    ))
+
+    # Select columns
+    bootstrap_selected <- dplyr::select(bootstrap_examples,
+      sim_id,
+      lower = bound_lower_tau_set,
+      upper = bound_upper_tau_set,
+      se_lower = bound_se_lower,
+      se_upper = bound_se_upper
+    )
+
+    # Slice and round
+    bootstrap_table <- dplyr::slice_head(bootstrap_selected, n = 10)
+    bootstrap_table <- dplyr::mutate(
+      bootstrap_table,
+      dplyr::across(dplyr::where(is.numeric) & !sim_id, ~ round(., 4))
+    )
+
     print(knitr::kable(bootstrap_table))
   }
-  
-  return(bootstrap_examples)
+
+  bootstrap_examples
 }
 
 
@@ -147,21 +168,21 @@ analyze_bootstrap_results <- function(results_main, bootstrap_demo, config, verb
 #'
 #' @export
 analyze_sample_size_results <- function(results_by_n, config, verbose = TRUE) {
-  n_summary <- results_by_n %>%
-    dplyr::group_by(sample_size) %>%
-    dplyr::summarise(
-      `2SLS Bias` = mean(tsls_gamma1, na.rm = TRUE) - config$gamma1,
-      `2SLS RMSE` = sqrt(mean((tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)),
-      `Avg First-Stage F` = mean(first_stage_F, na.rm = TRUE),
-      .groups = "drop"
-    )
-  
+  # Group by sample size and summarize
+  grouped_n <- dplyr::group_by(results_by_n, sample_size)
+  n_summary <- dplyr::summarise(grouped_n,
+    `2SLS Bias` = mean(tsls_gamma1, na.rm = TRUE) - config$gamma1,
+    `2SLS RMSE` = sqrt(mean((tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)),
+    `Avg First-Stage F` = mean(first_stage_F, na.rm = TRUE),
+    .groups = "drop"
+  )
+
   if (verbose) {
     cat("\n--- Consistency Check: Performance by Sample Size ---\n")
     print(knitr::kable(n_summary, digits = 4))
   }
-  
-  return(n_summary)
+
+  n_summary
 }
 
 
@@ -185,22 +206,22 @@ analyze_sample_size_results <- function(results_by_n, config, verbose = TRUE) {
 #'
 #' @export
 analyze_sensitivity_results <- function(results_by_delta, config, verbose = TRUE) {
-  delta_summary <- results_by_delta %>%
-    dplyr::group_by(delta_het) %>%
-    dplyr::summarise(
-      `2SLS Bias` = mean(tsls_gamma1, na.rm = TRUE) - config$gamma1,
-      `2SLS RMSE` = sqrt(mean((tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)),
-      `Avg First-Stage F` = mean(first_stage_F, na.rm = TRUE),
-      `Bounds Width` = mean(bound_upper_tau_set - bound_lower_tau_set, na.rm = TRUE),
-      .groups = "drop"
-    )
-  
+  # Group by delta_het and summarize
+  grouped_delta <- dplyr::group_by(results_by_delta, delta_het)
+  delta_summary <- dplyr::summarise(grouped_delta,
+    `2SLS Bias` = mean(tsls_gamma1, na.rm = TRUE) - config$gamma1,
+    `2SLS RMSE` = sqrt(mean((tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)),
+    `Avg First-Stage F` = mean(first_stage_F, na.rm = TRUE),
+    `Bounds Width` = mean(bound_upper_tau_set - bound_lower_tau_set, na.rm = TRUE),
+    .groups = "drop"
+  )
+
   if (verbose) {
     cat("\n--- Sensitivity to Heteroscedasticity Strength ---\n")
     print(knitr::kable(delta_summary, digits = 4))
   }
-  
-  return(delta_summary)
+
+  delta_summary
 }
 
 
@@ -216,8 +237,13 @@ analyze_sensitivity_results <- function(results_by_delta, config, verbose = TRUE
 #' }
 #'
 #' @export
-print_simulation_summary <- function(verbose = TRUE) {
-  if (verbose) {
+print_simulation_summary <- function(analysis = NULL, config = NULL, verbose = TRUE) {
+  # Handle different calling patterns - ensure verbose is a single logical value
+  if (is.list(verbose) || length(verbose) > 1) {
+    verbose <- TRUE # Default to TRUE if verbose is not a single logical
+  }
+
+  if (isTRUE(verbose)) {
     cat("\n--- SIMULATION COMPLETE ---\n")
     cat("Key findings:\n")
     cat("1. OLS is biased due to endogeneity.\n")
@@ -226,5 +252,12 @@ print_simulation_summary <- function(verbose = TRUE) {
     cat("4. Stronger heteroscedasticity improves instrument strength.\n")
     cat("5. Set identification bounds widen with tau but maintain good coverage.\n")
     cat("6. Bootstrap SEs provide valid inference for the bounds.\n")
+
+    # If analysis is provided, print additional summary
+    if (!is.null(analysis) && is.list(analysis)) {
+      if ("weak_iv_pct" %in% names(analysis)) {
+        cat(sprintf("7. Weak instrument rate: %.1f%%\n", analysis$weak_iv_pct))
+      }
+    }
   }
 }

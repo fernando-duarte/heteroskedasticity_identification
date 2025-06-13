@@ -21,15 +21,18 @@ run_main_simulation <- function(config, seeds, verbose = TRUE) {
   if (verbose) {
     cat(sprintf("\nStarting main simulation with %d runs...\n", config$num_simulations))
   }
-  
+
+  # Set the base seed for reproducibility
+  set.seed(seeds$main[1])
+
   # Set up parallel processing
   future::plan(future::multisession, workers = future::availableCores() - 1)
-  
+
   # Run main simulation with bootstrap for first few runs
   results <- furrr::future_map_dfr(
     1:config$num_simulations,
     function(i) {
-      run_single_lewbel_simulation(i, 
+      run_single_lewbel_simulation(i,
         list(
           sample_size = config$main_sample_size,
           beta1_0 = config$beta1_0, beta1_1 = config$beta1_1, gamma1 = config$gamma1,
@@ -43,14 +46,22 @@ run_main_simulation <- function(config, seeds, verbose = TRUE) {
         compute_bounds_se = (i <= config$bootstrap_subset_size)
       )
     },
-    .options = furrr::furrr_options(seed = seeds$main, chunk_size = NULL),
+    .options = furrr::furrr_options(
+      seed = TRUE,
+      chunk_size = NULL,
+      globals = list(
+        run_single_lewbel_simulation = run_single_lewbel_simulation,
+        generate_lewbel_data = generate_lewbel_data,
+        calculate_lewbel_bounds = calculate_lewbel_bounds
+      )
+    ),
     .progress = verbose
   )
-  
+
   # Clean up parallel workers
   future::plan(future::sequential)
-  
-  return(results)
+
+  results
 }
 
 
@@ -77,14 +88,17 @@ run_bootstrap_demonstration <- function(config, seeds, verbose = TRUE) {
   if (verbose) {
     cat("\nRunning separate bootstrap SE demonstration...\n")
   }
-  
+
+  # Set the base seed for reproducibility
+  set.seed(seeds$bootstrap_demo[1])
+
   # Set up parallel processing
   future::plan(future::multisession, workers = future::availableCores() - 1)
-  
+
   bootstrap_demo <- furrr::future_map_dfr(
     1:config$bootstrap_demo_size,
     function(i) {
-      run_single_lewbel_simulation(i, 
+      run_single_lewbel_simulation(i,
         list(
           sample_size = config$main_sample_size,
           beta1_0 = config$beta1_0, beta1_1 = config$beta1_1, gamma1 = config$gamma1,
@@ -98,13 +112,20 @@ run_bootstrap_demonstration <- function(config, seeds, verbose = TRUE) {
         compute_bounds_se = TRUE
       )
     },
-    .options = furrr::furrr_options(seed = seeds$bootstrap_demo)
+    .options = furrr::furrr_options(
+      seed = TRUE,
+      globals = list(
+        run_single_lewbel_simulation = run_single_lewbel_simulation,
+        generate_lewbel_data = generate_lewbel_data,
+        calculate_lewbel_bounds = calculate_lewbel_bounds
+      )
+    )
   )
-  
+
   # Clean up parallel workers
   future::plan(future::sequential)
-  
-  return(bootstrap_demo)
+
+  bootstrap_demo
 }
 
 
@@ -130,19 +151,24 @@ run_sample_size_analysis <- function(config, seeds, verbose = TRUE) {
   if (verbose) {
     cat("\nRunning sample size consistency analysis...\n")
   }
-  
+
   # Set up parallel processing
   future::plan(future::multisession, workers = future::availableCores() - 1)
-  
-  results_by_n <- purrr::map2_dfr(config$sample_sizes, 1:length(config$sample_sizes), 
+
+  results_by_n <- purrr::map2_dfr(
+    config$sample_sizes, seq_along(config$sample_sizes),
     function(n, idx) {
       if (verbose) {
         cat(sprintf("  Sample size %d...\n", n))
       }
+
+      # Set seed based on the first seed in the matrix row
+      set.seed(seeds$by_n[idx, 1])
+
       furrr::future_map_dfr(
         1:config$n_reps_by_n,
         function(j) {
-          run_single_lewbel_simulation(j, 
+          run_single_lewbel_simulation(j,
             list(
               sample_size = n,
               beta1_0 = config$beta1_0, beta1_1 = config$beta1_1, gamma1 = config$gamma1,
@@ -156,15 +182,22 @@ run_sample_size_analysis <- function(config, seeds, verbose = TRUE) {
             compute_bounds_se = FALSE
           )
         },
-        .options = furrr::furrr_options(seed = seeds$by_n[idx, ])
+        .options = furrr::furrr_options(
+          seed = TRUE,
+          globals = list(
+            run_single_lewbel_simulation = run_single_lewbel_simulation,
+            generate_lewbel_data = generate_lewbel_data,
+            calculate_lewbel_bounds = calculate_lewbel_bounds
+          )
+        )
       )
     }
   )
-  
+
   # Clean up parallel workers
   future::plan(future::sequential)
-  
-  return(results_by_n)
+
+  results_by_n
 }
 
 
@@ -190,19 +223,24 @@ run_sensitivity_analysis <- function(config, seeds, verbose = TRUE) {
   if (verbose) {
     cat("\nRunning heteroscedasticity sensitivity analysis...\n")
   }
-  
+
   # Set up parallel processing
   future::plan(future::multisession, workers = future::availableCores() - 1)
-  
-  results_by_delta <- purrr::map2_dfr(config$delta_het_values, 1:length(config$delta_het_values),
+
+  results_by_delta <- purrr::map2_dfr(
+    config$delta_het_values, seq_along(config$delta_het_values),
     function(d, idx) {
       if (verbose) {
         cat(sprintf("  Delta = %.1f...\n", d))
       }
+
+      # Set seed based on the first seed in the matrix row
+      set.seed(seeds$by_delta[idx, 1])
+
       furrr::future_map_dfr(
         1:config$n_reps_by_delta,
         function(j) {
-          run_single_lewbel_simulation(j, 
+          run_single_lewbel_simulation(j,
             list(
               sample_size = config$main_sample_size,
               beta1_0 = config$beta1_0, beta1_1 = config$beta1_1, gamma1 = config$gamma1,
@@ -216,13 +254,20 @@ run_sensitivity_analysis <- function(config, seeds, verbose = TRUE) {
             compute_bounds_se = FALSE
           )
         },
-        .options = furrr::furrr_options(seed = seeds$by_delta[idx, ])
+        .options = furrr::furrr_options(
+          seed = TRUE,
+          globals = list(
+            run_single_lewbel_simulation = run_single_lewbel_simulation,
+            generate_lewbel_data = generate_lewbel_data,
+            calculate_lewbel_bounds = calculate_lewbel_bounds
+          )
+        )
       )
     }
   )
-  
+
   # Clean up parallel workers
   future::plan(future::sequential)
-  
-  return(results_by_delta)
+
+  results_by_delta
 }

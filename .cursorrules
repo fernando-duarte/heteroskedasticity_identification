@@ -66,8 +66,148 @@ gh run list --workflow=rworkflows.yml
 - Ensure all functions have examples
 - Run `devtools::check()` before committing
 
+### R Coding Standards
+
+#### Function and Variable Naming
+- **Function names**: Use snake_case, max 30 characters
+  - ❌ `plot_heteroscedasticity_sensitivity` (35 chars)
+  - ✅ `plot_het_sensitivity` (20 chars)
+- **Variable names**: Always use snake_case
+  - ❌ `cov_Z_W1W2` or `first_stage_F`
+  - ✅ `cov_z_w1w2` or `first_stage_f`
+- **No mixed naming**: Don't mix snake_case with camelCase
+
+#### Code Style
+- **Line length**: Max 120 characters (break long lines)
+- **Indentation**: Use 2 spaces (never tabs)
+- **Assignment**: Use `<-` not `=` for assignment
+- **Spacing**: Add spaces around operators (`x + y`, not `x+y`)
+
+#### Function Returns
+- **Use implicit returns**: Don't use explicit `return()`
+  ```r
+  # ❌ Bad
+  my_function <- function(x) {
+    result <- x + 1
+    return(result)
+  }
+
+  # ✅ Good
+  my_function <- function(x) {
+    x + 1
+  }
+  ```
+
+#### Safe Iteration
+- **Never use `1:length(x)`**: Use `seq_along(x)`
+  ```r
+  # ❌ Bad - fails when x is empty
+  for (i in 1:length(x)) { }
+
+  # ✅ Good - handles empty vectors
+  for (i in seq_along(x)) { }
+  ```
+- **Never use `1:nrow(df)`**: Use `seq_len(nrow(df))`
+
+#### Documentation Standards
+- **Every exported function** needs:
+  - `@title` Brief description
+  - `@description` Detailed explanation
+  - `@param` for each parameter
+  - `@return` what the function returns
+  - `@examples` with `\dontrun{}` if needed
+  - `@export` if user-facing
+- **Use ASCII-only characters in documentation**:
+  - ❌ Unicode: `γ₁`, `ε₁ε₂`, `≠`, `≈`, `≤`
+  - ✅ ASCII/LaTeX: `gamma_1`, `\epsilon_1 \epsilon_2`, `!=`, `approx.`, `<=`
+  - This ensures cross-platform compatibility and avoids roxygen2 encoding issues
+
+#### Common Roxygen2 Keywords
+These are valid roxygen2 keywords, not typos:
+- `\dontrun{}` - Examples that shouldn't be run automatically
+- `\deqn{}` - Display equations (LaTeX)
+- Mathematical symbols in roxygen2: Use LaTeX notation
+
+#### Dependencies
+- **Always declare dependencies**: If using `purrr::map()` or `tidyr::pivot_longer()`, ensure package is in DESCRIPTION
+- **Use explicit namespacing**: `package::function()` for clarity
+
+#### Spell Check Compliance
+Common technical terms to use (already in inst/WORDLIST or should be added):
+- R packages: purrr, tidyr, dplyr, ggplot2
+- Statistics terms: heteroskedasticity, monte, carlo
+- Programming terms: globals, orchestrator, refactoring
+- Project-specific: lewbel, hetid
+
+#### File Organization
+- **Logical grouping**: One concept per file
+- **File naming**: Use descriptive names matching function purposes
+- **Internal functions**: Prefix with `.` if not exported
+
 ### Git Workflow
 - Main branch: `main` or `master`
 - Feature branches: descriptive names (e.g., `add-rworkflows`)
 - Commit messages: clear and descriptive
 - Always check CI status before merging PRs
+
+## Pre-commit Hooks
+
+### Configuration Files
+The project has multiple pre-commit configuration files:
+- `.pre-commit-config.yaml` - Currently active configuration (using local R hooks)
+- `.pre-commit-config-full.yaml` - Full configuration with all R-specific hooks
+- `.pre-commit-config-local-r.yaml` - Local R hooks configuration
+- `.pre-commit-config.backup.yaml` - Backup of previous configuration
+
+### Running Pre-commit Hooks
+```bash
+# Run all hooks on all files
+pre-commit run --all-files
+
+# Run specific hook
+pre-commit run <hook-id> --all-files
+
+# Run on staged files only (default)
+pre-commit run
+
+# Install/reinstall hooks
+pre-commit install
+
+# Clear pre-commit cache (useful for troubleshooting)
+pre-commit clean
+```
+
+### Available Hooks
+1. **R-specific hooks** (in local configuration):
+   - `style-files` - Apply tidyverse style using styler
+   - `lintr` - Lint R code for style issues
+   - `parsable-R` - Check R code is parsable
+   - `roxygenize` - Update roxygen documentation
+   - `spell-check` - Check spelling (add words to inst/WORDLIST)
+   - `readme-rmd-rendered` - Ensure README.Rmd is rendered
+   - `no-browser-statement` - Check for browser() calls
+   - `no-debug-statement` - Check for debug() calls
+   - `deps-in-desc` - Check dependencies are in DESCRIPTION
+
+2. **General hooks**:
+   - `tidy-description` - Format DESCRIPTION file
+   - `check-added-large-files` - Prevent large files
+   - `trailing-whitespace` - Remove trailing whitespace
+   - `end-of-file-fixer` - Ensure files end with newline
+   - `check-case-conflict` - Check for case conflicts
+   - `check-merge-conflict` - Check for merge markers
+   - `check-yaml` - Validate YAML files
+   - `mixed-line-ending` - Check line endings
+   - `file-contents-sorter` - Sort file contents
+
+### Common Issues & Solutions
+- **Linting failures**: These often require manual fixes (function names, indentation, etc.)
+- **Spelling errors**: Add legitimate words to `inst/WORDLIST`
+- **Style changes**: Review with `git diff` before committing
+- **Hook failures**: Use `pre-commit clean` and reinstall if hooks are misbehaving
+- **Styler vs Lintr indentation conflicts**: The `indentation_linter` is disabled in `.lintr` to avoid conflicts with styler's formatting decisions
+
+### Hook Locations
+- Hook scripts: `inst/hooks/` directory
+- Pre-commit manages environments in `~/.cache/pre-commit/`
+- Local R hooks run in system R environment (avoids compilation issues)

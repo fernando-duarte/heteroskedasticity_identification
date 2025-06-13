@@ -12,7 +12,7 @@
 #' @examples
 #' \dontrun{
 #' seeds <- generate_seed_matrix(123, 3, 100)
-#' dim(seeds)  # 3 x 100
+#' dim(seeds) # 3 x 100
 #' }
 #'
 #' @export
@@ -23,7 +23,7 @@ generate_seed_matrix <- function(base_seed, n_experiments, n_reps_each) {
     nrow = n_experiments,
     ncol = n_reps_each
   )
-  return(seeds)
+  seeds
 }
 
 
@@ -46,8 +46,8 @@ generate_seed_matrix <- function(base_seed, n_experiments, n_reps_each) {
 #' @examples
 #' \dontrun{
 #' config <- create_default_config()
-#' config$gamma1  # -0.8
-#' 
+#' config$gamma1 # -0.8
+#'
 #' # Custom configuration
 #' custom_config <- create_default_config(
 #'   num_simulations = 500,
@@ -56,50 +56,61 @@ generate_seed_matrix <- function(base_seed, n_experiments, n_reps_each) {
 #' }
 #'
 #' @export
-create_default_config <- function(num_simulations = 1000,
-                                  sample_sizes = c(500, 1000, 2000),
-                                  main_sample_size = 1000,
-                                  set_seed = 123,
+create_default_config <- function(num_simulations = 200,
+                                  main_sample_size = 500,
+                                  sample_sizes = c(250, 500, 1000, 2000),
+                                  delta_het = 0.8,
+                                  delta_het_values = c(0.4, 0.8, 1.2),
+                                  n_reps_by_n = 100,
+                                  n_reps_by_delta = 100,
+                                  bootstrap_reps = 100,
+                                  bootstrap_subset_size = 10,
+                                  bootstrap_demo_size = 5,
+                                  beta1_0 = 0.5,
+                                  beta1_1 = 1.5,
                                   gamma1 = -0.8,
-                                  delta_het = 1.2,
+                                  beta2_0 = 1.0,
+                                  beta2_1 = -1.0,
+                                  alpha1 = -0.5,
+                                  alpha2 = 1.0,
                                   tau_set_id = 0.2,
-                                  bootstrap_reps = 100) {
-  
+                                  endog_var_name = "Y2",
+                                  exog_var_names = "Xk") {
   list(
     # Simulation Controls
     num_simulations = num_simulations,
     sample_sizes = sample_sizes,
     main_sample_size = main_sample_size,
-    set_seed = set_seed,
-    
+    set_seed = 123,
+
     # True Model Parameters (Triangular System)
-    beta1_0 = 0.5,
-    beta1_1 = 1.5,
+    beta1_0 = beta1_0,
+    beta1_1 = beta1_1,
     gamma1 = gamma1,
-    beta2_0 = 1.0,
-    beta2_1 = -1.0,
-    
+    beta2_0 = beta2_0,
+    beta2_1 = beta2_1,
+
     # Error Structure Parameters (Single-Factor Model)
-    alpha1 = -0.5,
-    alpha2 = 1.0,
+    alpha1 = alpha1,
+    alpha2 = alpha2,
     delta_het = delta_het,
-    delta_het_values = c(0.6, 1.2, 1.8),
-    
+    delta_het_values = delta_het_values,
+
     # Set Identification Parameters
     tau_set_id = tau_set_id,
-    
+
     # Bootstrap parameters
     bootstrap_reps = bootstrap_reps,
-    bootstrap_subset_size = 10,
-    bootstrap_demo_size = 5,
-    
+    bootstrap_subset_size = bootstrap_subset_size,
+    bootstrap_demo_size = bootstrap_demo_size,
+
     # Variable names (for flexibility)
-    endog_var_name = "Y2",
-    exog_var_names = c("Xk"),
-    
+    endog_var_name = endog_var_name,
+    exog_var_names = exog_var_names,
+
     # Auxiliary simulation controls
-    n_reps_by_n = 200,
-    n_reps_by_delta = 200
+    n_reps_by_n = n_reps_by_n,
+    n_reps_by_delta = n_reps_by_delta
   )
 }
 
@@ -117,19 +128,23 @@ create_default_config <- function(num_simulations = 1000,
 #' \dontrun{
 #' config <- create_default_config()
 #' seeds <- generate_all_seeds(config)
-#' names(seeds)  # "main", "by_n", "by_delta", "bootstrap_demo"
+#' names(seeds) # "main", "by_n", "by_delta", "bootstrap_demo"
 #' }
 #'
 #' @export
 generate_all_seeds <- function(config) {
   list(
     main = 1:config$num_simulations + config$set_seed * 1000,
-    by_n = generate_seed_matrix(config$set_seed + 1, 
-                                length(config$sample_sizes), 
-                                config$n_reps_by_n),
-    by_delta = generate_seed_matrix(config$set_seed + 2, 
-                                    length(config$delta_het_values), 
-                                    config$n_reps_by_delta),
+    by_n = generate_seed_matrix(
+      config$set_seed + 1,
+      length(config$sample_sizes),
+      config$n_reps_by_n
+    ),
+    by_delta = generate_seed_matrix(
+      config$set_seed + 2,
+      length(config$delta_het_values),
+      config$n_reps_by_delta
+    ),
     bootstrap_demo = 1:config$bootstrap_demo_size + config$set_seed * 3000
   )
 }
