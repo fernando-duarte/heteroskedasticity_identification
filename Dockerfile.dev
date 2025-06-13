@@ -46,7 +46,6 @@ RUN --mount=type=cache,target=/var/cache/apt \
     libopenmpi-dev \
     # Additional development utilities
     pandoc \
-    pandoc-citeproc \
     texlive-latex-base \
     texlive-latex-recommended \
     texlive-fonts-recommended \
