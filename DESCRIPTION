@@ -4,7 +4,10 @@ Version: 0.1.0
 Authors@R: person("Fernando", "Duarte",
                       email = "duarte@alum.mit.edu",
                       role = c("aut", "cre"))
-Description: This package applies the identification through heteroskedasticity of Lewbel (2012) to a time-series model with endogenous regressors
+Description: This package implements the identification through heteroskedasticity 
+    method of Lewbel (2012) for time-series models with endogenous regressors. 
+    It provides tools for estimation and inference when traditional instruments 
+    are not available.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -14,19 +17,10 @@ BugReports: https://github.com/fernando-duarte/heteroskedasticity_identification
 Depends: R (>= 4.2)
 biocViews:
 Imports:
-    AER,
-    tidyverse,
-    knitr,
-    future,
-    furrr,
-    boot,
-    methods,
-    markdown,
-    rmarkdown,
-    remotes,
-    testthat (>= 3.0.0),
-    utils
 Suggests:
-RoxygenNote: 7.2.3
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+RoxygenNote: 7.3.2.9000
 VignetteBuilder: knitr
 Config/testthat/edition: 3

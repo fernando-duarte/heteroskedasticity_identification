@@ -1,3 +1,12 @@
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^\.github$
+^\.cursorrules$
+^monitor_pr_checks\.sh$
+^check_monitor_status\.sh$
+^monitor\.log$
+^pr_logs$
+^code_to_do\.md$
+^setup_package_plan\.md$
+^lewbel2012$
