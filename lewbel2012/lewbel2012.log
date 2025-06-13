@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.14)  12 JUN 2025 21:03
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.3.14)  12 JUN 2025 23:23
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -242,12 +242,16 @@ al/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}]
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
  ) 
 Here is how much of TeX's memory you used:
- 2771 strings out of 473190
- 40892 string characters out of 5715800
- 448253 words of memory out of 5000000
- 26029 multiletter control sequences out of 15000+600000
+ 2773 strings out of 473190
+ 40938 string characters out of 5715800
+ 448291 words of memory out of 5000000
+ 26031 multiletter control sequences out of 15000+600000
  568000 words of font info for 71 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  57i,10n,65p,426b,304s stack positions out of 10000i,1000n,20000p,200000b,200000s

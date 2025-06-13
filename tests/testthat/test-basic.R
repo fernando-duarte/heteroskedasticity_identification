@@ -4,4 +4,4 @@ test_that("basic test passes", {
 
 test_that("package can be loaded", {
   expect_true(TRUE)
-}) 
+})
