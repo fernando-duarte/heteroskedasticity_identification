@@ -8,3 +8,9 @@ pr_logs/
 monitor.log
 ..Rcheck
 enable_github_pages.sh
+setup_env.sh
+
+# Environment variables - NEVER commit these!
+.env
+.env.local
+.Renviron
