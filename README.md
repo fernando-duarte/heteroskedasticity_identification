@@ -48,6 +48,42 @@ This package uses modern development practices to ensure code quality and consis
 
 ### Development Environment Setup
 
+Choose your preferred development environment:
+
+#### Option 1: GitHub Codespaces (Recommended for Quick Start) ☁️
+
+**Zero setup required** - fully configured cloud development environment:
+
+1. **Launch Codespace**:
+   - Click "Code" → "Codespaces" → "Create codespace on main"
+   - Wait 2-3 minutes for automatic setup
+
+2. **Start Developing**:
+   - RStudio Server auto-opens on port 8787
+   - Package pre-loaded and ready to use
+   - All tools and dependencies included
+
+**Features**: RStudio Server, VS Code, R 4.5.0, all dependencies, Git integration, Docker support
+
+#### Option 2: Local Docker Development 🐳
+
+**Consistent environment** across all machines:
+
+1. **Prerequisites**: Docker Engine 28.0+ and docker-compose
+
+2. **Quick Start**:
+   ```bash
+   git clone https://github.com/fernando-duarte/heteroskedasticity_identification.git
+   cd heteroskedasticity_identification
+   make dev-start  # Launches RStudio at http://localhost:8787
+   ```
+
+See [DOCKER.md](DOCKER.md) for comprehensive Docker documentation.
+
+#### Option 3: Local R Installation 💻
+
+**Traditional setup** for local development:
+
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/fernando-duarte/heteroskedasticity_identification.git
@@ -69,9 +105,9 @@ This package uses modern development practices to ensure code quality and consis
    pre-commit install
    ```
 
-4. **(Optional) For Cursor AI users**: The repository includes a `.cursorignore` file that prevents the AI from accessing sensitive files and improves performance by excluding large generated files.
+#### Additional Tools
 
-5. **(Optional) For Docker users**: A `.dockerignore` file is included to optimize Docker builds.
+- **(Optional) For Cursor AI users**: The repository includes a `.cursorignore` file that prevents the AI from accessing sensitive files and improves performance by excluding large generated files.
 
 ### Code Quality Tools
 
@@ -109,13 +145,103 @@ The project includes comprehensive ignore files following 2025 best practices:
 
 ## Usage
 
-(To be expanded as more functions are implemented)
+### GitHub Codespaces (Easiest) ☁️
+
+**Zero-setup cloud development**:
+
+1. **Launch**: Click "Code" → "Codespaces" → "Create codespace"
+2. **Access RStudio**: Click port 8787 in VS Code Ports tab
+3. **Start coding**: Package pre-loaded, all tools ready
+
+```bash
+# In Codespaces terminal - helpful shortcuts available:
+hetid_demo    # Run package demonstration
+hetid_test    # Run comprehensive tests
+hetid_sim     # Run quick Monte Carlo simulation
+rdev          # Load package in development mode
+```
+
+### Local Installation
 
 ```r
 library(hetid)
 
 # Example usage will be added as functions are developed
 ```
+
+### Docker Usage (Recommended for Local Development)
+
+The package includes a complete Docker setup with 2025 best practices for easy development and deployment.
+
+#### Quick Start Guide
+
+**Prerequisites**: Docker Engine 28.0+ and docker-compose
+
+1. **Start Development Environment**:
+   ```bash
+   make dev-start
+   ```
+   This launches RStudio Server at http://localhost:8787 with the package pre-loaded.
+
+2. **Run Package Tests**:
+   ```bash
+   make test
+   ```
+
+3. **Execute Monte Carlo Simulations**:
+   ```bash
+   # Quick simulation (100 iterations)
+   make simulation-quick
+
+   # Full simulation (1000 iterations)
+   make simulation
+
+   # Sensitivity analysis
+   make simulation-sensitivity
+   ```
+
+4. **Interactive Development**:
+   ```bash
+   # Open R console in container
+   make dev-r
+
+   # Open bash shell
+   make dev-shell
+
+   # View logs
+   make dev-logs
+   ```
+
+5. **Stop Environment**:
+   ```bash
+   make dev-stop
+   ```
+
+#### Alternative Commands
+
+If you prefer direct Docker commands:
+
+```bash
+# Development with RStudio
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d hetid-dev
+
+# Run production simulation
+docker run --rm hetid:latest R -e "library(hetid); run_lewbel_monte_carlo()"
+
+# Build production image
+docker build -t hetid:latest --target production .
+```
+
+#### Docker Features
+
+- **Multi-stage builds** for optimized production images
+- **RStudio Server** for interactive development
+- **Parallel processing** optimized for simulations
+- **Automated testing** and quality checks
+- **Security hardened** with non-root users
+- **Multi-platform** support (AMD64/ARM64)
+
+See [DOCKER.md](DOCKER.md) for comprehensive documentation, troubleshooting, and advanced usage.
 
 ## Contributing
 

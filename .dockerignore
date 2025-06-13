@@ -1,5 +1,6 @@
 # Docker ignore file for R package - Updated June 2025
 # Reduces build context size and improves security
+# Optimized for hetid package with parallel processing and simulations
 
 ### Version control ###
 .git/
