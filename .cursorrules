@@ -1,0 +1,73 @@
+# Cursor Rules for heteroskedasticity_identification
+
+## GitHub CLI Workaround
+
+Due to a known Cursor bug (Issue #3139), the `gh` CLI commands fail with "head: |: No such file or directory" errors. Use these GitHub API alternatives instead:
+
+### Check Workflow Runs
+```bash
+# List recent workflow runs for a branch
+curl -s -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/fernando-duarte/heteroskedasticity_identification/actions/runs?branch=add-rworkflows&per_page=5" \
+  | grep -A2 -B2 '"name":'
+
+# Check status of a specific workflow run (replace RUN_ID)
+curl -s -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/fernando-duarte/heteroskedasticity_identification/actions/runs/RUN_ID" \
+  | grep -E '"status"|"conclusion"|"html_url"'
+```
+
+### Check Pull Request Status
+```bash
+# Get PR information (replace PR_NUMBER)
+curl -s -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/fernando-duarte/heteroskedasticity_identification/pulls/PR_NUMBER" \
+  | grep -E '"state"|"mergeable"|"merged"'
+
+# Check PR checks status
+curl -s -H "Accept: application/vnd.github+json" \
+  "https://api.github.com/repos/fernando-duarte/heteroskedasticity_identification/commits/COMMIT_SHA/check-runs" \
+  | grep -E '"status"|"conclusion"|"name"'
+```
+
+### Get Latest Commit SHA
+```bash
+# For current branch
+git rev-parse HEAD
+
+# For a specific branch
+git rev-parse origin/add-rworkflows
+```
+
+### Direct Web Links
+- **Actions**: https://github.com/fernando-duarte/heteroskedasticity_identification/actions
+- **Pull Requests**: https://github.com/fernando-duarte/heteroskedasticity_identification/pulls
+- **Specific PR**: https://github.com/fernando-duarte/heteroskedasticity_identification/pull/1
+
+### Alternative: Use External Terminal
+If you need full `gh` CLI functionality, open Terminal.app (outside Cursor) and run commands there:
+```bash
+cd ~/Dropbox\ \(Personal\)/Research/vfci/V-FCI-Overleaf/heteroskedasticity
+gh pr checks 1
+gh run list --workflow=rworkflows.yml
+```
+
+## Project-Specific Rules
+
+### Problem-Solving Approach
+- **Before asking the user for help**: If something is not working or you can't figure out how to do something after 2-3 attempts, use Exa and Context7 to search for solutions
+- Use `mcp_exa_web_search_exa` for current information, error messages, and troubleshooting
+- Use `mcp_context7_resolve-library-id` and `mcp_context7_get-library-docs` for library-specific documentation
+- Only ask the user if you've exhausted research options or need clarification on their specific requirements
+
+### R Package Development
+- Follow tidyverse style guide
+- Use roxygen2 for documentation
+- Ensure all functions have examples
+- Run `devtools::check()` before committing
+
+### Git Workflow
+- Main branch: `main` or `master`
+- Feature branches: descriptive names (e.g., `add-rworkflows`)
+- Commit messages: clear and descriptive
+- Always check CI status before merging PRs 
