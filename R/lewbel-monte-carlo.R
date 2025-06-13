@@ -1,17 +1,23 @@
 #' Run Complete Lewbel (2012) Monte Carlo Simulation
 #'
-#' Executes a comprehensive Monte Carlo simulation to evaluate the performance of
-#' Lewbel's (2012) heteroscedasticity-based identification strategy. This is the
-#' main function that orchestrates all simulation components.
+#' Executes a comprehensive Monte Carlo simulation to evaluate the performance
+#' of Lewbel's (2012) heteroscedasticity-based identification strategy. This
+#' is the main function that orchestrates all simulation components.
 #'
-#' @param config List. Configuration object from create_default_config(). If NULL,
-#'   uses default configuration.
-#' @param run_verification Logical. Whether to run assumption verification (default: TRUE).
-#' @param run_bootstrap_demo Logical. Whether to run bootstrap demonstration (default: TRUE).
-#' @param run_sample_analysis Logical. Whether to run sample size analysis (default: TRUE).
-#' @param run_sensitivity Logical. Whether to run sensitivity analysis (default: TRUE).
-#' @param generate_plots Logical. Whether to generate visualization plots (default: TRUE).
-#' @param verbose Logical. Whether to print progress and results (default: TRUE).
+#' @param config List. Configuration object from create_default_config().
+#'   If NULL, uses default configuration.
+#' @param run_verification Logical. Whether to run assumption verification
+#'   (default: TRUE).
+#' @param run_bootstrap_demo Logical. Whether to run bootstrap demonstration
+#'   (default: TRUE).
+#' @param run_sample_analysis Logical. Whether to run sample size analysis
+#'   (default: TRUE).
+#' @param run_sensitivity Logical. Whether to run sensitivity analysis
+#'   (default: TRUE).
+#' @param generate_plots Logical. Whether to generate visualization plots
+#'   (default: TRUE).
+#' @param verbose Logical. Whether to print progress and results (default:
+#'   TRUE).
 #'
 #' @details
 #' This function runs a complete Monte Carlo evaluation including:
@@ -78,11 +84,19 @@ run_lewbel_monte_carlo <- function(config = NULL,
   # Verify assumptions if requested
   if (run_verification) {
     params_for_verification <- list(
-      beta1_0 = config$beta1_0, beta1_1 = config$beta1_1, gamma1 = config$gamma1,
-      beta2_0 = config$beta2_0, beta2_1 = config$beta2_1,
-      alpha1 = config$alpha1, alpha2 = config$alpha2, delta_het = config$delta_het
+      beta1_0 = config$beta1_0,
+      beta1_1 = config$beta1_1,
+      gamma1 = config$gamma1,
+      beta2_0 = config$beta2_0,
+      beta2_1 = config$beta2_1,
+      alpha1 = config$alpha1,
+      alpha2 = config$alpha2,
+      delta_het = config$delta_het
     )
-    verify_lewbel_assumptions(params = params_for_verification, verbose = verbose)
+    verify_lewbel_assumptions(
+      params = params_for_verification,
+      verbose = verbose
+    )
   }
 
   # Run main simulation
@@ -95,17 +109,29 @@ run_lewbel_monte_carlo <- function(config = NULL,
 
   # Run bootstrap demonstration if requested
   if (run_bootstrap_demo) {
-    bootstrap_demo <- run_bootstrap_demonstration(config, seeds, verbose = verbose)
+    bootstrap_demo <- run_bootstrap_demonstration(
+      config,
+      seeds,
+      verbose = verbose
+    )
   }
 
   # Run sample size analysis if requested
   if (run_sample_analysis) {
-    results_by_n <- run_sample_size_analysis(config, seeds, verbose = verbose)
+    results_by_n <- run_sample_size_analysis(
+      config,
+      seeds,
+      verbose = verbose
+    )
   }
 
   # Run sensitivity analysis if requested
   if (run_sensitivity) {
-    results_by_delta <- run_sensitivity_analysis(config, seeds, verbose = verbose)
+    results_by_delta <- run_sensitivity_analysis(
+      config,
+      seeds,
+      verbose = verbose
+    )
   }
 
   # Analyze results
@@ -113,17 +139,30 @@ run_lewbel_monte_carlo <- function(config = NULL,
 
   bootstrap_analysis <- NULL
   if (!is.null(bootstrap_demo)) {
-    bootstrap_analysis <- analyze_bootstrap_results(results_main, bootstrap_demo, config, verbose = verbose)
+    bootstrap_analysis <- analyze_bootstrap_results(
+      results_main,
+      bootstrap_demo,
+      config,
+      verbose = verbose
+    )
   }
 
   sample_analysis <- NULL
   if (!is.null(results_by_n)) {
-    sample_analysis <- analyze_sample_size_results(results_by_n, config, verbose = verbose)
+    sample_analysis <- analyze_sample_size_results(
+      results_by_n,
+      config,
+      verbose = verbose
+    )
   }
 
   sensitivity_analysis <- NULL
   if (!is.null(results_by_delta)) {
-    sensitivity_analysis <- analyze_sensitivity_results(results_by_delta, config, verbose = verbose)
+    sensitivity_analysis <- analyze_sensitivity_results(
+      results_by_delta,
+      config,
+      verbose = verbose
+    )
   }
 
   # Generate plots if requested
@@ -141,8 +180,11 @@ run_lewbel_monte_carlo <- function(config = NULL,
     }
 
     plots <- generate_all_plots(
-      results_main, results_by_n, results_by_delta,
-      bootstrap_analysis, config,
+      results_main,
+      results_by_n,
+      results_by_delta,
+      bootstrap_analysis,
+      config,
       verbose = verbose
     )
   }

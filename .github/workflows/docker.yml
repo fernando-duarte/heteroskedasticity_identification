@@ -66,12 +66,27 @@ jobs:
         flavor: |
           suffix=-${{ matrix.target }}
 
-    - name: Build Docker image
+    - name: Build Docker image (non-development)
+      if: matrix.target != 'development'
       uses: docker/build-push-action@v5
       with:
         context: .
-        file: ${{ matrix.target == 'development' && 'Dockerfile.dev' || 'Dockerfile' }}
-        target: ${{ matrix.target == 'development' && '' || matrix.target }}
+        file: Dockerfile
+        target: ${{ matrix.target }}
+        platforms: linux/amd64
+        push: false
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        outputs: type=docker,dest=/tmp/${{ matrix.target }}-image.tar
+
+    - name: Build Docker image (development)
+      if: matrix.target == 'development'
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: Dockerfile.dev
         platforms: linux/amd64
         push: false
         tags: ${{ steps.meta.outputs.tags }}
@@ -230,12 +245,26 @@ jobs:
         flavor: |
           suffix=${{ matrix.target == 'production' && '' || format('-{0}', matrix.target) }}
 
-    - name: Build and push Docker image
+    - name: Build and push Docker image (non-development)
+      if: matrix.target != 'development'
       uses: docker/build-push-action@v5
       with:
         context: .
-        file: ${{ matrix.target == 'development' && 'Dockerfile.dev' || 'Dockerfile' }}
-        target: ${{ matrix.target == 'development' && '' || matrix.target }}
+        file: Dockerfile
+        target: ${{ matrix.target }}
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Build and push Docker image (development)
+      if: matrix.target == 'development'
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: Dockerfile.dev
         platforms: linux/amd64,linux/arm64
         push: true
         tags: ${{ steps.meta.outputs.tags }}

@@ -1,6 +1,7 @@
 #' Create Distribution Plot of Estimators
 #'
-#' Creates a density plot comparing the distributions of OLS and 2SLS estimators.
+#' Creates a density plot comparing the distributions of OLS and 2SLS
+#' estimators.
 #'
 #' @param results_clean Data.frame. Cleaned simulation results.
 #' @param config List. Configuration object containing true parameter values.
@@ -33,20 +34,33 @@ plot_estimator_distributions <- function(results_clean, config) {
   )
 
   # Create plot
-  ggplot2::ggplot(plot_data_long, ggplot2::aes(x = Estimate, fill = Estimator)) +
+  ggplot2::ggplot(
+    plot_data_long,
+    ggplot2::aes(x = Estimate, fill = Estimator)
+  ) +
     ggplot2::geom_density(alpha = 0.7) +
-    ggplot2::geom_vline(xintercept = config$gamma1, linetype = "dashed", color = "red", linewidth = 1) +
+    ggplot2::geom_vline(
+      xintercept = config$gamma1,
+      linetype = "dashed",
+      color = "red",
+      linewidth = 1
+    ) +
     ggplot2::annotate("text",
       x = config$gamma1, y = Inf, label = paste("True =", config$gamma1),
       color = "red", angle = 90, vjust = 1.5, hjust = 1.1
     ) +
     ggplot2::labs(
       title = "Distribution of gamma1 Estimates",
-      subtitle = sprintf("N = %d, Replications = %d", config$main_sample_size, config$num_simulations),
+      subtitle = sprintf(
+        "N = %d, Replications = %d",
+        config$main_sample_size, config$num_simulations
+      ),
       x = "Estimated gamma1", y = "Density"
     ) +
     ggplot2::theme_minimal(base_size = 14) +
-    ggplot2::scale_fill_manual(values = c("OLS (Biased)" = "#d95f02", "2SLS (Lewbel)" = "#1b9e77"))
+    ggplot2::scale_fill_manual(
+      values = c("OLS (Biased)" = "#d95f02", "2SLS (Lewbel)" = "#1b9e77")
+    )
 }
 
 
@@ -74,12 +88,19 @@ plot_sample_size_consistency <- function(results_by_n, config) {
   plot_data <- dplyr::filter(results_by_n, !is.na(tsls_gamma1))
 
   # Create plot
-  ggplot2::ggplot(plot_data, ggplot2::aes(x = factor(sample_size), y = tsls_gamma1)) +
+  ggplot2::ggplot(
+    plot_data,
+    ggplot2::aes(x = factor(sample_size), y = tsls_gamma1)
+  ) +
     ggplot2::geom_boxplot(fill = "lightblue", alpha = 0.7) +
-    ggplot2::geom_hline(yintercept = config$gamma1, linetype = "dashed", color = "red") +
+    ggplot2::geom_hline(
+      yintercept = config$gamma1, linetype = "dashed", color = "red"
+    ) +
     ggplot2::labs(
       title = "2SLS Consistency: Estimates by Sample Size",
-      subtitle = "Estimates should concentrate around true value as N increases",
+      subtitle = paste0(
+        "Estimates should concentrate around true value as N increases"
+      ),
       x = "Sample Size", y = "2SLS Estimate of gamma1"
     ) +
     ggplot2::theme_minimal(base_size = 14)
@@ -100,7 +121,7 @@ plot_sample_size_consistency <- function(results_by_n, config) {
 #' config <- create_default_config()
 #' seeds <- generate_all_seeds(config)
 #' results_by_delta <- run_sensitivity_analysis(config, seeds)
-#' p3 <- plot_heteroscedasticity_sensitivity(results_by_delta, config)
+#' p3 <- plot_het_sensitivity(results_by_delta, config)
 #' print(p3)
 #' }
 #'
@@ -110,13 +131,19 @@ plot_het_sensitivity <- function(results_by_delta, config) {
   plot_data <- dplyr::filter(results_by_delta, !is.na(tsls_gamma1))
 
   # Create plot
-  ggplot2::ggplot(plot_data, ggplot2::aes(x = factor(delta_het), y = tsls_gamma1)) +
+  ggplot2::ggplot(
+    plot_data,
+    ggplot2::aes(x = factor(delta_het), y = tsls_gamma1)
+  ) +
     ggplot2::geom_boxplot(fill = "lightgreen", alpha = 0.7) +
-    ggplot2::geom_hline(yintercept = config$gamma1, linetype = "dashed", color = "red") +
+    ggplot2::geom_hline(
+      yintercept = config$gamma1, linetype = "dashed", color = "red"
+    ) +
     ggplot2::labs(
       title = "2SLS Performance by Heteroscedasticity Strength",
       subtitle = "Stronger heteroscedasticity should improve precision",
-      x = "Delta (Heteroscedasticity Parameter)", y = "2SLS Estimate of gamma1"
+      x = "Delta (Heteroscedasticity Parameter)",
+      y = "2SLS Estimate of gamma1"
     ) +
     ggplot2::theme_minimal(base_size = 14)
 }
@@ -124,7 +151,8 @@ plot_het_sensitivity <- function(results_by_delta, config) {
 
 #' Create First-Stage F Distribution Plot
 #'
-#' Creates a histogram of first-stage F-statistics with weak instrument threshold.
+#' Creates a histogram of first-stage F-statistics with weak instrument
+#' threshold.
 #'
 #' @param results_clean Data.frame. Cleaned simulation results.
 #' @param weak_iv_pct Numeric. Percentage of simulations with weak instruments.
@@ -138,12 +166,14 @@ plot_het_sensitivity <- function(results_by_delta, config) {
 #' results <- run_main_simulation(config, seeds)
 #' results_clean <- na.omit(results)
 #' weak_iv_pct <- mean(results_clean$first_stage_F < 10) * 100
-#' p4 <- plot_first_stage_f_distribution(results_clean, weak_iv_pct)
+#' p4 <- plot_first_stage_f_dist(results_clean, weak_iv_pct)
 #' print(p4)
 #' }
 #'
 #' @export
-plot_first_stage_f_dist <- function(results_clean, config = NULL, weak_iv_pct = NULL) {
+plot_first_stage_f_dist <- function(results_clean,
+                                    config = NULL,
+                                    weak_iv_pct = NULL) {
   # Handle different calling patterns
   if (is.null(weak_iv_pct)) {
     # Calculate weak_iv_pct if not provided
@@ -169,7 +199,10 @@ plot_first_stage_f_dist <- function(results_clean, config = NULL, weak_iv_pct = 
     ) +
     ggplot2::labs(
       title = "Distribution of First-Stage F-Statistics",
-      subtitle = sprintf("%.1f%% have F < 10 (weak instrument threshold)", weak_iv_pct),
+      subtitle = sprintf(
+        "%.1f%% have F < 10 (weak instrument threshold)",
+        weak_iv_pct
+      ),
       x = "First-Stage F-Statistic", y = "Count"
     ) +
     ggplot2::theme_minimal(base_size = 14)
@@ -178,9 +211,11 @@ plot_first_stage_f_dist <- function(results_clean, config = NULL, weak_iv_pct = 
 
 #' Create Bootstrap Confidence Intervals Plot
 #'
-#' Creates a plot showing set identification bounds with bootstrap confidence intervals.
+#' Creates a plot showing set identification bounds with bootstrap confidence
+#' intervals.
 #'
-#' @param bootstrap_examples Data.frame. Bootstrap examples with standard errors.
+#' @param bootstrap_examples Data.frame. Bootstrap examples with standard
+#'   errors.
 #' @param config List. Configuration object containing true parameter values.
 #'
 #' @return A ggplot2 object or NULL if insufficient data.
@@ -191,8 +226,10 @@ plot_first_stage_f_dist <- function(results_clean, config = NULL, weak_iv_pct = 
 #' seeds <- generate_all_seeds(config)
 #' results_main <- run_main_simulation(config, seeds)
 #' bootstrap_demo <- run_bootstrap_demonstration(config, seeds)
-#' bootstrap_examples <- analyze_bootstrap_results(results_main, bootstrap_demo, config)
-#' p5 <- plot_bootstrap_confidence_intervals(bootstrap_examples, config)
+#' bootstrap_examples <- analyze_bootstrap_results(
+#'   results_main, bootstrap_demo, config
+#' )
+#' p5 <- plot_bootstrap_ci(bootstrap_examples, config)
 #' if (!is.null(p5)) print(p5)
 #' }
 #'
@@ -223,14 +260,23 @@ plot_bootstrap_ci <- function(bootstrap_examples, config) {
       ),
       color = "steelblue", linewidth = 2
     ) +
-    ggplot2::geom_vline(xintercept = config$gamma1, linetype = "dashed", color = "red") +
+    ggplot2::geom_vline(
+      xintercept = config$gamma1, linetype = "dashed", color = "red"
+    ) +
     ggplot2::labs(
-      title = "Set Identification Bounds with Bootstrap Confidence Intervals",
-      subtitle = "Blue: point estimates, Gray: 95% CIs based on bootstrap SEs",
+      title = paste0(
+        "Set Identification Bounds with Bootstrap Confidence Intervals"
+      ),
+      subtitle = paste0(
+        "Blue: point estimates, Gray: 95% CIs based on bootstrap SEs"
+      ),
       x = "gamma1", y = "Example"
     ) +
     ggplot2::theme_minimal(base_size = 14) +
-    ggplot2::theme(axis.text.y = ggplot2::element_blank(), axis.ticks.y = ggplot2::element_blank())
+    ggplot2::theme(
+      axis.text.y = ggplot2::element_blank(),
+      axis.ticks.y = ggplot2::element_blank()
+    )
 }
 
 
@@ -256,7 +302,9 @@ plot_bootstrap_ci <- function(bootstrap_examples, config) {
 #' results_by_n <- run_sample_size_analysis(config, seeds)
 #' results_by_delta <- run_sensitivity_analysis(config, seeds)
 #' bootstrap_demo <- run_bootstrap_demonstration(config, seeds)
-#' bootstrap_examples <- analyze_bootstrap_results(results_main, bootstrap_demo, config)
+#' bootstrap_examples <- analyze_bootstrap_results(
+#'   results_main, bootstrap_demo, config
+#' )
 #'
 #' plots <- generate_all_plots(
 #'   results_main, results_by_n, results_by_delta,
@@ -265,21 +313,28 @@ plot_bootstrap_ci <- function(bootstrap_examples, config) {
 #' }
 #'
 #' @export
-generate_all_plots <- function(results_main, results_by_n, results_by_delta,
-                               bootstrap_examples, config, verbose = TRUE) {
+generate_all_plots <- function(results_main,
+                               results_by_n,
+                               results_by_delta,
+                               bootstrap_examples,
+                               config,
+                               verbose = TRUE) {
   if (verbose) {
     cat("\nGenerating enhanced plots...\n")
   }
 
   results_clean <- stats::na.omit(results_main)
-  weak_iv_pct <- mean(results_clean$first_stage_F < 10) * 100
+  weak_iv_pct <- mean(results_clean$first_stage_F < 10, na.rm = TRUE) * 100
 
   # Generate all plots
   plots <- list(
     distributions = plot_estimator_distributions(results_clean, config),
     sample_size = plot_sample_size_consistency(results_by_n, config),
     sensitivity = plot_het_sensitivity(results_by_delta, config),
-    first_stage_f = plot_first_stage_f_dist(results_clean, weak_iv_pct),
+    first_stage_f = plot_first_stage_f_dist(
+      results_clean,
+      weak_iv_pct = weak_iv_pct
+    ),
     bootstrap_ci = plot_bootstrap_ci(bootstrap_examples, config)
   )
 

@@ -7,7 +7,8 @@
 plot_bootstrap_ci(bootstrap_examples, config)
 }
 \arguments{
-\item{bootstrap_examples}{Data.frame. Bootstrap examples with standard errors.}
+\item{bootstrap_examples}{Data.frame. Bootstrap examples with standard
+errors.}
 
 \item{config}{List. Configuration object containing true parameter values.}
 }
@@ -15,7 +16,8 @@ plot_bootstrap_ci(bootstrap_examples, config)
 A ggplot2 object or NULL if insufficient data.
 }
 \description{
-Creates a plot showing set identification bounds with bootstrap confidence intervals.
+Creates a plot showing set identification bounds with bootstrap confidence
+intervals.
 }
 \examples{
 \dontrun{
@@ -23,8 +25,10 @@ config <- create_default_config()
 seeds <- generate_all_seeds(config)
 results_main <- run_main_simulation(config, seeds)
 bootstrap_demo <- run_bootstrap_demonstration(config, seeds)
-bootstrap_examples <- analyze_bootstrap_results(results_main, bootstrap_demo, config)
-p5 <- plot_bootstrap_confidence_intervals(bootstrap_examples, config)
+bootstrap_examples <- analyze_bootstrap_results(
+  results_main, bootstrap_demo, config
+)
+p5 <- plot_bootstrap_ci(bootstrap_examples, config)
 if (!is.null(p5)) print(p5)
 }
 

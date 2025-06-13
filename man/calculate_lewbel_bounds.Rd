@@ -4,23 +4,26 @@
 \alias{calculate_lewbel_bounds}
 \title{Calculate Set Identification Bounds for Lewbel Estimator}
 \usage{
-calculate_lewbel_bounds(data, tau, compute_se = FALSE, B = 100)
+calculate_lewbel_bounds(data, tau, compute_se = FALSE, b_reps = 100)
 }
 \arguments{
 \item{data}{Data.frame. Dataset containing Y1, Y2, Xk, Z variables.}
 
-\item{tau}{Numeric. Relaxation parameter for covariance restriction (0 <= tau < 1).
-When tau = 0, gives point identification.}
+\item{tau}{Numeric. Relaxation parameter for covariance restriction
+(0 <= tau < 1). When tau = 0, gives point identification.}
 
-\item{compute_se}{Logical. Whether to compute bootstrap standard errors (default: FALSE).}
+\item{compute_se}{Logical. Whether to compute bootstrap standard errors
+(default: FALSE).}
 
-\item{B}{Integer. Number of bootstrap replications if compute_se = TRUE (default: 100).}
+\item{b_reps}{Integer. Number of bootstrap replications if compute_se = TRUE
+(default: 100).}
 }
 \value{
 A list containing:
 \itemize{
 \item bounds: Numeric vector of length 2 with lower and upper bounds
-\item se: Numeric vector of length 2 with bootstrap standard errors (if requested)
+\item se: Numeric vector of length 2 with bootstrap standard errors
+(if requested)
 }
 }
 \description{
@@ -29,7 +32,8 @@ a relaxed covariance restriction. Optionally computes bootstrap standard
 errors for the bounds.
 }
 \details{
-Under the relaxed assumption |Corr(Z, \eqn{\epsilon_1 \epsilon_2})| <= tau |Corr(Z, \eqn{\epsilon_2^2})|,
+Under the relaxed assumption
+|Corr(Z, \eqn{\epsilon_1 \epsilon_2})| <= tau |Corr(Z, \eqn{\epsilon_2^2})|,
 the parameter gamma_1 is set-identified. The bounds are computed as the
 real roots of a quadratic equation in gamma_1.
 }
@@ -40,13 +44,18 @@ params <- list(
   beta2_0 = 1.0, beta2_1 = -1.0,
   alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
 )
+# TODO: Update generate_lewbel_data call if its return columns change to
+# snake_case
 data <- generate_lewbel_data(1000, params)
 
 # Point identification (tau = 0)
 bounds_point <- calculate_lewbel_bounds(data, tau = 0)
 
 # Set identification with bootstrap SE
-bounds_set <- calculate_lewbel_bounds(data, tau = 0.2, compute_se = TRUE, B = 100)
+bounds_set <- calculate_lewbel_bounds(
+  data,
+  tau = 0.2, compute_se = TRUE, b_reps = 100
+)
 }
 
 }

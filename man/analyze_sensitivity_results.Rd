@@ -24,7 +24,9 @@ Analyzes sensitivity of results to heteroscedasticity strength.
 config <- create_default_config()
 seeds <- generate_all_seeds(config)
 results_by_delta <- run_sensitivity_analysis(config, seeds)
-sensitivity_analysis <- analyze_sensitivity_results(results_by_delta, config)
+sensitivity_analysis <- analyze_sensitivity_results(
+  results_by_delta, config
+)
 }
 
 }

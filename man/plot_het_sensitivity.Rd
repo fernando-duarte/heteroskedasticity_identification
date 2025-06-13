@@ -22,7 +22,7 @@ Creates a boxplot showing 2SLS performance by heteroscedasticity strength.
 config <- create_default_config()
 seeds <- generate_all_seeds(config)
 results_by_delta <- run_sensitivity_analysis(config, seeds)
-p3 <- plot_heteroscedasticity_sensitivity(results_by_delta, config)
+p3 <- plot_het_sensitivity(results_by_delta, config)
 print(p3)
 }
 

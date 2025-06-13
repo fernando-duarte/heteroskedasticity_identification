@@ -256,3 +256,8 @@ OpenMP
 SSD
 nNote
 nTest
+arg
+str
+coeff
+linter
+nolint

@@ -10,7 +10,8 @@ generate_all_seeds(config)
 \item{config}{List. Configuration object from create_default_config().}
 }
 \value{
-A list containing seed vectors/matrices for different simulation parts.
+A list containing seed vectors/matrices for different simulation
+parts.
 }
 \description{
 Pre-generates all seeds needed for different parts of the Lewbel simulation

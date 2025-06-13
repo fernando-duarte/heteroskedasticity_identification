@@ -19,7 +19,9 @@
 generate_seed_matrix <- function(base_seed, n_experiments, n_reps_each) {
   set.seed(base_seed)
   seeds <- matrix(
-    sample.int(.Machine$integer.max / 2, n_experiments * n_reps_each),
+    sample.int(
+      .Machine$integer.max / 2, n_experiments * n_reps_each
+    ),
     nrow = n_experiments,
     ncol = n_reps_each
   )
@@ -32,14 +34,21 @@ generate_seed_matrix <- function(base_seed, n_experiments, n_reps_each) {
 #' Creates a comprehensive configuration list with all parameters needed
 #' for running Lewbel (2012) Monte Carlo simulations.
 #'
-#' @param num_simulations Integer. Number of main simulation runs (default: 1000).
-#' @param sample_sizes Integer vector. Sample sizes for consistency analysis (default: c(500, 1000, 2000)).
-#' @param main_sample_size Integer. Primary sample size for main results (default: 1000).
+#' @param num_simulations Integer. Number of main simulation runs
+#'   (default: 1000).
+#' @param sample_sizes Integer vector. Sample sizes for consistency analysis
+#'   (default: c(500, 1000, 2000)).
+#' @param main_sample_size Integer. Primary sample size for main results
+#'   (default: 1000).
 #' @param set_seed Integer. Base seed for reproducibility (default: 123).
-#' @param gamma1 Numeric. True value of the endogenous parameter (default: -0.8).
-#' @param delta_het Numeric. Heteroscedasticity strength parameter (default: 1.2).
-#' @param tau_set_id Numeric. Tau parameter for set identification (default: 0.2).
-#' @param bootstrap_reps Integer. Number of bootstrap replications (default: 100).
+#' @param gamma1 Numeric. True value of the endogenous parameter
+#'   (default: -0.8).
+#' @param delta_het Numeric. Heteroscedasticity strength parameter
+#'   (default: 1.2).
+#' @param tau_set_id Numeric. Tau parameter for set identification
+#'   (default: 0.2).
+#' @param bootstrap_reps Integer. Number of bootstrap replications
+#'   (default: 100).
 #'
 #' @return A list containing all configuration parameters.
 #'
@@ -81,7 +90,7 @@ create_default_config <- function(num_simulations = 200,
     num_simulations = num_simulations,
     sample_sizes = sample_sizes,
     main_sample_size = main_sample_size,
-    set_seed = 123,
+    set_seed = 123, # Base seed, not configurable through function arg
 
     # True Model Parameters (Triangular System)
     beta1_0 = beta1_0,
@@ -122,7 +131,8 @@ create_default_config <- function(num_simulations = 200,
 #'
 #' @param config List. Configuration object from create_default_config().
 #'
-#' @return A list containing seed vectors/matrices for different simulation parts.
+#' @return A list containing seed vectors/matrices for different simulation
+#'   parts.
 #'
 #' @examples
 #' \dontrun{
@@ -136,14 +146,14 @@ generate_all_seeds <- function(config) {
   list(
     main = 1:config$num_simulations + config$set_seed * 1000,
     by_n = generate_seed_matrix(
-      config$set_seed + 1,
-      length(config$sample_sizes),
-      config$n_reps_by_n
+      base_seed = config$set_seed + 1,
+      n_experiments = length(config$sample_sizes),
+      n_reps_each = config$n_reps_by_n
     ),
     by_delta = generate_seed_matrix(
-      config$set_seed + 2,
-      length(config$delta_het_values),
-      config$n_reps_by_delta
+      base_seed = config$set_seed + 2,
+      n_experiments = length(config$delta_het_values),
+      n_reps_each = config$n_reps_by_delta
     ),
     bootstrap_demo = 1:config$bootstrap_demo_size + config$set_seed * 3000
   )

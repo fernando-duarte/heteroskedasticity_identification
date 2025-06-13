@@ -15,7 +15,8 @@ plot_estimator_distributions(results_clean, config)
 A ggplot2 object.
 }
 \description{
-Creates a density plot comparing the distributions of OLS and 2SLS estimators.
+Creates a density plot comparing the distributions of OLS and 2SLS
+estimators.
 }
 \examples{
 \dontrun{

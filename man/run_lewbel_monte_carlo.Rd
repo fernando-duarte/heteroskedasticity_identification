@@ -15,20 +15,26 @@ run_lewbel_monte_carlo(
 )
 }
 \arguments{
-\item{config}{List. Configuration object from create_default_config(). If NULL,
-uses default configuration.}
+\item{config}{List. Configuration object from create_default_config().
+If NULL, uses default configuration.}
 
-\item{run_verification}{Logical. Whether to run assumption verification (default: TRUE).}
+\item{run_verification}{Logical. Whether to run assumption verification
+(default: TRUE).}
 
-\item{run_bootstrap_demo}{Logical. Whether to run bootstrap demonstration (default: TRUE).}
+\item{run_bootstrap_demo}{Logical. Whether to run bootstrap demonstration
+(default: TRUE).}
 
-\item{run_sample_analysis}{Logical. Whether to run sample size analysis (default: TRUE).}
+\item{run_sample_analysis}{Logical. Whether to run sample size analysis
+(default: TRUE).}
 
-\item{run_sensitivity}{Logical. Whether to run sensitivity analysis (default: TRUE).}
+\item{run_sensitivity}{Logical. Whether to run sensitivity analysis
+(default: TRUE).}
 
-\item{generate_plots}{Logical. Whether to generate visualization plots (default: TRUE).}
+\item{generate_plots}{Logical. Whether to generate visualization plots
+(default: TRUE).}
 
-\item{verbose}{Logical. Whether to print progress and results (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress and results (default:
+TRUE).}
 }
 \value{
 A list containing:
@@ -43,9 +49,9 @@ A list containing:
 }
 }
 \description{
-Executes a comprehensive Monte Carlo simulation to evaluate the performance of
-Lewbel's (2012) heteroscedasticity-based identification strategy. This is the
-main function that orchestrates all simulation components.
+Executes a comprehensive Monte Carlo simulation to evaluate the performance
+of Lewbel's (2012) heteroscedasticity-based identification strategy. This
+is the main function that orchestrates all simulation components.
 }
 \details{
 This function runs a complete Monte Carlo evaluation including:

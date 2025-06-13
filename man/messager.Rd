@@ -4,7 +4,11 @@
 \alias{messager}
 \title{Print messages}
 \usage{
-messager(..., v = Sys.getenv("VERBOSE") != "FALSE", parallel = FALSE)
+messager(
+  ...,
+  v = Sys.getenv("VERBOSE", unset = "TRUE") != "FALSE",
+  parallel = FALSE
+)
 }
 \arguments{
 \item{v}{Whether to print messages or not.}

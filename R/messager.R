@@ -13,10 +13,13 @@
 #' @return Null
 #' @keywords internal
 messager <- function(...,
-                     v = Sys.getenv("VERBOSE") != "FALSE",
+                     v = Sys.getenv("VERBOSE", unset = "TRUE") != "FALSE",
                      parallel = FALSE) {
   message_parallel <- function(...) {
-    system(sprintf('echo "%s"', paste0(..., collapse = "")))
+    system(sprintf(
+      'echo "%s"',
+      paste0(..., collapse = "")
+    ))
   }
   if (isTRUE(parallel)) {
     if (v) {

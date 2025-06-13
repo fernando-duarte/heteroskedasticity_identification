@@ -19,9 +19,11 @@ run_single_lewbel_simulation(
 
 \item{endog_var}{Character. Name of endogenous variable (default: "Y2").}
 
-\item{exog_vars}{Character vector. Names of exogenous variables (default: "Xk").}
+\item{exog_vars}{Character vector. Names of exogenous variables
+(default: "Xk").}
 
-\item{compute_bounds_se}{Logical. Whether to compute bootstrap SE for bounds (default: FALSE).}
+\item{compute_bounds_se}{Logical. Whether to compute bootstrap SE for bounds
+(default: FALSE).}
 }
 \value{
 A data.frame with one row containing simulation results including:

@@ -41,7 +41,9 @@ results_main <- run_main_simulation(config, seeds)
 results_by_n <- run_sample_size_analysis(config, seeds)
 results_by_delta <- run_sensitivity_analysis(config, seeds)
 bootstrap_demo <- run_bootstrap_demonstration(config, seeds)
-bootstrap_examples <- analyze_bootstrap_results(results_main, bootstrap_demo, config)
+bootstrap_examples <- analyze_bootstrap_results(
+  results_main, bootstrap_demo, config
+)
 
 plots <- generate_all_plots(
   results_main, results_by_n, results_by_delta,

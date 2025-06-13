@@ -14,7 +14,8 @@ run_sensitivity_analysis(config, seeds, verbose = TRUE)
 \item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
-A data.frame containing results for different heteroscedasticity parameters.
+A data.frame containing results for different heteroscedasticity
+parameters.
 }
 \description{
 Analyzes sensitivity of results to heteroscedasticity strength.

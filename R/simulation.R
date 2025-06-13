@@ -19,7 +19,10 @@
 #' @export
 run_main_simulation <- function(config, seeds, verbose = TRUE) {
   if (verbose) {
-    cat(sprintf("\nStarting main simulation with %d runs...\n", config$num_simulations))
+    cat(sprintf(
+      "\nStarting main simulation with %d runs...\n",
+      config$num_simulations
+    ))
   }
 
   # Set the base seed for reproducibility
@@ -32,15 +35,22 @@ run_main_simulation <- function(config, seeds, verbose = TRUE) {
   results <- furrr::future_map_dfr(
     1:config$num_simulations,
     function(i) {
-      run_single_lewbel_simulation(i,
-        list(
-          sample_size = config$main_sample_size,
-          beta1_0 = config$beta1_0, beta1_1 = config$beta1_1, gamma1 = config$gamma1,
-          beta2_0 = config$beta2_0, beta2_1 = config$beta2_1,
-          alpha1 = config$alpha1, alpha2 = config$alpha2,
-          delta_het = config$delta_het, tau_set_id = config$tau_set_id,
-          bootstrap_reps = config$bootstrap_reps
-        ),
+      params_list <- list(
+        sample_size = config$main_sample_size,
+        beta1_0 = config$beta1_0,
+        beta1_1 = config$beta1_1,
+        gamma1 = config$gamma1,
+        beta2_0 = config$beta2_0,
+        beta2_1 = config$beta2_1,
+        alpha1 = config$alpha1,
+        alpha2 = config$alpha2,
+        delta_het = config$delta_het,
+        tau_set_id = config$tau_set_id,
+        bootstrap_reps = config$bootstrap_reps
+      )
+      run_single_lewbel_simulation(
+        sim_id = i,
+        params = params_list,
         endog_var = config$endog_var_name,
         exog_vars = config$exog_var_names,
         compute_bounds_se = (i <= config$bootstrap_subset_size)
@@ -98,15 +108,22 @@ run_bootstrap_demonstration <- function(config, seeds, verbose = TRUE) {
   bootstrap_demo <- furrr::future_map_dfr(
     1:config$bootstrap_demo_size,
     function(i) {
-      run_single_lewbel_simulation(i,
-        list(
-          sample_size = config$main_sample_size,
-          beta1_0 = config$beta1_0, beta1_1 = config$beta1_1, gamma1 = config$gamma1,
-          beta2_0 = config$beta2_0, beta2_1 = config$beta2_1,
-          alpha1 = config$alpha1, alpha2 = config$alpha2,
-          delta_het = config$delta_het, tau_set_id = config$tau_set_id,
-          bootstrap_reps = config$bootstrap_reps
-        ),
+      params_list <- list(
+        sample_size = config$main_sample_size,
+        beta1_0 = config$beta1_0,
+        beta1_1 = config$beta1_1,
+        gamma1 = config$gamma1,
+        beta2_0 = config$beta2_0,
+        beta2_1 = config$beta2_1,
+        alpha1 = config$alpha1,
+        alpha2 = config$alpha2,
+        delta_het = config$delta_het,
+        tau_set_id = config$tau_set_id,
+        bootstrap_reps = config$bootstrap_reps
+      )
+      run_single_lewbel_simulation(
+        sim_id = i,
+        params = params_list,
         endog_var = config$endog_var_name,
         exog_vars = config$exog_var_names,
         compute_bounds_se = TRUE
@@ -157,9 +174,9 @@ run_sample_size_analysis <- function(config, seeds, verbose = TRUE) {
 
   results_by_n <- purrr::map2_dfr(
     config$sample_sizes, seq_along(config$sample_sizes),
-    function(n, idx) {
+    function(n_val, idx) {
       if (verbose) {
-        cat(sprintf("  Sample size %d...\n", n))
+        cat(sprintf("  Sample size %d...\n", n_val))
       }
 
       # Set seed based on the first seed in the matrix row
@@ -168,15 +185,22 @@ run_sample_size_analysis <- function(config, seeds, verbose = TRUE) {
       furrr::future_map_dfr(
         1:config$n_reps_by_n,
         function(j) {
-          run_single_lewbel_simulation(j,
-            list(
-              sample_size = n,
-              beta1_0 = config$beta1_0, beta1_1 = config$beta1_1, gamma1 = config$gamma1,
-              beta2_0 = config$beta2_0, beta2_1 = config$beta2_1,
-              alpha1 = config$alpha1, alpha2 = config$alpha2,
-              delta_het = config$delta_het, tau_set_id = config$tau_set_id,
-              bootstrap_reps = config$bootstrap_reps
-            ),
+          params_list <- list(
+            sample_size = n_val,
+            beta1_0 = config$beta1_0,
+            beta1_1 = config$beta1_1,
+            gamma1 = config$gamma1,
+            beta2_0 = config$beta2_0,
+            beta2_1 = config$beta2_1,
+            alpha1 = config$alpha1,
+            alpha2 = config$alpha2,
+            delta_het = config$delta_het,
+            tau_set_id = config$tau_set_id,
+            bootstrap_reps = config$bootstrap_reps
+          )
+          run_single_lewbel_simulation(
+            sim_id = j,
+            params = params_list,
             endog_var = config$endog_var_name,
             exog_vars = config$exog_var_names,
             compute_bounds_se = FALSE
@@ -209,7 +233,8 @@ run_sample_size_analysis <- function(config, seeds, verbose = TRUE) {
 #' @param seeds List. Seed object from generate_all_seeds().
 #' @param verbose Logical. Whether to print progress messages (default: TRUE).
 #'
-#' @return A data.frame containing results for different heteroscedasticity parameters.
+#' @return A data.frame containing results for different heteroscedasticity
+#'   parameters.
 #'
 #' @examples
 #' \dontrun{
@@ -229,9 +254,9 @@ run_sensitivity_analysis <- function(config, seeds, verbose = TRUE) {
 
   results_by_delta <- purrr::map2_dfr(
     config$delta_het_values, seq_along(config$delta_het_values),
-    function(d, idx) {
+    function(d_val, idx) {
       if (verbose) {
-        cat(sprintf("  Delta = %.1f...\n", d))
+        cat(sprintf("  Delta = %.1f...\n", d_val))
       }
 
       # Set seed based on the first seed in the matrix row
@@ -240,15 +265,22 @@ run_sensitivity_analysis <- function(config, seeds, verbose = TRUE) {
       furrr::future_map_dfr(
         1:config$n_reps_by_delta,
         function(j) {
-          run_single_lewbel_simulation(j,
-            list(
-              sample_size = config$main_sample_size,
-              beta1_0 = config$beta1_0, beta1_1 = config$beta1_1, gamma1 = config$gamma1,
-              beta2_0 = config$beta2_0, beta2_1 = config$beta2_1,
-              alpha1 = config$alpha1, alpha2 = config$alpha2,
-              delta_het = d, tau_set_id = config$tau_set_id,
-              bootstrap_reps = config$bootstrap_reps
-            ),
+          params_list <- list(
+            sample_size = config$main_sample_size,
+            beta1_0 = config$beta1_0,
+            beta1_1 = config$beta1_1,
+            gamma1 = config$gamma1,
+            beta2_0 = config$beta2_0,
+            beta2_1 = config$beta2_1,
+            alpha1 = config$alpha1,
+            alpha2 = config$alpha2,
+            delta_het = d_val,
+            tau_set_id = config$tau_set_id,
+            bootstrap_reps = config$bootstrap_reps
+          )
+          run_single_lewbel_simulation(
+            sim_id = j,
+            params = params_list,
             endog_var = config$endog_var_name,
             exog_vars = config$exog_var_names,
             compute_bounds_se = FALSE

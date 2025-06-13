@@ -15,7 +15,8 @@ plot_first_stage_f_dist(results_clean, config = NULL, weak_iv_pct = NULL)
 A ggplot2 object.
 }
 \description{
-Creates a histogram of first-stage F-statistics with weak instrument threshold.
+Creates a histogram of first-stage F-statistics with weak instrument
+threshold.
 }
 \examples{
 \dontrun{
@@ -24,7 +25,7 @@ seeds <- generate_all_seeds(config)
 results <- run_main_simulation(config, seeds)
 results_clean <- na.omit(results)
 weak_iv_pct <- mean(results_clean$first_stage_F < 10) * 100
-p4 <- plot_first_stage_f_distribution(results_clean, weak_iv_pct)
+p4 <- plot_first_stage_f_dist(results_clean, weak_iv_pct)
 print(p4)
 }
 

@@ -28,19 +28,26 @@ create_default_config(
 )
 }
 \arguments{
-\item{num_simulations}{Integer. Number of main simulation runs (default: 1000).}
+\item{num_simulations}{Integer. Number of main simulation runs
+(default: 1000).}
 
-\item{main_sample_size}{Integer. Primary sample size for main results (default: 1000).}
+\item{main_sample_size}{Integer. Primary sample size for main results
+(default: 1000).}
 
-\item{sample_sizes}{Integer vector. Sample sizes for consistency analysis (default: c(500, 1000, 2000)).}
+\item{sample_sizes}{Integer vector. Sample sizes for consistency analysis
+(default: c(500, 1000, 2000)).}
 
-\item{delta_het}{Numeric. Heteroscedasticity strength parameter (default: 1.2).}
+\item{delta_het}{Numeric. Heteroscedasticity strength parameter
+(default: 1.2).}
 
-\item{bootstrap_reps}{Integer. Number of bootstrap replications (default: 100).}
+\item{bootstrap_reps}{Integer. Number of bootstrap replications
+(default: 100).}
 
-\item{gamma1}{Numeric. True value of the endogenous parameter (default: -0.8).}
+\item{gamma1}{Numeric. True value of the endogenous parameter
+(default: -0.8).}
 
-\item{tau_set_id}{Numeric. Tau parameter for set identification (default: 0.2).}
+\item{tau_set_id}{Numeric. Tau parameter for set identification
+(default: 0.2).}
 
 \item{set_seed}{Integer. Base seed for reproducibility (default: 123).}
 }

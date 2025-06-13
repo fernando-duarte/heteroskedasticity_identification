@@ -7,19 +7,23 @@
 verify_lewbel_assumptions(
   data = NULL,
   config = NULL,
-  n = 10000,
+  n_obs = 10000,
   params = NULL,
   verbose = TRUE
 )
 }
 \arguments{
-\item{data}{Data.frame. Optional. Pre-generated data to verify (alternative to n/params).}
+\item{data}{Data.frame. Optional. Pre-generated data to verify (alternative
+to n_obs/params).}
 
-\item{config}{List. Optional. Configuration object (used with data parameter).}
+\item{config}{List. Optional. Configuration object (used with data
+parameter).}
 
-\item{n}{Integer. Sample size for verification (default: 10000, used with params).}
+\item{n_obs}{Integer. Sample size for verification (default: 10000, used
+with params).}
 
-\item{params}{List. Parameters for the DGP (same format as generate_lewbel_data).}
+\item{params}{List. Parameters for the DGP (same format as
+generate_lewbel_data).}
 
 \item{verbose}{Logical. Whether to print detailed output (default: TRUE).}
 }
@@ -34,7 +38,8 @@ the covariance restriction and instrument relevance condition.
 \details{
 The function tests:
 \itemize{
-\item Assumption A2: Cov(Z, \eqn{\epsilon_1 \epsilon_2}) = 0 (covariance restriction)
+\item Assumption A2: Cov(Z, \eqn{\epsilon_1 \epsilon_2}) = 0 (covariance
+restriction)
 \item Assumption A3: Cov(Z, \eqn{\epsilon_2^2}) != 0 (instrument relevance)
 \item Endogeneity: Cov(\eqn{\epsilon_1}, \eqn{\epsilon_2}) != 0
 }
@@ -42,7 +47,8 @@ The function tests:
 Can be called in two ways:
 \enumerate{
 \item verify_lewbel_assumptions(data, config) - using pre-generated data
-\item verify_lewbel_assumptions(n = 10000, params = params) - generating new data
+\item verify_lewbel_assumptions(n_obs = 10000, params = params) - generating
+new data
 }
 }
 \examples{
@@ -51,7 +57,8 @@ config <- create_default_config()
 params <- list(
   beta1_0 = config$beta1_0, beta1_1 = config$beta1_1, gamma1 = config$gamma1,
   beta2_0 = config$beta2_0, beta2_1 = config$beta2_1,
-  alpha1 = config$alpha1, alpha2 = config$alpha2, delta_het = config$delta_het
+  alpha1 = config$alpha1, alpha2 = config$alpha2,
+  delta_het = config$delta_het
 )
 verify_lewbel_assumptions(params = params)
 }

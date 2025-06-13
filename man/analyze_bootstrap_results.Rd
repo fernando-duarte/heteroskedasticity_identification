@@ -19,7 +19,8 @@ analyze_bootstrap_results(results_main, bootstrap_demo, config, verbose = TRUE)
 A data.frame with bootstrap examples.
 }
 \description{
-Analyzes and displays bootstrap standard error results for set identification bounds.
+Analyzes and displays bootstrap standard error results for set
+identification bounds.
 }
 \examples{
 \dontrun{
@@ -27,7 +28,9 @@ config <- create_default_config()
 seeds <- generate_all_seeds(config)
 results_main <- run_main_simulation(config, seeds)
 bootstrap_demo <- run_bootstrap_demonstration(config, seeds)
-bootstrap_analysis <- analyze_bootstrap_results(results_main, bootstrap_demo, config)
+bootstrap_analysis <- analyze_bootstrap_results(
+  results_main, bootstrap_demo, config
+)
 }
 
 }
