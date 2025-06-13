@@ -14,6 +14,20 @@ BugReports:
     https://github.com/fernando-duarte/heteroskedasticity_identification/issues
 Depends:
     R (>= 4.2)
+Imports:
+    AER,
+    boot,
+    dplyr,
+    furrr,
+    future,
+    ggplot2,
+    knitr,
+    magrittr,
+    purrr,
+    rlang,
+    stats,
+    tidyr,
+    utils
 Suggests:
     knitr,
     rmarkdown,
