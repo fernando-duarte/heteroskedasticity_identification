@@ -7,3 +7,4 @@ check_monitor_status.sh
 pr_logs/
 monitor.log
 ..Rcheck
+enable_github_pages.sh
