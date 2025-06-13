@@ -88,9 +88,9 @@ the covariance restriction and instrument relevance condition.</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The function tests:</p><ul><li><p>Assumption A2: Cov(Z, _1 _2) = 0 (covariance restriction)</p></li>
-<li><p>Assumption A3: Cov(Z, _2^2) != 0 (instrument relevance)</p></li>
-<li><p>Endogeneity: Cov(_1, _2) != 0</p></li>
+    <p>The function tests:</p><ul><li><p>Assumption A2: Cov(Z, \(\epsilon_1 \epsilon_2\)) = 0 (covariance restriction)</p></li>
+<li><p>Assumption A3: Cov(Z, \(\epsilon_2^2\)) != 0 (instrument relevance)</p></li>
+<li><p>Endogeneity: Cov(\(\epsilon_1\), \(\epsilon_2\)) != 0</p></li>
 </ul><p>Can be called in two ways:</p><ol><li><p>verify_lewbel_assumptions(data, config) - using pre-generated data</p></li>
 <li><p>verify_lewbel_assumptions(n = 10000, params = params) - generating new data</p></li>
 </ol></div>
