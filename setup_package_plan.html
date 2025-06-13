@@ -97,7 +97,7 @@ Roxygen:        list(markdown = TRUE)</code></pre>
 <h2 id="id_5-enable-the-rworkflows-ci-suite">5. Enable the <code>rworkflows</code> CI Suite<a class="anchor" aria-label="anchor" href="#id_5-enable-the-rworkflows-ci-suite"></a></h2>
 <p>Back in R, run:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">rworkflows</span><span class="fu">::</span><span class="fu">use_workflow</span><span class="op">(</span>template <span class="op">=</span> <span class="st">"templateR"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">rworkflows</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rworkflows/man/use_workflow.html" class="external-link">use_workflow</a></span><span class="op">(</span>template <span class="op">=</span> <span class="st">"templateR"</span><span class="op">)</span></span></code></pre></div>
 <p>This creates or updates <code>.github/workflows/rworkflows.yaml</code> to:</p>
 <ul><li>Run <code>R CMD check</code> across platforms</li>
 <li>Build vignettes and pkgdown site</li>
