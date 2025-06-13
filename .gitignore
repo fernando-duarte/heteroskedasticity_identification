@@ -81,6 +81,7 @@ setup_env.sh
 # Pre-commit backups
 *.backup.yaml
 .pre-commit-config.backup.yaml
+.pre-commit-config-*.yaml
 
 # LaTeX/LyX files
 *.lyx~
