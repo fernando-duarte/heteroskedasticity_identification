@@ -51,4 +51,4 @@ if (!setequal(old_rd_files, new_rd_files)) {
 # Exit with non-zero status if changes were made
 if (changed) {
   quit(status = 1)
-} 
+}

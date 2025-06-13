@@ -24,4 +24,4 @@ if (!md_exists || rmd_time > md_time) {
   cat("README.md is out of sync with README.Rmd\n")
   cat("Please run: rmarkdown::render('README.Rmd', output_format = 'github_document')\n")
   quit(status = 1)
-} 
+}

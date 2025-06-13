@@ -1,0 +1,1647 @@
+#LyX 2.4 created this file. For more info see https://www.lyx.org/
+\lyxformat 620
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\begin_preamble
+\usepackage{amsthm}\usepackage{enumitem}% For custom list labels
+
+
+% ---------- shortcuts ----------
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\cov}{\operatorname{Cov}}
+\newcommand{\corr}{\operatorname{Corr}}
+\newcommand{\var}{\operatorname{Var}}
+\newcommand{\plim}{\operatorname*{plim}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+
+% ---------- theorem environments ----------
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}\newtheorem{remark}{Remark}
+\end_preamble
+\use_default_options false
+\begin_modules
+theorems-ams
+\end_modules
+\maintain_unincluded_children no
+\language english
+\language_package none
+\inputencoding utf8
+\fontencoding default
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_roman_osf false
+\font_sans_osf false
+\font_typewriter_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 2
+\use_package amssymb 2
+\use_package cancel 0
+\use_package esint 1
+\use_package mathdots 0
+\use_package mathtools 0
+\use_package mhchem 0
+\use_package stackrel 0
+\use_package stmaryrd 0
+\use_package undertilde 0
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\use_formatted_ref 0
+\use_minted 0
+\use_lineno 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tablestyle default
+\tracking_changes false
+\output_changes false
+\change_bars false
+\postpone_fragile_content true
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\docbook_table_output 0
+\docbook_mathml_prefix 1
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Heteroscedasticity-Based Identification
+\end_layout
+
+\begin_layout Section
+Preliminaries and Notation
+\end_layout
+
+\begin_layout Standard
+This document summarizes the heteroscedasticity-based identification strategy for models with endogenous regressors,
+ as developed by Lewbel (2012),
+ Rigobon (2003) and Prono (2XXX),
+ and proposes an application to a time-series context.
+ The method provides a way to construct valid instruments from the model's data when traditional external instruments are unavailable and heteroskedasticity is present.
+\end_layout
+
+\begin_layout Standard
+Throughout,
+ 
+\begin_inset Formula $Z=g(X)$
+\end_inset
+
+ denotes a transformation of the exogenous variables,
+ constructed to be mean-zero.
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Thus,
+ we write 
+\begin_inset Formula $Z$
+\end_inset
+
+ to mean the centered variable 
+\begin_inset Formula $Z-\E[Z]$
+\end_inset
+
+ for population moments and the sample-demeaned version,
+ 
+\begin_inset Formula $Z_{i}-\bar{Z}$
+\end_inset
+
+,
+ in calculations when using empirical data in a finite sample.
+\end_layout
+
+\end_inset
+
+ All instruments are therefore understood to be mean-zero.
+\end_layout
+
+\begin_layout Section
+Structural Forms and Reduced-Form Residuals
+\end_layout
+
+\begin_layout Standard
+Let 
+\begin_inset Formula $(Y_{1},Y_{2})^{}$
+\end_inset
+
+ be an endogenous vector,
+ 
+\begin_inset Formula $X$
+\end_inset
+
+ a vector of exogenous variables (including a constant),
+ and 
+\begin_inset Formula $Z=g(X)$
+\end_inset
+
+ as above.
+ The models we consider are:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\textbf{Triangular:}\quad & Y_{1}=X'\beta_{1}+\gamma_{1}Y_{2}+\varepsilon_{1}, & \quad Y_{2}=X'\beta_{2}+\varepsilon_{2},\\[3pt]
+\textbf{Simultaneous:}\quad & Y_{1}=X'\beta_{1}+\gamma_{1}Y_{2}+\varepsilon_{1}, & \quad Y_{2}=X'\beta_{2}+\gamma_{2}Y_{1}+\varepsilon_{2}.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Projecting each 
+\begin_inset Formula $Y_{j}$
+\end_inset
+
+ on 
+\begin_inset Formula $X$
+\end_inset
+
+ yields 
+\emph on
+reduced-form residuals
+\emph default
+ 
+\begin_inset Formula $W_{j}\triangleq Y_{j}-X'(\E[XX'])^{-1}\E[XY_{j}]$
+\end_inset
+
+.
+ A short calculation gives 
+\begin_inset Formula 
+\[
+W_{1}=\frac{\varepsilon_{1}+\gamma_{1}\varepsilon_{2}}{1-\gamma_{1}\gamma_{2}},\qquad W_{2}=\frac{\varepsilon_{2}+\gamma_{2}\varepsilon_{1}}{1-\gamma_{1}\gamma_{2}},
+\]
+
+\end_inset
+
+with the triangular case obtained by setting
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Formula $\gamma_{2}=0$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{remark}
+\end_layout
+
+\end_inset
+
+ The algebra follows directly from solving the two-equation system for the reduced form and collecting the error terms.
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{remark}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Core Assumptions for Point Identification
+\end_layout
+
+\begin_layout Standard
+The method relies on the following key assumptions:
+ 
+\end_layout
+
+\begin_layout Standard
+[label=(A
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+arabic*
+\end_layout
+
+\end_inset
+
+)] 
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Strict exogeneity.
+
+\series default
+ 
+\begin_inset Formula $\E[\varepsilon_{j}\mid X]=0$
+\end_inset
+
+ for 
+\begin_inset Formula $j=1,2$
+\end_inset
+
+.
+ 
+\emph on
+Time-series note:
+
+\emph default
+ in Section
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:timeseries"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ we weaken this to a martingale-difference assumption and add HAC inference.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Covariance restriction.
+
+\series default
+ 
+\begin_inset Formula $\cov(Z,\varepsilon_{1}\varepsilon_{2})=0$
+\end_inset
+
+.
+ This holds automatically if the errors have a common factor structure 
+\begin_inset Formula $\varepsilon_{j}=a_{j}u+\eta_{j}$
+\end_inset
+
+ where the common factor 
+\begin_inset Formula $u$
+\end_inset
+
+ is uncorrelated with and mean independent of 
+\begin_inset Formula $Z$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Instrument relevance via heteroscedasticity.
+
+\series default
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Argument listpreamble:1
+status collapsed
+
+\begin_layout Plain Layout
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+itemsep
+\end_layout
+
+\end_inset
+
+2pt
+\end_layout
+
+\end_inset
+
+
+\emph on
+Triangular:
+
+\emph default
+ 
+\begin_inset Formula $\cov(Z,\varepsilon_{2}^{2})\neq0$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+Simultaneous:
+
+\emph default
+ the 
+\begin_inset Formula $r\times2$
+\end_inset
+
+ matrix 
+\begin_inset Formula $\Phi_{W}=[\,\cov(Z,W_{1}^{2})\;\;\cov(Z,W_{2}^{2})\,]$
+\end_inset
+
+ has rank
+\begin_inset space ~
+\end_inset
+
+2.
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+
+\series bold
+Normalization (simultaneous case).
+
+\series default
+ The parameter space for 
+\begin_inset Formula $(\gamma_{1},\gamma_{2})$
+\end_inset
+
+ precludes the observationally equivalent pair 
+\begin_inset Formula $(1/\gamma_{2},1/\gamma_{1})$
+\end_inset
+
+ unless 
+\begin_inset Formula $\gamma_{1}\gamma_{2}=1$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Section
+Triangular System:
+ Closed-Form Identification and 2SLS
+\end_layout
+
+\begin_layout Subsection
+Closed-form
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\gamma_{1}=\frac{\cov(Z,W_{1}W_{2})}{\cov(Z,W_{2}^{2})}.\label{eq:gamma1_id}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{remark}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+[
+\end_layout
+
+\end_inset
+
+Why 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:gamma1_id"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ identifies 
+\begin_inset Formula $\gamma_{1}$
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+]
+\end_layout
+
+\end_inset
+
+ Under
+\begin_inset space ~
+\end_inset
+
+(A2) the numerator simplifies to 
+\begin_inset Formula $\cov(Z,\varepsilon_{1}\varepsilon_{2})+\gamma_{1}\cov(Z,\varepsilon_{2}^{2})=\gamma_{1}\cov(Z,\varepsilon_{2}^{2})$
+\end_inset
+
+.
+ Because the denominator is non-zero by (A3),
+ 
+\begin_inset Formula $\gamma_{1}$
+\end_inset
+
+ is point identified.
+ 
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{remark}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Feasible two-step 2SLS
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument listpreamble:1
+status collapsed
+
+\begin_layout Plain Layout
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+itemsep
+\end_layout
+
+\end_inset
+
+2pt
+\end_layout
+
+\end_inset
+
+
+\series bold
+Generate residuals.
+
+\series default
+ Regress 
+\begin_inset Formula $Y_{2}$
+\end_inset
+
+ on 
+\begin_inset Formula $X$
+\end_inset
+
+ via OLS and store the residuals 
+\begin_inset Formula $\hat{\varepsilon}_{2}=Y_{2}-X'\hat{\beta}_{2}^{\text{OLS}}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Construct the heteroscedasticity-based instrument.
+
+\series default
+ The generated instrument is 
+\begin_inset Formula $IV=(Z-\bar{Z})\hat{\varepsilon}_{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+First stage.
+
+\series default
+ Regress the endogenous variable 
+\begin_inset Formula $Y_{2}$
+\end_inset
+
+ on the exogenous variables and the generated instrument,
+ 
+\begin_inset Formula $[X,IV]$
+\end_inset
+
+,
+ to obtain fitted values 
+\begin_inset Formula $\hat{Y}_{2}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Enumerate
+
+\series bold
+Second stage.
+
+\series default
+ Regress 
+\begin_inset Formula $Y_{1}$
+\end_inset
+
+ on 
+\begin_inset Formula $[X,\hat{Y}_{2}]$
+\end_inset
+
+ to estimate 
+\begin_inset Formula $(\beta_{1},\gamma_{1})$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Paragraph
+Practical guidance.
+\end_layout
+
+\begin_layout Standard
+Weak-instrument concerns apply because the instrument is generated.
+ Report the first-stage F-statistic on 
+\begin_inset Formula $IV$
+\end_inset
+
+ and,
+ where necessary,
+ use weak-IV-robust inference.
+ Standard errors should account for the first-stage estimation step,
+ typically via GMM or bootstrap.
+\end_layout
+
+\begin_layout Section
+GMM Moment Conditions
+\end_layout
+
+\begin_layout Standard
+The identification strategy can be expressed more generally using GMM.
+ The core idea is to form moment conditions that are zero at the true parameter values 
+\begin_inset Formula $\theta$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Triangular system
+\end_layout
+
+\begin_layout Standard
+The parameter vector is 
+\begin_inset Formula $\theta=(\beta_{1}',\gamma_{1},\beta_{2}')'$
+\end_inset
+
+.
+ The moment vector is formed by multiplying instruments by the model's structural errors,
+ which are defined as 
+\begin_inset Formula $\varepsilon_{1}(\theta)=Y_{1}-X'\beta_{1}-Y_{2}\gamma_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon_{2}(\theta)=Y_{2}-X'\beta_{2}$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\begin{equation}
+Q_{\text{TRI}}(\theta)=\begin{pmatrix}X\cdot\varepsilon_{1}(\theta)\\[3pt]
+X\cdot\varepsilon_{2}(\theta)\\[3pt]
+Z\cdot\varepsilon_{1}(\theta)\cdot\varepsilon_{2}(\theta)
+\end{pmatrix}.\label{eq:moment_tri}
+\end{equation}
+
+\end_inset
+
+The instruments are constructed directly from the exogenous data:
+ 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Argument listpreamble:1
+status collapsed
+
+\begin_layout Plain Layout
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+itemsep
+\end_layout
+
+\end_inset
+
+0pt
+\end_layout
+
+\end_inset
+
+For the two mean equations,
+ the instruments are the exogenous variables 
+\begin_inset Formula $X$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+For the covariance restriction,
+ the instrument is the heteroscedasticity driver 
+\begin_inset Formula $Z$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Since the errors are functions of data and parameters,
+ the entire moment vector is observable for any candidate 
+\begin_inset Formula $\theta$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Simultaneous system
+\end_layout
+
+\begin_layout Standard
+The parameter vector is 
+\begin_inset Formula $\theta=(\beta_{1}',\gamma_{1},\beta_{2}',\gamma_{2})'$
+\end_inset
+
+.
+ The structural errors are now 
+\begin_inset Formula $\varepsilon_{1}(\theta)=Y_{1}-X'\beta_{1}-Y_{2}\gamma_{1}$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon_{2}(\theta)=Y_{2}-X'\beta_{2}-Y_{1}\gamma_{2}$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\begin{equation}
+Q_{\text{SIM}}(\theta)=\begin{pmatrix}X\cdot\varepsilon_{1}(\theta)\\[3pt]
+X\cdot\varepsilon_{2}(\theta)\\[3pt]
+Z\cdot\varepsilon_{1}(\theta)\cdot\varepsilon_{2}(\theta)
+\end{pmatrix}.\label{eq:moment_sim}
+\end{equation}
+
+\end_inset
+
+The instruments are again constructed from exogenous data:
+ 
+\begin_inset Formula $X$
+\end_inset
+
+ for the mean equations and 
+\begin_inset Formula $Z$
+\end_inset
+
+ for the covariance restriction.
+ Estimation proceeds by finding the parameter vector 
+\begin_inset Formula $\hat{\theta}$
+\end_inset
+
+ that minimizes the sample analog of the moment conditions,
+ 
+\begin_inset Formula $\bar{Q}(\theta)'W\bar{Q}(\theta)$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $W$
+\end_inset
+
+ is a weighting matrix.
+\end_layout
+
+\begin_layout Section
+Set Identification Under a Relaxed Covariance Restriction
+\end_layout
+
+\begin_layout Standard
+When assumption (A2) is weakened to allow for a small correlation,
+ 
+\begin_inset Formula $|\corr(Z,\varepsilon_{1}\varepsilon_{2})|\le\tau|\corr(Z,\varepsilon_{2}^{2})|,\;\tau\in[0,1)$
+\end_inset
+
+,
+ the parameter 
+\begin_inset Formula $\gamma_{1}$
+\end_inset
+
+ in the triangular model is set-identified rather than point-identified.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{theorem}[Bounds for 
+\backslash
+(
+\backslash
+gamma_1
+\backslash
+) with 
+\backslash
+(
+\backslash
+tau>0
+\backslash
+)]
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset CommandInset label
+LatexCommand label
+name "thm:bounds"
+
+\end_inset
+
+ 
+\begin_inset Formula $\gamma_{1}$
+\end_inset
+
+ is contained in the closed interval whose endpoints are the (real) roots of the quadratic equation in 
+\begin_inset Formula $\gamma_{1}$
+\end_inset
+
+:
+ 
+\begin_inset Formula 
+\[
+\frac{\cov(Z,W_{1}W_{2})^{2}}{\cov(Z,W_{2}^{2})^{2}}-\frac{\var(W_{1}W_{2})}{\var(W_{2}^{2})}\tau^{2}+2\!\left(\frac{\cov(W_{1}W_{2},W_{2}^{2})}{\var(W_{2}^{2})}\tau^{2}-\frac{\cov(Z,W_{1}W_{2})}{\cov(Z,W_{2}^{2})}\right)\!\gamma_{1}+(1-\tau^{2})\gamma_{1}^{2}=0.
+\]
+
+\end_inset
+
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{theorem}
+\end_layout
+
+\end_inset
+
+ The interval collapses to the point estimate from 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "eq:gamma1_id"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+
+\end_inset
+
+ when 
+\begin_inset Formula $\tau=0$
+\end_inset
+
+ and widens as 
+\begin_inset Formula $\tau\to1$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Paragraph
+Identification of other parameters.
+\end_layout
+
+\begin_layout Standard
+The remaining parameters are identified conditional on a value of 
+\begin_inset Formula $\gamma_{1}$
+\end_inset
+
+ from its identified set.
+ 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Argument listpreamble:1
+status collapsed
+
+\begin_layout Plain Layout
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+itemsep
+\end_layout
+
+\end_inset
+
+0pt
+\end_layout
+
+\end_inset
+
+The parameter 
+\begin_inset Formula $\beta_{2}$
+\end_inset
+
+ is always point-identified by OLS:
+ 
+\begin_inset Formula $\hat{\beta}_{2}=(\E[X'X])^{-1}\E[X'Y_{2}]$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+For each value 
+\begin_inset Formula $\gamma_{1,k}$
+\end_inset
+
+ in the identified interval for 
+\begin_inset Formula $\gamma_{1}$
+\end_inset
+
+,
+ there is a corresponding identified value for 
+\begin_inset Formula $\beta_{1}$
+\end_inset
+
+,
+ given by 
+\begin_inset Formula $\beta_{1,k}=(\E[X'X])^{-1}\E[X'(Y_{1}-Y_{2}\gamma_{1,k})]$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The result is an identified set of parameter pairs 
+\begin_inset Formula $(\beta_{1},\gamma_{1})$
+\end_inset
+
+ corresponding to the interval for 
+\begin_inset Formula $\gamma_{1}$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Two Illustrative Extensions
+\end_layout
+
+\begin_layout Standard
+The core idea can be adapted to other contexts by creatively defining the heteroscedasticity-generating variable 
+\begin_inset Formula $Z$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Conditional heteroscedasticity (Prono)
+\end_layout
+
+\begin_layout Paragraph
+Context and Model.
+\end_layout
+
+\begin_layout Standard
+In a time-series setting,
+ the structural model is a triangular system:
+ 
+\begin_inset Formula 
+\begin{align*}
+Y_{1t} & =X_{t}'\beta_{1}+\gamma_{1}Y_{2t}+\varepsilon_{1t}\\
+Y_{2t} & =X_{t}'\beta_{2}+\varepsilon_{2t}
+\end{align*}
+
+\end_inset
+
+The key insight is that the error variance may be time-varying and predictable.
+ Prono's extension assumes 
+\begin_inset Formula $\varepsilon_{2t}$
+\end_inset
+
+ follows a GARCH process,
+ where its conditional variance is a function of past errors and variances:
+ 
+\begin_inset Formula 
+\[
+\var(\varepsilon_{2t}\mid\mathcal{F}_{t-1})=\sigma_{2t}^{2}=\omega+\alpha\varepsilon_{2,t-1}^{2}+\beta\sigma_{2,t-1}^{2}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Procedure.
+\end_layout
+
+\begin_layout Standard
+The fitted conditional variance from the GARCH model serves as the heteroscedasticity driver.
+ 
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument listpreamble:1
+status collapsed
+
+\begin_layout Plain Layout
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+itemsep
+\end_layout
+
+\end_inset
+
+2pt
+\end_layout
+
+\end_inset
+
+Estimate the second equation by OLS to get residuals 
+\begin_inset Formula $\hat{\varepsilon}_{2t}=Y_{2t}-X_{t}'\hat{\beta}_{2}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Fit a GARCH(1,1) model to the residuals 
+\begin_inset Formula $\hat{\varepsilon}_{2t}$
+\end_inset
+
+ to obtain the series of fitted conditional variances,
+ 
+\begin_inset Formula $\hat{\sigma}_{2t}^{2}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+This fitted variance is the heteroscedasticity driver:
+ set 
+\begin_inset Formula $Z_{t}=\hat{\sigma}_{2t}^{2}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Construct the generated instrument:
+ 
+\begin_inset Formula $IV_{t}=(Z_{t}-\bar{Z})\hat{\varepsilon}_{2t}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Proceed with 2SLS as in Section 4.2,
+ using 
+\begin_inset Formula $[X_{t},IV_{t}]$
+\end_inset
+
+ as instruments for 
+\begin_inset Formula $Y_{2t}$
+\end_inset
+
+ in the first structural equation.
+ Use HAC-robust standard errors.
+ 
+\end_layout
+
+\begin_layout Subsection
+Regime heteroscedasticity (Rigobon)
+\end_layout
+
+\begin_layout Paragraph
+Context and Model.
+\end_layout
+
+\begin_layout Standard
+The model is a simultaneous system where the error variances differ across observable,
+ discrete regimes (e.g.,
+ pre- and post-policy change,
+ or high- vs.
+ low-volatility periods).
+ 
+\begin_inset Formula 
+\begin{align*}
+Y_{1} & =X'\beta_{1}+\gamma_{1}Y_{2}+\varepsilon_{1}\\
+Y_{2} & =X'\beta_{2}+\gamma_{2}Y_{1}+\varepsilon_{2}
+\end{align*}
+
+\end_inset
+
+The key assumption is that for at least one error term 
+\begin_inset Formula $\varepsilon_{j}$
+\end_inset
+
+,
+ its variance changes across regimes 
+\begin_inset Formula $s$
+\end_inset
+
+,
+ while the covariance between the errors remains constant:
+ 
+\begin_inset Formula 
+\begin{align*}
+\var(\varepsilon_{j}\mid s) & \neq\var(\varepsilon_{j}\mid s')\quad\text{for }s\neq s'\\
+\cov(\varepsilon_{1},\varepsilon_{2}\mid s) & =\text{constant for all }s.
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Procedure.
+\end_layout
+
+\begin_layout Standard
+The regime indicators are used to generate the instrument.
+ 
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument listpreamble:1
+status collapsed
+
+\begin_layout Plain Layout
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+itemsep
+\end_layout
+
+\end_inset
+
+2pt
+\end_layout
+
+\end_inset
+
+Estimate the second equation by OLS to get residuals 
+\begin_inset Formula $\hat{\varepsilon}_{2}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Create a set of dummy variables 
+\begin_inset Formula $\{D_{1},\dots,D_{S}\}$
+\end_inset
+
+ for the regimes.
+ 
+\end_layout
+
+\begin_layout Enumerate
+The heteroscedasticity drivers are these dummies:
+ set 
+\begin_inset Formula $Z$
+\end_inset
+
+ to be the vector of centered dummies,
+ 
+\begin_inset Formula $Z_{s}=D_{s}-p_{s}$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $p_{s}$
+\end_inset
+
+ is the sample proportion of observations in regime 
+\begin_inset Formula $s$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Construct the generated instrument(s):
+ 
+\begin_inset Formula $IV_{s}=Z_{s}\hat{\varepsilon}_{2}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Proceed with 2SLS,
+ using 
+\begin_inset Formula $[X,IV_{1},\dots,IV_{S}]$
+\end_inset
+
+ as instruments for 
+\begin_inset Formula $Y_{2}$
+\end_inset
+
+ in the main equation.
+ 
+\end_layout
+
+\begin_layout Section
+Time-Series Variant with Log-Linear Conditional Variances
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:timeseries"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Context and Model.
+\end_layout
+
+\begin_layout Standard
+This extension formalizes identification within a GMM framework for a stationary and mixing time series.
+ The structural model is a simultaneous system:
+ 
+\begin_inset Formula 
+\begin{align*}
+Y_{1t} & =X_{t}'\beta_{1}+\gamma_{1}Y_{2t}+\varepsilon_{1t}\\
+Y_{2t} & =X_{t}'\beta_{2}+\gamma_{2}Y_{1t}+\varepsilon_{2t}
+\end{align*}
+
+\end_inset
+
+The key assumption is that the conditional variances are an explicit log-linear function of the exogenous variables 
+\begin_inset Formula $X_{t}$
+\end_inset
+
+:
+ 
+\begin_inset Formula 
+\[
+\log\sigma_{jt}^{2}=X_{t}'\delta_{j},\quad\text{where}\quad\varepsilon_{jt}\mid\mathcal{F}_{t-1}\sim(0,\sigma_{jt}^{2})\quad\text{for }j=1,2.
+\]
+
+\end_inset
+
+Since 
+\begin_inset Formula $(\delta_{1},\delta_{2})$
+\end_inset
+
+ are assumed non-zero,
+ 
+\begin_inset Formula $X_{t}$
+\end_inset
+
+ is correlated with 
+\begin_inset Formula $\varepsilon_{jt}^{2}$
+\end_inset
+
+,
+ satisfying the instrument relevance condition (A3).
+ The heteroscedasticity driver is defined as the centered exogenous variables,
+ 
+\begin_inset Formula $Z_{t}=X_{t}-\E[X_{t}]$
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Moment vector
+\end_layout
+
+\begin_layout Standard
+The full set of parameters is 
+\begin_inset Formula $\theta=(\beta_{1}',\beta_{2}',\gamma_{1},\gamma_{2},\delta_{1}',\delta_{2}')'$
+\end_inset
+
+.
+ The moment conditions implied by the model are 
+\begin_inset Formula $\E[Q_{t}(\theta)]=0$
+\end_inset
+
+,
+ where:
+ 
+\begin_inset Formula 
+\[
+Q_{t}(\theta)=\begin{pmatrix}X_{t}\varepsilon_{1t}(\theta)\\[2pt]
+X_{t}\varepsilon_{2t}(\theta)\\[2pt]
+Z_{t}\varepsilon_{1t}(\theta)\varepsilon_{2t}(\theta)\\[2pt]
+Z_{t}\!\left(\varepsilon_{1t}(\theta)^{2}-e^{X_{t}'\delta_{1}}\right)\\[2pt]
+Z_{t}\!\left(\varepsilon_{2t}(\theta)^{2}-e^{X_{t}'\delta_{2}}\right)
+\end{pmatrix}.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Paragraph
+Instruments as Functions of Observables.
+\end_layout
+
+\begin_layout Standard
+The instruments are derived from the exogenous variables 
+\begin_inset Formula $X_{t}$
+\end_inset
+
+.
+ The terms inside the expectation are functions of these instruments and the structural errors (e.g.,
+ 
+\begin_inset Formula $\varepsilon_{1t}(\theta)=Y_{1t}-X_{t}'\beta_{1}-Y_{2t}\gamma_{1}$
+\end_inset
+
+),
+ which are themselves functions of the observable data and the parameter vector 
+\begin_inset Formula $\theta$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+For the first two mean equations,
+ the instruments are 
+\begin_inset Formula $X_{t}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+For the error product and variance specification moments,
+ the instrument is 
+\begin_inset Formula $Z_{t}=X_{t}-\E[X_{t}]$
+\end_inset
+
+,
+ estimated in-sample as 
+\begin_inset Formula $X_{t}-\bar{X}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Therefore,
+ the sample average of 
+\begin_inset Formula $Q_{t}(\theta)$
+\end_inset
+
+ is a computable criterion function for any candidate parameter values.
+\end_layout
+
+\begin_layout Subsection
+Estimation
+\end_layout
+
+\begin_layout Standard
+Estimation proceeds via a multi-step GMM procedure:
+ 
+\end_layout
+
+\begin_layout Enumerate
+\begin_inset Argument listpreamble:1
+status collapsed
+
+\begin_layout Plain Layout
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+itemsep
+\end_layout
+
+\end_inset
+
+2pt
+\end_layout
+
+\end_inset
+
+Obtain initial estimates of mean parameters via OLS/IV,
+ and get residuals 
+\begin_inset Formula $\hat{\varepsilon}_{jt}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Estimate the variance parameters 
+\begin_inset Formula $\delta_{j}$
+\end_inset
+
+ by regressing 
+\begin_inset Formula $\log\hat{\varepsilon}_{jt}^{2}$
+\end_inset
+
+ on 
+\begin_inset Formula $X_{t}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Use the full set of moment conditions defined in 
+\begin_inset Formula $Q_{t}(\theta)$
+\end_inset
+
+ to form a GMM criterion function.
+ 
+\end_layout
+
+\begin_layout Enumerate
+Minimize the GMM objective function using a HAC-robust weighting matrix (e.g.,
+ Newey-West) to obtain efficient,
+ consistent,
+ and asymptotically normal estimates of 
+\begin_inset Formula $\hat{\theta}$
+\end_inset
+
+.
+ A conventional bandwidth choice is 
+\begin_inset Formula $\ell_{T}=\lfloor4(T/100)^{2/9}\rfloor$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Section
+Diagnostic Tests and Practical Checks
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Argument listpreamble:1
+status collapsed
+
+\begin_layout Plain Layout
+
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+itemsep
+\end_layout
+
+\end_inset
+
+2pt
+\end_layout
+
+\end_inset
+
+
+\series bold
+Instrument relevance.
+
+\series default
+ Report the first-stage 
+\begin_inset Formula $F$
+\end_inset
+
+-statistic on the generated instrument(s);
+ if 
+\begin_inset Formula $F<10$
+\end_inset
+
+,
+ standard inference is unreliable,
+ and weak-IV-robust tests should be used.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Instrument validity.
+
+\series default
+ If there are more heteroscedasticity drivers 
+\begin_inset Formula $Z$
+\end_inset
+
+ than needed for identification (i.e.,
+ the model is overidentified),
+ a Hansen 
+\begin_inset Formula $J$
+\end_inset
+
+-test of overidentifying restrictions can be used to test the validity of the moment conditions.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Endogeneity of 
+\begin_inset Formula $Y_{2}$
+\end_inset
+
+.
+
+\series default
+ The endogeneity of 
+\begin_inset Formula $Y_{2}$
+\end_inset
+
+ can be tested using a difference-in-Hansen test (C-statistic) or a Hausman-style test comparing the OLS and 2SLS estimates of 
+\begin_inset Formula $\gamma_{1}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Heteroscedasticity of 
+\begin_inset Formula $\varepsilon_{2}$
+\end_inset
+
+.
+
+\series default
+ The crucial assumption (A3) can be checked with a Breusch–Pagan or White test for heteroscedasticity,
+ by regressing the squared residuals 
+\begin_inset Formula $\hat{\varepsilon}_{2}^{2}$
+\end_inset
+
+ on the proposed driver(s)
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset Formula $Z$
+\end_inset
+
+.
+ A significant relationship provides evidence for instrument relevance.
+ 
+\end_layout
+
+\end_body
+\end_document

@@ -49,12 +49,12 @@ EOF
 if [ "$ARCH" = "arm64" ]; then
     echo "" >> "$MAKEVARS_FILE"
     echo "# Apple Silicon (M1/M2/M3) specific settings" >> "$MAKEVARS_FILE"
-    
+
     # Check for Homebrew gfortran
     if [ -f "/opt/homebrew/bin/gfortran" ]; then
         echo "FC = /opt/homebrew/bin/gfortran" >> "$MAKEVARS_FILE"
         echo "F77 = /opt/homebrew/bin/gfortran" >> "$MAKEVARS_FILE"
-        
+
         # Find the correct GCC version
         GCC_VERSION=$(ls /opt/homebrew/lib/gcc/ 2>/dev/null | grep -E '^[0-9]+$' | sort -n | tail -1)
         if [ -n "$GCC_VERSION" ]; then
@@ -131,4 +131,4 @@ echo "   cp .pre-commit-config-full.yaml .pre-commit-config.yaml"
 echo "   pre-commit install"
 echo "   pre-commit run --all-files"
 echo
-echo "=== Fix Applied Successfully ===" 
+echo "=== Fix Applied Successfully ==="

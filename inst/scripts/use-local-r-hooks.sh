@@ -47,4 +47,4 @@ echo "  - No renv isolation issues"
 echo "  - All R hooks should work properly now"
 echo
 echo "To test, run: pre-commit run --all-files"
-echo "To revert, run: cp .pre-commit-config.backup.yaml .pre-commit-config.yaml" 
+echo "To revert, run: cp .pre-commit-config.backup.yaml .pre-commit-config.yaml"

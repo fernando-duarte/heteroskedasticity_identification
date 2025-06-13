@@ -146,4 +146,4 @@ Pre-commit Environment:
 
 ## Summary
 
-The digest package IS fixed, but pre-commit creates a time capsule environment that recreates the old problem. It's like having a modern car but being forced to use 1950s gasoline - the car is fine, but the fuel makes it break down. 
+The digest package IS fixed, but pre-commit creates a time capsule environment that recreates the old problem. It's like having a modern car but being forced to use 1950s gasoline - the car is fine, but the fuel makes it break down.

@@ -19,21 +19,21 @@ if (file.exists("inst/WORDLIST")) {
 # Spell check the files
 if (length(args) > 0) {
   has_errors <- FALSE
-  
+
   for (file in args) {
     # Check spelling
     errors <- spelling::spell_check_files(file, ignore = wordlist)
-    
+
     if (nrow(errors) > 0) {
       has_errors <- TRUE
       cat("\nSpelling errors in", file, ":\n")
       print(errors)
     }
   }
-  
+
   # Exit with non-zero status if spelling errors were found
   if (has_errors) {
     cat("\nTo add words to the ignore list, add them to inst/WORDLIST\n")
     quit(status = 1)
   }
-} 
+}

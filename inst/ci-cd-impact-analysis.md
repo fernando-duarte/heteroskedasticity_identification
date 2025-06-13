@@ -109,4 +109,4 @@ Missing from CI (but covered locally):
 - Spell checking
 - Debug statement detection
 
-These are primarily development-time concerns, so having them only in local pre-commit is perfectly reasonable. 
+These are primarily development-time concerns, so having them only in local pre-commit is perfectly reasonable.

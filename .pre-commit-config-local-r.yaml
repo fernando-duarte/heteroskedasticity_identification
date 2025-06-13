@@ -16,7 +16,7 @@ repos:
           packrat/.*|
           \.Rprofile
         )$
-    
+
     # Run lintr
     - id: lintr
       name: Lint R files
@@ -28,14 +28,14 @@ repos:
           renv/.*|
           packrat/.*
         )$
-    
+
     # Check if R code is parsable
     - id: parsable-R
       name: Check R parsable
       entry: Rscript inst/hooks/parsable-R.R
       language: system
       files: '\.(R|r)$'
-    
+
     # Update roxygen documentation
     - id: roxygenize
       name: Update roxygen documentation
@@ -43,7 +43,7 @@ repos:
       language: system
       files: '\.(R|r)$'
       pass_filenames: false
-    
+
     # Keep DESCRIPTION tidy
     - id: use-tidy-description
       name: Tidy DESCRIPTION
@@ -51,7 +51,7 @@ repos:
       language: system
       files: '^DESCRIPTION$'
       pass_filenames: false
-    
+
     # Spell check
     - id: spell-check
       name: Spell check
@@ -66,7 +66,7 @@ repos:
           man/.*|
           tests/testthat/_snaps/.*
         )$
-    
+
     # Ensure README.Rmd and README.md are in sync
     - id: readme-rmd-rendered
       name: Check README.Rmd rendered
@@ -74,28 +74,36 @@ repos:
       language: system
       files: '^README\.(Rmd|md)$'
       pass_filenames: false
-    
-    # No browser() statements
+
+        # No browser() statements
     - id: no-browser-statement
       name: Check for browser()
       entry: Rscript inst/hooks/no-browser-statement.R
       language: system
       files: '\.(R|r|Rmd|rmd|Rnw|rnw)$'
-    
+      exclude: |
+        (?x)^(
+          inst/hooks/.*
+        )$
+
     # No debug() statements
     - id: no-debug-statement
       name: Check for debug()
       entry: Rscript inst/hooks/no-debug-statement.R
       language: system
       files: '\.(R|r|Rmd|rmd|Rnw|rnw)$'
-    
+      exclude: |
+        (?x)^(
+          inst/hooks/.*
+        )$
+
     # Check dependencies are in DESCRIPTION
     - id: deps-in-desc
       name: Check dependencies in DESCRIPTION
       entry: Rscript inst/hooks/deps-in-desc.R
       language: system
-      files: '\.(R|r)$'
-    
+      files: '^R/.*\.(R|r)$'
+
     # Don't commit common R artifacts
     - id: forbid-to-commit
       name: Don't commit common R artifacts
@@ -127,4 +135,4 @@ repos:
 
 # pre-commit CI config
 ci:
-  autoupdate_schedule: monthly 
+  autoupdate_schedule: monthly

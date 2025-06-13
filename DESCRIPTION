@@ -14,15 +14,12 @@ BugReports:
     https://github.com/fernando-duarte/heteroskedasticity_identification/issues
 Depends:
     R (>= 4.2)
-Imports:
-
 Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
 VignetteBuilder:
     knitr
-biocViews:
 Config/testthat/edition: 3
 Encoding: UTF-8
 LazyData: true

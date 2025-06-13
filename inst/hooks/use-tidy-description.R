@@ -25,4 +25,4 @@ new_content <- readLines("DESCRIPTION")
 if (!identical(old_content, new_content)) {
   cat("DESCRIPTION file was tidied\n")
   quit(status = 1)
-} 
+}

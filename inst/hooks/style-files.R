@@ -13,14 +13,14 @@ if (!requireNamespace("styler", quietly = TRUE)) {
 # Style the files
 if (length(args) > 0) {
   changed_files <- FALSE
-  
+
   for (file in args) {
     # Check if file needs styling
     original_content <- readLines(file)
-    
+
     # Style the file
     styler::style_file(file, style = styler::tidyverse_style)
-    
+
     # Check if file was changed
     new_content <- readLines(file)
     if (!identical(original_content, new_content)) {
@@ -28,9 +28,9 @@ if (length(args) > 0) {
       cat("Styled:", file, "\n")
     }
   }
-  
+
   # Exit with non-zero status if files were changed
   if (changed_files) {
     quit(status = 1)
   }
-} 
+}

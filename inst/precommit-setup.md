@@ -119,7 +119,7 @@ This script will:
    echo "CXXFLAGS = -Wno-implicit-function-declaration" >> ~/.R/Makevars
    ```
 
-2. **Install Xcode Command Line Tools**: 
+2. **Install Xcode Command Line Tools**:
    ```bash
    xcode-select --install
    ```
@@ -164,4 +164,4 @@ To enable, visit https://pre-commit.ci and add the repository.
 - `parsable-R`: Ensure R code is parsable
 - `no-browser-statement`: No browser() calls
 - `no-debug-statement`: No debug() calls
-- `deps-in-desc`: Check dependencies are declared 
+- `deps-in-desc`: Check dependencies are declared

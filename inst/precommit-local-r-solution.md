@@ -37,16 +37,16 @@ This solution bypasses the renv isolation issues that cause R package compilatio
 
 ## Advantages
 
-✅ No compilation errors  
-✅ Uses your working R setup  
-✅ Faster (no package installation)  
-✅ Easier to debug  
+✅ No compilation errors
+✅ Uses your working R setup
+✅ Faster (no package installation)
+✅ Easier to debug
 
 ## Disadvantages
 
-❌ Less reproducible across team members  
-❌ Requires local R package installation  
-❌ Not as isolated from your environment  
+❌ Less reproducible across team members
+❌ Requires local R package installation
+❌ Not as isolated from your environment
 
 ## Hook Scripts
 
@@ -72,4 +72,4 @@ cp .pre-commit-config.yaml.bak .pre-commit-config.yaml
 
 ## Future Improvements
 
-When the upstream lorenzwalthert/precommit repository updates to digest 0.6.37+, you can switch back to the standard configuration for better reproducibility across team members. 
+When the upstream lorenzwalthert/precommit repository updates to digest 0.6.37+, you can switch back to the standard configuration for better reproducibility across team members.

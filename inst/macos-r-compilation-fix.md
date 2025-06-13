@@ -101,4 +101,4 @@ Pre-commit creates isolated environments using `renv`, which:
 - `inst/scripts/setup-precommit-r.sh` - Pre-commit setup with R packages
 - `inst/setup/Makevars-example` - Example Makevars configuration
 - `.pre-commit-config.yaml` - Current (simplified) configuration
-- `.pre-commit-config-full.yaml` - Full configuration (with R hooks) 
+- `.pre-commit-config-full.yaml` - Full configuration (with R hooks)

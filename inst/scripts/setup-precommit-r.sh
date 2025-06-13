@@ -54,4 +54,4 @@ pre-commit install
 echo "Testing hooks on all files..."
 pre-commit run --all-files
 
-echo "Setup complete!" 
+echo "Setup complete!"

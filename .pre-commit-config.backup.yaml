@@ -1,70 +1,37 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
-# R-specific hooks from lorenzwalthert/precommit
-- repo: https://github.com/lorenzwalthert/precommit
-  rev: v0.4.3
-  hooks:
-    # Style files using styler
-    - id: style-files
-      args: [--style_pkg=styler, --style_fun=tidyverse_style]
-      exclude: |
-        (?x)^(
-          renv/.*|
-          packrat/.*|
-          \.Rprofile|
-          .*\.Rproj$
-        )$
-    # Update documentation with roxygen2
-    # Note: This can be problematic with many dependencies
-    # Comment out if it causes issues
-    - id: roxygenize
-      # Dependencies will be added if needed
-    # Keep DESCRIPTION tidy
-    - id: use-tidy-description
-    # Spell check
-    - id: spell-check
-      args: [--wordlist=inst/WORDLIST]
-      exclude: |
-        (?x)^(
-          .*\.[rR]|
-          .*\.feather|
-          .*\.jpeg|
-          .*\.pdf|
-          .*\.png|
-          .*\.RData|
-          .*\.rds|
-          .*\.Rds|
-          .*\.Rproj|
-          \.gitignore|
-          \.Rbuildignore|
-          \.Renviron|
-          \.Rprofile|
-          NAMESPACE|
-          inst/WORDLIST|
-          data/.*|
-          man/.*|
-          inst/.*|
-          tests/testthat/_snaps/.*
-        )$
-    # Code quality checks with lintr
-    - id: lintr
-      args: [--warn-only]
-      exclude: |
-        (?x)^(
-          renv/.*|
-          packrat/.*
-        )$
-    # Ensure README.Rmd and README.md are in sync
-    - id: readme-rmd-rendered
-    # Check for parsable R code
-    - id: parsable-R
-    # No browser() statements
-    - id: no-browser-statement
-    # No debug() statements
-    - id: no-debug-statement
-    # Check dependencies are in DESCRIPTION
-    - id: deps-in-desc
+# NOTE: R-specific hooks are temporarily disabled due to macOS compilation issues
+# To enable them, uncomment the section below and ensure R packages can compile
+# See .pre-commit-config-full.yaml for the full configuration
+
+# # R-specific hooks from lorenzwalthert/precommit
+# - repo: https://github.com/lorenzwalthert/precommit
+#   rev: v0.4.3
+#   hooks:
+#     # Style files using styler
+#     - id: style-files
+#       args: [--style_pkg=styler, --style_fun=tidyverse_style]
+#     # Update documentation with roxygen2
+#     - id: roxygenize
+#     # Keep DESCRIPTION tidy
+#     - id: use-tidy-description
+#     # Spell check
+#     - id: spell-check
+#       args: [--wordlist=inst/WORDLIST]
+#     # Code quality checks with lintr
+#     - id: lintr
+#       args: [--warn-only]
+#     # Ensure README.Rmd and README.md are in sync
+#     - id: readme-rmd-rendered
+#     # Check for parsable R code
+#     - id: parsable-R
+#     # No browser() statements
+#     - id: no-browser-statement
+#     # No debug() statements
+#     - id: no-debug-statement
+#     # Check dependencies are in DESCRIPTION
+#     - id: deps-in-desc
 
 # Standard pre-commit hooks
 - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -118,8 +85,8 @@ ci:
   # Autofix PRs
   autofix_commit_msg: |
     [pre-commit.ci] auto fixes from pre-commit.com hooks
-
+    
     for more information, see https://pre-commit.ci
   autofix_prs: true
   autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
-  autoupdate_branch: ''
+  autoupdate_branch: '' 

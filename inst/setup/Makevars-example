@@ -17,4 +17,4 @@ CXXFLAGS = -Wno-implicit-function-declaration
 # For Intel Macs with older gfortran:
 # FC = /usr/local/gfortran/bin/gfortran
 # F77 = /usr/local/gfortran/bin/gfortran
-# FLIBS = -L/usr/local/gfortran/lib 
+# FLIBS = -L/usr/local/gfortran/lib
