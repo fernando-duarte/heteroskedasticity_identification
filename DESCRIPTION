@@ -1,0 +1,28 @@
+Package: het_id
+Title: A package for identification through heteroskedasticity a la Lewben (2012)
+Version: 0.1.0
+Authors@R: person("Fernando", "Duarte",
+                      email = "fernando.duarte@gmail.com",
+                      role = c("aut", "cre"))
+Description: This package applies the identification through heteroskedasticity of Lewben (2012) to a time-series model with endogenous regressors
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+URL: https://github.com/neurogenomics/templateR
+BugReports: https://github.com/neurogenomics/templateR/issues
+Depends: R (>= 4.2)
+biocViews:
+Imports:
+Suggests:
+    rworkflows,
+    methods,
+    markdown,
+    rmarkdown,
+    remotes,
+    knitr,
+    testthat (>= 3.0.0),
+    utils
+RoxygenNote: 7.2.3
+VignetteBuilder: knitr
+Config/testthat/edition: 3

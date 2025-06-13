@@ -7,169 +7,302 @@
 \newcommand{\cov}{\operatorname{Cov}}
 \newcommand{\corr}{\operatorname{Corr}}
 \newcommand{\var}{\operatorname{Var}}
+\newcommand{\plim}{\operatorname*{plim}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
 
 % ---------- theorem environments ----------
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}
+\newtheorem{remark}{Remark}
 
 \begin{document}
 
-\section*{Heteroscedasticity‐Based Identification (Lewbel, 2012)}
+\title{Heteroscedasticity‐Based Identification \\ (Lewbel, 2012 and Extensions)}
+\maketitle
 
-\vspace{-0.8em}
-\paragraph{Notation.}
-Let $(Y_1,Y_2)'$ be endogenous, $X$ exogenous (contains a constant), and the $r\times 1$
-vector $Z=g(X)$ any \emph{mean‑zero} function of~$X$ with $\E(ZZ')$ full rank.\footnote{%
-Centring $Z$ rules out a constant in~$Z$ and guarantees
-$\cov(Z,\varepsilon_j)=0$ while allowing $\cov(Z,\varepsilon_j^{2})\neq0$.
-}
-Define the \emph{linear‑projection residuals}
-\[
-W_j \;=\; Y_j-X'\E(XX')^{-1}\E(XY_j), \qquad
-\varepsilon_j \;=\; Y_j-\beta_j'X-\gamma_jY_{3-j}, \quad j=1,2.
-\]
+\section*{0 \quad Preliminaries and Notation}
+
+Throughout the paper \(Z=g(X)\) denotes a \emph{centered} transformation of the
+exogenous variables, i.e.\ \(\E[Z]=0\) by construction.\footnote{In practice we
+demean $Z$ in sample; writing \(Z\) keeps formulas uncluttered.
+The sample mean~$\bar Z$ appears only where an explicit finite‑sample
+expression is needed (e.g.\ generated instruments).}
+All instruments in what follows are therefore understood to be mean‑zero.
+
+\vspace{-0.5em}
+\paragraph{Shorthands.}
+We pre‑define the operators \(\E\), \(\cov\), \(\corr\), and \(\var\)
+and the probability limit \(\plim\) to streamline formulas.
 
 % ---------- structural models ----------
-\subsection*{1. Structural Forms}
+\section*{1 \quad Structural Forms and Reduced‑Form Residuals}
+
+Let the endogenous vector be \((Y_1,\,Y_2)'\), $X$ a vector of exogenous
+variables (including a constant), and $Z=g(X)$ as above.
+
 \begin{align*}
-\textbf{Measurement error:}\quad 
-&Y_1 = X'\beta_1 + Y_2^*\gamma_1 + V_1, & Y_2 = Y_2^* + U,\\[2pt]
 \textbf{Triangular:}\quad
-&Y_1 = X'\beta_1+\gamma_1Y_2+\varepsilon_1, &
-Y_2 = X'\beta_2+\varepsilon_2,\\[2pt]
+& Y_1 = X'\beta_1 + \gamma_1 Y_2 + \varepsilon_1,
+&\quad
+  Y_2 = X'\beta_2 + \varepsilon_2, \\[3pt]
 \textbf{Simultaneous:}\quad
-&Y_1 = X'\beta_1+\gamma_1Y_2+\varepsilon_1, &
-Y_2 = X'\beta_2+\gamma_2Y_1+\varepsilon_2.
+& Y_1 = X'\beta_1 + \gamma_1 Y_2 + \varepsilon_1,
+&\quad
+  Y_2 = X'\beta_2 + \gamma_2 Y_1 + \varepsilon_2.
 \end{align*}
 
-\textbf{Note:} The measurement error model is rewritten as a triangular system with
-$\varepsilon_1 = -\gamma_1 U + V_1$ and $\varepsilon_2 = U + V_2$, where $V_2$ is the 
-residual from projecting $Y_2^*$ on $X$.
+Projecting each \(Y_j\) on \(X\) yields \emph{reduced‑form residuals}
+\(W_j\triangleq Y_j - X'(\E[XX'])^{-1}\E[XY_j]\).
+A short calculation gives
+\[
+W_1 = \frac{\varepsilon_1+\gamma_1\varepsilon_2}{1-\gamma_1\gamma_2},\qquad
+W_2 = \frac{\varepsilon_2+\gamma_2\varepsilon_1}{1-\gamma_1\gamma_2},
+\]
+with the triangular case obtained by setting~\(\gamma_2=0\).
+
+\begin{remark}
+The algebra follows directly from solving the two‑equation system for the
+reduced form and collecting the error terms; see Lewbel (2012, App.\ B) for
+details.
+\end{remark}
 
 % ---------- core assumptions ----------
-\subsection*{2. Core Assumptions}
+\section*{2 \quad Core Assumptions for Point Identification}
+
 \begin{enumerate}
-\item[(A1)] $\E|ZZ'|<\infty$ and $\E(ZZ')$ nonsingular.
-\item[(A2)] $\E(Z\varepsilon_j)=0$ and $\cov(Z,\varepsilon_1\varepsilon_2)=0$.
-\item[(A3)] (Simultaneous case) the $r\times3$ matrix
-      $\bigl[\cov(Z,W_1W_2)\;\;\cov(Z,W_1^{2})\;\;\cov(Z,W_2^{2})\bigr]$ has
-      rank $2$.
-\item[(A4)] $(\gamma_1,\gamma_2)$ and $(1/\gamma_2,1/\gamma_1)$ cannot both
-      lie in the parameter space unless $\gamma_1\gamma_2=1$.
+\item[(A1)] \textbf{Strict exogeneity.}
+      $\E[\varepsilon_j\mid X]=0$ for $j=1,2$.  
+      \emph{Time‑series note:} in Section~\ref{sec:TimeSeries} we weaken this to a martingale‑difference assumption and add HAC inference.
+
+\item[(A2)] \textbf{Covariance restriction.}
+      $\cov(Z,\varepsilon_1\varepsilon_2)=0$.  
+      This holds automatically if the errors have a common factor
+      \(u \perp X\); then \(\varepsilon_j = a_j u + \eta_j\) with
+      \(u\) independent of \(Z\) implies the restriction.
+
+\item[(A3)] \textbf{Instrument relevance via heteroscedasticity.}
+      \begin{itemize}\itemsep2pt
+      \item \emph{Triangular:}
+            $\cov(Z,\varepsilon_2^2)\neq0$.
+      \item \emph{Simultaneous:}
+            the $r\times 2$ matrix
+            $\Phi_W = [\,\cov(Z,W_1^2)\;\; \cov(Z,W_2^2)\,]$
+            has rank 2; equivalently each column is linearly independent
+            in~\(Z\).  See Lewbel (2012, Prop.\ 4).
+      \end{itemize}
+
+\item[(A4)] \textbf{Normalization (simultaneous case).}
+      As in Lewbel (2012), the parameter space precludes the observationally
+      equivalent pair \((1/\gamma_2,1/\gamma_1)\) unless
+      \(\gamma_1\gamma_2=1\).
 \end{enumerate}
-\smallskip
-\emph{Additional model‑specific conditions}
-\begin{itemize}
-\item Measurement error: $U$ is independent of $(X, Y_1, Y_2^*)$, $\E(XV_2) = 0$,
-      $\cov(Z,V_2^{2})\neq0$.
-\item Triangular: $\cov(Z,\varepsilon_2^{2})\neq0$.
-\item Simultaneous: $\cov(Z,\varepsilon_j^{2})\neq0$ for at least one~$j$.
-\end{itemize}
 
 % ---------- internal instruments ----------
-\subsection*{3. Internal Instruments (Two-Stage Least Squares)}
-For the triangular system (including measurement error as a special case):
-\[
-\text{Instruments for } Y_2: \quad X \text{ and } (Z-\bar{Z})\hat{\varepsilon}_2
-\]
-where $\hat{\varepsilon}_2$ are residuals from regressing $Y_2$ on $X$.
+\section*{3 \quad Triangular System: Closed‑Form Identification and 2SLS}
 
-% ---------- identification ----------
-\subsection*{4. Point Identification}
-\begin{theorem}[Triangular/Measurement Error] 
-Under (A1)–(A2) and $\cov(Z,\varepsilon_2^{2})\neq0$,
-$(\beta_1,\beta_2,\gamma_1)$ are point identified.
-\end{theorem}
+\subsection*{3.1 \; Closed‑form}
 
-\begin{theorem}[Simultaneous] 
-Under (A1)–(A4) and non‑degenerate $\cov(Z,\varepsilon_j^{2})$,
-$(\beta_1,\beta_2,\gamma_1,\gamma_2)$ are point identified.
-\end{theorem}
+\begin{equation}\label{eq:gamma1_id}
+\gamma_1
+  = \frac{\cov(Z,W_1W_2)}{\cov(Z, W_2^2)}.
+\end{equation}
+
+\begin{remark}[Why \eqref{eq:gamma1_id} identifies $\gamma_1$]
+Under~(A2) the numerator simplifies to
+\(\cov(Z,\varepsilon_1\varepsilon_2)+\gamma_1\cov(Z,\varepsilon_2^2)
+    =\gamma_1\cov(Z,\varepsilon_2^2)\).
+Because the denominator is non‑zero by (A3),
+\(\gamma_1\) cancels on the right‑hand side, yielding point identification.
+\end{remark}
+
+\subsection*{3.2 \; Feasible two‑step 2SLS}
+
+\begin{enumerate}\itemsep2pt
+\item \textbf{Generate residuals.}
+      Regress \(Y_2\) on \(X\) via OLS and store
+      $\hat\varepsilon_2 = Y_2 - X'\hat\beta_2^{\text{OLS}}$.
+
+\item \textbf{Construct the heteroscedasticity‑based instrument.}
+      \(IV = (Z-\bar Z)\hat\varepsilon_2\).
+
+\item \textbf{First stage.} Regress \(Y_2\) on $[X,IV]$,
+      obtain fitted values \(\hat Y_2\).
+
+\item \textbf{Second stage.} Regress \(Y_1\) on $[X,\hat Y_2]$
+      to estimate \((\beta_1,\gamma_1)\).
+\end{enumerate}
+
+\paragraph{Practical guidance.}
+Weak‑instrument concerns apply because $IV$ is generated:
+report the first‑stage F‑statistic on $IV$ and, where necessary,
+use weak‑IV‑robust inference (Anderson–Rubin or Kleibergen–Paap
+$r_k$ tests).  
+Standard errors should be obtained from a two‑step GMM covariance
+matrix or via bootstrap to account for first‑stage estimation.
 
 % ---------- GMM moments ----------
-\subsection*{5. GMM Moment Conditions}
+\section*{4 \quad GMM Moment Conditions}
 
-\paragraph{Parameter notation:}
-\begin{itemize}
-\item $\mu = \E[Z]$ is the population mean of $Z$ (unknown parameter)
-\item $\bar{Z} = \frac{1}{n}\sum_{i=1}^n Z_i$ is the sample mean of $Z$ (observable)
-\item In GMM: $\mu$ is estimated jointly with other parameters
-\item In 2SLS: $(Z - \bar{Z})\hat{\varepsilon}_2$ is used directly as an instrument
-\end{itemize}
+Let $\theta$ collect structural parameters and let
+$\mu = \E[Z]=0$ by centering.  The identifying moments are
 
-\paragraph{(i) Triangular system (includes measurement error)}
-\[
-Q_{\text{TRI}}(\theta)=
+\paragraph{(i) Triangular system.}
+\begin{equation}\label{eq:moment_tri}
+Q_{\text{TRI}}(\theta) =
   \begin{pmatrix}
-    X\varepsilon_1\\ 
-    X\varepsilon_2\\
-    Z - \mu\\
-    (Z-\mu)\varepsilon_1\varepsilon_2
-  \end{pmatrix},
-\quad
-\E\bigl[Q_{\text{TRI}}(\theta)\bigr]=0,
-\quad
-\theta=(\beta_1,\beta_2,\gamma_1,\mu)'.
-\]
+    X (Y_1 - X'\beta_1 - Y_2\gamma_1) \\[3pt]
+    X (Y_2 - X'\beta_2) \\[3pt]
+    (Z)(Y_1 - X'\beta_1 - Y_2\gamma_1)(Y_2 - X'\beta_2)
+  \end{pmatrix}.
+\end{equation}
 
-\paragraph{(ii) Simultaneous system}
-\[
-Q_{\text{SIM}}(\theta)=
+\paragraph{(ii) Simultaneous system.}
+\begin{equation}\label{eq:moment_sim}
+Q_{\text{SIM}}(\theta) =
   \begin{pmatrix}
-    X\varepsilon_1\\ 
-    X\varepsilon_2\\
-    Z - \mu\\
-    (Z-\mu)\varepsilon_1\varepsilon_2
-  \end{pmatrix},
-\quad
-\E\bigl[Q_{\text{SIM}}(\theta)\bigr]=0,
-\quad
-\theta=(\beta_1,\beta_2,\gamma_1,\gamma_2,\mu)'.
-\]
-
-\textbf{Special case:} If $\E[\varepsilon_1\varepsilon_2] = 0$, then $\mu$ can be dropped from $\theta$,
-and the moment condition simplifies to $\E[Z\varepsilon_1\varepsilon_2] = 0$.
+    X (Y_1 - X'\beta_1 - Y_2\gamma_1) \\[3pt]
+    X (Y_2 - X'\beta_2 - Y_1\gamma_2) \\[3pt]
+    (Z)(Y_1 - X'\beta_1 - Y_2\gamma_1)(Y_2 - X'\beta_2 - Y_1\gamma_2)
+  \end{pmatrix}.
+\end{equation}
+Equations~\eqref{eq:moment_tri}–\eqref{eq:moment_sim} satisfy
+$\E[Q(\theta)]=0$ under (A1)–(A3).
 
 % ---------- set identification ----------
-\section*{6. Set Identification (Relaxed A2)}
+\section*{5 \quad Set Identification Under a Relaxed Covariance Restriction}
 
-\paragraph{Relaxed moment.}
-Allow
-\[
-|\corr(Z,\varepsilon_1\varepsilon_2)|
-  \;\le\;
-  \tau\,|\corr(Z,\varepsilon_2^{2})|,
-  \qquad 0\le\tau<1.
-\]
+When assumption (A2) is weakened to
+\(|\corr(Z,\varepsilon_1\varepsilon_2)|
+   \le \tau|\corr(Z,\varepsilon_2^2)|,\; \tau\in[0,1)\),
+$\gamma_1$ in the triangular model is set‑identified.
 
-\begin{theorem}[Bounds for the triangular model]
+\begin{theorem}[Bounds for \(\gamma_1\) with \(\tau>0\)]
 \label{thm:bounds}
-Assume conditions for the triangular model hold except that the above relaxed moment
-replaces $\cov(Z,\varepsilon_1\varepsilon_2)=0$ and that
-$\cov(Z,W_2^{2})\neq0$, $\var(W_2^{2})>0$.
-Then $\gamma_1$ lies in the closed interval $\Gamma_1$ whose endpoints are the
+$\gamma_1$ is contained in the closed interval whose endpoints are the
 (real) roots of
-\begin{align}\label{eq:quad}
-\frac{\bigl[\cov(Z,W_1W_2)\bigr]^{2}}{\bigl[\cov(Z,W_2^{2})\bigr]^{2}}
--\frac{\var(W_1W_2)}{\var(W_2^{2})}\tau^{2}
-+2\Bigl(\frac{\cov(W_1W_2,W_2^{2})}{\var(W_2^{2})}\tau^{2}
-      -\frac{\cov(Z,W_1W_2)}{\cov(Z,W_2^{2})}\Bigr)\gamma_1
-+(1-\tau^{2})\gamma_1^{2}=0.
-\end{align}
+\[
+\frac{\cov(Z,W_1W_2)^2}{\cov(Z,W_2^2)^2}
+-\frac{\var(W_1W_2)}{\var(W_2^2)}\tau^{2}
++2\!\left(
+  \frac{\cov(W_1W_2,W_2^{2})}{\var(W_2^{2})}\tau^{2}
+  -\frac{\cov(Z,W_1W_2)}{\cov(Z,W_2^{2})}
+ \right)\!\gamma_1
+ +(1-\tau^{2})\gamma_1^{2}=0.
+\]
 \end{theorem}
 
-\paragraph{Properties.}
-\begin{itemize}\itemsep0pt
-\item $\tau=0\;\Rightarrow\;$ $\Gamma_1$ collapses to the
-      point‑identified $\gamma_1$ of the triangular model.
-\item $\Gamma_1$ widens monotonically in $\tau$.
-\item For any $\gamma_1\in\Gamma_1$,
-      $\beta_1=\E(XX')^{-1}\E\!\bigl[X(Y_1-Y_2\gamma_1)\bigr]$.
+The interval collapses to a point when $\tau=0$
+and widens monotonically as $\tau\!\to\!1$.
+
+% ---------- extensions ----------
+\section*{6 \quad Two Illustrative Extensions}
+
+\subsection*{6.1 \; Conditional heteroscedasticity (Prono, 2013)}
+
+Let $\var(\varepsilon_{2t}\mid\mathcal F_{t-1})=\sigma_{2t}^2$
+follow a GARCH model; set $Z_t=\sigma_{2t}^2$.
+Replacing population variances by the fitted
+$\hat\sigma_{2t}^2$ yields the generated instrument
+\((\hat Z_t-\bar Z)\hat\varepsilon_{2t}\),
+and estimation proceeds exactly as in Section 3,
+with HAC‑robust standard errors.
+
+\subsection*{6.2 \; Regime heteroscedasticity (Rigobon, 2003)}
+
+If exogenous regimes $s\in\{1,\dots,S\}$ shift
+$\var(\varepsilon_j\mid s)$ but leave
+$\cov(\varepsilon_1,\varepsilon_2\mid s)$ constant,
+the centered regime dummies serve as $Z$ and satisfy (A2)–(A3),
+delivering identification by the same 2SLS recipe.
+
+% ---------- diagnostics ----------
+\section*{7 \quad Diagnostic Tests and Practical Checks}
+
+\begin{itemize}\itemsep2pt
+\item \textbf{Instrument relevance.}
+      Report the first‑stage \(F\)-statistic on generated instruments;
+      if \(F<10\) adopt weak‑IV‑robust tests.
+\item \textbf{Instrument validity.}
+      Sargan/Hansen \(C\)-tests can be run by dropping the generated instrument
+      and testing over‑identifying restrictions.
+\item \textbf{Endogeneity of \(Y_2\).}
+      Difference‑in‑Sargan (C‑statistic) compares the full and
+      restricted instrument sets.
+\item \textbf{Heteroscedasticity of \(\varepsilon_2\).}
+      A Breusch–Pagan test of \(\hat\varepsilon_2^2\) on~\(Z\)
+      provides evidence for assumption (A3).
 \end{itemize}
 
-\paragraph{Estimation.}
-Replace population moments in \eqref{eq:quad} by sample moments,
-solve the quadratic for the two roots, and obtain standard errors by the
-delta method.
+% ---------- time‑series extension ----------
+\section*{8 \quad Time‑Series Variant with Log‑Linear Conditional Variances}
+\label{sec:TimeSeries}
+
+Let $(Y_{1t},Y_{2t},X_t)$ be strictly stationary and
+$\alpha$‑mixing with absolutely summable mixing coefficients.
+Maintain the structural forms of Section 1 and set $Z_t=X_t-\mu=Z_t$.
+Assume
+\begin{equation}\label{eq:loglin_var}
+\varepsilon_{jt}\mid\mathcal F_{t-1}\sim(0,\sigma_{jt}^2),\quad
+\log\sigma_{jt}^2=X_t'\delta_j,\qquad j=1,2.
+\end{equation}
+Because $(\delta_1,\delta_2)\neq0$,
+$\cov(Z_t,\varepsilon_{jt}^2)\neq0$, preserving relevance.
+
+\vspace{-0.5em}
+\subsection*{8.1 \; Moment vector}
+
+\[
+Q_t(\theta)=
+\begin{pmatrix}
+X_t\varepsilon_{1t}\\[2pt]
+X_t\varepsilon_{2t}\\[2pt]
+Z_t\varepsilon_{1t}\varepsilon_{2t}\\[2pt]
+Z_t\!\left(\varepsilon_{1t}^2-e^{X_t'\delta_1}\right)\\[2pt]
+Z_t\!\left(\varepsilon_{2t}^2-e^{X_t'\delta_2}\right)
+\end{pmatrix},
+\qquad
+\E[Q_t(\theta)]=0,\;
+\theta=(\beta_1,\beta_2,\gamma_1,\gamma_2,\delta_1,\delta_2)'.
+\]
+
+\subsection*{8.2 \; Estimation}
+
+\begin{enumerate}\itemsep2pt
+\item OLS/IV of the mean equations, obtain residuals $\hat\varepsilon_{jt}$.
+\item Estimate \eqref{eq:loglin_var} by regressing $\log\hat\varepsilon_{jt}^2$
+      on $X_t$; set $\hat\sigma_{jt}^2=e^{X_t'\hat\delta_j}$.
+\item Instruments: $Z_t,\;Z_t\hat\varepsilon_{jt},\;
+      Z_t(\hat\varepsilon_{jt}^2-\hat\sigma_{jt}^2)$ ($6$ per~$t$).
+\item One‑step 2SLS or (if over‑identified) GMM with
+      Newey–West weight matrix;
+      a bandwidth such as
+      $\ell_T=\lfloor4(T/100)^{2/9}\rfloor$ is conventional.
+\end{enumerate}
+
+Mixing ensures a serial‑correlation‑robust LLN/CLT, so
+$\hat\theta$ is consistent and asymptotically normal.
+
+% ---------- bibliography ----------
+\bigskip
+\begin{thebibliography}{9}\setlength{\itemsep}{0pt}
+
+\bibitem{Lewbel2012}
+Lewbel, A.\ (2012).
+\newblock Using Heteroscedasticity to Identify and Estimate Mismeasured and
+  Endogenous Regressor Models.
+\newblock \emph{Journal of Business \& Economic Statistics}, 30(1), 67–80.
+
+\bibitem{Prono2013}
+Prono, T.\ (2013).
+\newblock The Role of Conditional Heteroscedasticity in Identifying and
+  Estimating Linear Simultaneous Equation Models.
+\newblock \emph{Journal of Applied Econometrics}, 28(2), 338–356.
+
+\bibitem{Rigobon2003}
+Rigobon, R.\ (2003).
+\newblock Identification Through Heteroskedasticity.
+\newblock \emph{Review of Economics and Statistics}, 85(4), 777–792.
+
+\end{thebibliography}
 
 \end{document}
