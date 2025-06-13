@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(het_id)
+library(hetid)
 
-test_check("het_id")
+test_check("hetid")

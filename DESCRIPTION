@@ -1,28 +1,32 @@
-Package: het_id
-Title: A package for identification through heteroskedasticity a la Lewben (2012)
+Package: hetid
+Title: A package for identification through heteroskedasticity a la Lewbel (2012)
 Version: 0.1.0
 Authors@R: person("Fernando", "Duarte",
-                      email = "fernando.duarte@gmail.com",
+                      email = "duarte@alum.mit.edu",
                       role = c("aut", "cre"))
-Description: This package applies the identification through heteroskedasticity of Lewben (2012) to a time-series model with endogenous regressors
+Description: This package applies the identification through heteroskedasticity of Lewbel (2012) to a time-series model with endogenous regressors
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-URL: https://github.com/neurogenomics/templateR
-BugReports: https://github.com/neurogenomics/templateR/issues
+URL: https://github.com/fernando-duarte/heteroskedasticity_identification
+BugReports: https://github.com/fernando-duarte/heteroskedasticity_identification/issues
 Depends: R (>= 4.2)
 biocViews:
 Imports:
-Suggests:
-    rworkflows,
+    AER,
+    tidyverse,
+    knitr,
+    future,
+    furrr,
+    boot,
     methods,
     markdown,
     rmarkdown,
     remotes,
-    knitr,
     testthat (>= 3.0.0),
     utils
+Suggests:
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 Config/testthat/edition: 3
