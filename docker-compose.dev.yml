@@ -1,0 +1,101 @@
+# Docker Compose override for development
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+# Optimized for interactive development workflow
+
+version: '3.8'
+
+services:
+  # Enhanced development service
+  hetid-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      cache_from:
+        - hetid:dev
+    ports:
+      - "8787:8787"  # RStudio Server
+      - "3838:3838"  # Shiny apps (if needed)
+    environment:
+      - DISABLE_AUTH=true
+      - ROOT=true
+      - RSTUDIO_WHICH_R=/usr/local/bin/R
+      # Development-specific settings
+      - R_PROFILE_USER=/home/rstudio/hetid/.Rprofile
+      - R_ENVIRON_USER=/home/rstudio/hetid/.Renviron
+    volumes:
+      # Live source code mounting
+      - .:/home/rstudio/hetid
+      # Persistent development libraries
+      - hetid-dev-libs:/usr/local/lib/R/site-library
+      # RStudio configuration persistence
+      - hetid-rstudio-config:/home/rstudio/.rstudio
+      # Git configuration
+      - ~/.gitconfig:/home/rstudio/.gitconfig:ro
+      # SSH keys for Git operations (if needed)
+      - ~/.ssh:/home/rstudio/.ssh:ro
+    working_dir: /home/rstudio/hetid
+    stdin_open: true
+    tty: true
+    networks:
+      - hetid-network
+
+  # Development testing service with live reload
+  hetid-test-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: hetid-test-development
+    environment:
+      - R_LIBS_USER=/usr/local/lib/R/site-library
+    volumes:
+      - .:/home/rstudio/hetid
+      - hetid-test-results:/home/rstudio/hetid/test-results
+    working_dir: /home/rstudio/hetid
+    command: >
+      bash -c "
+        echo 'Development testing mode - watching for changes...' &&
+        while true; do
+          echo 'Running tests...' &&
+          R -e 'devtools::test()' &&
+          echo 'Tests completed. Waiting for changes...' &&
+          sleep 30
+        done
+      "
+    networks:
+      - hetid-network
+
+  # Interactive R console for quick testing
+  hetid-console:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: hetid-console
+    environment:
+      - R_LIBS_USER=/usr/local/lib/R/site-library
+    volumes:
+      - .:/home/rstudio/hetid
+    working_dir: /home/rstudio/hetid
+    stdin_open: true
+    tty: true
+    command: >
+      bash -c "
+        echo 'Loading hetid package...' &&
+        R --slave -e 'devtools::load_all()' &&
+        echo 'Starting interactive R session...' &&
+        R
+      "
+    networks:
+      - hetid-network
+
+# Development-specific volumes
+volumes:
+  hetid-dev-libs:
+    driver: local
+  hetid-rstudio-config:
+    driver: local
+  hetid-test-results:
+    driver: local
+
+networks:
+  hetid-network:
+    driver: bridge

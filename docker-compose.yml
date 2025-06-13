@@ -1,0 +1,149 @@
+# Docker Compose for hetid R package
+# Supports development, testing, and production environments
+# Updated for 2025 best practices
+
+version: '3.8'
+
+services:
+  # Production service - minimal runtime
+  hetid-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+    image: hetid:latest
+    container_name: hetid-production
+    restart: unless-stopped
+    environment:
+      - R_LIBS_USER=/usr/local/lib/R/site-library
+      - OMP_NUM_THREADS=1
+      - OPENBLAS_NUM_THREADS=1
+    volumes:
+      # Mount for input/output data (read-only source)
+      - ./data:/app/data:ro
+      # Mount for results output
+      - hetid-results:/app/results
+    working_dir: /app
+    command: ["R", "--slave", "-e", "library(hetid); cat('hetid production ready\\n')"]
+    networks:
+      - hetid-network
+    healthcheck:
+      test: ["CMD", "R", "--slave", "-e", "library(hetid); cat('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Development service with RStudio Server
+  hetid-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+    image: hetid:dev
+    container_name: hetid-development
+    ports:
+      - "8787:8787"  # RStudio Server
+    environment:
+      - DISABLE_AUTH=true
+      - ROOT=true
+      - RSTUDIO_WHICH_R=/usr/local/bin/R
+    volumes:
+      # Mount source code for live development
+      - .:/home/rstudio/hetid
+      # Persistent R library for development packages
+      - hetid-dev-libs:/usr/local/lib/R/site-library
+      # Persistent RStudio settings
+      - hetid-rstudio-config:/home/rstudio/.rstudio
+    working_dir: /home/rstudio/hetid
+    networks:
+      - hetid-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8787/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Testing service - runs package tests
+  hetid-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    image: hetid:test
+    container_name: hetid-testing
+    environment:
+      - R_LIBS_USER=/usr/local/lib/R/site-library
+    volumes:
+      - .:/build
+      - hetid-test-results:/build/test-results
+    working_dir: /build
+    command: >
+      bash -c "
+        echo 'Running R package tests...' &&
+        R -e 'devtools::test()' &&
+        echo 'Running R CMD check...' &&
+        R CMD check --as-cran *.tar.gz
+      "
+    networks:
+      - hetid-network
+
+  # Simulation runner - for Monte Carlo simulations
+  hetid-simulation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    image: hetid:simulation
+    container_name: hetid-simulation
+    environment:
+      - R_LIBS_USER=/usr/local/lib/R/site-library
+      - OMP_NUM_THREADS=4  # Allow more threads for simulations
+      - OPENBLAS_NUM_THREADS=4
+    volumes:
+      - ./simulation-configs:/app/configs:ro
+      - hetid-simulation-results:/app/simulation-results
+    working_dir: /app
+    command: >
+      R --slave -e "
+        library(hetid);
+        cat('Starting Monte Carlo simulation...\\n');
+        results <- run_lewbel_monte_carlo();
+        saveRDS(results, '/app/simulation-results/latest_results.rds');
+        cat('Simulation completed successfully\\n')
+      "
+    networks:
+      - hetid-network
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+        reservations:
+          cpus: '2.0'
+          memory: 4G
+
+# Named volumes for persistent data
+volumes:
+  hetid-results:
+    driver: local
+  hetid-dev-libs:
+    driver: local
+  hetid-rstudio-config:
+    driver: local
+  hetid-test-results:
+    driver: local
+  hetid-simulation-results:
+    driver: local
+
+# Custom network for service communication
+networks:
+  hetid-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
