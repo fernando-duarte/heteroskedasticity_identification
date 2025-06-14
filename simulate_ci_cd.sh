@@ -50,16 +50,16 @@ command_exists() {
 # Function to check prerequisites
 check_prerequisites() {
     print_section "Checking Prerequisites"
-    
+
     local missing_deps=()
-    
+
     # Check R
     if ! command_exists R; then
         missing_deps+=("R")
     else
         print_success "R is installed: $(R --version | head -1)"
     fi
-    
+
     # Check Docker (if not skipping)
     if [ "$SKIP_DOCKER" != "true" ]; then
         if ! command_exists docker; then
@@ -68,39 +68,39 @@ check_prerequisites() {
             print_success "Docker is installed: $(docker --version)"
         fi
     fi
-    
+
     # Check git
     if ! command_exists git; then
         missing_deps+=("git")
     else
         print_success "Git is installed: $(git --version)"
     fi
-    
+
     # Check if we're in a git repository
     if ! git rev-parse --git-dir > /dev/null 2>&1; then
         print_error "Not in a git repository"
         exit 1
     fi
-    
+
     if [ ${#missing_deps[@]} -ne 0 ]; then
         print_error "Missing dependencies: ${missing_deps[*]}"
         print_status "Please install missing dependencies and try again"
         exit 1
     fi
-    
+
     print_success "All prerequisites satisfied"
 }
 
 # Function to simulate R workflows
 simulate_r_workflows() {
     print_section "Simulating R Workflows (rworkflows.yml)"
-    
+
     # Check if DESCRIPTION file exists
     if [ ! -f "DESCRIPTION" ]; then
         print_error "DESCRIPTION file not found. Are you in an R package directory?"
         return 1
     fi
-    
+
     print_status "Installing R dependencies..."
     R -e "
     if (!require('devtools', quietly = TRUE)) install.packages('devtools')
@@ -110,13 +110,13 @@ simulate_r_workflows() {
     " || {
         print_warning "Some R dependencies may have failed to install"
     }
-    
+
     print_status "Running R CMD check..."
     R CMD build . || {
         print_error "R CMD build failed"
         return 1
     }
-    
+
     # Find the built package
     PKG_TAR=$(ls -t *.tar.gz | head -1)
     if [ -n "$PKG_TAR" ]; then
@@ -125,12 +125,12 @@ simulate_r_workflows() {
             print_warning "R CMD check completed with warnings/errors"
         }
     fi
-    
+
     print_status "Running package tests..."
     R -e "devtools::test()" || {
         print_warning "Some tests may have failed"
     }
-    
+
     print_status "Running test coverage analysis..."
     R -e "
     if (require('covr', quietly = TRUE)) {
@@ -144,7 +144,7 @@ simulate_r_workflows() {
     " || {
         print_warning "Coverage analysis failed"
     }
-    
+
     print_success "R workflows simulation completed"
 }
 
@@ -154,31 +154,31 @@ simulate_docker_workflows() {
         print_warning "Skipping Docker workflows (SKIP_DOCKER=true)"
         return 0
     fi
-    
+
     print_section "Simulating Docker Workflows (docker.yml)"
-    
+
     # Check if Dockerfiles exist
     if [ ! -f "Dockerfile" ]; then
         print_warning "Dockerfile not found, skipping Docker simulation"
         return 0
     fi
-    
+
     print_status "Building Docker images..."
-    
+
     # Build production image
     print_status "Building production image..."
     docker build -t hetid:production --target production . || {
         print_error "Failed to build production image"
         return 1
     }
-    
+
     # Build builder image
     print_status "Building builder image..."
     docker build -t hetid:builder --target builder . || {
         print_error "Failed to build builder image"
         return 1
     }
-    
+
     # Build development image if Dockerfile.dev exists
     if [ -f "Dockerfile.dev" ]; then
         print_status "Building development image..."
@@ -186,21 +186,21 @@ simulate_docker_workflows() {
             print_warning "Failed to build development image"
         }
     fi
-    
+
     print_status "Testing Docker images..."
-    
+
     # Test production image
     print_status "Testing production image..."
     docker run --rm hetid:production R -e "library(hetid); cat('Production image test passed\n')" || {
         print_warning "Production image test failed"
     }
-    
+
     # Test builder image with package tests
     print_status "Testing builder image with package tests..."
     docker run --rm -v "$(pwd):/workspace" -w /workspace hetid:builder R -e "devtools::test()" || {
         print_warning "Builder image tests failed"
     }
-    
+
     print_success "Docker workflows simulation completed"
 }
 
@@ -210,9 +210,9 @@ simulate_pkgdown_workflows() {
         print_warning "Skipping pkgdown workflows (SKIP_PKGDOWN=true)"
         return 0
     fi
-    
+
     print_section "Simulating pkgdown Workflows (pkgdown.yml)"
-    
+
     print_status "Installing pkgdown..."
     R -e "
     if (!require('pkgdown', quietly = TRUE)) install.packages('pkgdown')
@@ -220,18 +220,18 @@ simulate_pkgdown_workflows() {
         print_warning "Failed to install pkgdown"
         return 0
     }
-    
+
     print_status "Building pkgdown site..."
     R -e "pkgdown::build_site()" || {
         print_warning "pkgdown site build failed"
         return 0
     }
-    
+
     if [ -d "docs" ]; then
         print_success "pkgdown site built successfully in docs/ directory"
         print_status "You can view the site by opening docs/index.html in a browser"
     fi
-    
+
     print_success "pkgdown workflows simulation completed"
 }
 
@@ -241,13 +241,13 @@ simulate_security_scans() {
         print_warning "Skipping security scans (SKIP_SECURITY=true)"
         return 0
     fi
-    
+
     print_section "Simulating Security Scans (codeql.yml)"
-    
+
     # Check if trivy is available
     if command_exists trivy; then
         print_status "Running Trivy security scans..."
-        
+
         # Scan Dockerfiles
         if [ -f "Dockerfile" ]; then
             print_status "Scanning Dockerfiles..."
@@ -255,7 +255,7 @@ simulate_security_scans() {
                 print_warning "Dockerfile security scan completed with issues"
             }
         fi
-        
+
         # Scan workflows
         if [ -d ".github/workflows" ]; then
             print_status "Scanning GitHub workflows..."
@@ -263,7 +263,7 @@ simulate_security_scans() {
                 print_warning "Workflow security scan completed with issues"
             }
         fi
-        
+
         # Scan Docker images if they exist
         if [ "$SKIP_DOCKER" != "true" ] && docker images hetid:production >/dev/null 2>&1; then
             print_status "Scanning Docker images..."
@@ -275,26 +275,26 @@ simulate_security_scans() {
         print_warning "Trivy not installed, skipping security scans"
         print_status "To install Trivy: https://aquasecurity.github.io/trivy/latest/getting-started/installation/"
     fi
-    
+
     print_success "Security scans simulation completed"
 }
 
 # Function to cleanup
 cleanup() {
     print_section "Cleanup"
-    
+
     # Remove built packages
     if ls *.tar.gz >/dev/null 2>&1; then
         print_status "Removing built packages..."
         rm -f *.tar.gz
     fi
-    
+
     # Remove check directories
     if ls *.Rcheck >/dev/null 2>&1; then
         print_status "Removing R check directories..."
         rm -rf *.Rcheck
     fi
-    
+
     print_success "Cleanup completed"
 }
 
@@ -307,32 +307,32 @@ main() {
     print_status "  SKIP_SECURITY=true  - Skip security scans"
     print_status "  SKIP_PKGDOWN=true   - Skip pkgdown workflows"
     print_status "  VERBOSE=true        - Enable verbose output"
-    
+
     # Set verbose mode
     if [ "$VERBOSE" = "true" ]; then
         set -x
     fi
-    
+
     # Check prerequisites
     check_prerequisites
-    
+
     # Run simulations
     simulate_r_workflows
     simulate_docker_workflows
     simulate_pkgdown_workflows
     simulate_security_scans
-    
+
     # Cleanup
     cleanup
-    
+
     print_section "Simulation Complete"
     print_success "All CI/CD workflow simulations completed!"
     print_status "Check the output above for any warnings or errors"
-    
+
     if [ -f "coverage-report.html" ]; then
         print_status "Coverage report: coverage-report.html"
     fi
-    
+
     if [ -d "docs" ]; then
         print_status "Documentation site: docs/index.html"
     fi

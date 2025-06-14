@@ -33,6 +33,18 @@ devtools::build_vignettes()
 browseVignettes("hetid")
 ```
 
+### Optional Dependencies
+
+For enhanced functionality, you may want to install these optional packages:
+
+```r
+# For enhanced table formatting in analysis output
+install.packages("knitr")
+```
+
+The package will work without these dependencies, but installing them provides:
+- **knitr**: Nicely formatted tables in analysis functions (when `verbose = TRUE`)
+
 ## Project Structure
 
 ```

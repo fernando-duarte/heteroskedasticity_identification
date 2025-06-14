@@ -20,6 +20,8 @@ knitr::opts_chunk$set(
 library(hetid)
 ```
 
+> **Note**: For enhanced table formatting in analysis output, consider installing the `knitr` package: `install.packages("knitr")`. The package works without it, but provides nicer formatted tables when available.
+
 ## Introduction
 
 The `hetid` package implements the identification through heteroskedasticity method developed by Lewbel (2012) for time-series models with endogenous regressors. This method provides a way to identify and estimate causal effects when traditional instrumental variables are not available, using heteroskedasticity in the error terms as a source of identification.

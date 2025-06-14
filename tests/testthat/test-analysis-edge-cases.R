@@ -6,8 +6,14 @@ test_that("analyze_main_results handles empty results", {
   # Empty data frame - should produce errors due to missing columns
   empty_results <- data.frame()
   # analyze_main_results will fail with empty data
+  # When results are empty, mean() will warn about non-numeric arguments
+  # We expect multiple warnings (one for each mean() call), but since
+  # expect_warning() only captures one warning at a time in testthat edition 3,
+  # we suppress them here and document their expected nature
   expect_error(
-    analyze_main_results(empty_results, config, verbose = FALSE)
+    suppressWarnings(
+      analyze_main_results(empty_results, config, verbose = FALSE)
+    )
   )
 
   # All NA results
@@ -25,11 +31,9 @@ test_that("analyze_main_results handles empty results", {
   )
 
   # With all NA values, correlation calculation will fail
-  expect_error({
-    suppressWarnings(
-      analyze_main_results(na_results, config, verbose = FALSE)
-    )
-  })
+  expect_error(
+    analyze_main_results(na_results, config, verbose = FALSE)
+  )
 })
 
 test_that("analyze_main_results handles extreme values", {

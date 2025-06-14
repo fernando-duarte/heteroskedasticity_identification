@@ -20,6 +20,11 @@ A list containing summary tables and statistics.
 Provides comprehensive analysis of the main Monte Carlo simulation results,
 including performance metrics for point estimators and set identification.
 }
+\details{
+For enhanced table formatting in verbose output, install the knitr package:
+\code{install.packages("knitr")}. When knitr is not available,
+tables are displayed in plain text format.
+}
 \examples{
 \dontrun{
 config <- create_default_config()

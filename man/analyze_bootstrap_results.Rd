@@ -22,6 +22,11 @@ A data.frame with bootstrap examples.
 Analyzes and displays bootstrap standard error results for set
 identification bounds.
 }
+\details{
+For enhanced table formatting in verbose output, install the knitr package:
+\code{install.packages("knitr")}. When knitr is not available,
+tables are displayed in plain text format.
+}
 \examples{
 \dontrun{
 config <- create_default_config()

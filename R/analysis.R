@@ -7,6 +7,11 @@
 #' @param config List. Configuration object used for the simulation.
 #' @param verbose Logical. Whether to print detailed output (default: TRUE).
 #'
+#' @details
+#' For enhanced table formatting in verbose output, install the knitr package:
+#' \code{install.packages("knitr")}. When knitr is not available,
+#' tables are displayed in plain text format.
+#'
 #' @return A list containing summary tables and statistics.
 #'
 #' @examples
@@ -125,6 +130,11 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
 #' @param config List. Configuration object.
 #' @param verbose Logical. Whether to print output (default: TRUE).
 #'
+#' @details
+#' For enhanced table formatting in verbose output, install the knitr package:
+#' \code{install.packages("knitr")}. When knitr is not available,
+#' tables are displayed in plain text format.
+#'
 #' @return A data.frame with bootstrap examples.
 #'
 #' @examples
@@ -203,6 +213,11 @@ analyze_bootstrap_results <- function(results_main,
 #' @param config List. Configuration object.
 #' @param verbose Logical. Whether to print output (default: TRUE).
 #'
+#' @details
+#' For enhanced table formatting in verbose output, install the knitr package:
+#' \code{install.packages("knitr")}. When knitr is not available,
+#' tables are displayed in plain text format.
+#'
 #' @return A data.frame with sample size analysis.
 #'
 #' @examples
@@ -252,6 +267,11 @@ analyze_sample_size_results <- function(results_by_n,
 #' @param results_by_delta Data.frame. Results from run_sensitivity_analysis().
 #' @param config List. Configuration object.
 #' @param verbose Logical. Whether to print output (default: TRUE).
+#'
+#' @details
+#' For enhanced table formatting in verbose output, install the knitr package:
+#' \code{install.packages("knitr")}. When knitr is not available,
+#' tables are displayed in plain text format.
 #'
 #' @return A data.frame with sensitivity analysis.
 #'
