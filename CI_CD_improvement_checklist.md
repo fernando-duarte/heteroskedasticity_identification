@@ -10,7 +10,7 @@
 ## Concurrency Controls
 
 - [ ] Add concurrency key to rworkflows.yml to prevent duplicate runs
-- [ ] Add concurrency key to docker.yml to prevent duplicate runs  
+- [ ] Add concurrency key to docker.yml to prevent duplicate runs
 - [ ] Add concurrency key to pkgdown.yml to prevent duplicate runs
 - [ ] Configure cancel-in-progress appropriately for each workflow
 
@@ -56,4 +56,4 @@
 - [ ] Add `dependabot.yml` to automatically track and propose updates for GitHub Actions and Docker images.
 - [ ] Introduce a GitHub **CodeQL** security-analysis workflow to scan source, Dockerfiles, and workflows.
 - [ ] Ensure every third-party action in all workflows is pinned to a version tag or commit SHA.
-- [ ] Keep the monthly autoupdate schedule for **pre-commit** hooks and monitor for a future `pre-commit-hooks v6` release. 
+- [ ] Keep the monthly autoupdate schedule for **pre-commit** hooks and monitor for a future `pre-commit-hooks v6` release.

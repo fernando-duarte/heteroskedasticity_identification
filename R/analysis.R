@@ -59,7 +59,11 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
   )
 
   if (verbose) {
-    print(knitr::kable(summary_table, digits = 4))
+    if (requireNamespace("knitr", quietly = TRUE)) {
+      print(knitr::kable(summary_table, digits = 4))
+    } else {
+      print(summary_table)
+    }
 
     # Weak instrument diagnostics
     weak_iv_pct <- mean(results_clean$first_stage_F < 10) * 100
@@ -95,7 +99,11 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
       "\n--- Performance of Set Identification ---",
       "\n"
     ))
-    print(knitr::kable(bounds_summary, digits = 4))
+    if (requireNamespace("knitr", quietly = TRUE)) {
+      print(knitr::kable(bounds_summary, digits = 4))
+    } else {
+      print(bounds_summary)
+    }
   }
 
   list(
@@ -176,7 +184,11 @@ analyze_bootstrap_results <- function(results_main,
       )
     )
 
-    print(knitr::kable(bootstrap_table))
+    if (requireNamespace("knitr", quietly = TRUE)) {
+      print(knitr::kable(bootstrap_table))
+    } else {
+      print(bootstrap_table)
+    }
   }
 
   bootstrap_examples
@@ -222,7 +234,11 @@ analyze_sample_size_results <- function(results_by_n,
       "\n--- Consistency Check: Performance by Sample Size ---",
       "\n"
     ))
-    print(knitr::kable(n_summary, digits = 4))
+    if (requireNamespace("knitr", quietly = TRUE)) {
+      print(knitr::kable(n_summary, digits = 4))
+    } else {
+      print(n_summary)
+    }
   }
 
   n_summary
@@ -274,7 +290,11 @@ analyze_sensitivity_results <- function(results_by_delta,
       "\n--- Sensitivity to Heteroscedasticity Strength ---",
       "\n"
     ))
-    print(knitr::kable(delta_summary, digits = 4))
+    if (requireNamespace("knitr", quietly = TRUE)) {
+      print(knitr::kable(delta_summary, digits = 4))
+    } else {
+      print(delta_summary)
+    }
   }
 
   delta_summary

@@ -31,7 +31,7 @@ The `hetid` package uses a comprehensive CI/CD pipeline to ensure code quality, 
 **Matrix Configuration**:
 ```yaml
 - Ubuntu 22.04 with Bioconductor devel
-- macOS 14 with Bioconductor release  
+- macOS 14 with Bioconductor release
 - Windows 2022 with Bioconductor release
 ```
 
