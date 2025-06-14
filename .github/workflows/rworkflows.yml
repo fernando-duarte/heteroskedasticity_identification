@@ -12,6 +12,10 @@ name: rworkflows
     - main
     - devel
     - RELEASE_**
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   rworkflows:
     permissions:
@@ -28,24 +32,24 @@ jobs:
       fail-fast: ${{ false }}
       matrix:
         config:
-        - os: ubuntu-latest
+        - os: ubuntu-22.04
           bioc: devel
           r: auto
           cont: ghcr.io/bioconductor/bioconductor_docker:devel
           rspm: ~
-        - os: macOS-latest
+        - os: macos-14
           bioc: release
           r: auto
           cont: ~
           rspm: ~
-        - os: windows-latest
+        - os: windows-2022
           bioc: release
           r: auto
           cont: ~
           rspm: ~
     steps:
     - uses: actions/checkout@v4
-    - uses: neurogenomics/rworkflows@master
+    - uses: neurogenomics/rworkflows@v1
       with:
         run_bioccheck: ${{ false }}
         run_rcmdcheck: ${{ true }}

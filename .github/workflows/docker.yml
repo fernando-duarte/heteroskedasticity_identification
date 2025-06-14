@@ -17,6 +17,10 @@ on:
         default: false
         type: boolean
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -24,7 +28,7 @@ env:
 jobs:
   # Build and test Docker images
   docker-build-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         target: [builder, production, development]
@@ -68,7 +72,7 @@ jobs:
 
     - name: Build Docker image (non-development)
       if: matrix.target != 'development'
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: .
         file: Dockerfile
@@ -83,7 +87,7 @@ jobs:
 
     - name: Build Docker image (development)
       if: matrix.target == 'development'
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: .
         file: Dockerfile.dev
@@ -105,7 +109,7 @@ jobs:
   # Test package functionality in Docker
   docker-test:
     needs: docker-build-test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Checkout repository
@@ -153,7 +157,7 @@ jobs:
   # Test production image functionality
   production-test:
     needs: docker-build-test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Download production image
@@ -180,7 +184,11 @@ jobs:
   # Security scanning
   security-scan:
     needs: docker-build-test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
+    permissions:
+      contents: read
+      security-events: write
 
     steps:
     - name: Download production image
@@ -193,7 +201,7 @@ jobs:
       run: docker load --input /tmp/production-image.tar
 
     - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
+      uses: aquasecurity/trivy-action@v0.31.0
       with:
         image-ref: $(docker images --format "table {{.Repository}}:{{.Tag}}" | grep production | head -1)
         format: 'sarif'
@@ -209,7 +217,7 @@ jobs:
   docker-push:
     if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || github.event.inputs.push_images == 'true')
     needs: [docker-test, production-test]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         target: [production, development]
@@ -247,7 +255,7 @@ jobs:
 
     - name: Build and push Docker image (non-development)
       if: matrix.target != 'development'
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: .
         file: Dockerfile
@@ -261,7 +269,7 @@ jobs:
 
     - name: Build and push Docker image (development)
       if: matrix.target == 'development'
-      uses: docker/build-push-action@v5
+      uses: docker/build-push-action@v6
       with:
         context: .
         file: Dockerfile.dev
@@ -276,7 +284,7 @@ jobs:
   cleanup:
     if: always()
     needs: [docker-test, production-test, security-scan]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
     - name: Delete artifacts

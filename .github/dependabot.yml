@@ -1,0 +1,87 @@
+# Dependabot configuration for automated dependency updates
+# Monitors GitHub Actions, Docker images, and R package dependencies
+
+version: 2
+updates:
+  # GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "fernando-duarte"
+    assignees:
+      - "fernando-duarte"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    # Group related updates together
+    groups:
+      docker-actions:
+        patterns:
+          - "docker/*"
+      security-actions:
+        patterns:
+          - "aquasecurity/*"
+          - "github/codeql-action"
+      artifact-actions:
+        patterns:
+          - "actions/upload-artifact"
+          - "actions/download-artifact"
+          - "geekyeggo/delete-artifact"
+
+  # Docker base images in Dockerfiles
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "fernando-duarte"
+    assignees:
+      - "fernando-duarte"
+    commit-message:
+      prefix: "docker"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "docker"
+    # Group R-related Docker images
+    groups:
+      rocker-images:
+        patterns:
+          - "rocker/*"
+
+  # R package dependencies (if using renv.lock)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+      day: "first-monday"
+      time: "09:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 2
+    reviewers:
+      - "fernando-duarte"
+    assignees:
+      - "fernando-duarte"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "r-packages"
+    # Only update R-related actions monthly to avoid noise
+    allow:
+      - dependency-name: "neurogenomics/rworkflows"
+      - dependency-name: "r-lib/*"
