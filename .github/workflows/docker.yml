@@ -200,10 +200,16 @@ jobs:
     - name: Load Docker image
       run: docker load --input /tmp/production-image.tar
 
+    - name: Get image name
+      id: get-image
+      run: |
+        IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep production | head -1)
+        echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_OUTPUT
+
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@v0.31.0
       with:
-        image-ref: $(docker images --format "table {{.Repository}}:{{.Tag}}" | grep production | head -1)
+        image-ref: ${{ steps.get-image.outputs.IMAGE_NAME }}
         format: 'sarif'
         output: 'trivy-results.sarif'
 

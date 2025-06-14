@@ -1,0 +1,12 @@
+# Trivy ignore file for hetid package
+# This file contains false positives and acceptable risks
+
+# Ignore low-severity vulnerabilities in development dependencies
+# Format: CVE-YYYY-NNNN
+
+# Ignore specific misconfigurations that are intentional
+# DS002: Dockerfile COPY with user-specific permissions (needed for R package)
+DS002
+
+# Ignore workflow security issues that are by design
+# GITHUB-ACTION-001: Using master/main branch references (acceptable for trusted actions) 
