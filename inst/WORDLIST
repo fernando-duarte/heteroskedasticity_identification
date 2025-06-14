@@ -261,3 +261,9 @@ str
 coeff
 linter
 nolint
+nan
+suppressWarnings
+unlist
+nnewline
+setenv
+unsetenv
