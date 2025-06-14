@@ -98,9 +98,14 @@ setup_env.sh
 *.fls
 *.out
 *.toc
+*.bcf
+*.run.xml
 
 # Generated PDF output (but keep reference papers)
 lewbel2012/lewbel2012.pdf
+
+# Generated bibliography files (from filecontents)
+lewbel2012/*.bib
 
 # Temporary R/editor files
 *~
