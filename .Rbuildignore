@@ -1,175 +1,216 @@
-# Benchmarking
-# Build artifacts
-# Code quality and linting
-# Coverage reports
-# Data and examples
-# Development and version control
-# Development scripts and tools
-# Docker
-# Documentation and meta files
-# Documentation building
-# Editor and IDE files
-# Environment and secrets
-# LaTeX artifacts
-# Logs and reports
-# Node.js (if using htmlwidgets or similar)
-# OS-specific files
-# Other common development files
-# Package management
-# Project-specific directories
-# Python/reticulate
 # R package build ignore file - Updated June 2025
-# Regular expression to match dotfiles
 # See: https://r-pkgs.org/package-structure-state.html
-# Temporary and backup files
-# Testing and CI/CD
+
+# Package build artifacts (specific patterns)
+^hetid\.Rcheck$
+^hetid_.*\.tar\.gz$
 ^.*\.Rcheck$
-^.*\.Rout$
-^.*\.Rout\.save$
+^.*\.tar\.gz$
+^.*\.tgz$
+^.*\.zip$
+^\.\.Rcheck$
+
+# Documentation building
+^doc$
+^docs$
+^pkgdown$
+^_pkgdown\.yml$
+^inst/doc$
+^Meta/$
+
+# Development and version control
+^\.git$
+^\.gitattributes$
+^\.gitignore$
+^\.github$
+^\.github/workflows$
+
+# Development tools and CI/CD
+^\.devcontainer$
+^\.circleci$
+^\.travis\.yml$
+^\.gitlab-ci\.yml$
+^appveyor\.yml$
+^azure-pipelines\.yml$
+^codecov\.yml$
+^\.pre-commit-config\.yaml$
+^\.pre-commit-config\.backup\.yaml$
+^\.pre-commit-config-.*\.yaml$
+^\.pre-commit-hooks\.yaml$
+
+# Docker related
+^docker$
+^docker-compose\.yml$
+^docker-compose\.dev\.yml$
+^Dockerfile$
+^Dockerfile\.dev$
+^\.dockerignore$
+^DOCKER\.md$
+^DOCKER_IMPLEMENTATION_SUMMARY\.md$
+
+# Editor and IDE files
+^\.Rproj\.user$
 ^.*\.Rproj$
+^\.idea$
+^\.vscode$
+^\.sublime-project$
+^\.sublime-workspace$
+^\.cursorignore$
+^\.cursorrules$
+
+# Project-specific directories
+^lewbel2012$
+^lewbel2012/lewbel_2012_paper\.pdf$
+^simulation-results$
+^news$
+^tutorials$
+^data-raw$
+^dev$
+^dev/.*$
+^examples$
+^misc$
+^bench$
+^benchmark$
+^benchmarks$
+^revdep$
+^tools$
+
+# Scripts and tools
+^scripts$
+^setup_env\.sh$
+^enable_github_pages\.sh$
+^monitor_pr_checks\.sh$
+^check_monitor_status\.sh$
+^quick_ci_test\.sh$
+^simulate_ci_cd\.sh$
+^Makefile$
+^make\.R$
+
+# Documentation and markdown files in inst
+^inst/.*\.md$
+^inst/WORDLIST$
+^inst/scripts$
+^inst/precommit-.*\.md$
+^inst/extdata/.*\.RData$
+
+# Project documentation (source files)
+^README\.Rmd$
+^README\.html$
+^NEWS\.Rmd$
+^README_CI_CD_SIMULATION\.md$
+^CI_CD_SIMULATION_SUMMARY\.md$
+^CI_CD_improvement_checklist\.md$
+^CONTRIBUTING\.md$
+^CODE_OF_CONDUCT\.md$
+^LICENSE\.md$
+^cran-comments\.md$
+
+# Notes and planning
+^TODO$
+^TODO\.md$
+^TODO\.txt$
+^notes$
+^notes\.md$
+^notes\.txt$
+^ideas\.md$
+^ideas\.txt$
+^planning$
+^planning\.md$
+^diary\.md$
+^journal\.md$
+^local-todo\.md$
+^code_to_do\.md$
+^scratch$
+
+# Environment and secrets
+^\.env$
+^\.env\..*$
+^\.Renviron$
+^\.Renviron\..*$
+^\.secrets$
+^credentials$
+
+# R temporary files
+^\.Rhistory$
+^\.RData$
+^\.Ruserdata$
+^\.Rprofile$
+
+# OS-specific files
+^\.DS_Store$
+^Thumbs\.db$
+^\.Trash-.*$
+
+# Code quality and linting
+^\.lintr$
+^\.coverage$
+^coverage$
+^htmlcov$
+
+# Testing
+^tests/testthat/\.cache$
+^pr_logs$
+^monitor\.log$
+
+# LaTeX artifacts
 ^.*\.aux$
-^.*\.backup$
-^.*\.bak$
 ^.*\.bbl$
 ^.*\.blg$
 ^.*\.fdb_latexmk$
 ^.*\.fls$
 ^.*\.log$
 ^.*\.out$
-^.*\.pyc$
-^.*\.sublime-project$
-^.*\.sublime-workspace$
-^.*\.swo$
-^.*\.swp$
 ^.*\.synctex\.gz$
-^.*\.tar\.gz$
-^.*\.temp$
-^.*\.tgz$
-^.*\.tmp$
 ^.*\.toc$
-^.*\.zip$
-^.*_cache$
-^.*_files$
+
+# Temporary and backup files
+^.*\.backup$
+^.*\.bak$
+^.*\.tmp$
+^.*\.temp$
+^.*\.swp$
+^.*\.swo$
 ^.*~$
-^CODE_OF_CONDUCT\.md$
-^CONTRIBUTING\.md$
-^CRAN-RELEASE$
-^CRAN-SUBMISSION$
-^DOCKER\.md$
-^DOCKER_IMPLEMENTATION_SUMMARY\.md$
-^Dockerfile$
-^Dockerfile\.dev$
-^LICENSE\.md$
-^Makefile$
-^NEWS\.Rmd$
-^README\.Rmd$
-^README\.html$
-^TAGS$
-^TODO$
-^TODO\.md$
-^TODO\.txt$
-^Thumbs\.db$
 ^\#.*\#$
 ^\.#.*$
-^\.DS_Store$
-^\.RData$
-^\.Renviron$
-^\.Renviron\..*$
-^\.Rhistory$
-^\.Rprofile$
-^\.Rproj\.user$
-^\.Ruserdata$
-^\.Trash-.*$
-^\.[^/]*$
-^\.circleci$
-^\.coverage$
-^\.cursorignore$
-^\.cursorrules$
-^\.dockerignore$
-^\.dockerignore$
-^\.env$
-^\.env\..*$
-^\.git$
-^\.gitattributes$
-^\.github$
-^\.github/workflows$
-^\.gitignore$
-^\.gitlab-ci\.yml$
-^\.idea$
-^\.lintr$
-^\.notes$
-^\.nyc_output$
-^\.pre-commit-config-full\.yaml$
-^\.pre-commit-config-local-r\.yaml$
-^\.pre-commit-config\.backup\.yaml$
-^\.pre-commit-config\.yaml$
-^\.pre-commit-hooks\.yaml$
-^\.secrets$
-^\.tags$
-^\.travis\.yml$
-^\.venv$
-^\.vscode$
-^__pycache__$
-^_book$
-^_pkgdown\.yml$
-^appveyor\.yml$
-^azure-pipelines\.yml$
-^bench$
-^benchmark$
-^benchmarks$
-^bookdown$
-^check_monitor_status\.sh$
-^code_to_do\.md$
-^codecov\.yml$
-^coverage$
-^cran-comments\.md$
-^credentials$
-^data-raw$
-^dev$
-^dev/.*$
-^diary\.md$
-^docker$
-^docker-compose\.dev\.yml$
-^docker-compose\.yml$
-^docs$
-^enable_github_pages\.sh$
-^examples$
-^htmlcov$
-^ideas\.md$
-^ideas\.txt$
-^inst/extdata/.*\.RData$
-^inst/precommit-.*\.md$
-^inst/scripts$
-^journal\.md$
-^lewbel2012$
-^local-todo\.md$
-^make\.R$
-^misc$
-^monitor\.log$
-^monitor_pr_checks\.sh$
-^node_modules$
-^notes$
-^notes\.md$
-^notes\.txt$
-^package-lock\.json$
-^package\.json$
-^packrat$
-^pkgdown$
-^planning$
-^planning\.md$
-^pr_logs$
+
+# Output files
+^.*\.Rout$
+^.*\.Rout\.save$
+
+# Package management
 ^renv$
 ^renv\.lock$
-^revdep$
-^scratch$
-^scripts$
-^setup_env\.sh$
-^tags$
-^tests/testthat/\.cache$
-^tools$
-^tutorials$
+^packrat$
+^package\.json$
+^package-lock\.json$
+^yarn\.lock$
+^node_modules$
+
+# Python/reticulate
+^\.venv$
 ^venv$
+^__pycache__$
+^.*\.pyc$
+^\.pytest_cache$
+^\.tox$
+^\.nyc_output$
+
+# Other files
+^CRAN-RELEASE$
+^CRAN-SUBMISSION$
+^TAGS$
+^tags$
+^\.tags$
+^\.notes$
+^bookdown$
+^_book$
+^.*_cache$
+^.*_files$
 ^vignettes/.*\.html$
 ^vignettes/.*_cache$
 ^vignettes/figure$
-^yarn\.lock$
+
+# Regular expression to match dotfiles not covered above
+^\.[^/]*$
+^Meta$

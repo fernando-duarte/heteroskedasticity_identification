@@ -1,3 +1,80 @@
-url: https://fernando-duarte.github.io/heteroskedasticity_identification/
+url: https://github.com/fernando-duarte/heteroskedasticity_identification
+
 template:
   bootstrap: 5
+  bootswatch: cosmo
+  
+home:
+  title: "hetid: Identification Through Heteroskedasticity"
+  description: >
+    Implements the identification through heteroskedasticity method 
+    of Lewbel (2012) for time-series models with endogenous regressors.
+
+authors:
+  Fernando Duarte:
+    href: https://orcid.org/0000-0002-8495-6936
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, tutorials, news]
+    right: [search, github]
+  components:
+    home:
+      icon: fas fa-home fa-lg
+      href: index.html
+    reference:
+      text: Reference
+      href: reference/index.html
+    articles:
+      text: Articles
+      menu:
+      - text: Getting Started
+        href: articles/getting-started.html
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/fernando-duarte/heteroskedasticity_identification
+
+reference:
+- title: "Data Generation"
+  desc: "Functions for generating data that satisfies Lewbel's assumptions"
+  contents:
+  - generate_lewbel_data
+  - verify_lewbel_assumptions
+  - generate_seed_matrix
+  - generate_all_seeds
+
+- title: "Estimation"
+  desc: "Core estimation functions for the Lewbel method"
+  contents:
+  - calculate_lewbel_bounds
+  - run_single_lewbel_simulation
+
+- title: "Monte Carlo Simulations"
+  desc: "Functions for running Monte Carlo experiments"
+  contents:
+  - run_lewbel_monte_carlo
+  - run_lewbel_demo
+  - run_main_simulation
+  - run_sample_size_analysis
+  - run_sensitivity_analysis
+  - run_bootstrap_demonstration
+  - create_default_config
+
+- title: "Analysis"
+  desc: "Functions for analyzing simulation results"
+  contents:
+  - analyze_main_results
+  - analyze_sample_size_results
+  - analyze_sensitivity_results
+  - analyze_bootstrap_results
+  - print_simulation_summary
+
+- title: "Visualization"
+  desc: "Functions for creating plots and visualizations"
+  contents:
+  - generate_all_plots
+  - plot_estimator_distributions
+  - plot_first_stage_f_dist
+  - plot_sample_size_consistency
+  - plot_het_sensitivity
+  - plot_bootstrap_ci

@@ -32,6 +32,10 @@
 vignettes/*.html
 vignettes/*.pdf
 
+# Generated vignette docs (created during build)
+inst/doc/
+inst/Meta/
+
 # OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
 .httr-oauth
 
@@ -52,6 +56,10 @@ vignettes/*.pdf
 # pkgdown site
 docs/
 pkgdown/
+
+# AI assistant rule files
+.cursorrules
+.augmentrules
 
 # translation temp files
 po/*~
@@ -277,3 +285,5 @@ packrat/src/
 *.p12
 .secrets/
 credentials/
+/doc/
+/Meta/
