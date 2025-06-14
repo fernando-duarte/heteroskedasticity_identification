@@ -49,7 +49,7 @@ jobs:
           rspm: ~
     steps:
     - uses: actions/checkout@v4
-    - uses: neurogenomics/rworkflows@v1
+    - uses: neurogenomics/rworkflows@v1  # Pinned to stable v1 release tag
       with:
         run_bioccheck: ${{ false }}
         run_rcmdcheck: ${{ true }}

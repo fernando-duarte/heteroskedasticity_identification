@@ -140,7 +140,7 @@ The project uses several tools to maintain code quality:
 - **Code coverage**: Test coverage reporting (to be implemented)
 - **pkgdown**: Automatic documentation website generation
 
-For detailed information about our CI/CD workflows, see [docs/workflows.md](docs/workflows.md).
+For detailed information about our CI/CD workflows, see [WORKFLOWS.md](WORKFLOWS.md).
 
 ### Pre-commit Hooks
 
