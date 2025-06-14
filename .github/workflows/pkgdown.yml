@@ -59,7 +59,7 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         continue-on-error: true
-        
+
       - name: Check deployment status
         if: steps.deployment.outcome == 'failure'
         run: |
