@@ -36,31 +36,32 @@ jobs:
           bioc: devel
           r: auto
           cont: ghcr.io/bioconductor/bioconductor_docker:devel
-          rspm: ~
+          rspm: ''
         - os: macos-14
           bioc: release
           r: auto
-          cont: ~
-          rspm: ~
+          cont: ''
+          rspm: ''
         - os: windows-2022
           bioc: release
           r: auto
-          cont: ~
-          rspm: ~
+          cont: ''
+          rspm: ''
     steps:
     - uses: actions/checkout@v4
-    - uses: neurogenomics/rworkflows@v1  # Pinned to stable v1 release tag
+    - uses: neurogenomics/rworkflows@master  # Use master branch which supports run_telemetry
       with:
-        run_bioccheck: ${{ false }}
-        run_rcmdcheck: ${{ true }}
-        as_cran: ${{ true }}
-        run_vignettes: ${{ true }}
-        has_testthat: ${{ true }}
-        run_covr: ${{ true }}
-        run_pkgdown: ${{ true }}
-        has_runit: ${{ false }}
-        has_latex: ${{ false }}
+        run_bioccheck: false
+        run_rcmdcheck: true
+        as_cran: true
+        run_vignettes: true
+        has_testthat: true
+        run_covr: true
+        run_pkgdown: true
+        has_runit: false
+        has_latex: false
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run_docker: ${{ false }}
+        run_docker: false
         runner_os: ${{ runner.os }}
         cache_version: cache-v1
+        run_telemetry: false  # Disable telemetry to fix permission errors
