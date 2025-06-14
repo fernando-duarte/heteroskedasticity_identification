@@ -9,6 +9,8 @@ plot_first_stage_f_dist(results_clean, config = NULL, weak_iv_pct = NULL)
 \arguments{
 \item{results_clean}{Data.frame. Cleaned simulation results.}
 
+\item{config}{List. Optional. Configuration object (not currently used).}
+
 \item{weak_iv_pct}{Numeric. Percentage of simulations with weak instruments.}
 }
 \value{

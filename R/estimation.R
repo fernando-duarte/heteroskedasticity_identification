@@ -208,7 +208,7 @@ run_single_lewbel_simulation <- function(sim_id,
       lewbel_iv <- (df$Z - mean(df$Z)) * e2_hat
 
       # Check for invalid instrument
-      if (any(is.na(lewbel_iv)) || sd(lewbel_iv, na.rm = TRUE) < 1e-10) {
+      if (any(is.na(lewbel_iv)) || stats::sd(lewbel_iv, na.rm = TRUE) < 1e-10) {
         tsls_est <- NA
         tsls_se <- NA
         tsls_covers <- NA

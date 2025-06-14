@@ -184,6 +184,7 @@ deqn
 dontrun
 extensibility
 globals
+globalVariables
 monte
 orchestrator
 pmax
@@ -267,3 +268,5 @@ unlist
 nnewline
 setenv
 unsetenv
+NSE
+NOTEs

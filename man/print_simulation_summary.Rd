@@ -7,6 +7,11 @@
 print_simulation_summary(analysis = NULL, config = NULL, verbose = TRUE)
 }
 \arguments{
+\item{analysis}{List. Optional. Analysis results object containing
+simulation metrics.}
+
+\item{config}{List. Optional. Configuration object (not currently used).}
+
 \item{verbose}{Logical. Whether to print the summary (default: TRUE).}
 }
 \description{

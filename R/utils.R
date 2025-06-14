@@ -36,19 +36,38 @@ generate_seed_matrix <- function(base_seed, n_experiments, n_reps_each) {
 #'
 #' @param num_simulations Integer. Number of main simulation runs
 #'   (default: 1000).
-#' @param sample_sizes Integer vector. Sample sizes for consistency analysis
-#'   (default: c(500, 1000, 2000)).
 #' @param main_sample_size Integer. Primary sample size for main results
 #'   (default: 1000).
-#' @param set_seed Integer. Base seed for reproducibility (default: 123).
-#' @param gamma1 Numeric. True value of the endogenous parameter
-#'   (default: -0.8).
+#' @param sample_sizes Integer vector. Sample sizes for consistency analysis
+#'   (default: c(500, 1000, 2000)).
 #' @param delta_het Numeric. Heteroscedasticity strength parameter
 #'   (default: 1.2).
-#' @param tau_set_id Numeric. Tau parameter for set identification
-#'   (default: 0.2).
+#' @param delta_het_values Numeric vector. Delta values for sensitivity
+#'   analysis (default: c(0.4, 0.8, 1.2)).
+#' @param n_reps_by_n Integer. Replications per sample size
+#'   (default: 100).
+#' @param n_reps_by_delta Integer. Replications per delta value
+#'   (default: 100).
 #' @param bootstrap_reps Integer. Number of bootstrap replications
 #'   (default: 100).
+#' @param bootstrap_subset_size Integer. Size of bootstrap subset
+#'   (default: 10).
+#' @param bootstrap_demo_size Integer. Size of bootstrap demo
+#'   (default: 5).
+#' @param beta1_0 Numeric. Intercept for first equation (default: 0.5).
+#' @param beta1_1 Numeric. Slope for first equation (default: 1.5).
+#' @param gamma1 Numeric. True value of the endogenous parameter
+#'   (default: -0.8).
+#' @param beta2_0 Numeric. Intercept for second equation (default: 1.0).
+#' @param beta2_1 Numeric. Slope for second equation (default: -1.0).
+#' @param alpha1 Numeric. Factor loading for first error (default: -0.5).
+#' @param alpha2 Numeric. Factor loading for second error (default: 1.0).
+#' @param tau_set_id Numeric. Tau parameter for set identification
+#'   (default: 0.2).
+#' @param endog_var_name Character. Name of endogenous variable
+#'   (default: "Y2").
+#' @param exog_var_names Character. Name of exogenous variable
+#'   (default: "Xk").
 #'
 #' @return A list containing all configuration parameters.
 #'

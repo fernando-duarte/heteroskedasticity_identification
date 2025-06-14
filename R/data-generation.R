@@ -27,7 +27,7 @@
 #'
 #' where U, V_1 are independent standard normal, and V_2 ~ N(0, exp(\eqn{\delta}
 #' Z))
-#' with Z = X^2 - E[X^2] being the heteroscedasticity driver.
+#' with Z = \eqn{X^2 - E[X^2]} being the heteroscedasticity driver.
 #'
 #' @return A data.frame with columns Y1, Y2, Xk, Z, epsilon1, epsilon2.
 #'

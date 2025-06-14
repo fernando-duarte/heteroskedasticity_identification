@@ -55,7 +55,10 @@
 ^CONTRIBUTING\.md$
 ^CRAN-RELEASE$
 ^CRAN-SUBMISSION$
+^DOCKER\.md$
+^DOCKER_IMPLEMENTATION_SUMMARY\.md$
 ^Dockerfile$
+^Dockerfile\.dev$
 ^LICENSE\.md$
 ^Makefile$
 ^NEWS\.Rmd$
@@ -125,6 +128,8 @@
 ^dev$
 ^dev/.*$
 ^diary\.md$
+^docker$
+^docker-compose\.dev\.yml$
 ^docker-compose\.yml$
 ^docs$
 ^enable_github_pages\.sh$

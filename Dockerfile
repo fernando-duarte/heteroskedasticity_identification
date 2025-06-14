@@ -53,10 +53,8 @@ RUN --mount=type=cache,target=/usr/local/lib/R/site-library \
 # Copy package metadata files first for better layer caching
 COPY DESCRIPTION NAMESPACE ./
 
-# Install package dependencies with cache mount (install missing dependencies first)
-RUN --mount=type=cache,target=/usr/local/lib/R/site-library \
-    R -e "install.packages(c('pbkrtest', 'lme4'), repos='https://cloud.r-project.org/')" && \
-    R -e "install.packages('car', repos='https://cloud.r-project.org/')" && \
+# Install package dependencies
+RUN R -e "install.packages(c('AER', 'boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr', 'testthat'), repos='https://cloud.r-project.org/')" && \
     R -e "remotes::install_deps('.', dependencies = TRUE, repos='https://cloud.r-project.org/')"
 
 # Copy source code and build package

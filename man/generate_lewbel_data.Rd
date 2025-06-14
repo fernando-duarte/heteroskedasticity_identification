@@ -39,7 +39,7 @@ The error structure follows a single-factor model:
 
 where U, V_1 are independent standard normal, and V_2 ~ N(0, exp(\eqn{\delta}
 Z))
-with Z = X^2 - E\link{X^2} being the heteroscedasticity driver.
+with Z = \eqn{X^2 - E[X^2]} being the heteroscedasticity driver.
 }
 \examples{
 \dontrun{

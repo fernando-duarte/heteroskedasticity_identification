@@ -155,6 +155,7 @@ plot_het_sensitivity <- function(results_by_delta, config) {
 #' threshold.
 #'
 #' @param results_clean Data.frame. Cleaned simulation results.
+#' @param config List. Optional. Configuration object (not currently used).
 #' @param weak_iv_pct Numeric. Percentage of simulations with weak instruments.
 #'
 #' @return A ggplot2 object.

@@ -285,6 +285,9 @@ analyze_sensitivity_results <- function(results_by_delta,
 #'
 #' Prints a comprehensive summary of simulation findings.
 #'
+#' @param analysis List. Optional. Analysis results object containing
+#'   simulation metrics.
+#' @param config List. Optional. Configuration object (not currently used).
 #' @param verbose Logical. Whether to print the summary (default: TRUE).
 #'
 #' @examples

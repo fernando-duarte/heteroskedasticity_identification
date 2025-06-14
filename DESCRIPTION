@@ -21,12 +21,9 @@ Imports:
     furrr,
     future,
     ggplot2,
-    knitr,
     purrr,
-    rlang,
     stats,
-    tidyr,
-    utils
+    tidyr
 Suggests:
     knitr,
     rmarkdown,

@@ -40,16 +40,47 @@ create_default_config(
 \item{delta_het}{Numeric. Heteroscedasticity strength parameter
 (default: 1.2).}
 
+\item{delta_het_values}{Numeric vector. Delta values for sensitivity
+analysis (default: c(0.4, 0.8, 1.2)).}
+
+\item{n_reps_by_n}{Integer. Replications per sample size
+(default: 100).}
+
+\item{n_reps_by_delta}{Integer. Replications per delta value
+(default: 100).}
+
 \item{bootstrap_reps}{Integer. Number of bootstrap replications
 (default: 100).}
+
+\item{bootstrap_subset_size}{Integer. Size of bootstrap subset
+(default: 10).}
+
+\item{bootstrap_demo_size}{Integer. Size of bootstrap demo
+(default: 5).}
+
+\item{beta1_0}{Numeric. Intercept for first equation (default: 0.5).}
+
+\item{beta1_1}{Numeric. Slope for first equation (default: 1.5).}
 
 \item{gamma1}{Numeric. True value of the endogenous parameter
 (default: -0.8).}
 
+\item{beta2_0}{Numeric. Intercept for second equation (default: 1.0).}
+
+\item{beta2_1}{Numeric. Slope for second equation (default: -1.0).}
+
+\item{alpha1}{Numeric. Factor loading for first error (default: -0.5).}
+
+\item{alpha2}{Numeric. Factor loading for second error (default: 1.0).}
+
 \item{tau_set_id}{Numeric. Tau parameter for set identification
 (default: 0.2).}
 
-\item{set_seed}{Integer. Base seed for reproducibility (default: 123).}
+\item{endog_var_name}{Character. Name of endogenous variable
+(default: "Y2").}
+
+\item{exog_var_names}{Character. Name of exogenous variable
+(default: "Xk").}
 }
 \value{
 A list containing all configuration parameters.
