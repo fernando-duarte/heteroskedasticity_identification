@@ -15,7 +15,7 @@
           \item Added \code{.dockerignore} for optimized Docker builds
         }
       }
-      
+
       \item \strong{Development Tools}
       \itemize{
         \item Configured pre-commit hooks for code quality:
@@ -33,7 +33,7 @@
           \item Documentation building
         }
       }
-      
+
       \item \strong{Documentation}
       \itemize{
         \item Updated README.md with:
@@ -51,7 +51,7 @@
           \item Documentation standards
         }
       }
-      
+
       \item \strong{Initial Package Structure}
       \itemize{
         \item Basic package skeleton with:
@@ -72,7 +72,7 @@
       \item This will be the first release of hetid, implementing the core functionality of Lewbel (2012) identification through heteroskedasticity method.
     }
   }
-  
+
   \subsection{Planned Features}{
     \itemize{
       \item Core Lewbel (2012) estimator implementation
@@ -82,4 +82,4 @@
       \item Full test coverage
     }
   }
-} 
+}

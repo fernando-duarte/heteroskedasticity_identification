@@ -270,3 +270,7 @@ setenv
 unsetenv
 NSE
 NOTEs
+CodeQL
+Dependabot
+SARIF
+neq

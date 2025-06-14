@@ -1,216 +1,193 @@
-# R package build ignore file - Updated June 2025
-# See: https://r-pkgs.org/package-structure-state.html
-
-# Package build artifacts (specific patterns)
-^hetid\.Rcheck$
-^hetid_.*\.tar\.gz$
-^.*\.Rcheck$
-^.*\.tar\.gz$
-^.*\.tgz$
-^.*\.zip$
-^\.\.Rcheck$
-
-# Documentation building
-^doc$
-^docs$
-^pkgdown$
-^_pkgdown\.yml$
-^inst/doc$
-^Meta/$
-
-# Development and version control
-^\.git$
-^\.gitattributes$
-^\.gitignore$
-^\.github$
-^\.github/workflows$
-
-# Development tools and CI/CD
-^\.devcontainer$
-^\.circleci$
-^\.travis\.yml$
-^\.gitlab-ci\.yml$
-^appveyor\.yml$
-^azure-pipelines\.yml$
-^codecov\.yml$
-^\.pre-commit-config\.yaml$
-^\.pre-commit-config\.backup\.yaml$
-^\.pre-commit-config-.*\.yaml$
-^\.pre-commit-hooks\.yaml$
-
-# Docker related
-^docker$
-^docker-compose\.yml$
-^docker-compose\.dev\.yml$
-^Dockerfile$
-^Dockerfile\.dev$
-^\.dockerignore$
-^DOCKER\.md$
-^DOCKER_IMPLEMENTATION_SUMMARY\.md$
-
-# Editor and IDE files
-^\.Rproj\.user$
-^.*\.Rproj$
-^\.idea$
-^\.vscode$
-^\.sublime-project$
-^\.sublime-workspace$
-^\.cursorignore$
-^\.cursorrules$
-
-# Project-specific directories
-^lewbel2012$
-^lewbel2012/lewbel_2012_paper\.pdf$
-^simulation-results$
-^news$
-^tutorials$
-^data-raw$
-^dev$
-^dev/.*$
-^examples$
-^misc$
-^bench$
-^benchmark$
-^benchmarks$
-^revdep$
-^tools$
-
-# Scripts and tools
-^scripts$
-^setup_env\.sh$
-^enable_github_pages\.sh$
-^monitor_pr_checks\.sh$
-^check_monitor_status\.sh$
-^quick_ci_test\.sh$
-^simulate_ci_cd\.sh$
-^Makefile$
-^make\.R$
-
-# Documentation and markdown files in inst
-^inst/.*\.md$
-^inst/WORDLIST$
-^inst/scripts$
-^inst/precommit-.*\.md$
-^inst/extdata/.*\.RData$
-
-# Project documentation (source files)
-^README\.Rmd$
-^README\.html$
-^NEWS\.Rmd$
-^README_CI_CD_SIMULATION\.md$
-^CI_CD_SIMULATION_SUMMARY\.md$
-^CI_CD_improvement_checklist\.md$
-^CONTRIBUTING\.md$
-^CODE_OF_CONDUCT\.md$
-^LICENSE\.md$
-^cran-comments\.md$
-
-# Notes and planning
-^TODO$
-^TODO\.md$
-^TODO\.txt$
-^notes$
-^notes\.md$
-^notes\.txt$
-^ideas\.md$
-^ideas\.txt$
-^planning$
-^planning\.md$
-^diary\.md$
-^journal\.md$
-^local-todo\.md$
-^code_to_do\.md$
-^scratch$
-
-# Environment and secrets
-^\.env$
-^\.env\..*$
-^\.Renviron$
-^\.Renviron\..*$
-^\.secrets$
-^credentials$
-
-# R temporary files
-^\.Rhistory$
-^\.RData$
-^\.Ruserdata$
-^\.Rprofile$
-
-# OS-specific files
-^\.DS_Store$
-^Thumbs\.db$
-^\.Trash-.*$
-
 # Code quality and linting
-^\.lintr$
-^\.coverage$
-^coverage$
-^htmlcov$
-
-# Testing
-^tests/testthat/\.cache$
-^pr_logs$
-^monitor\.log$
-
+# Development and version control
+# Development tools and CI/CD
+# Docker related
+# Documentation and markdown files in inst
+# Documentation building
+# Editor and IDE files
+# Environment and secrets
 # LaTeX artifacts
+# Notes and planning
+# OS-specific files
+# Other files
+# Output files
+# Package build artifacts (specific patterns)
+# Package management
+# Project documentation (source files)
+# Project-specific directories
+# Python/reticulate
+# R package build ignore file - Updated June 2025
+# R temporary files
+# Regular expression to match dotfiles not covered above
+# Scripts and tools
+# See: https://r-pkgs.org/package-structure-state.html
+# Temporary and backup files
+# Testing
+^.*\.Rcheck$
+^.*\.Rout$
+^.*\.Rout\.save$
+^.*\.Rproj$
 ^.*\.aux$
+^.*\.backup$
+^.*\.bak$
 ^.*\.bbl$
 ^.*\.blg$
 ^.*\.fdb_latexmk$
 ^.*\.fls$
 ^.*\.log$
 ^.*\.out$
-^.*\.synctex\.gz$
-^.*\.toc$
-
-# Temporary and backup files
-^.*\.backup$
-^.*\.bak$
-^.*\.tmp$
-^.*\.temp$
-^.*\.swp$
-^.*\.swo$
-^.*~$
-^\#.*\#$
-^\.#.*$
-
-# Output files
-^.*\.Rout$
-^.*\.Rout\.save$
-
-# Package management
-^renv$
-^renv\.lock$
-^packrat$
-^package\.json$
-^package-lock\.json$
-^yarn\.lock$
-^node_modules$
-
-# Python/reticulate
-^\.venv$
-^venv$
-^__pycache__$
 ^.*\.pyc$
-^\.pytest_cache$
-^\.tox$
-^\.nyc_output$
-
-# Other files
-^CRAN-RELEASE$
-^CRAN-SUBMISSION$
-^TAGS$
-^tags$
-^\.tags$
-^\.notes$
-^bookdown$
-^_book$
+^.*\.swo$
+^.*\.swp$
+^.*\.synctex\.gz$
+^.*\.tar\.gz$
+^.*\.temp$
+^.*\.tgz$
+^.*\.tmp$
+^.*\.toc$
+^.*\.zip$
 ^.*_cache$
 ^.*_files$
+^.*~$
+^CI_CD_SIMULATION_SUMMARY\.md$
+^CI_CD_improvement_checklist\.md$
+^CODE_OF_CONDUCT\.md$
+^CONTRIBUTING\.md$
+^CRAN-RELEASE$
+^CRAN-SUBMISSION$
+^DOCKER\.md$
+^DOCKER_IMPLEMENTATION_SUMMARY\.md$
+^Dockerfile$
+^Dockerfile\.dev$
+^LICENSE\.md$
+^Makefile$
+^Meta$
+^Meta/$
+^NEWS\.Rmd$
+^README\.Rmd$
+^README\.html$
+^README_CI_CD_SIMULATION\.md$
+^TAGS$
+^TODO$
+^TODO\.md$
+^TODO\.txt$
+^Thumbs\.db$
+^\#.*\#$
+^\.#.*$
+^\.DS_Store$
+^\.RData$
+^\.Renviron$
+^\.Renviron\..*$
+^\.Rhistory$
+^\.Rprofile$
+^\.Rproj\.user$
+^\.Ruserdata$
+^\.Trash-.*$
+^\.[^/]*$
+^\.\.Rcheck$
+^\.circleci$
+^\.coverage$
+^\.cursorignore$
+^\.cursorrules$
+^\.devcontainer$
+^\.dockerignore$
+^\.env$
+^\.env\..*$
+^\.git$
+^\.gitattributes$
+^\.github$
+^\.github/workflows$
+^\.gitignore$
+^\.gitlab-ci\.yml$
+^\.idea$
+^\.lintr$
+^\.notes$
+^\.nyc_output$
+^\.pre-commit-config-.*\.yaml$
+^\.pre-commit-config\.backup\.yaml$
+^\.pre-commit-config\.yaml$
+^\.pre-commit-hooks\.yaml$
+^\.pytest_cache$
+^\.secrets$
+^\.sublime-project$
+^\.sublime-workspace$
+^\.tags$
+^\.tox$
+^\.travis\.yml$
+^\.venv$
+^\.vscode$
+^__pycache__$
+^_book$
+^_pkgdown\.yml$
+^appveyor\.yml$
+^azure-pipelines\.yml$
+^bench$
+^benchmark$
+^benchmarks$
+^bookdown$
+^check_monitor_status\.sh$
+^code_to_do\.md$
+^codecov\.yml$
+^coverage$
+^cran-comments\.md$
+^credentials$
+^data-raw$
+^dev$
+^dev/.*$
+^diary\.md$
+^doc$
+^docker$
+^docker-compose\.dev\.yml$
+^docker-compose\.yml$
+^docs$
+^enable_github_pages\.sh$
+^examples$
+^hetid\.Rcheck$
+^hetid_.*\.tar\.gz$
+^htmlcov$
+^ideas\.md$
+^ideas\.txt$
+^inst/.*\.md$
+^inst/WORDLIST$
+^inst/doc$
+^inst/extdata/.*\.RData$
+^inst/precommit-.*\.md$
+^inst/scripts$
+^journal\.md$
+^lewbel2012$
+^lewbel2012/lewbel_2012_paper\.pdf$
+^local-todo\.md$
+^make\.R$
+^misc$
+^monitor\.log$
+^monitor_pr_checks\.sh$
+^news$
+^node_modules$
+^notes$
+^notes\.md$
+^notes\.txt$
+^package-lock\.json$
+^package\.json$
+^packrat$
+^pkgdown$
+^planning$
+^planning\.md$
+^pr_logs$
+^quick_ci_test\.sh$
+^renv$
+^renv\.lock$
+^revdep$
+^scratch$
+^scripts$
+^setup_env\.sh$
+^simulate_ci_cd\.sh$
+^simulation-results$
+^tags$
+^tests/testthat/\.cache$
+^tools$
+^tutorials$
+^venv$
 ^vignettes/.*\.html$
 ^vignettes/.*_cache$
 ^vignettes/figure$
-
-# Regular expression to match dotfiles not covered above
-^\.[^/]*$
-^Meta$
+^yarn\.lock$

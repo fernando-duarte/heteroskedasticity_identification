@@ -21,6 +21,18 @@ You can install the development version of hetid from GitHub with:
 devtools::install_github("fernando-duarte/heteroskedasticity_identification")
 ```
 
+### Note on Vignettes
+
+If you're installing from a path containing spaces (e.g., "Dropbox (Personal)"), vignettes may not build correctly during installation. To view the vignette after installation:
+
+```r
+# Build vignettes manually if needed
+devtools::build_vignettes()
+
+# View available vignettes
+browseVignettes("hetid")
+```
+
 ## Project Structure
 
 ```

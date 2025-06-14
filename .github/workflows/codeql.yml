@@ -22,7 +22,7 @@ jobs:
     name: Analyze Code
     runs-on: ubuntu-22.04
     timeout-minutes: 360
-    
+
     permissions:
       # Required for all workflows
       security-events: write
@@ -78,7 +78,7 @@ jobs:
   dockerfile-security:
     name: Dockerfile Security Scan
     runs-on: ubuntu-22.04
-    
+
     permissions:
       contents: read
       security-events: write
@@ -107,7 +107,7 @@ jobs:
   workflow-security:
     name: Workflow Security Scan
     runs-on: ubuntu-22.04
-    
+
     permissions:
       contents: read
       security-events: write

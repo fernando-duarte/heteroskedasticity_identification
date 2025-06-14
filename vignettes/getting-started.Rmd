@@ -47,14 +47,14 @@ The package provides a function to generate data that satisfies Lewbel's assumpt
 ```{r generate-data}
 # Set parameters for the data generating process
 params <- list(
-  beta1_0 = 0.5,    # Intercept in first equation
-  beta1_1 = 1.5,    # Coefficient on X in first equation
-  gamma1 = -0.8,    # Endogenous parameter (true value)
-  beta2_0 = 1.0,    # Intercept in second equation
-  beta2_1 = -1.0,   # Coefficient on X in second equation
-  alpha1 = -0.5,    # Factor loading for error correlation
-  alpha2 = 1.0,     # Factor loading for error correlation
-  delta_het = 1.2   # Heteroskedasticity strength
+  beta1_0 = 0.5, # Intercept in first equation
+  beta1_1 = 1.5, # Coefficient on X in first equation
+  gamma1 = -0.8, # Endogenous parameter (true value)
+  beta2_0 = 1.0, # Intercept in second equation
+  beta2_1 = -1.0, # Coefficient on X in second equation
+  alpha1 = -0.5, # Factor loading for error correlation
+  alpha2 = 1.0, # Factor loading for error correlation
+  delta_het = 1.2 # Heteroskedasticity strength
 )
 
 # Generate a sample
@@ -81,7 +81,7 @@ When the covariance restriction holds exactly, we can obtain point estimates usi
 ```{r point-estimation}
 # Run a single simulation to demonstrate estimation
 result <- run_single_lewbel_simulation(
-  sim_id = 1, 
+  sim_id = 1,
   params = c(params, list(
     sample_size = 1000,
     tau_set_id = 0.2,
@@ -104,25 +104,35 @@ When we relax the covariance restriction to allow for some correlation between $
 # Calculate bounds under exact identification (tau = 0)
 bounds_exact <- calculate_lewbel_bounds(data, tau = 0)
 cat("Bounds under exact identification (tau = 0):\n")
-cat("[", round(bounds_exact$bounds[1], 3), ",", round(bounds_exact$bounds[2], 3), "]\n")
+cat(
+  "[", round(bounds_exact$bounds[1], 3), ",",
+  round(bounds_exact$bounds[2], 3), "]\n"
+)
 
 # Calculate bounds under relaxed assumption (tau = 0.2)
 bounds_relaxed <- calculate_lewbel_bounds(data, tau = 0.2)
 cat("\nBounds under relaxed assumption (tau = 0.2):\n")
-cat("[", round(bounds_relaxed$bounds[1], 3), ",", round(bounds_relaxed$bounds[2], 3), "]\n")
+cat(
+  "[", round(bounds_relaxed$bounds[1], 3), ",",
+  round(bounds_relaxed$bounds[2], 3), "]\n"
+)
 
 # With bootstrap standard errors
 bounds_with_se <- calculate_lewbel_bounds(
-  data, 
-  tau = 0.2, 
-  compute_se = TRUE, 
+  data,
+  tau = 0.2,
+  compute_se = TRUE,
   b_reps = 100
 )
 cat("\nBounds with standard errors:\n")
-cat("Lower bound:", round(bounds_with_se$bounds[1], 3), 
-    "(SE:", round(bounds_with_se$se[1], 3), ")\n")
-cat("Upper bound:", round(bounds_with_se$bounds[2], 3), 
-    "(SE:", round(bounds_with_se$se[2], 3), ")\n")
+cat(
+  "Lower bound:", round(bounds_with_se$bounds[1], 3),
+  "(SE:", round(bounds_with_se$se[1], 3), ")\n"
+)
+cat(
+  "Upper bound:", round(bounds_with_se$bounds[2], 3),
+  "(SE:", round(bounds_with_se$se[2], 3), ")\n"
+)
 ```
 
 ## Monte Carlo Simulation
@@ -146,7 +156,7 @@ sim_params <- c(params, list(
 results <- map_dfr(1:n_sims, ~ run_single_lewbel_simulation(.x, sim_params))
 
 # Summarize results
-summary_stats <- results %>%
+summary_stats <- results |>
   summarise(
     ols_bias = mean(ols_gamma1 - params$gamma1, na.rm = TRUE),
     tsls_bias = mean(tsls_gamma1 - params$gamma1, na.rm = TRUE),

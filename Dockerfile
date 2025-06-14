@@ -27,6 +27,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     # Core development tools
     build-essential \
     git \
+    gfortran \
     # R package compilation dependencies
     libcurl4-openssl-dev \
     libssl-dev \
@@ -42,6 +43,10 @@ RUN --mount=type=cache,target=/var/cache/apt \
     libgsl-dev \
     liblapack-dev \
     libblas-dev \
+    # Additional dependencies for nloptr and lme4
+    libnlopt-dev \
+    libgmp-dev \
+    libmpfr-dev \
     # Parallel processing support
     libopenmpi-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -53,9 +58,18 @@ RUN --mount=type=cache,target=/usr/local/lib/R/site-library \
 # Copy package metadata files first for better layer caching
 COPY DESCRIPTION NAMESPACE ./
 
-# Install package dependencies
-RUN R -e "install.packages(c('AER', 'boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr', 'testthat'), repos='https://cloud.r-project.org/')" && \
-    R -e "remotes::install_deps('.', dependencies = TRUE, repos='https://cloud.r-project.org/')"
+# Install core dependencies first (in order to handle dependency chains)
+RUN R -e "install.packages(c('nloptr', 'minqa', 'RcppEigen'), repos='https://cloud.r-project.org/', type='source')" && \
+    R -e "install.packages(c('lme4'), repos='https://cloud.r-project.org/')" && \
+    R -e "install.packages(c('pbkrtest'), repos='https://cloud.r-project.org/')" && \
+    R -e "install.packages(c('car'), repos='https://cloud.r-project.org/')" && \
+    R -e "install.packages(c('AER'), repos='https://cloud.r-project.org/')"
+
+# Install remaining package dependencies
+RUN R -e "install.packages(c('boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr', 'testthat'), repos='https://cloud.r-project.org/')"
+
+# Install package dependencies using remotes (ensure remotes is available)
+RUN R -e "if (!require('remotes', quietly = TRUE)) install.packages('remotes', repos='https://cloud.r-project.org/'); remotes::install_deps('.', dependencies = TRUE, repos='https://cloud.r-project.org/')"
 
 # Copy source code and build package
 COPY . .
@@ -96,6 +110,10 @@ RUN apt-get update && apt-get install -y \
     libgsl27 \
     liblapack3 \
     libblas3 \
+    # Runtime libraries for nloptr and lme4
+    libnlopt0 \
+    libgmp10 \
+    libmpfr6 \
     # Clean up
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean

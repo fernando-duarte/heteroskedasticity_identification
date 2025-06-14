@@ -3,11 +3,11 @@ url: https://github.com/fernando-duarte/heteroskedasticity_identification
 template:
   bootstrap: 5
   bootswatch: cosmo
-  
+
 home:
   title: "hetid: Identification Through Heteroskedasticity"
   description: >
-    Implements the identification through heteroskedasticity method 
+    Implements the identification through heteroskedasticity method
     of Lewbel (2012) for time-series models with endogenous regressors.
 
 authors:

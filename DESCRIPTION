@@ -4,10 +4,10 @@ Version: 0.1.0
 Authors@R:
     person("Fernando", "Duarte", , "fernando_duarte@brown.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-8495-6936"))
-Description: Implements the identification through heteroskedasticity method 
-    of Lewbel (2012) for time-series models with endogenous regressors. 
-    Provides tools for estimation and inference when traditional instruments 
-    are not available.
+Description: Implements the identification through heteroskedasticity
+    method of Lewbel (2012) for time-series models with endogenous
+    regressors.  Provides tools for estimation and inference when
+    traditional instruments are not available.
 License: MIT + file LICENSE
 URL: https://github.com/fernando-duarte/heteroskedasticity_identification
 BugReports:
@@ -31,10 +31,10 @@ Suggests:
     testthat (>= 3.0.0)
 VignetteBuilder:
     knitr
-Config/testthat/edition: 3
-Config/testthat/parallel: true
 Config/build/vignette-compression: both
 Config/Needs/website: pkgdown
+Config/testthat/edition: 3
+Config/testthat/parallel: true
 Encoding: UTF-8
 Language: en-US
 LazyData: true
