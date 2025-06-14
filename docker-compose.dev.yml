@@ -2,8 +2,6 @@
 # Use with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 # Optimized for interactive development workflow
 
-version: '3.8'
-
 services:
   # Enhanced development service
   hetid-dev:

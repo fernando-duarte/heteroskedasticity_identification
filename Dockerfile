@@ -46,22 +46,25 @@ RUN --mount=type=cache,target=/var/cache/apt \
     libopenmpi-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install remotes and devtools for package management
+# Install remotes, devtools, and knitr for package management
 RUN --mount=type=cache,target=/usr/local/lib/R/site-library \
-    R -e "install.packages(c('remotes', 'devtools'), repos='https://cloud.r-project.org/')"
+    R -e "install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown'), repos='https://cloud.r-project.org/')"
 
 # Copy package metadata files first for better layer caching
 COPY DESCRIPTION NAMESPACE ./
 
-# Install package dependencies with cache mount
+# Install package dependencies with cache mount (install missing dependencies first)
 RUN --mount=type=cache,target=/usr/local/lib/R/site-library \
-    R -e "remotes::install_deps(dependencies = TRUE, repos='https://cloud.r-project.org/')"
+    R -e "install.packages(c('pbkrtest', 'lme4'), repos='https://cloud.r-project.org/')" && \
+    R -e "install.packages('car', repos='https://cloud.r-project.org/')" && \
+    R -e "remotes::install_deps('.', dependencies = TRUE, repos='https://cloud.r-project.org/')"
 
 # Copy source code and build package
 COPY . .
 
-# Build and install the package
-RUN R CMD build . && \
+# Build and install the package (ensure knitr is available)
+RUN R -e "if (!require('knitr', quietly = TRUE)) install.packages('knitr', repos='https://cloud.r-project.org/')" && \
+    R CMD build . && \
     R CMD INSTALL *.tar.gz && \
     # Verify installation
     R -e "library(hetid); packageVersion('hetid')"
@@ -134,7 +137,7 @@ LABEL org.opencontainers.image.title="hetid R Package Development"
 LABEL org.opencontainers.image.description="Development environment for heteroskedasticity identification package"
 LABEL org.opencontainers.image.version="0.1.0-dev"
 
-# Install additional development tools
+# Install additional development tools and system dependencies
 RUN apt-get update && apt-get install -y \
     # Development tools
     vim \
@@ -147,6 +150,20 @@ RUN apt-get update && apt-get install -y \
     # Additional utilities
     less \
     tree \
+    # System libraries needed for R packages
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libfontconfig1-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libtiff5-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libharfbuzz-dev \
+    libfribidi-dev \
+    libgit2-dev \
+    libssh2-1-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install development R packages
@@ -158,7 +175,8 @@ RUN install2.r --error --skipinstalled \
     covr \
     lintr \
     styler \
-    rmarkdown
+    rmarkdown \
+    knitr
 
 # Copy package source for development
 WORKDIR /home/rstudio/hetid

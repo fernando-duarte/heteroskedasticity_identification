@@ -38,6 +38,9 @@ RUN --mount=type=cache,target=/var/cache/apt \
     libpng-dev \
     libtiff5-dev \
     libjpeg-dev \
+    zlib1g-dev \
+    libgit2-dev \
+    libssh2-1-dev \
     # Statistical computing dependencies
     libgsl-dev \
     liblapack-dev \
@@ -53,31 +56,12 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 # Install comprehensive R development packages
 RUN --mount=type=cache,target=/usr/local/lib/R/site-library \
-    R -e "install.packages('littler', repos='https://cloud.r-project.org/')" && \
-    ln -s /usr/local/lib/R/site-library/littler/bin/r /usr/local/bin/r && \
-    install2.r --error --skipinstalled \
-    # Core development tools
-    devtools \
-    remotes \
-    usethis \
-    # Testing and quality assurance
-    testthat \
-    covr \
-    lintr \
-    styler \
-    # Documentation
-    roxygen2 \
-    pkgdown \
-    rmarkdown \
-    knitr \
-    # Debugging and profiling
-    profvis \
-    bench \
-    # Additional utilities
-    here \
-    fs \
-    glue \
-    cli
+    R -e "install.packages(c( \
+        'devtools', 'remotes', 'usethis', \
+        'testthat', 'covr', 'lintr', 'styler', \
+        'roxygen2', 'pkgdown', 'rmarkdown', 'knitr', \
+        'profvis', 'bench', 'here', 'fs', 'glue', 'cli' \
+    ), repos='https://cloud.r-project.org/')"
 
 # Set up development environment
 WORKDIR /home/rstudio

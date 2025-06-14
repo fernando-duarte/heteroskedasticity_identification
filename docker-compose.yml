@@ -2,8 +2,6 @@
 # Supports development, testing, and production environments
 # Updated for 2025 best practices
 
-version: '3.8'
-
 services:
   # Production service - minimal runtime
   hetid-prod:
