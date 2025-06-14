@@ -94,9 +94,42 @@ for running Lewbel (2012) Monte Carlo simulations.</p>
 (default: 1.2).</p></dd>
 
 
+<dt id="arg-delta-het-values">delta_het_values<a class="anchor" aria-label="anchor" href="#arg-delta-het-values"></a></dt>
+<dd><p>Numeric vector. Delta values for sensitivity
+analysis (default: c(0.4, 0.8, 1.2)).</p></dd>
+
+
+<dt id="arg-n-reps-by-n">n_reps_by_n<a class="anchor" aria-label="anchor" href="#arg-n-reps-by-n"></a></dt>
+<dd><p>Integer. Replications per sample size
+(default: 100).</p></dd>
+
+
+<dt id="arg-n-reps-by-delta">n_reps_by_delta<a class="anchor" aria-label="anchor" href="#arg-n-reps-by-delta"></a></dt>
+<dd><p>Integer. Replications per delta value
+(default: 100).</p></dd>
+
+
 <dt id="arg-bootstrap-reps">bootstrap_reps<a class="anchor" aria-label="anchor" href="#arg-bootstrap-reps"></a></dt>
 <dd><p>Integer. Number of bootstrap replications
 (default: 100).</p></dd>
+
+
+<dt id="arg-bootstrap-subset-size">bootstrap_subset_size<a class="anchor" aria-label="anchor" href="#arg-bootstrap-subset-size"></a></dt>
+<dd><p>Integer. Size of bootstrap subset
+(default: 10).</p></dd>
+
+
+<dt id="arg-bootstrap-demo-size">bootstrap_demo_size<a class="anchor" aria-label="anchor" href="#arg-bootstrap-demo-size"></a></dt>
+<dd><p>Integer. Size of bootstrap demo
+(default: 5).</p></dd>
+
+
+<dt id="arg-beta-">beta1_0<a class="anchor" aria-label="anchor" href="#arg-beta-"></a></dt>
+<dd><p>Numeric. Intercept for first equation (default: 0.5).</p></dd>
+
+
+<dt id="arg-beta-">beta1_1<a class="anchor" aria-label="anchor" href="#arg-beta-"></a></dt>
+<dd><p>Numeric. Slope for first equation (default: 1.5).</p></dd>
 
 
 <dt id="arg-gamma-">gamma1<a class="anchor" aria-label="anchor" href="#arg-gamma-"></a></dt>
@@ -104,13 +137,35 @@ for running Lewbel (2012) Monte Carlo simulations.</p>
 (default: -0.8).</p></dd>
 
 
+<dt id="arg-beta-">beta2_0<a class="anchor" aria-label="anchor" href="#arg-beta-"></a></dt>
+<dd><p>Numeric. Intercept for second equation (default: 1.0).</p></dd>
+
+
+<dt id="arg-beta-">beta2_1<a class="anchor" aria-label="anchor" href="#arg-beta-"></a></dt>
+<dd><p>Numeric. Slope for second equation (default: -1.0).</p></dd>
+
+
+<dt id="arg-alpha-">alpha1<a class="anchor" aria-label="anchor" href="#arg-alpha-"></a></dt>
+<dd><p>Numeric. Factor loading for first error (default: -0.5).</p></dd>
+
+
+<dt id="arg-alpha-">alpha2<a class="anchor" aria-label="anchor" href="#arg-alpha-"></a></dt>
+<dd><p>Numeric. Factor loading for second error (default: 1.0).</p></dd>
+
+
 <dt id="arg-tau-set-id">tau_set_id<a class="anchor" aria-label="anchor" href="#arg-tau-set-id"></a></dt>
 <dd><p>Numeric. Tau parameter for set identification
 (default: 0.2).</p></dd>
 
 
-<dt id="arg-set-seed">set_seed<a class="anchor" aria-label="anchor" href="#arg-set-seed"></a></dt>
-<dd><p>Integer. Base seed for reproducibility (default: 123).</p></dd>
+<dt id="arg-endog-var-name">endog_var_name<a class="anchor" aria-label="anchor" href="#arg-endog-var-name"></a></dt>
+<dd><p>Character. Name of endogenous variable
+(default: "Y2").</p></dd>
+
+
+<dt id="arg-exog-var-names">exog_var_names<a class="anchor" aria-label="anchor" href="#arg-exog-var-names"></a></dt>
+<dd><p>Character. Name of exogenous variable
+(default: "Xk").</p></dd>
 
 </dl></div>
     <div class="section level2">
