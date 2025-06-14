@@ -3,11 +3,11 @@
 test_that("analyze_main_results knitr conditional logic works", {
   config <- create_default_config(num_simulations = 2)
   seeds <- generate_all_seeds(config)
-  
+
   suppressMessages({
     results <- run_main_simulation(config, seeds, verbose = FALSE)
   })
-  
+
   # Test with knitr available (normal case)
   if (requireNamespace("knitr", quietly = TRUE)) {
     output_with_knitr <- capture.output({
@@ -16,7 +16,7 @@ test_that("analyze_main_results knitr conditional logic works", {
     expect_true(length(output_with_knitr) > 0)
     expect_true(any(grepl("Main simulation", output_with_knitr)))
   }
-  
+
   # Test fallback when knitr is not available (mock scenario)
   # We can't easily unload knitr, but we can test the else branch
   # by checking that the function works with verbose output
@@ -32,18 +32,18 @@ test_that("analyze_main_results handles different config parameters", {
   # Test with different gamma1 values
   config1 <- create_default_config(num_simulations = 2, gamma1 = -0.5)
   config2 <- create_default_config(num_simulations = 2, gamma1 = -1.2)
-  
+
   seeds1 <- generate_all_seeds(config1)
   seeds2 <- generate_all_seeds(config2)
-  
+
   suppressMessages({
     results1 <- run_main_simulation(config1, seeds1, verbose = FALSE)
     results2 <- run_main_simulation(config2, seeds2, verbose = FALSE)
   })
-  
+
   analysis1 <- analyze_main_results(results1, config1, verbose = FALSE)
   analysis2 <- analyze_main_results(results2, config2, verbose = FALSE)
-  
+
   # Check that different gamma1 values affect bias calculations
   expect_type(analysis1$summary_table$Bias, "double")
   expect_type(analysis2$summary_table$Bias, "double")
@@ -54,23 +54,23 @@ test_that("analyze_main_results handles different config parameters", {
 test_that("analyze_main_results verbose output includes all expected elements", {
   config <- create_default_config(num_simulations = 3)
   seeds <- generate_all_seeds(config)
-  
+
   suppressMessages({
     results <- run_main_simulation(config, seeds, verbose = FALSE)
   })
-  
+
   # Capture all verbose output
   output <- capture.output({
     analysis <- analyze_main_results(results, config, verbose = TRUE)
   })
-  
+
   # Check for all expected output elements
   expect_true(any(grepl("Main simulation:", output)))
   expect_true(any(grepl("True value of gamma1:", output)))
   expect_true(any(grepl("Performance of Point Estimators", output)))
   expect_true(any(grepl("Weak instrument diagnostic:", output)))
   expect_true(any(grepl("Performance of Set Identification", output)))
-  
+
   # Check that weak_iv_pct is calculated correctly
   expect_type(analysis$weak_iv_pct, "double")
   expect_true(analysis$weak_iv_pct >= 0 && analysis$weak_iv_pct <= 100)
@@ -83,33 +83,35 @@ test_that("analyze_bootstrap_results handles various data combinations", {
     bootstrap_reps = 5
   )
   seeds <- generate_all_seeds(config)
-  
+
   suppressMessages({
     main_results <- run_main_simulation(config, seeds, verbose = FALSE)
     bootstrap_demo <- run_bootstrap_demonstration(config, seeds, verbose = FALSE)
   })
-  
+
   # Test with verbose output
   output <- capture.output({
     bootstrap_analysis <- analyze_bootstrap_results(
-      main_results, bootstrap_demo, config, verbose = TRUE
+      main_results, bootstrap_demo, config,
+      verbose = TRUE
     )
   })
-  
+
   expect_s3_class(bootstrap_analysis, "data.frame")
   expect_true(length(output) > 0)
   expect_true(any(grepl("Bootstrap Standard Errors", output)))
-  
+
   # Test with verbose = FALSE
   bootstrap_analysis_quiet <- analyze_bootstrap_results(
-    main_results, bootstrap_demo, config, verbose = FALSE
+    main_results, bootstrap_demo, config,
+    verbose = FALSE
   )
   expect_s3_class(bootstrap_analysis_quiet, "data.frame")
 })
 
 test_that("analyze_bootstrap_results handles edge cases in data filtering", {
   config <- create_default_config(bootstrap_subset_size = 10)
-  
+
   # Create main results with some NA values in bound_se_lower
   main_results <- data.frame(
     sim_id = 1:5,
@@ -118,7 +120,7 @@ test_that("analyze_bootstrap_results handles edge cases in data filtering", {
     bound_se_lower = c(0.1, NA, 0.2, NA, 0.3),
     bound_se_upper = c(0.1, NA, 0.2, NA, 0.3)
   )
-  
+
   # Create bootstrap demo
   bootstrap_demo <- data.frame(
     sim_id = 6:7,
@@ -127,11 +129,12 @@ test_that("analyze_bootstrap_results handles edge cases in data filtering", {
     bound_se_lower = c(0.4, 0.5),
     bound_se_upper = c(0.4, 0.5)
   )
-  
+
   result <- analyze_bootstrap_results(
-    main_results, bootstrap_demo, config, verbose = FALSE
+    main_results, bootstrap_demo, config,
+    verbose = FALSE
   )
-  
+
   # Should filter out NA values and combine with bootstrap_demo
   expect_s3_class(result, "data.frame")
   expect_true(nrow(result) >= 2) # At least the bootstrap_demo rows
@@ -143,18 +146,19 @@ test_that("analyze_sample_size_results verbose output works correctly", {
     sample_sizes = c(100, 200, 300)
   )
   seeds <- generate_all_seeds(config)
-  
+
   suppressMessages({
     sample_results <- run_sample_size_analysis(config, seeds, verbose = FALSE)
   })
-  
+
   # Test verbose output
   output <- capture.output({
     analysis <- analyze_sample_size_results(
-      sample_results, config, verbose = TRUE
+      sample_results, config,
+      verbose = TRUE
     )
   })
-  
+
   expect_s3_class(analysis, "data.frame")
   expect_true(length(output) > 0)
   expect_true(any(grepl("Consistency Check", output)))
@@ -168,18 +172,19 @@ test_that("analyze_sensitivity_results verbose output works correctly", {
     delta_het_values = c(0.8, 1.0, 1.2)
   )
   seeds <- generate_all_seeds(config)
-  
+
   suppressMessages({
     sens_results <- run_sensitivity_analysis(config, seeds, verbose = FALSE)
   })
-  
+
   # Test verbose output
   output <- capture.output({
     analysis <- analyze_sensitivity_results(
-      sens_results, config, verbose = TRUE
+      sens_results, config,
+      verbose = TRUE
     )
   })
-  
+
   expect_s3_class(analysis, "data.frame")
   expect_true(length(output) > 0)
   expect_true(any(grepl("Sensitivity to Heteroscedasticity", output)))
@@ -189,14 +194,14 @@ test_that("analyze_sensitivity_results verbose output works correctly", {
 test_that("print_simulation_summary handles all parameter combinations", {
   # Test with NULL analysis and config
   expect_silent(print_simulation_summary(NULL, NULL, verbose = FALSE))
-  
+
   # Test with verbose = TRUE and NULL inputs
   output1 <- capture.output(
     print_simulation_summary(NULL, NULL, verbose = TRUE)
   )
   expect_true(any(grepl("SIMULATION COMPLETE", output1)))
   expect_true(any(grepl("Key findings:", output1)))
-  
+
   # Test with analysis object containing weak_iv_pct
   analysis_with_weak <- list(weak_iv_pct = 25.7)
   output2 <- capture.output(
@@ -204,7 +209,7 @@ test_that("print_simulation_summary handles all parameter combinations", {
   )
   expect_true(any(grepl("25.7%", output2)))
   expect_true(any(grepl("Weak instrument rate", output2)))
-  
+
   # Test with analysis object without weak_iv_pct
   analysis_without_weak <- list(other_field = "value")
   output3 <- capture.output(
@@ -240,14 +245,14 @@ test_that("print_simulation_summary handles edge cases in verbose parameter", {
 
 test_that("all analysis functions handle missing columns gracefully", {
   config <- create_default_config()
-  
+
   # Test with minimal data frame missing some expected columns
   minimal_results <- data.frame(
     sim_id = 1:2,
     ols_gamma1 = c(0.5, 0.6),
     tsls_gamma1 = c(0.3, 0.4)
   )
-  
+
   # Should error due to missing required columns
   # When columns are missing, mean() will warn about non-numeric arguments
   # This is expected behavior when required columns are absent
@@ -256,23 +261,23 @@ test_that("all analysis functions handle missing columns gracefully", {
       analyze_main_results(minimal_results, config, verbose = FALSE)
     )
   )
-  
+
   # Test sample size analysis with missing columns
   minimal_sample <- data.frame(
     sim_id = 1:2,
     sample_size = c(100, 200)
   )
-  
+
   expect_error(
     analyze_sample_size_results(minimal_sample, config, verbose = FALSE)
   )
-  
+
   # Test sensitivity analysis with missing columns
   minimal_sens <- data.frame(
     sim_id = 1:2,
     delta_het = c(0.8, 1.2)
   )
-  
+
   expect_error(
     analyze_sensitivity_results(minimal_sens, config, verbose = FALSE)
   )
@@ -298,7 +303,8 @@ test_that("analyze_main_results handles correlation edge cases", {
   )
 
   analysis <- analyze_main_results(
-    problematic_results, config, verbose = FALSE
+    problematic_results, config,
+    verbose = FALSE
   )
 
   # Should handle perfect correlation case
@@ -329,7 +335,8 @@ test_that("analyze_main_results handles zero variance cases", {
   # "the standard deviation is zero". This is expected behavior.
   suppressWarnings({
     analysis <- analyze_main_results(
-      zero_var_results, config, verbose = FALSE
+      zero_var_results, config,
+      verbose = FALSE
     )
   })
 
@@ -362,7 +369,8 @@ test_that("analyze_bootstrap_results handles empty filtered results", {
   )
 
   result <- analyze_bootstrap_results(
-    all_na_main, empty_bootstrap, config, verbose = FALSE
+    all_na_main, empty_bootstrap, config,
+    verbose = FALSE
   )
 
   # Should return empty data frame or handle gracefully
@@ -401,7 +409,8 @@ test_that("analysis functions handle single row data frames", {
   )
 
   sample_analysis <- analyze_sample_size_results(
-    single_sample, config, verbose = FALSE
+    single_sample, config,
+    verbose = FALSE
   )
   expect_s3_class(sample_analysis, "data.frame")
   expect_equal(nrow(sample_analysis), 1)
@@ -417,7 +426,8 @@ test_that("analysis functions handle single row data frames", {
   )
 
   sens_analysis <- analyze_sensitivity_results(
-    single_sens, config, verbose = FALSE
+    single_sens, config,
+    verbose = FALSE
   )
   expect_s3_class(sens_analysis, "data.frame")
   expect_equal(nrow(sens_analysis), 1)

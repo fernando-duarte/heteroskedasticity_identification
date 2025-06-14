@@ -51,7 +51,8 @@ test_that("analyze_bootstrap_results with verbose output", {
   # Test with verbose = TRUE
   expect_output(
     analysis <- analyze_bootstrap_results(
-      results_main, bootstrap_demo, config, verbose = TRUE
+      results_main, bootstrap_demo, config,
+      verbose = TRUE
     ),
     "Bootstrap Standard Errors"
   )
@@ -72,7 +73,8 @@ test_that("analyze_sample_size_results with verbose output", {
   # Test with verbose = TRUE
   expect_output(
     analysis <- analyze_sample_size_results(
-      results_by_n, config, verbose = TRUE
+      results_by_n, config,
+      verbose = TRUE
     ),
     "Consistency Check"
   )
@@ -95,7 +97,8 @@ test_that("analyze_sensitivity_results with verbose output", {
   # Test with verbose = TRUE
   expect_output(
     analysis <- analyze_sensitivity_results(
-      results_by_delta, config, verbose = TRUE
+      results_by_delta, config,
+      verbose = TRUE
     ),
     "Sensitivity to Heteroscedasticity"
   )
@@ -129,10 +132,10 @@ test_that("verify_lewbel_assumptions basic functionality", {
 test_that("calculate_lewbel_bounds negative discriminant case (line 88)", {
   # Create data that will result in negative discriminant
   bad_data <- data.frame(
-    Y1 = rep(0, 10),  # Constant values
-    Y2 = rep(0, 10),  # Constant values
-    Z = rep(0, 10),   # Constant values
-    Xk = rep(0, 10)   # Constant values
+    Y1 = rep(0, 10), # Constant values
+    Y2 = rep(0, 10), # Constant values
+    Z = rep(0, 10), # Constant values
+    Xk = rep(0, 10) # Constant values
   )
 
   # This should trigger the negative discriminant case (line 88)
@@ -145,7 +148,7 @@ test_that("run_single_lewbel_simulation error cases", {
 
   # Create params that will cause issues
   bad_params <- list(
-    sample_size = 5,  # Very small sample
+    sample_size = 5, # Very small sample
     beta1_0 = 0, beta1_1 = 0, gamma1 = 0,
     beta2_0 = 0, beta2_1 = 0,
     alpha1 = 0, alpha2 = 0,
@@ -213,13 +216,14 @@ test_that("generate_all_plots verbose output and null bootstrap", {
   expect_output(
     plots <- generate_all_plots(
       results_main, results_by_n, results_by_delta,
-      bootstrap_examples, config, verbose = TRUE
+      bootstrap_examples, config,
+      verbose = TRUE
     ),
     "Generating enhanced plots"
   )
 
   expect_type(plots, "list")
-  expect_null(plots$bootstrap_ci)  # Should be NULL due to insufficient data
+  expect_null(plots$bootstrap_ci) # Should be NULL due to insufficient data
 })
 
 test_that("run_lewbel_monte_carlo verification path (line 78)", {
@@ -302,7 +306,7 @@ test_that("run_single_lewbel_simulation error handling paths", {
 
   # Create params that will cause estimation errors
   error_params <- list(
-    sample_size = 10,  # Very small sample
+    sample_size = 10, # Very small sample
     beta1_0 = 0, beta1_1 = 0, gamma1 = 0,
     beta2_0 = 0, beta2_1 = 0,
     alpha1 = 0, alpha2 = 0,
@@ -330,13 +334,13 @@ test_that("run_single_lewbel_simulation bootstrap error paths", {
 
   # Create params that will cause bootstrap errors
   bootstrap_error_params <- list(
-    sample_size = 5,  # Very small sample for bootstrap
+    sample_size = 5, # Very small sample for bootstrap
     beta1_0 = 1, beta1_1 = 1, gamma1 = 1,
     beta2_0 = 1, beta2_1 = 1,
     alpha1 = 0, alpha2 = 0,
     delta_het = 0,
     tau_set_id = 0.1,
-    bootstrap_reps = 3  # Small number of bootstrap reps
+    bootstrap_reps = 3 # Small number of bootstrap reps
   )
 
   # Set seed for reproducible bootstrap errors
@@ -355,12 +359,12 @@ test_that("run_single_lewbel_simulation bounds calculation errors", {
 
   # Create params that will cause bounds calculation errors
   bounds_error_params <- list(
-    sample_size = 8,  # Small sample
+    sample_size = 8, # Small sample
     beta1_0 = 0, beta1_1 = 0, gamma1 = 0,
     beta2_0 = 0, beta2_1 = 0,
     alpha1 = 0, alpha2 = 0,
     delta_het = 0,
-    tau_set_id = 0.5,  # Different tau value
+    tau_set_id = 0.5, # Different tau value
     bootstrap_reps = 2
   )
 
@@ -380,12 +384,12 @@ test_that("run_single_lewbel_simulation final error paths", {
 
   # Create params that will cause final calculation errors
   final_error_params <- list(
-    sample_size = 6,  # Small sample
+    sample_size = 6, # Small sample
     beta1_0 = 0, beta1_1 = 0, gamma1 = 0,
     beta2_0 = 0, beta2_1 = 0,
     alpha1 = 0, alpha2 = 0,
     delta_het = 0,
-    tau_set_id = 0.9,  # High tau value
+    tau_set_id = 0.9, # High tau value
     bootstrap_reps = 2
   )
 
