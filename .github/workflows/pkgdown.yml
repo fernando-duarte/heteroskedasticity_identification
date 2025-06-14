@@ -58,3 +58,11 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        continue-on-error: true
+        
+      - name: Check deployment status
+        if: steps.deployment.outcome == 'failure'
+        run: |
+          echo "::warning::GitHub Pages deployment failed. Please ensure GitHub Pages is enabled in repository settings."
+          echo "::warning::Go to Settings > Pages and configure the source."
+          exit 0  # Don't fail the workflow

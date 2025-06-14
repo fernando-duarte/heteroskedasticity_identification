@@ -9,4 +9,4 @@
 DS002
 
 # Ignore workflow security issues that are by design
-# GITHUB-ACTION-001: Using master/main branch references (acceptable for trusted actions) 
+# GITHUB-ACTION-001: Using master/main branch references (acceptable for trusted actions)
