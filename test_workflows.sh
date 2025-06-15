@@ -51,9 +51,15 @@ for workflow in .github/workflows/*.yml; do
 done
 
 echo -e "\n💡 To test a workflow locally with act:"
-echo "   act -W .github/workflows/R-CMD-check.yml"
-echo "   act -W .github/workflows/pkgdown.yml"
-echo "   act -W .github/workflows/docker.yml -P ubuntu-22.04=catthehacker/ubuntu:act-22.04"
+if [ -f ".github/workflows/R-CMD-check.yml" ]; then
+    echo "   act -W .github/workflows/R-CMD-check.yml"
+fi
+if [ -f ".github/workflows/pkgdown.yml" ]; then
+    echo "   act -W .github/workflows/pkgdown.yml"
+fi
+if [ -f ".github/workflows/docker.yml" ]; then
+    echo "   act -W .github/workflows/docker.yml -P ubuntu-22.04=catthehacker/ubuntu:act-22.04"
+fi
 
 echo -e "\n📝 Summary of fixes applied:"
 echo "1. ✅ R-CMD-check.yml: Updated to use r-lib/actions/setup-r-dependencies"

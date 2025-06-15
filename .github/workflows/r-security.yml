@@ -58,6 +58,8 @@ jobs:
           any::pkgdepends
           any::uuid
           any::licenses
+          any::remotes
+          any::pak
         needs: |
           desc
           jsonlite
@@ -84,11 +86,14 @@ jobs:
             ), config_file)
           }
           
-          # Try pak first
+          # Try pak first (should be installed by setup-r-dependencies)
           if (requireNamespace('pak', quietly = TRUE)) {
             pak::pkg_install('sonatype-nexus-community/oysteR', upgrade = FALSE)
-          } else {
+          } else if (requireNamespace('remotes', quietly = TRUE)) {
             remotes::install_github('sonatype-nexus-community/oysteR', upgrade = 'never')
+          } else {
+            # Fallback to install.packages if available on CRAN
+            install.packages('oysteR')
           }
           
           if (requireNamespace('oysteR', quietly = TRUE)) {

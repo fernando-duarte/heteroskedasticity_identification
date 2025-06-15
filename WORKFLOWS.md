@@ -108,20 +108,6 @@ The `hetid` package uses a comprehensive CI/CD pipeline to ensure code quality, 
 4. Code quality and complexity analysis
 5. SBOM generation for supply chain security
 
-### 5. Docker Workflow (`docker.yml`)
-
-**Purpose**: Build, test, and deploy Docker containers with integrated security scanning.
-
-**Key Features**:
-- **Dockerfile scanning**: Security analysis of Docker configurations using Trivy
-- **Image vulnerability scanning**: Scans built Docker images for vulnerabilities
-- **SARIF integration**: Results uploaded to GitHub Security tab
-- **Multi-severity scanning**: Checks for CRITICAL, HIGH, and MEDIUM severity issues
-
-**Scan Types**:
-1. **Dockerfile security**: Vulnerability scanning of all Dockerfiles
-2. **Container image scanning**: Security analysis of built Docker images
-3. **Workflow security**: Security analysis of GitHub Actions workflows using Trivy
 
 ## Concurrency Management
 

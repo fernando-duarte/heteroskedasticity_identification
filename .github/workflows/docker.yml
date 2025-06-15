@@ -102,10 +102,12 @@ jobs:
     - name: Save image info
       id: save-image
       run: |
+        # Get the first tag from the list
         TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n 1)
         echo "tag=${TAG}" >> $GITHUB_OUTPUT
-        echo "image-file=/tmp/${{ matrix.target }}-image.tar" >> $GITHUB_OUTPUT
-
+        # Save tag to file for later use
+        echo "${TAG}" > /tmp/${{ matrix.target }}-tag.txt
+        
     - name: Upload image artifact
       uses: actions/upload-artifact@v4
       with:
@@ -113,6 +115,13 @@ jobs:
         path: /tmp/${{ matrix.target }}-image.tar
         retention-days: 1
         compression-level: 0  # Docker images are already compressed
+        
+    - name: Upload tag artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-tag-${{ matrix.target }}
+        path: /tmp/${{ matrix.target }}-tag.txt
+        retention-days: 1
 
   # Test package functionality in Docker
   docker-test:
@@ -129,11 +138,18 @@ jobs:
         name: docker-image-builder
         path: /tmp
 
+    - name: Download builder tag artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-tag-builder
+        path: /tmp
+        
     - name: Load Docker image
       run: |
         docker load --input /tmp/builder-image.tar
-        # Get the loaded image tag
-        IMAGE_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "hetid|heteroskedasticity" | grep builder | head -n 1)
+        # Read the tag from the artifact
+        IMAGE_TAG=$(cat /tmp/builder-tag.txt)
+        echo "Using image tag: ${IMAGE_TAG}"
         echo "TAG_NAME=${IMAGE_TAG}" >> $GITHUB_OUTPUT
       id: image_tag_step
 
@@ -183,11 +199,18 @@ jobs:
         name: docker-image-production
         path: /tmp
 
+    - name: Download production tag artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-tag-production
+        path: /tmp
+        
     - name: Load Docker image
       run: |
         docker load --input /tmp/production-image.tar
-        # Get the loaded image tag
-        IMAGE_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "hetid|heteroskedasticity" | grep production | head -n 1)
+        # Read the tag from the artifact
+        IMAGE_TAG=$(cat /tmp/production-tag.txt)
+        echo "Using image tag: ${IMAGE_TAG}"
         echo "TAG_NAME=${IMAGE_TAG}" >> $GITHUB_OUTPUT
       id: prod_image_tag_step
 
@@ -245,11 +268,18 @@ jobs:
         name: docker-image-production
         path: /tmp
 
+    - name: Download production tag artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-tag-production
+        path: /tmp
+        
     - name: Load Docker image
       run: |
         docker load --input /tmp/production-image.tar
-        # Get the loaded image tag
-        IMAGE_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "hetid|heteroskedasticity" | grep production | head -n 1)
+        # Read the tag from the artifact
+        IMAGE_TAG=$(cat /tmp/production-tag.txt)
+        echo "Using image tag: ${IMAGE_TAG}"
         echo "IMAGE_NAME=${IMAGE_TAG}" >> $GITHUB_OUTPUT
       id: get-image
 
@@ -392,3 +422,6 @@ jobs:
           docker-image-builder
           docker-image-production
           docker-image-development
+          docker-tag-builder
+          docker-tag-production
+          docker-tag-development
