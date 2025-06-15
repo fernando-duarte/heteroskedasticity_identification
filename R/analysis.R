@@ -1,3 +1,10 @@
+# Global variables to avoid R CMD check NOTEs
+utils::globalVariables(c(
+  "bound_se_lower", "sim_id", "bound_lower_tau_set", "bound_upper_tau_set",
+  "bound_se_upper", "sample_size", "tsls_gamma1", "first_stage_F",
+  "delta_het"
+))
+
 #' Analyze Main Simulation Results
 #'
 #' Provides comprehensive analysis of the main Monte Carlo simulation results,

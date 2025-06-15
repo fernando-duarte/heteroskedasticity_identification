@@ -186,3 +186,18 @@ info: ## Show Docker and system information
 	@echo ""
 	@echo "hetid Volumes:"
 	@docker volume ls | grep hetid || echo "No hetid volumes found"
+
+# Lewbel implementation comparison targets
+lewbel-comparison-doc: ## Compile Lewbel implementation comparison LaTeX document
+	@echo "Compiling Lewbel implementation comparison document..."
+	pdflatex lewbel_implementations_comparison.tex
+	pdflatex lewbel_implementations_comparison.tex  # Run twice for references
+
+verify-lewbel: ## Run Lewbel implementation verification script
+	@echo "Running Lewbel implementation verification..."
+	Rscript verify_lewbel_implementations.R
+
+lewbel-analysis: lewbel-comparison-doc verify-lewbel ## Run full Lewbel comparison analysis
+	@echo "Lewbel comparison analysis complete!"
+	@echo "PDF: lewbel_implementations_comparison.pdf"
+	@echo "Results: lewbel_verification_results.RData"

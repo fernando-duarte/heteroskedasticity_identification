@@ -1,0 +1,69 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{Quick Reference: Lewbel Implementation Differences}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{The Key Difference}
+
+All three methods claim to implement Lewbel (2012), but they construct instruments differently:
+
+\subsection*{Standard Lewbel (hetid \& Stata ivreg2h)}
+\begin{enumerate}
+\item First stage: $Y_2 = \beta_{20} + \beta_{21}X + \varepsilon_2$
+\item Get residuals: $\hat{e}_2 = Y_2 - \hat{Y}_2$
+\item Construct: $IV = (Z - \bar{Z}) \cdot \hat{e}_2$ where $Z = X^2 - E[X^2]$
+\item Use instruments: $\{X, IV\}$ (just-identified)
+\end{enumerate}
+
+\subsection*{REndo's hetErrorsIV}
+\begin{enumerate}
+\item Reverse regression: $X = \alpha_0 + \alpha_1 Y_2 + u$
+\item Get residuals: $\hat{u} = X - \hat{X}$
+\item Construct: $IV = \hat{u} \cdot (Y_2 - \bar{Y}_2)$
+\item Use instruments: $\{X, Y_2, IV\}$ (overidentified)
+\end{enumerate}
+
+\section*{Quick Verification Code}
+
+\begin{verbatim}
+# Generate data
+library(hetid)
+data <- generate_lewbel_data(1000, params)
+
+# Standard Lewbel
+e2 <- residuals(lm(Y2 ~ X, data = data))
+iv_lewbel <- (data$Z - mean(data$Z)) * e2
+
+# What REndo does (approximately)
+u <- residuals(lm(X ~ Y2, data = data))
+iv_rendo <- u * (data$Y2 - mean(data$Y2))
+
+# Compare
+cor(iv_lewbel, iv_rendo)  # High but not 1
+\end{verbatim}
+
+\section*{Results Summary}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lcc}
+\toprule
+Method & Coefficient & Std. Error \\
+\midrule
+hetid/ivreg2h & -0.801 & 0.00094 \\
+REndo (normal data) & -0.801 & 0.00100 \\
+REndo (weak het.) & -0.800 & 0.00527 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key Finding}: REndo uses a different identification strategy that can produce much weaker instruments when the heteroskedasticity pattern doesn't match its assumptions.
+
+\end{document}

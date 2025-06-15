@@ -30,8 +30,8 @@ run_single_lewbel_simulation(
 \item{return_models}{Logical. Whether to return the fitted model objects
 (default: FALSE).}
 
-\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic" (default)
-or "finite". Affects standard errors and confidence intervals.}
+\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic"
+(default) or "finite". Affects standard errors and confidence intervals.}
 }
 \value{
 If return_models = FALSE: A data.frame with one row containing

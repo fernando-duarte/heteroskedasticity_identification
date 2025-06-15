@@ -12,7 +12,7 @@ if (file.exists("DESCRIPTION")) {
 # Create configuration
 config <- create_default_config(
   num_simulations = 500,
-  main_sample_size = 100  # Small sample to see the difference
+  main_sample_size = 100 # Small sample to see the difference
 )
 
 # 1. Run simulation with asymptotic SEs (default)
@@ -53,11 +53,13 @@ cat("TSLS SE (finite):", result_finite$tsls_se, "\n\n")
 
 # 3. Calculate the adjustment factor
 n <- 100
-k <- 3  # intercept + 2 regressors
+k <- 3 # intercept + 2 regressors
 adjustment_factor <- sqrt(n / (n - k))
 cat("Expected adjustment factor:", adjustment_factor, "\n")
-cat("Actual OLS SE ratio (finite/asymptotic):", result_finite$ols_se / result_asymp$ols_se, "\n")
-cat("Actual TSLS SE ratio (finite/asymptotic):", result_finite$tsls_se / result_asymp$tsls_se, "\n\n")
+cat("Actual OLS SE ratio (finite/asymptotic):",
+    result_finite$ols_se / result_asymp$ols_se, "\n")
+cat("Actual TSLS SE ratio (finite/asymptotic):",
+    result_finite$tsls_se / result_asymp$tsls_se, "\n\n")
 
 # 4. Compare critical values
 crit_asymp <- get_critical_value(n, k, df_adjust = "asymptotic")
@@ -70,7 +72,7 @@ cat("Critical value ratio:", crit_finite / crit_asymp, "\n\n")
 cat("5. Running full comparison of DF adjustments...\n")
 config_small <- create_default_config(
   num_simulations = 100,
-  main_sample_size = 50  # Very small sample
+  main_sample_size = 50 # Very small sample
 )
 
 comparison_results <- compare_df_adjustments(config_small, verbose = TRUE)
