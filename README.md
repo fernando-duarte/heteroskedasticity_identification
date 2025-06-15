@@ -1,7 +1,7 @@
 # hetid: Heteroskedasticity Identification
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/rworkflows.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/rworkflows.yml)
+[![R-CMD-check](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/R-CMD-check.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/R-CMD-check.yml)
 [![Docker Build and Test](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/docker.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/docker.yml)
 [![CodeQL Security Analysis](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/codeql.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/codeql.yml)
 [![pkgdown](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/pkgdown.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/pkgdown.yml)
@@ -64,7 +64,7 @@ heteroskedasticity_identification/
 ├── docs/                # pkgdown site (generated)
 ├── .github/             # GitHub Actions workflows
 │   ├── workflows/
-│   │   ├── rworkflows.yml    # R package CI/CD
+│   │   ├── R-CMD-check.yml   # R package CI/CD
 │   │   ├── docker.yml        # Docker build and security
 │   │   ├── codeql.yml        # Security analysis
 │   │   └── pkgdown.yml       # Documentation site
