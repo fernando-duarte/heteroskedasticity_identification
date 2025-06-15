@@ -168,7 +168,7 @@ ivregress 2sls y1 xk (y2 = lewbel_iv)
 library(hetid); library(REndo); library(AER)
 set.seed(42)
 data <- generate_lewbel_data(1000, params)
-test_data <- data.frame(y=data$Y1, x=data$Xk, 
+test_data <- data.frame(y=data$Y1, x=data$Xk,
                         p=data$Y2, z=data$Z)
 
 # Standard Lewbel with Z
@@ -196,7 +196,7 @@ REndo creates an overidentified model while standard Lewbel is just-identified:
 \begin{lstlisting}[caption={Testing overidentification}]
 # Test if REndo uses Y2 as its own instrument
 # Create overidentified model manually
-overid_model <- ivreg(y ~ X1 + P | X1 + P + lewbel_iv, 
+overid_model <- ivreg(y ~ X1 + P | X1 + P + lewbel_iv,
                       data = test_data)
 
 # Sargan test for overidentifying restrictions

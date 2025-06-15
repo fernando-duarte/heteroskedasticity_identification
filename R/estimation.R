@@ -217,7 +217,8 @@ run_single_lewbel_simulation <- function(sim_id,
         n <- nobs(ols_model)
         k <- length(coef(ols_model))
         crit_val <- get_critical_value(
-          n, k, alpha = 0.05, df_adjust = df_adjust
+          n, k,
+          alpha = 0.05, df_adjust = df_adjust
         )
 
         ols_covers <- (params$gamma1 >= ols_est - crit_val * ols_se &&
@@ -316,7 +317,8 @@ run_single_lewbel_simulation <- function(sim_id,
             n <- nobs(tsls_model)
             k <- length(coef(tsls_model))
             crit_val <- get_critical_value(
-              n, k, alpha = 0.05, df_adjust = df_adjust
+              n, k,
+              alpha = 0.05, df_adjust = df_adjust
             )
 
             tsls_covers <- (params$gamma1 >= tsls_est - crit_val * tsls_se &&

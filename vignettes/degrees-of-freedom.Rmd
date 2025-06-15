@@ -81,8 +81,10 @@ n <- params$sample_size
 k <- 3 # intercept + 2 regressors
 adjustment_factor <- sqrt(n / (n - k))
 cat("\nAdjustment factor:", adjustment_factor, "\n")
-cat("Ratio finite/asymptotic:",
-    result_finite$tsls_se / result_asymp$tsls_se, "\n")
+cat(
+  "Ratio finite/asymptotic:",
+  result_finite$tsls_se / result_asymp$tsls_se, "\n"
+)
 ```
 
 ## Impact on Confidence Intervals

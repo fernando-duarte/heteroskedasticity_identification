@@ -56,10 +56,14 @@ n <- 100
 k <- 3 # intercept + 2 regressors
 adjustment_factor <- sqrt(n / (n - k))
 cat("Expected adjustment factor:", adjustment_factor, "\n")
-cat("Actual OLS SE ratio (finite/asymptotic):",
-    result_finite$ols_se / result_asymp$ols_se, "\n")
-cat("Actual TSLS SE ratio (finite/asymptotic):",
-    result_finite$tsls_se / result_asymp$tsls_se, "\n\n")
+cat(
+  "Actual OLS SE ratio (finite/asymptotic):",
+  result_finite$ols_se / result_asymp$ols_se, "\n"
+)
+cat(
+  "Actual TSLS SE ratio (finite/asymptotic):",
+  result_finite$tsls_se / result_asymp$tsls_se, "\n\n"
+)
 
 # 4. Compare critical values
 crit_asymp <- get_critical_value(n, k, df_adjust = "asymptotic")

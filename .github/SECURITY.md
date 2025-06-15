@@ -79,4 +79,4 @@ Security updates are released as patch versions (e.g., 0.1.1, 0.1.2) and announc
 
 - [R Package Security Best Practices](https://cran.r-project.org/doc/manuals/r-devel/R-exts.html#Security-considerations)
 - [GitHub Security Features](https://docs.github.com/en/code-security)
-- [oysteR Package](https://github.com/sonatype-nexus-community/oysteR) 
+- [oysteR Package](https://github.com/sonatype-nexus-community/oysteR)

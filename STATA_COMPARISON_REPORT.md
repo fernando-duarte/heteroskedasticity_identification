@@ -9,14 +9,14 @@ The hetid package successfully replicates Stata's IV regression results with the
 1. **Coefficient estimates match almost exactly** (<0.2% difference)
    - hetid: -0.7996279
    - Stata: -0.8009241
-   - Difference: 0.16% 
+   - Difference: 0.16%
 
 2. **Standard errors with df_adjust implementation:**
    - **Asymptotic SEs** (df_adjust = "asymptotic"):
      - hetid: 0.0009378
      - Stata: 0.0009596
      - Difference: 2.3%
-   
+
    - **Finite sample SEs** (df_adjust = "finite"):
      - hetid: 0.0010123
      - Stata: 0.0009611

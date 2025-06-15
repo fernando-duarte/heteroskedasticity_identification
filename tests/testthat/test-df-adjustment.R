@@ -110,9 +110,6 @@ test_that("adjust_se_for_df works correctly", {
 })
 
 test_that("ivreg SE extraction works correctly", {
-  # Skip this test due to numerical precision differences across platforms
-  skip("Numerical precision differences in SE extraction across platforms")
-
   # Generate test data with instrument
   set.seed(789)
   n <- 200
@@ -135,7 +132,7 @@ test_that("ivreg SE extraction works correctly", {
   expect_equal(
     se_asymp,
     sqrt(diag(vcov(iv_model))),
-    tolerance = 1e-3
+    tolerance = 1e-2 # Increased tolerance for platform differences
   )
 
   # Finite should be larger
