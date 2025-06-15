@@ -78,3 +78,12 @@ reference:
   - plot_sample_size_consistency
   - plot_het_sensitivity
   - plot_bootstrap_ci
+
+- title: "Utilities"
+  desc: "Helper functions for checking optional dependencies"
+  contents:
+  - has_curl
+  - has_haven
+  - has_rendo
+  - has_rstata
+  - has_stata
