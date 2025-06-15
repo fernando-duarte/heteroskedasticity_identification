@@ -54,9 +54,11 @@ run_main_simulation <- function(config, seeds, verbose = TRUE) {
         endog_var = config$endog_var_name,
         exog_vars = config$exog_var_names,
         compute_bounds_se = (i <= config$bootstrap_subset_size),
-        df_adjust = ifelse(
-          is.null(config$df_adjust), "asymptotic", config$df_adjust
-        )
+        df_adjust = if (is.null(config$df_adjust)) {
+          "asymptotic"
+        } else {
+          config$df_adjust
+        }
       )
     },
     .options = furrr::furrr_options(
@@ -134,9 +136,11 @@ run_bootstrap_demonstration <- function(config, seeds, verbose = TRUE) {
         endog_var = config$endog_var_name,
         exog_vars = config$exog_var_names,
         compute_bounds_se = TRUE,
-        df_adjust = ifelse(
-          is.null(config$df_adjust), "asymptotic", config$df_adjust
-        )
+        df_adjust = if (is.null(config$df_adjust)) {
+          "asymptotic"
+        } else {
+          config$df_adjust
+        }
       )
     },
     .options = furrr::furrr_options(
@@ -218,7 +222,11 @@ run_sample_size_analysis <- function(config, seeds, verbose = TRUE) {
             endog_var = config$endog_var_name,
             exog_vars = config$exog_var_names,
             compute_bounds_se = FALSE,
-            df_adjust = ifelse(is.null(config$df_adjust), "asymptotic", config$df_adjust)
+            df_adjust = if (is.null(config$df_adjust)) {
+              "asymptotic"
+            } else {
+              config$df_adjust
+            }
           )
         },
         .options = furrr::furrr_options(
@@ -303,7 +311,11 @@ run_sensitivity_analysis <- function(config, seeds, verbose = TRUE) {
             endog_var = config$endog_var_name,
             exog_vars = config$exog_var_names,
             compute_bounds_se = FALSE,
-            df_adjust = ifelse(is.null(config$df_adjust), "asymptotic", config$df_adjust)
+            df_adjust = if (is.null(config$df_adjust)) {
+              "asymptotic"
+            } else {
+              config$df_adjust
+            }
           )
         },
         .options = furrr::furrr_options(
