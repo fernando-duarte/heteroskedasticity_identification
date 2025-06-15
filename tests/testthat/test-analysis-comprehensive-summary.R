@@ -1,4 +1,4 @@
-# Comprehensive tests for simulation summary functions
+# Tests for print_simulation_summary() function and missing columns handling
 
 test_that("print_simulation_summary handles all parameter combinations", {
   # Test with NULL analysis and config

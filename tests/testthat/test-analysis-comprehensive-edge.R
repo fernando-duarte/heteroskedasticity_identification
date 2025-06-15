@@ -1,4 +1,4 @@
-# Comprehensive tests for analysis edge cases and formatting
+# Tests for analysis function edge cases (correlation, zero variance, extreme values)
 
 test_that("analyze_main_results handles correlation edge cases", {
   config <- create_default_config()
@@ -158,42 +158,4 @@ test_that("verbose output formatting works with different table sizes", {
   expect_true(length(output_sens) > 0)
 })
 
-test_that("all analysis functions handle missing columns gracefully", {
-  config <- create_default_config()
 
-  # Test with minimal data frame missing some expected columns
-  minimal_results <- data.frame(
-    sim_id = 1:2,
-    ols_gamma1 = c(0.5, 0.6),
-    tsls_gamma1 = c(0.3, 0.4)
-  )
-
-  # Should error due to missing required columns
-  # When columns are missing, mean() will warn about non-numeric arguments
-  # This is expected behavior when required columns are absent
-  expect_error(
-    suppressWarnings(
-      analyze_main_results(minimal_results, config, verbose = FALSE)
-    )
-  )
-
-  # Test sample size analysis with missing columns
-  minimal_sample <- data.frame(
-    sim_id = 1:2,
-    sample_size = c(100, 200)
-  )
-
-  expect_error(
-    analyze_sample_size_results(minimal_sample, config, verbose = FALSE)
-  )
-
-  # Test sensitivity analysis with missing columns
-  minimal_sens <- data.frame(
-    sim_id = 1:2,
-    delta_het = c(0.8, 1.2)
-  )
-
-  expect_error(
-    analyze_sensitivity_results(minimal_sens, config, verbose = FALSE)
-  )
-})

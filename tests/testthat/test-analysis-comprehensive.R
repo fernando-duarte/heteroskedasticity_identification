@@ -1,4 +1,4 @@
-# Comprehensive tests for main analysis functions
+# Tests for core analysis functions (analyze_main_results, analyze_sample_size_results, analyze_sensitivity_results)
 
 test_that("analyze_main_results knitr conditional logic works", {
   config <- create_default_config(num_simulations = 2)
