@@ -1,4 +1,6 @@
-# Tests for analyze_bootstrap_results() function only
+# Tests for bootstrap analysis functionality - analyze_bootstrap_results()
+# Covers bootstrap standard error calculations, data filtering, and edge cases
+# Dependencies: testthat, hetid package functions
 
 test_that("analyze_bootstrap_results handles various data combinations", {
   config <- create_default_config(

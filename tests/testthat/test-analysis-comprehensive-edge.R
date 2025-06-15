@@ -1,4 +1,7 @@
-# Tests for analysis function edge cases (correlation, zero variance, extreme values)
+# Tests for analysis function edge cases and robustness
+# Covers correlation edge cases, zero variance scenarios, extreme values, and formatting
+# Includes single row data frames and verbose output formatting tests
+# Dependencies: testthat, hetid package functions
 
 test_that("analyze_main_results handles correlation edge cases", {
   config <- create_default_config()

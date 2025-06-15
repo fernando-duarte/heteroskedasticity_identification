@@ -1,4 +1,7 @@
-# Tests for print_simulation_summary() function and missing columns handling
+# Tests for simulation summary and error handling functions
+# Covers print_simulation_summary() with various parameter combinations and edge cases
+# Also tests missing column handling across all analysis functions
+# Dependencies: testthat, hetid package functions
 
 test_that("print_simulation_summary handles all parameter combinations", {
   # Test with NULL analysis and config
