@@ -39,6 +39,7 @@ reference:
   desc: "Functions for generating data that satisfies Lewbel's assumptions"
   contents:
   - generate_lewbel_data
+  - generate_hetid_test_data
   - verify_lewbel_assumptions
   - generate_seed_matrix
   - generate_all_seeds
@@ -53,6 +54,7 @@ reference:
   desc: "Functions for running Monte Carlo experiments"
   contents:
   - run_lewbel_monte_carlo
+  - run_lewbel_monte_carlo_df
   - run_lewbel_demo
   - run_main_simulation
   - run_sample_size_analysis
@@ -68,6 +70,7 @@ reference:
   - analyze_sensitivity_results
   - analyze_bootstrap_results
   - print_simulation_summary
+  - compare_df_adjustments
 
 - title: "Visualization"
   desc: "Functions for creating plots and visualizations"
@@ -79,11 +82,21 @@ reference:
   - plot_het_sensitivity
   - plot_bootstrap_ci
 
+- title: "Degrees of Freedom"
+  desc: "Functions for handling degrees of freedom adjustments"
+  contents:
+  - adjust_se_for_df
+  - get_critical_value
+  - extract_se_lm
+  - extract_se_ivreg
+
 - title: "Utilities"
-  desc: "Helper functions for checking optional dependencies"
+  desc: "Helper functions for checking optional dependencies and Stata integration"
   contents:
   - has_curl
   - has_haven
   - has_rendo
   - has_rstata
   - has_stata
+  - ensure_stata_packages
+  - get_stata_path
