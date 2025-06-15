@@ -67,7 +67,9 @@ RUN R -e "install.packages(c('nloptr', 'minqa', 'RcppEigen'), repos='https://clo
     R -e "install.packages(c('AER'), repos='https://cloud.r-project.org/')"
 
 # Install remaining package dependencies
-RUN R -e "install.packages(c('boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr', 'testthat'), repos='https://cloud.r-project.org/')"
+# Ensure testthat is installed with all its dependencies for testing
+RUN R -e "install.packages(c('boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr', 'testthat'), repos='https://cloud.r-project.org/')" && \
+    R -e "if (!requireNamespace('testthat', quietly = TRUE)) stop('testthat installation failed')"
 
 # Install package dependencies using remotes (ensure remotes is available)
 # Install both runtime and test dependencies (including Suggests)
@@ -77,9 +79,10 @@ RUN R -e "if (!require('remotes', quietly = TRUE)) install.packages('remotes', r
 COPY . .
 
 # Build and install the package (ensure knitr is available)
+# Build with --no-build-vignettes to avoid vignette building issues in Docker
 RUN R -e "if (!require('knitr', quietly = TRUE)) install.packages('knitr', repos='https://cloud.r-project.org/')" && \
-    R CMD build . && \
-    R CMD INSTALL *.tar.gz && \
+    R CMD build . --no-build-vignettes && \
+    R CMD INSTALL *.tar.gz --with-keep.source && \
     # Verify installation
     R -e "library(hetid); packageVersion('hetid')"
 

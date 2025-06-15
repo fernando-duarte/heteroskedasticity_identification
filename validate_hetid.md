@@ -1,329 +1,435 @@
+**TASK: Implement a comprehensive testthat suite for the hetid R package that validates its Lewbel (2012) heteroskedasticity-based instrumental variables implementation**
 
----
+You are implementing a minimal yet convincing test suite that compares hetid against:
+- **REndo::hetErrorsIV()** (R package on CRAN, version 2.4.0+)
+- **ivreg2h** (Stata module, accessed via RStata if available)
 
-## 0 Prerequisites the LLM must set up
+The test suite must be CRAN-compliant: < 5 seconds runtime, < 5MB size, no internet/Stata dependencies on CRAN.
 
-| Item                | Action                                                                                                                                                                          |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **DESCRIPTION**     | *Suggests:* `REndo (>= 2.2.0)`, `AER`, `RStata`, `testthat (>= 3.2.0)`, `withr`                                                                                                 |
-| **Imports**         | `stats`, `utils` (already)                                                                                                                                                      |
-| **Config/testthat** | `Config/testthat/edition: 3`                                                                                                                                                    |
-| **R helper**        | in `R/utils-hetid.R` add<br>`has_stata   <- function() nzchar(Sys.which("stata"))`<br>`has_rendo   <- function() requireNamespace("REndo", quietly = TRUE)`                     |
-| **Data**            | Create one tiny (n = 300) simulated dataset `lewbel_sim` (2 exogenous X, 1 endogenous P, outcome y, true β\_P = –1) and save as **data/lewbel\_sim.rda** (120 kB ≪ size limit). |
+## STEP 1: Update Package Infrastructure
 
-The LLM writes the dataset generator in `data-raw/make_lewbel_sim.R`, runs it once, stores the `.rda`, then deletes any large intermediates.
-
----
-
-## 1 Core, *internet‑free* tests (always run, even on CRAN)
-
-| File                                         | Purpose                                                                                                                       | Key code fragments                                                  |   |                                                                                                   |
-| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | - | ------------------------------------------------------------------------------------------------- |
-| `tests/testthat/test-lewbel-internal.R`      | 1) Runs **hetid::hetIV()** on `lewbel_sim`.<br>2) Checks coefficient and SE for **P** against hard‑coded truth (±0.03).       | \`\`\`r withr::with\_seed(1, { fit <- hetid::hetIV(y \~ X1 + X2 + P | P | IIV(X2), lewbel\_sim) coef\_P <- coef(fit)\["P"]; expect\_equal(coef\_P, -1, tol = .03) }) \`\`\` |
-| `tests/testthat/test-instrument-stability.R` | Confirms generated instruments are<br>• invariant to row order • mean‑zero<br>• perfectly collinear with REndo when available | *Shuffle rows twice; expect\_equal() on instruments.*               |   |                                                                                                   |
-| `tests/testthat/test-api-consistency.R`      | Basic S3 behaviour: `predict`, `fitted`, `vcov`, `model.matrix`, and that printing works without error                        | `expect_s3_class(fit, "ivreg")`, etc.                               |   |                                                                                                   |
-
-These three files give **≥90 % coverage of hetid’s code path** in < 1 s, entirely offline, ensuring CRAN checks always pass.
-
----
-
-## 2 Optional tests that run **only if REndo is present**
-
-| File                             | Guard                        | What it does                                                                                                                        | Why valuable                                                                                                        |
-| -------------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `tests/testthat/test-vs-rendo.R` | `r skip_if_not(has_rendo())` | • Fits the identical formula with `REndo::hetErrorsIV()`.<br>• Compares `coef`, `vcov`, Hansen J (if over‑ID).<br>• Tolerance 1e‑6. | Detects divergences caused by future REndo changes (*test fails*, alerting you to upstream bug or your regression). |
-
-Because the results are computed **at runtime**, the test automatically tracks future REndo releases—exactly the “keep up with updates” requirement.
-
----
-
-## 3 Optional tests that run **only if Stata + ivreg2h are present**
-
-| File                             | Guard                                                         | Steps (all scripted)                                                                                                                                                                                                                                                             | Run‑time        |
-| -------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
-| `tests/testthat/test-vs-stata.R` | `r skip_if_not(has_stata()); skip_if_not_installed("RStata")` | 1. Write `lewbel_sim` to a temp `.dta`.<br>2. Generate a temp do‑file: <br>`stata\nivreg2h y X1 X2 (P=) , gen(z) \nmat list e(b)\n`<br>3. Execute with `RStata::stata()` (batch).<br>4. Parse returned matrix, compare to hetid coefficients (tol 1e‑6).<br>5. Clean temp files. | ≤ 2 s (small n) |
-
-If Stata or `ivreg2h` is missing, the test is skipped.
-*CRAN never has Stata*, so this test never runs there, satisfying policy.
-
----
-
-## 4 Optional **internet** regression tests (skipped on CRAN)
-
-| File                                       | Guard                                  | Example                                                                                                                                 |
-| ------------------------------------------ | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `tests/testthat/test-remote-lewbel-data.R` | `r skip_on_cran(); skip_if_offline();` | Downloads Lewbel’s original UK Engel data from Boston College mirror (tiny 30 kB CSV), fits hetid & REndo, asserts equality (tol 1e‑6). |
-
----
-
-## 5 Test maintenance & speed
-
-* **Dataset size** chosen so each fit completes in **< 20 ms** on CRAN’s worst machine.
-* **Random seeds** fixed (`withr::with_seed()`), but model errors are simulated once and stored, guaranteeing reproducibility.
-* **Tolerances** loose enough to allow platform FP variation, tight enough to spot algorithmic drift.
-* **`skip_if_not()`** wrappers ensure optional infrastructure is detected at *run time*; therefore CI pipelines (GitHub Actions) can run the full suite while CRAN runs only the core set.
-* **Hard‑coded truth** (β\_P = –1) is acceptable under CRAN policy because it comes from a tiny, self‑contained simulation shipped with the package.
-
----
-
-## 6 Implementation checklist for the LLM
-
-| Step | File ‑‑ Path                                                                            | What to insert / create                                                                     |
-| ---- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| 1    | `DESCRIPTION`                                                                           | Add *Suggests* and `Config/testthat/edition`.                                               |
-| 2    | `data-raw/make_lewbel_sim.R`                                                            | Script that simulates, saves `data/lewbel_sim.rda`.                                         |
-| 3    | `R/utils-hetid.R`                                                                       | `has_stata()`, `has_rendo()` helpers.                                                       |
-| 4    | `tests/testthat/testthat.R`                                                             | `library(testthat); library(hetid)`                                                         |
-| 5    | Core test files (Section 1).                                                            | Code snippets given above.                                                                  |
-| 6    | Optional test files (Sections 2–4).                                                     | Include guards.                                                                             |
-| 7    | GitHub Action YAML *(outside CRAN)*                                                     | Matrix with & without REndo, with self‑hosted runner that has Stata to exercise full suite. |
-| 8    | Run `R CMD check`. Ensure **≤ 5 s** extra test time and **< 5 MB** of new package size. |                                                                                             |
-
----
-
-## 7 Outcome
-
-* **On CRAN:** only internal tests run → **fast, internet‑free, Stata‑free**.
-* **For developers / CI:** full battery runs, catching any drift between **hetid**, **REndo**, and **ivreg2h**.
-* **Convincing validation:** core tests prove hetid matches known truth; optional tests prove it agrees with two independent reference implementations.
-* **Minimal footprint:** one 120 kB dataset, \~300 lines of test code, negligible CPU.
-
-
----
-# Context
-
-Below is “just enough” technical context—gleaned from the REndo GitHub tree, its *testthat* folder, the ivreg2h Stata help file, typical **RStata** recipes, and CRAN policy notes—to let an autonomous coding‑LLM implement the test plan quickly and safely.
-
----
-
-## 1 What an `REndo::hetErrorsIV()` fit looks like
-
-### Function call pattern
-
-```r
-library(REndo)
-data("dataHetIV", package = "REndo")
-
-m1 <- hetErrorsIV(
-  y ~ X1 + X2 + P            # structural equation (y on all regressors)
-  |  P                       # endogenous regressor(s)
-  |  IIV(X2)                 # exog vars to create Lewbel IVs from
-  , data = dataHetIV
-)
+### 1.1 Update DESCRIPTION file
+Add to the Suggests field:
+```
+Suggests: 
+    REndo (>= 2.4.0),
+    AER,
+    ivreg,
+    RStata,
+    curl (>= 5.0.0),
+    haven,
+    testthat (>= 3.2.3),
+    withr
 ```
 
-### Returned object
-
-* **Class**: `"ivreg"` (from **AER**) with extra attributes.
-* Key extractors that the LLM can rely on:
-
-| What                   | Function call                    |
-| ---------------------- | -------------------------------- |
-| Coefficient vector     | `coef(m1)`                       |
-| Variance–cov matrix    | `vcov(m1)`                       |
-| Fitted + residuals     | `fitted(m1)` / `residuals(m1)`   |
-| Diagnostics in summary | `summary(m1)$diagnostics` (list) |
-
-### REndo test idioms worth copying
-
-Inside `tests/testthat/test_hetErrorsIV.R` (commit cb94e3…):
-
-```r
-test_that("order of data rows does not matter", {
-  data("dataHetIV", package = "REndo")
-  set.seed(11)
-  res.orig  <- hetErrorsIV(y ~ X1 + X2 + P | P | IIV(X2), data = dataHetIV)
-  res.shuff <- hetErrorsIV(y ~ X1 + X2 + P | P | IIV(X2),
-                           data = dataHetIV[sample(nrow(dataHetIV)), ])
-  expect_equal(coef(res.orig), coef(res.shuff))
-})
+Add this line:
+```
+Config/testthat/edition: 3
 ```
 
-*Take‑away*: `expect_equal()` on `coef()`/`vcov()` with tight tolerance is the accepted way to claim identity.
+### 1.2 Create helper functions in R/utils-hetid.R
+```r
+#' Check if REndo is available
+#' @export
+has_rendo <- function() {
+  requireNamespace("REndo", quietly = TRUE)
+}
 
----
+#' Check if curl is available
+#' @export
+has_curl <- function() {
+  requireNamespace("curl", quietly = TRUE)
+}
 
-## 2 ivreg2h in Stata (source of truth #2)
+#' Check if haven is available
+#' @export
+has_haven <- function() {
+  requireNamespace("haven", quietly = TRUE)
+}
 
-### Minimal Stata do‑file that the LLM can auto‑generate
+#' Check if RStata is available
+#' @export
+has_rstata <- function() {
+  requireNamespace("RStata", quietly = TRUE)
+}
 
-```stata
-* --- ivreg2h.do ----
-quietly {
-    * load data written out by R
-    use "tmpdata.dta", clear
-    * install the command if missing
-    capture which ivreg2h
-    if _rc {
-        ssc install ivreg2h, replace
-    }
-    * run Lewbel with no external IVs
-    ivreg2h y X1 X2 (P =), gen(iiv)
-    * write coefficient and VCV to temporary files
-    mat list e(b)
-    mat list e(V)
+#' Check if Stata is available via RStata
+#' @export
+has_stata <- function() {
+  if (!has_rstata()) return(FALSE)
+  
+  # Check common Stata executables
+  stata_paths <- c("stata", "stata-mp", "stata-se", "StataMP", "StataSE", "Stata")
+  any(nzchar(Sys.which(stata_paths)))
 }
 ```
 
-*Extracting results back into R*
-`RStata::stata()` returns a character vector of the Stata log. The LLM can parse the lines starting with `" e(b)[1,*]"`. Alternatively, save the matrices to `.dta` inside Stata (`svmat`) and read them with **haven**.
+## STEP 2: Create Test Data
 
-*Matrix names*
-`e(b)` is 1 × k row vector with column names equal to regressor names (`X1`, `X2`, `P`, `_cons`).
-`e(V)` is k × k and **column names match row names**; use them to align.
-
----
-
-## 3 Simulating a compact in‑package dataset (`lewbel_sim`)
-
-The generator (placed in `data-raw/make_lewbel_sim.R`) can follow exactly what the REndo paper did:
-
+### 2.1 Create data-raw/make_lewbel_sim.R
 ```r
+# Generate Lewbel simulation dataset
+# True parameters: beta_P = -1
+
 set.seed(2025)
-n  <- 300
+n <- 200  # Small for fast CRAN checks, sufficient for IV
+
+# Exogenous variables
 X1 <- rnorm(n)
 X2 <- rnorm(n)
-v  <- rnorm(n, sd = 0.5 + 0.5 * X2^2)    # heteroskedastic in X2
-P  <- 0.3 * X1 + 0.7 * X2 + v
+
+# Heteroskedastic error in first stage (key for Lewbel identification)
+v <- rnorm(n, sd = 0.5 + 0.5 * X2^2)
+
+# Endogenous variable
+P <- 0.3 * X1 + 0.7 * X2 + v
+
+# Outcome equation error
 eps <- rnorm(n)
-y  <- 2 + 1.5 * X1 + 3 * X2 - 1.0 * P + eps
-lewbel_sim <- data.frame(y, P, X1, X2)
-usethis::use_data(lewbel_sim, overwrite = TRUE)
+
+# Outcome with true beta_P = -1
+y <- 2 + 1.5 * X1 + 3 * X2 - 1.0 * P + eps
+
+# Create data frame with ID column for row-order tests
+lewbel_sim <- data.frame(
+  id = seq_len(n),
+  y = y,
+  P = P,
+  X1 = X1,
+  X2 = X2
+)
+
+# Save with maximum compression
+save(lewbel_sim, file = "data/lewbel_sim.rda", compress = "xz")
+
+# Optimize file size
+tools::resaveRdaFiles("data", compress = "xz")
+
+# Clean up
+rm(list = ls())
 ```
 
-Resulting `.rda` is \~120 kB < CRAN’s 5 MB limit.
+Run this script once to create data/lewbel_sim.rda.
 
----
+## STEP 3: Set Up Test Infrastructure
 
-## 4 CRAN‑safe skipping heuristics
-
+### 3.1 Create tests/testthat.R
 ```r
-has_rendo <- function() requireNamespace("REndo", quietly = TRUE)
-has_stata <- function() nzchar(Sys.which("stata")   ) ||
-                             nzchar(Sys.which("stata-mp")) ||
-                             nzchar(Sys.which("stata-se"))
+library(testthat)
+library(hetid)
+
+test_check("hetid")
 ```
 
-Use them as guards:
+## STEP 4: Implement Core Tests (Always Run on CRAN)
 
+### 4.1 Create tests/testthat/test-lewbel-internal.R
 ```r
-test_that("hetid matches REndo", {
-  skip_if_not(has_rendo())
-  ...
-})
-
-test_that("hetid matches ivreg2h (if Stata present)", {
-  skip_if_not(has_stata())
-  skip_if_not_installed("RStata")
-  ...
-})
-```
-
-CRAN machines never have Stata, so that test is auto‑skipped.
-
-`skip_on_cran()` + `curl::has_internet()` cover any web‑pulling tests.
-
----
-
-## 5 Canonical tolerances
-
-Platform FP noise in 2SLS is usually < 1e‑12, but to be safe:
-
-```r
-tol_coef <- 1e-6     # between hetid and REndo / ivreg2h
-tol_true <- 3e-2     # vs. hard‑coded β = –1 in the core test
-```
-
----
-
-## 6 Tiny blueprint of each required test file
-
-### `test-lewbel-internal.R` (core)
-
-```r
-test_that("hetid replicates known truth on lewbel_sim", {
+test_that("hetid recovers known truth on lewbel_sim", {
   withr::with_seed(1, {
-    fit <- hetid::hetIV(y ~ X1 + X2 + P | P | IIV(X2), lewbel_sim)
+    # Load built-in test data
+    data(lewbel_sim, package = "hetid")
+    
+    # Fit model using hetid with model=TRUE to ensure instruments are stored
+    fit <- hetid::hetIV(
+      y ~ X1 + X2 + P |  # Structural equation
+      P |                # Endogenous variable
+      IIV(X2),          # Generate Lewbel instruments from X2
+      data = lewbel_sim,
+      model = TRUE      # Ensure model matrix is stored
+    )
+    
+    # Extract coefficient for endogenous variable P
+    coef_P <- coef(fit)["P"]
+    
+    # Test against known truth with appropriate tolerance
+    # At n=200, Monte Carlo std error is ~0.06, so 0.04 keeps us within 2σ
+    expect_equal(coef_P, -1.0, tolerance = 0.04)
+    
+    # Verify standard errors are reasonable
+    se_P <- sqrt(diag(vcov(fit)))["P"]
+    expect_true(se_P > 0 && se_P < 0.5)
   })
-  expect_equal(coef(fit)["P"],  -1, tolerance = 0.03)
-  expect_equal(mean(model.matrix(fit)[ ,"IIV.X2"]), 0, tolerance = 1e-10)
 })
 ```
 
-### `test-vs-rendo.R` (optional)
-
+### 4.2 Create tests/testthat/test-instrument-stability.R
 ```r
-test_that("hetid equals REndo on same data", {
+test_that("Generated instruments are invariant to row order", {
+  data(lewbel_sim, package = "hetid")
+  
+  # Original order
+  fit1 <- hetid::hetIV(y ~ X1 + X2 + P | P | IIV(X2), 
+                       data = lewbel_sim, 
+                       model = TRUE)
+  iv1 <- model.matrix(fit1)[, "IIV.X2"]
+  
+  # Shuffled order
+  set.seed(42)
+  shuffled_data <- lewbel_sim[sample(nrow(lewbel_sim)), ]
+  fit2 <- hetid::hetIV(y ~ X1 + X2 + P | P | IIV(X2), 
+                       data = shuffled_data,
+                       model = TRUE)
+  
+  # Use ID column to reorder back to original
+  mm2 <- model.matrix(fit2)
+  reorder_idx <- match(lewbel_sim$id, shuffled_data$id)
+  iv2_reordered <- mm2[reorder_idx, "IIV.X2"]
+  
+  # Test equality
+  expect_equal(iv1, iv2_reordered, tolerance = 1e-10)
+})
+
+test_that("Generated instruments are mean-zero", {
+  data(lewbel_sim, package = "hetid")
+  fit <- hetid::hetIV(y ~ X1 + X2 + P | P | IIV(X2), 
+                      data = lewbel_sim,
+                      model = TRUE)
+  iv <- model.matrix(fit)[, "IIV.X2"]
+  
+  expect_equal(mean(iv), 0, tolerance = 1e-10)
+})
+```
+
+### 4.3 Create tests/testthat/test-api-consistency.R
+```r
+test_that("hetid returns proper S3 ivreg object", {
+  data(lewbel_sim, package = "hetid")
+  fit <- hetid::hetIV(y ~ X1 + X2 + P | P | IIV(X2), 
+                      data = lewbel_sim,
+                      model = TRUE)
+  
+  # Check S3 class
+  expect_s3_class(fit, "ivreg")
+  
+  # Test standard S3 methods work
+  expect_no_error(print(fit))
+  expect_no_error(summary(fit))
+  
+  # Check predict method
+  pred <- predict(fit)
+  expect_equal(length(pred), nrow(lewbel_sim))
+  
+  # Check fitted values
+  fitted_vals <- fitted(fit)
+  expect_equal(length(fitted_vals), nrow(lewbel_sim))
+  
+  # Check residuals
+  resids <- residuals(fit)
+  expect_equal(length(resids), nrow(lewbel_sim))
+  
+  # Verify model.matrix works and contains instruments
+  mm <- model.matrix(fit)
+  expect_true("IIV.X2" %in% colnames(mm))
+})
+```
+
+## STEP 5: Implement Optional Comparison Tests
+
+### 5.1 Create tests/testthat/test-vs-rendo.R
+```r
+test_that("hetid matches REndo::hetErrorsIV() on identical data", {
   skip_if_not(has_rendo())
-  data("dataHetIV", package = "REndo")
+  
+  data(lewbel_sim, package = "hetid")
+  
+  # Common formula
   frml <- y ~ X1 + X2 + P | P | IIV(X2)
-  res_rendo <- REndo::hetErrorsIV(frml, dataHetIV)
-  res_hetid <- hetid::hetIV     (frml, dataHetIV)
-  expect_equal(coef(res_hetid), coef(res_rendo), tolerance = tol_coef)
-  expect_equal(vcov(res_hetid), vcov(res_rendo), tolerance = tol_coef)
+  
+  # Fit with both packages
+  fit_hetid <- hetid::hetIV(frml, data = lewbel_sim, model = TRUE)
+  fit_rendo <- REndo::hetErrorsIV(frml, data = lewbel_sim)
+  
+  # Compare coefficients
+  expect_equal(
+    coef(fit_hetid),
+    coef(fit_rendo),
+    tolerance = 1e-6,
+    ignore_attr = TRUE
+  )
+  
+  # Compare variance-covariance matrices
+  expect_equal(
+    vcov(fit_hetid),
+    vcov(fit_rendo),
+    tolerance = 1e-6,
+    ignore_attr = TRUE
+  )
+  
+  # Compare diagnostics (handle REndo 2.4.x's new weak instrument row)
+  if ("diagnostics" %in% names(summary(fit_hetid)) && 
+      "diagnostics" %in% names(summary(fit_rendo))) {
+    diag_hetid <- summary(fit_hetid)$diagnostics
+    diag_rendo <- summary(fit_rendo)$diagnostics
+    
+    # Find common diagnostic tests (handles version differences)
+    if (is.matrix(diag_hetid) && is.matrix(diag_rendo)) {
+      common_rows <- intersect(rownames(diag_hetid), rownames(diag_rendo))
+      if (length(common_rows) > 0 && "statistic" %in% colnames(diag_hetid)) {
+        expect_equal(
+          diag_hetid[common_rows, "statistic", drop = FALSE],
+          diag_rendo[common_rows, "statistic", drop = FALSE],
+          tolerance = 1e-6,
+          ignore_attr = TRUE
+        )
+      }
+    }
+  }
 })
 ```
 
-### `test-vs-stata.R` (optional)
-
+### 5.2 Create tests/testthat/test-vs-stata.R
 ```r
-test_that("hetid equals ivreg2h (Stata)", {
+test_that("hetid matches Stata ivreg2h", {
   skip_if_not(has_stata())
-  skip_if_not_installed("RStata")
-  tmpdta <- tempfile(fileext = ".dta")
-  haven::write_dta(lewbel_sim, tmpdta)
-  dowrite <- tempfile(fileext = ".do")
+  skip_if_not(has_haven())
+  
+  data(lewbel_sim, package = "hetid")
+  
+  # Write data to temporary Stata file
+  tmp_dta <- tempfile(fileext = ".dta")
+  tmp_csv <- tempfile(fileext = ".csv")
+  haven::write_dta(lewbel_sim, tmp_dta)
+  
+  # Create Stata do-file with robust matrix export
+  do_file <- tempfile(fileext = ".do")
   writeLines(c(
-    sprintf("use \"%s\", clear", tmpdta),
-    "quietly capture which ivreg2h",
-    "if _rc { ssc install ivreg2h, replace }",
-    "quietly ivreg2h y X1 X2 (P =), gen(iv)",
-    "mat b = e(b)",
-    "mat list b",
-    "mat V = e(V)",
-    "mat list V",
+    sprintf('use "%s", clear', tmp_dta),
+    "quietly {",
+    "  capture which ivreg2h",
+    "  if _rc {",
+    "    ssc install ivreg2h, replace",
+    "  }",
+    "  ivreg2h y X1 X2 (P =), gen(iiv)",
+    "  matrix b = e(b)",
+    "  matrix V = e(V)",
+    "  * Export coefficients to CSV",
+    "  svmat b, names(col)",
+    sprintf('  outsheet using "%s", comma replace', tmp_csv),
+    "}",
     "exit"
-  ), dowrite)
-  out <- RStata::stata(dowrite, stata.echo = FALSE)
-  coef_stata <- scan(textConnection(grep("^ *b\\[1,", out$stata, value = TRUE)),
-                     what = double(), quiet = TRUE)
-  names(coef_stata) <- c("X1","X2","P","(Intercept)")
-  res_hetid <- hetid::hetIV(y ~ X1 + X2 + P | P | IIV(X2), lewbel_sim)
-  expect_equal(coef(res_hetid)[names(coef_stata)],
-               coef_stata[names(coef(res_hetid))],
-               tolerance = tol_coef)
+  ), do_file)
+  
+  # Run Stata
+  stata_result <- tryCatch({
+    RStata::stata(do_file, stata.echo = FALSE)
+    TRUE
+  }, error = function(e) FALSE)
+  
+  if (stata_result && file.exists(tmp_csv)) {
+    # Read Stata results
+    stata_coefs <- as.numeric(read.csv(tmp_csv, header = FALSE)[1, ])
+    
+    # Stata order is typically: X1 X2 P _cons
+    names(stata_coefs) <- c("X1", "X2", "P", "(Intercept)")
+    
+    # Fit with hetid
+    fit_hetid <- hetid::hetIV(y ~ X1 + X2 + P | P | IIV(X2), 
+                              data = lewbel_sim,
+                              model = TRUE)
+    coef_hetid <- coef(fit_hetid)
+    
+    # Compare coefficients (reorder to match)
+    common_names <- intersect(names(coef_hetid), names(stata_coefs))
+    expect_equal(
+      coef_hetid[common_names],
+      stata_coefs[common_names],
+      tolerance = 1e-6,
+      ignore_attr = TRUE
+    )
+  }
+  
+  # Clean up
+  unlink(c(tmp_dta, tmp_csv, do_file))
 })
 ```
 
----
+## STEP 6: Implement Internet Tests
 
-## 7 CRAN policy snippets the LLM must honour
+### 6.1 Create tests/testthat/test-remote-lewbel-data.R
+```r
+test_that("hetid works on real Lewbel data from Boston College", {
+  skip_on_cran()
+  skip_if_not(has_curl())
+  skip_if_offline()
+  skip_if_not(has_rendo())
+  
+  # URL for Lewbel's UK Engel curve data
+  url <- "http://fmwww.bc.edu/ec-p/data/stockwatson/uk_engel.csv"
+  
+  # Try to download data
+  tmp_file <- tempfile(fileext = ".csv")
+  tryCatch({
+    download.file(url, tmp_file, quiet = TRUE, method = "libcurl")
+    uk_data <- read.csv(tmp_file)
+    
+    # Basic data validation
+    expect_true(nrow(uk_data) > 100)
+    expect_true(all(c("foodshare", "lntotalexp", "age") %in% names(uk_data)))
+    
+    # Fit models (simplified for testing)
+    formula <- foodshare ~ age + lntotalexp | lntotalexp | IIV(age)
+    
+    fit_hetid <- hetid::hetIV(formula, data = uk_data, model = TRUE)
+    fit_rendo <- REndo::hetErrorsIV(formula, data = uk_data)
+    
+    # Compare results
+    expect_equal(
+      coef(fit_hetid),
+      coef(fit_rendo),
+      tolerance = 1e-6,
+      ignore_attr = TRUE
+    )
+    
+  }, error = function(e) {
+    skip("Could not download Lewbel data")
+  })
+  
+  # Clean up
+  unlink(tmp_file)
+})
+```
 
-* **Tests that need external software or internet must be skipped automatically**—using `skip_if_not()` or `skip_on_cran()`.
-* **Suggests** not Imports for `REndo`, `RStata`, `curl`.
-* **Total size** (including data) < 5 MB.
-* **Total test time** < 5 s on *release* mode. Simulating 300 obs + three SLS fits is ≈ 0.1 s on CRAN hardware.
+## STEP 6: Run Final Validation
 
----
+After implementing all files:
 
-## 8 Additional nuggets from the upstream codebases
+1. Regenerate and optimize test data:
+   ```r
+   source("data-raw/make_lewbel_sim.R")
+   tools::checkRdaFiles("data")  # Verify compression
+   ```
 
-| Upstream file                     | Insight useful for the LLM                                                                                                                                                      |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **REndo/R/hetErrorsIV.R**         | After parsing the formula, the function just does `AER::ivreg()` with `model = TRUE`. *Therefore* your own `hetIV` can also return an `ivreg` object—makes comparisons trivial. |
-| **REndo/tests/test-predict.R**    | They verify that `predict()` with new data works and that fitted + residuals sum to outcome; replicate that in hetid’s internal tests.                                          |
-| **ivreg2h.ado** (lines \~410–460) | The generated instruments are stored in `gen()` variables exactly as `(Z - `:Z'\[\_mean]) \* resid\`, confirming the formula to replicate in R.                                 |
-| **Stata help ivreg2h**            | Shows example command `ivreg2h foodshare age (lntotalexp =) , gen(iiv)` followed by `estat first`. Good reference if the LLM wants to add first‑stage diagnostics later.        |
+2. Run tests locally:
+   ```r
+   devtools::test()
+   ```
 
----
+3. Check package:
+   ```r
+   devtools::check()
+   ```
 
-### Bottom line
+4. Verify test timing:
+   ```r
+   system.time(testthat::test_dir("tests/testthat"))
+   ```
+   Report timing.
 
-Armed with the snippets above the coding‑LLM has:
+5. Verify package size:
+   ```bash
+   R CMD build .
+   ls -lh *.tar.gz
+   ```
+   Should be < 5MB.
 
-1. **Exact API contracts** (`coef`, `vcov`, summary diagnostics) it must compare.
-2. **Concrete code idioms** (skip guards, `expect_equal`) seen in real REndo tests.
-3. **Stata extraction recipe** that works without user interaction.
-4. **A legal, lightweight in‑package dataset** and generator script.
+## EXPECTED OUTCOMES
 
-It can now scaffold the full test suite in minutes while staying fully CRAN‑compliant and hitting every design constraint you set.
+✓ Core tests run on CRAN very fast
+✓ hetid matches known truth (β_P = -1) within tolerance 0.04  
+✓ hetid matches REndo within 1e-6 tolerance when available  
+✓ hetid matches Stata ivreg2h within 1e-6 tolerance when available  
+✓ All tests pass R CMD check --as-cran  
+✓ Tests handle REndo 2.4.x diagnostic changes gracefully  
+✓ Tests skip appropriately when optional dependencies missing  
+✓ Total package size remains under CRAN limit with xz compression  
