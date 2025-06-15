@@ -160,5 +160,3 @@ test_that("verbose output formatting works with different table sizes", {
   })
   expect_true(length(output_sens) > 0)
 })
-
-

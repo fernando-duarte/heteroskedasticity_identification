@@ -15,7 +15,7 @@ Implemented a comprehensive test suite for the hetid R package that validates it
   - Added `n_x` parameter (default: 1) for backward compatibility
   - Generates separate Z instruments for each X variable
   - Column naming: single X uses "Xk", "Z"; multiple X uses "X1", "X2", "Z1", "Z2"
-  
+
 - **run_single_lewbel_simulation()**: Added model return capability
   - New `return_models` parameter (default: FALSE)
   - When TRUE, returns list with results, models (ols, first_stage, tsls), and data
@@ -31,7 +31,7 @@ Implemented a comprehensive test suite for the hetid R package that validates it
 
 #### test-lewbel-validation.R (Core tests - always run)
 - Tests hetid methods with pre-generated lewbel_sim data
-- Validates single and multiple X variable functionality  
+- Validates single and multiple X variable functionality
 - Checks instrument properties (mean-zero, order invariance)
 - Verifies S3 method compliance
 
@@ -41,7 +41,7 @@ Implemented a comprehensive test suite for the hetid R package that validates it
 - Tests across different parameter configurations
 - Handles REndo 2.4.x diagnostic changes gracefully
 
-#### test-lewbel-vs-stata.R (Stata comparison - conditional) 
+#### test-lewbel-vs-stata.R (Stata comparison - conditional)
 - Compares against Stata's ivreg2h module
 - Tests both single and multiple X variable cases
 - Uses temporary file I/O for Stata communication
@@ -76,11 +76,11 @@ devtools::check()
 
 ## Expected Outcomes
 
-✓ Core validation tests pass on CRAN in <5 seconds  
-✓ hetid matches known truth (β_P = -1) within tolerance  
-✓ hetid matches REndo within 1e-6 when available  
-✓ hetid matches Stata ivreg2h within 1e-6 when available  
-✓ All tests handle missing dependencies gracefully  
+✓ Core validation tests pass on CRAN in <5 seconds
+✓ hetid matches known truth (β_P = -1) within tolerance
+✓ hetid matches REndo within 1e-6 when available
+✓ hetid matches Stata ivreg2h within 1e-6 when available
+✓ All tests handle missing dependencies gracefully
 ✓ Package remains CRAN-compliant
 
 ## Notes

@@ -4,38 +4,38 @@ library(AER)
 
 test_that("hetid methods work with pre-generated lewbel_sim data", {
   withr::with_seed(1, {
-    # Load built-in test data  
+    # Load built-in test data
     load("../../data/lewbel_sim.rda")
-    
+
     # lewbel_sim has columns: id, y, P, X1, X2
     # where P is endogenous, X1 and X2 are exogenous
-    
+
     # Generate residuals from first stage
     first_stage <- lm(P ~ X1 + X2, data = lewbel_sim)
     e2_hat <- residuals(first_stage)
-    
+
     # Construct Lewbel instrument using X2 for heteroskedasticity
     Z2 <- lewbel_sim$X2^2 - mean(lewbel_sim$X2^2)
     lewbel_iv <- (Z2 - mean(Z2)) * e2_hat
     # Ensure instrument is exactly mean-zero
     lewbel_iv <- lewbel_iv - mean(lewbel_iv)
     lewbel_sim$lewbel_iv <- lewbel_iv
-    
+
     # Run 2SLS
     tsls_model <- ivreg(
       y ~ X1 + X2 + P | X1 + X2 + lewbel_iv,
       data = lewbel_sim
     )
-    
+
     # Extract coefficient for P
     coef_P <- coef(tsls_model)["P"]
-    
+
     # Test that coefficient is reasonable (true value is -1.0)
     expect_true(coef_P < -0.8 && coef_P > -1.2)
-    
+
     # Test that instrument is mean-zero
     expect_equal(mean(lewbel_iv), 0, tolerance = 1e-10)
-    
+
     # Test standard methods work
     expect_s3_class(tsls_model, "ivreg")
     expect_no_error(summary(tsls_model))
@@ -53,7 +53,7 @@ test_that("run_single_lewbel_simulation generates valid results", {
     tau_set_id = 0,
     bootstrap_reps = 50
   )
-  
+
   result <- run_single_lewbel_simulation(
     sim_id = 1,
     params = params,
@@ -61,20 +61,20 @@ test_that("run_single_lewbel_simulation generates valid results", {
     exog_vars = "Xk",
     return_models = TRUE
   )
-  
+
   # Check that results were generated
   expect_type(result, "list")
   expect_true("results" %in% names(result))
   expect_true("models" %in% names(result))
-  
+
   # Check results data frame
   expect_equal(nrow(result$results), 1)
   expect_true("tsls_gamma1" %in% names(result$results))
-  
+
   # If model is not NULL, check it
   if (!is.null(result$models$tsls_model)) {
     expect_s3_class(result$models$tsls_model, "ivreg")
-    
+
     # Check that estimate is reasonable
     coef_endog <- coef(result$models$tsls_model)["Y2"]
     expect_true(abs(coef_endog - params$gamma1) < 0.5)
@@ -91,7 +91,7 @@ test_that("Multiple X variables work correctly", {
     tau_set_id = 0,
     bootstrap_reps = 50
   )
-  
+
   result <- run_single_lewbel_simulation(
     sim_id = 1,
     params = params,
@@ -99,10 +99,10 @@ test_that("Multiple X variables work correctly", {
     exog_vars = c("X1", "X2"),
     return_models = TRUE
   )
-  
+
   # Check that results were generated
   expect_type(result, "list")
-  
+
   # If successful, check the model
   if (!is.null(result$models$tsls_model)) {
     # Model should include both X variables
@@ -121,29 +121,29 @@ test_that("Instrument order invariance holds", {
     beta2_0 = 1.0, beta2_1 = -1.0,
     alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
   )
-  
+
   n <- 200
   data1 <- generate_lewbel_data(n, params)
-  
+
   # Create instrument with original order
   first_stage1 <- lm(Y2 ~ Xk, data = data1)
   e2_hat1 <- residuals(first_stage1)
   Z1 <- data1$Z
   iv1 <- (Z1 - mean(Z1)) * e2_hat1
-  
+
   # Shuffle and recreate
   shuffled_idx <- sample(n)
   data2 <- data1[shuffled_idx, ]
-  
+
   first_stage2 <- lm(Y2 ~ Xk, data = data2)
   e2_hat2 <- residuals(first_stage2)
   Z2 <- data2$Z
   iv2 <- (Z2 - mean(Z2)) * e2_hat2
-  
+
   # Reorder back
   reorder_idx <- order(shuffled_idx)
   iv2_reordered <- iv2[reorder_idx]
-  
+
   # Should be identical
   expect_equal(iv1, iv2_reordered, tolerance = 1e-10)
 })
@@ -151,22 +151,22 @@ test_that("Instrument order invariance holds", {
 test_that("generate_hetid_test_data creates valid data", {
   # Test the new helper function
   data <- generate_hetid_test_data(n = 500, seed = 123)
-  
+
   # Check structure
   expect_true(is.data.frame(data))
   expect_equal(nrow(data), 500)
   expect_true(all(c("y", "P", "X1", "Z", "lewbel_iv") %in% names(data)))
-  
+
   # Check instrument properties
   expect_equal(mean(data$lewbel_iv), 0, tolerance = 1e-10)
   expect_true(var(data$lewbel_iv) > 0)
-  
+
   # Check that we can run 2SLS with this data
   tsls_model <- ivreg(
     y ~ X1 + P | X1 + lewbel_iv,
     data = data
   )
-  
+
   expect_s3_class(tsls_model, "ivreg")
   expect_true(abs(coef(tsls_model)["P"] - (-0.8)) < 0.5)
 })

@@ -70,7 +70,7 @@ To run specific comparisons:
 # REndo comparison only
 testthat::test_file("tests/testthat/test-lewbel-vs-rendo.R")
 
-# Stata comparison only  
+# Stata comparison only
 testthat::test_file("tests/testthat/test-lewbel-vs-stata.R")
 ```
 

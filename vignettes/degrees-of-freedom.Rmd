@@ -1,0 +1,138 @@
+---
+title: "Degrees of Freedom Adjustment in hetid"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Degrees of Freedom Adjustment in hetid}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(hetid)
+```
+
+## Introduction
+
+The `hetid` package now supports both asymptotic and finite sample standard errors through the `df_adjust` parameter. This vignette explains the difference between these approaches and how to use them.
+
+## Background
+
+When computing standard errors in regression models, there are two main approaches:
+
+1. **Asymptotic standard errors**: Use the formula $SE = \sqrt{\hat{\sigma}^2 (X'X)^{-1}}$ where $\hat{\sigma}^2 = RSS/n$
+2. **Finite sample standard errors**: Use $\hat{\sigma}^2 = RSS/(n-k)$ where $k$ is the number of parameters
+
+The difference is in the degrees of freedom adjustment. Asymptotic theory assumes $n \to \infty$, while finite sample corrections account for the loss of degrees of freedom from estimating parameters.
+
+## Default Behavior
+
+Following Stata's convention, **asymptotic standard errors are now the default** in hetid:
+
+```{r default-example}
+# Generate example data
+params <- list(
+  beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
+  beta2_0 = 1.0, beta2_1 = -1.0,
+  alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2,
+  sample_size = 200,
+  tau_set_id = 0,
+  bootstrap_reps = 50
+)
+
+# Run with default (asymptotic) standard errors
+result_asymp <- run_single_lewbel_simulation(
+  sim_id = 1,
+  params = params,
+  df_adjust = "asymptotic"  # This is the default
+)
+
+# Display results
+cat("Asymptotic SEs:\n")
+cat("OLS SE:", result_asymp$ols_se, "\n")
+cat("TSLS SE:", result_asymp$tsls_se, "\n")
+```
+
+## Using Finite Sample Standard Errors
+
+For smaller samples, you may want to use finite sample corrections:
+
+```{r finite-example}
+# Run with finite sample standard errors
+result_finite <- run_single_lewbel_simulation(
+  sim_id = 1,
+  params = params,
+  df_adjust = "finite"
+)
+
+# Display results
+cat("\nFinite Sample SEs:\n")
+cat("OLS SE:", result_finite$ols_se, "\n")
+cat("TSLS SE:", result_finite$tsls_se, "\n")
+
+# Calculate the adjustment factor
+n <- params$sample_size
+k <- 3  # intercept + 2 regressors
+adjustment_factor <- sqrt(n / (n - k))
+cat("\nAdjustment factor:", adjustment_factor, "\n")
+cat("Ratio finite/asymptotic:", result_finite$tsls_se / result_asymp$tsls_se, "\n")
+```
+
+## Impact on Confidence Intervals
+
+The `df_adjust` parameter affects both standard errors and critical values:
+
+```{r confidence-intervals}
+# Critical values
+n <- 200
+k <- 3
+crit_asymp <- get_critical_value(n, k, alpha = 0.05, df_adjust = "asymptotic")
+crit_finite <- get_critical_value(n, k, alpha = 0.05, df_adjust = "finite")
+
+cat("Critical values for 95% CI:\n")
+cat("Asymptotic (normal):", crit_asymp, "\n")
+cat("Finite (t-distribution):", crit_finite, "\n")
+cat("Difference:", (crit_finite - crit_asymp) / crit_asymp * 100, "%\n")
+```
+
+## Monte Carlo Simulations
+
+When running Monte Carlo simulations, you can specify the df_adjust in the configuration:
+
+```{r monte-carlo, eval=FALSE}
+# Create configuration with finite sample adjustment
+config <- create_default_config()
+config$df_adjust <- "finite"
+
+# Run simulation
+results <- run_lewbel_monte_carlo(config)
+
+# Compare with asymptotic
+config_asymp <- create_default_config()
+config_asymp$df_adjust <- "asymptotic"
+results_asymp <- run_lewbel_monte_carlo(config_asymp)
+```
+
+## Recommendations
+
+1. **For large samples (n > 200)**: The difference between asymptotic and finite sample SEs is negligible
+2. **For small samples (n < 100)**: Consider using finite sample corrections
+3. **For comparison with Stata**: Use asymptotic (the default) as Stata's ivreg2h reports asymptotic SEs
+4. **For comparison with R's lm()**: Use finite sample, as lm() uses n-k by default
+
+## Technical Details
+
+The adjustment is implemented through several helper functions:
+
+- `adjust_se_for_df()`: Applies the degrees of freedom correction
+- `get_critical_value()`: Returns appropriate critical values (normal vs t-distribution)
+- `extract_se_lm()`: Extracts SEs from lm models with adjustment
+- `extract_se_ivreg()`: Extracts SEs from ivreg models with adjustment
+
+These functions ensure consistent behavior across all estimation methods in the package.

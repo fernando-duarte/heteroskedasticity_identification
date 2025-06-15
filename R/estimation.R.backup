@@ -11,9 +11,6 @@
 #'   (default: FALSE).
 #' @param b_reps Integer. Number of bootstrap replications if compute_se = TRUE
 #'   (default: 100).
-#' @param df_adjust Character. Degrees of freedom adjustment: "asymptotic" (default)
-#'   or "finite". Note: This parameter currently only affects the interpretation
-#'   of bootstrap SEs, not the bounds calculation itself.
 #'
 #' @details
 #' Under the relaxed assumption
@@ -53,8 +50,7 @@
 calculate_lewbel_bounds <- function(data,
                                     tau,
                                     compute_se = FALSE,
-                                    b_reps = 100,
-                                    df_adjust = "asymptotic") {
+                                    b_reps = 100) {
   # Main calculation function
   calculate_bounds_internal <- function(df, indices = seq_len(nrow(df))) {
     d <- df[indices, ]
@@ -133,8 +129,6 @@ calculate_lewbel_bounds <- function(data,
 #'   (default: FALSE).
 #' @param return_models Logical. Whether to return the fitted model objects
 #'   (default: FALSE).
-#' @param df_adjust Character. Degrees of freedom adjustment: "asymptotic" (default)
-#'   or "finite". Affects standard errors and confidence intervals.
 #'
 #' @return If return_models = FALSE: A data.frame with one row containing
 #'   simulation results including OLS and 2SLS estimates, coverage indicators,
@@ -172,8 +166,7 @@ run_single_lewbel_simulation <- function(sim_id,
                                          endog_var = "Y2",
                                          exog_vars = "Xk",
                                          compute_bounds_se = FALSE,
-                                         return_models = FALSE,
-                                         df_adjust = "asymptotic") {
+                                         return_models = FALSE) {
   # Wrap entire function in tryCatch for robustness
   tryCatch(
     {
@@ -207,17 +200,9 @@ run_single_lewbel_simulation <- function(sim_id,
         ols_covers <- NA
       } else {
         ols_est <- stats::coef(ols_model)[endog_var]
-        # Extract SE with df adjustment
-        all_se <- extract_se_lm(ols_model, df_adjust = df_adjust)
-        ols_se <- all_se[endog_var]
-        
-        # Get critical value
-        n <- nobs(ols_model)
-        k <- length(coef(ols_model))
-        crit_val <- get_critical_value(n, k, alpha = 0.05, df_adjust = df_adjust)
-        
-        ols_covers <- (params$gamma1 >= ols_est - crit_val * ols_se &&
-          params$gamma1 <= ols_est + crit_val * ols_se)
+        ols_se <- summary(ols_model)$coefficients[endog_var, "Std. Error"]
+        ols_covers <- (params$gamma1 >= ols_est - 1.96 * ols_se &&
+          params$gamma1 <= ols_est + 1.96 * ols_se)
       }
 
       # --- 2SLS (Lewbel) Estimation ---
@@ -304,17 +289,9 @@ run_single_lewbel_simulation <- function(sim_id,
             tsls_covers <- NA
           } else {
             tsls_est <- tsls_coef
-            # Extract SE with df adjustment
-            all_se <- extract_se_ivreg(tsls_model, df_adjust = df_adjust)
-            tsls_se <- all_se[endog_var]
-            
-            # Get critical value
-            n <- nobs(tsls_model)
-            k <- length(coef(tsls_model))
-            crit_val <- get_critical_value(n, k, alpha = 0.05, df_adjust = df_adjust)
-            
-            tsls_covers <- (params$gamma1 >= tsls_est - crit_val * tsls_se &&
-              params$gamma1 <= tsls_est + crit_val * tsls_se)
+            tsls_se <- tsls_summary$coefficients[endog_var, "Std. Error"]
+            tsls_covers <- (params$gamma1 >= tsls_est - 1.96 * tsls_se &&
+              params$gamma1 <= tsls_est + 1.96 * tsls_se)
           }
         }
       }
@@ -323,8 +300,7 @@ run_single_lewbel_simulation <- function(sim_id,
       bounds_tau0 <- tryCatch(
         calculate_lewbel_bounds(
           df, 0,
-          compute_se = compute_bounds_se, b_reps = params$bootstrap_reps,
-          df_adjust = df_adjust
+          compute_se = compute_bounds_se, b_reps = params$bootstrap_reps
         ),
         error = function(e) list(bounds = c(NA, NA), se = c(NA, NA))
       )
@@ -346,8 +322,6 @@ run_single_lewbel_simulation <- function(sim_id,
         delta_het = params$delta_het,
         ols_gamma1 = ols_est,
         tsls_gamma1 = tsls_est,
-        ols_se = ols_se,
-        tsls_se = tsls_se,
         ols_coverage = ols_covers,
         tsls_coverage = tsls_covers,
         first_stage_F = first_stage_f,
@@ -356,8 +330,7 @@ run_single_lewbel_simulation <- function(sim_id,
         bound_lower_tau_set = bounds_tau_set$bounds[1],
         bound_upper_tau_set = bounds_tau_set$bounds[2],
         bound_se_lower = bounds_tau_set$se[1],
-        bound_se_upper = bounds_tau_set$se[2],
-        df_adjust = df_adjust
+        bound_se_upper = bounds_tau_set$se[2]
       )
 
       # Return results based on return_models parameter
@@ -383,8 +356,6 @@ run_single_lewbel_simulation <- function(sim_id,
         delta_het = params$delta_het,
         ols_gamma1 = NA,
         tsls_gamma1 = NA,
-        ols_se = NA,
-        tsls_se = NA,
         ols_coverage = NA,
         tsls_coverage = NA,
         first_stage_F = NA,
@@ -393,8 +364,7 @@ run_single_lewbel_simulation <- function(sim_id,
         bound_lower_tau_set = NA,
         bound_upper_tau_set = NA,
         bound_se_lower = NA,
-        bound_se_upper = NA,
-        df_adjust = df_adjust
+        bound_se_upper = NA
       )
 
       if (return_models) {

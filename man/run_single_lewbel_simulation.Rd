@@ -10,7 +10,8 @@ run_single_lewbel_simulation(
   endog_var = "Y2",
   exog_vars = "Xk",
   compute_bounds_se = FALSE,
-  return_models = FALSE
+  return_models = FALSE,
+  df_adjust = "asymptotic"
 )
 }
 \arguments{
@@ -28,6 +29,9 @@ run_single_lewbel_simulation(
 
 \item{return_models}{Logical. Whether to return the fitted model objects
 (default: FALSE).}
+
+\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic" (default)
+or "finite". Affects standard errors and confidence intervals.}
 }
 \value{
 If return_models = FALSE: A data.frame with one row containing
@@ -58,7 +62,10 @@ params <- list(
 result <- run_single_lewbel_simulation(1, params)
 
 # With models
-result_with_models <- run_single_lewbel_simulation(1, params, return_models = TRUE)
+result_with_models <- run_single_lewbel_simulation(
+  1, params,
+  return_models = TRUE
+)
 }
 
 }

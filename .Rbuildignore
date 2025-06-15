@@ -149,7 +149,6 @@
 ^ideas\.txt$
 ^inst/.*\.md$
 ^inst/WORDLIST$
-^inst/doc$
 ^inst/extdata/.*\.RData$
 ^inst/precommit-.*\.md$
 ^inst/scripts$

@@ -137,5 +137,3 @@ test_that("exponent capping works correctly", {
   expect_true(all(exponent_capped <= 10))
   expect_true(any(exponent != exponent_capped)) # Some should be capped
 })
-
-

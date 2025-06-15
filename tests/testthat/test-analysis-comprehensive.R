@@ -129,5 +129,3 @@ test_that("analyze_sensitivity_results verbose output works correctly", {
   expect_true(any(grepl("Sensitivity to Heteroscedasticity", output)))
   expect_equal(nrow(analysis), 3) # Three delta values
 })
-
-

@@ -142,5 +142,3 @@ test_that("analyze_bootstrap_results handles different bootstrap_subset_size", {
   expect_s3_class(analysis_small, "data.frame")
   expect_s3_class(analysis_large, "data.frame")
 })
-
-

@@ -182,5 +182,3 @@ test_that("analyze_sample_size_results handles edge cases", {
   expect_equal(nrow(analysis_mixed), 2)
   expect_false(any(is.na(analysis_mixed$`2SLS Bias`)))
 })
-
-

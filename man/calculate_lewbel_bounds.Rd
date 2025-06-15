@@ -4,7 +4,13 @@
 \alias{calculate_lewbel_bounds}
 \title{Calculate Set Identification Bounds for Lewbel Estimator}
 \usage{
-calculate_lewbel_bounds(data, tau, compute_se = FALSE, b_reps = 100)
+calculate_lewbel_bounds(
+  data,
+  tau,
+  compute_se = FALSE,
+  b_reps = 100,
+  df_adjust = "asymptotic"
+)
 }
 \arguments{
 \item{data}{Data.frame. Dataset containing Y1, Y2, Xk, Z variables.}
@@ -17,6 +23,10 @@ calculate_lewbel_bounds(data, tau, compute_se = FALSE, b_reps = 100)
 
 \item{b_reps}{Integer. Number of bootstrap replications if compute_se = TRUE
 (default: 100).}
+
+\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic" (default)
+or "finite". Note: This parameter currently only affects the interpretation
+of bootstrap SEs, not the bounds calculation itself.}
 }
 \value{
 A list containing:

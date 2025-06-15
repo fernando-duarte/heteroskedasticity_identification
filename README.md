@@ -205,6 +205,31 @@ library(hetid)
 # Example usage will be added as functions are developed
 ```
 
+### Degrees of Freedom Adjustment
+
+The package supports both asymptotic and finite sample standard errors through the `df_adjust` parameter:
+
+```r
+# Asymptotic standard errors (default, matches Stata's ivreg2h)
+result_asymp <- run_single_lewbel_simulation(
+  sim_id = 1, 
+  params = params, 
+  df_adjust = "asymptotic"
+)
+
+# Finite sample standard errors (matches R's lm())
+result_finite <- run_single_lewbel_simulation(
+  sim_id = 1, 
+  params = params, 
+  df_adjust = "finite"
+)
+
+# Compare methods using the helper function
+comparison <- compare_df_adjustments(config)
+```
+
+For more details, see `vignette("degrees-of-freedom")`.
+
 ### Docker Usage (Recommended for Local Development)
 
 The package includes a complete Docker setup with 2025 best practices for easy development and deployment.

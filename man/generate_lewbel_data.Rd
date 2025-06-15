@@ -11,8 +11,10 @@ generate_lewbel_data(n_obs, params, n_x = 1)
 
 \item{params}{List. Parameters for the data generating process containing:
 \itemize{
-\item beta1_0, beta1_1: Parameters for first equation (beta1_1 can be a vector for multiple X)
-\item beta2_0, beta2_1: Parameters for second equation (beta2_1 can be a vector for multiple X)
+\item beta1_0, beta1_1: Parameters for first equation (beta1_1 can be
+a vector for multiple X)
+\item beta2_0, beta2_1: Parameters for second equation (beta2_1 can be
+a vector for multiple X)
 \item gamma1: Endogenous parameter (key parameter of interest)
 \item alpha1, alpha2: Factor loadings for common factor U
 \item delta_het: Heteroscedasticity strength parameter

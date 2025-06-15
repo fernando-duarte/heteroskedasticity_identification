@@ -221,10 +221,54 @@ jobs:
       with:
         sarif_file: 'trivy-results.sarif'
 
+  # Scan Dockerfiles and workflows for security issues
+  config-security-scan:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Run Trivy on Dockerfiles
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        scan-type: 'config'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'dockerfile-trivy-results.sarif'
+        severity: 'CRITICAL,HIGH,MEDIUM'
+        skip-dirs: '.git,node_modules,renv'
+
+    - name: Upload Dockerfile scan results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'dockerfile-trivy-results.sarif'
+        category: 'dockerfile-security'
+
+    - name: Run Trivy on GitHub Actions workflows
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        scan-type: 'config'
+        scan-ref: '.github/workflows'
+        format: 'sarif'
+        output: 'workflow-trivy-results.sarif'
+        severity: 'CRITICAL,HIGH,MEDIUM'
+
+    - name: Upload workflow scan results
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'workflow-trivy-results.sarif'
+        category: 'workflow-security'
+
   # Push images to registry
   docker-push:
     if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') || github.event.inputs.push_images == 'true')
-    needs: [docker-test, production-test]
+    needs: [docker-test, production-test, security-scan, config-security-scan]
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -291,7 +335,7 @@ jobs:
   # Cleanup artifacts
   cleanup:
     if: always()
-    needs: [docker-test, production-test, security-scan]
+    needs: [docker-test, production-test, security-scan, config-security-scan]
     runs-on: ubuntu-22.04
 
     steps:

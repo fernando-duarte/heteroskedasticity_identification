@@ -34,7 +34,7 @@ make dev-shell
 # Quick simulation (100 iterations)
 make simulation-quick
 
-# Full simulation (1000 iterations) 
+# Full simulation (1000 iterations)
 make simulation
 
 # Bootstrap demonstration
@@ -108,7 +108,7 @@ The package includes comprehensive parallel simulation infrastructure:
 ### Function Organization (R/ Directory)
 
 - **`estimation.R`**: Core estimation functions (`calculate_lewbel_bounds`, `run_single_lewbel_simulation`)
-- **`data-generation.R`**: Data generation and validation (`generate_lewbel_data`, `verify_lewbel_assumptions`)  
+- **`data-generation.R`**: Data generation and validation (`generate_lewbel_data`, `verify_lewbel_assumptions`)
 - **`lewbel-monte-carlo.R`**: Main simulation orchestrator (`run_lewbel_monte_carlo`, `run_lewbel_demo`)
 - **`simulation.R`**: Parallel simulation infrastructure (main, bootstrap, sample size, sensitivity analysis)
 - **`utils.R`**: Configuration and seed management
@@ -120,7 +120,7 @@ The package includes comprehensive parallel simulation infrastructure:
 
 Comprehensive test suite covering:
 - Basic functionality (`test-basic.R`, `test-data-generation.R`)
-- Edge cases (`test-edge-cases.R`, `test-estimation-errors.R`) 
+- Edge cases (`test-edge-cases.R`, `test-estimation-errors.R`)
 - Component-specific tests (`test-simulations.R`, `test-analysis.R`)
 - Utility functions (`test-messager.R`, `test-stopper.R`)
 
@@ -131,7 +131,7 @@ Comprehensive test suite covering:
 ### Lewbel Estimation Pattern
 ```r
 # Standard pattern for Lewbel estimation functions
-data <- validate_lewbel_data(data) 
+data <- validate_lewbel_data(data)
 instruments <- construct_lewbel_instruments(data)
 results <- estimate_with_instruments(data, instruments)
 results <- add_diagnostics(results)
@@ -139,7 +139,7 @@ class(results) <- c("lewbel_fit", class(results))
 return(results)
 ```
 
-### Simulation Pattern  
+### Simulation Pattern
 ```r
 # Standard pattern for Monte Carlo simulations
 set.seed(seed)
@@ -173,7 +173,7 @@ future::plan(future::sequential)
 ## Package Dependencies
 
 **Core Statistical:** `AER` (instrumental variables), `boot` (bootstrap), `stats`
-**Data Manipulation:** `dplyr`, `tidyr`, `purrr` 
+**Data Manipulation:** `dplyr`, `tidyr`, `purrr`
 **Parallel Processing:** `future`, `furrr`
 **Visualization:** `ggplot2`
 **Development:** `testthat` (≥3.0.0), `knitr`, `rmarkdown`
@@ -198,7 +198,7 @@ The package enforces **tidyverse style guide** via pre-commit hooks:
 ## Special Considerations
 
 **Methodological:** Implements specific Lewbel (2012) assumptions including triangular model structure and heteroskedasticity-based identification
-**Computational:** Optimized for parallel Monte Carlo simulations with comprehensive seed management  
+**Computational:** Optimized for parallel Monte Carlo simulations with comprehensive seed management
 **Reproducibility:** All simulations use controlled seeding for reproducible results
 **Error Handling:** Robust error handling throughout with informative error messages
 **Testing:** Comprehensive edge case coverage including proper handling of expected warnings

@@ -53,7 +53,8 @@ run_main_simulation <- function(config, seeds, verbose = TRUE) {
         params = params_list,
         endog_var = config$endog_var_name,
         exog_vars = config$exog_var_names,
-        compute_bounds_se = (i <= config$bootstrap_subset_size)
+        compute_bounds_se = (i <= config$bootstrap_subset_size),
+        df_adjust = ifelse(is.null(config$df_adjust), "asymptotic", config$df_adjust)
       )
     },
     .options = furrr::furrr_options(
@@ -62,7 +63,11 @@ run_main_simulation <- function(config, seeds, verbose = TRUE) {
       globals = list(
         run_single_lewbel_simulation = run_single_lewbel_simulation,
         generate_lewbel_data = generate_lewbel_data,
-        calculate_lewbel_bounds = calculate_lewbel_bounds
+        calculate_lewbel_bounds = calculate_lewbel_bounds,
+        extract_se_lm = extract_se_lm,
+        extract_se_ivreg = extract_se_ivreg,
+        get_critical_value = get_critical_value,
+        adjust_se_for_df = adjust_se_for_df
       )
     ),
     .progress = verbose
@@ -126,7 +131,8 @@ run_bootstrap_demonstration <- function(config, seeds, verbose = TRUE) {
         params = params_list,
         endog_var = config$endog_var_name,
         exog_vars = config$exog_var_names,
-        compute_bounds_se = TRUE
+        compute_bounds_se = TRUE,
+        df_adjust = ifelse(is.null(config$df_adjust), "asymptotic", config$df_adjust)
       )
     },
     .options = furrr::furrr_options(
@@ -134,7 +140,11 @@ run_bootstrap_demonstration <- function(config, seeds, verbose = TRUE) {
       globals = list(
         run_single_lewbel_simulation = run_single_lewbel_simulation,
         generate_lewbel_data = generate_lewbel_data,
-        calculate_lewbel_bounds = calculate_lewbel_bounds
+        calculate_lewbel_bounds = calculate_lewbel_bounds,
+        extract_se_lm = extract_se_lm,
+        extract_se_ivreg = extract_se_ivreg,
+        get_critical_value = get_critical_value,
+        adjust_se_for_df = adjust_se_for_df
       )
     )
   )
@@ -203,7 +213,8 @@ run_sample_size_analysis <- function(config, seeds, verbose = TRUE) {
             params = params_list,
             endog_var = config$endog_var_name,
             exog_vars = config$exog_var_names,
-            compute_bounds_se = FALSE
+            compute_bounds_se = FALSE,
+            df_adjust = ifelse(is.null(config$df_adjust), "asymptotic", config$df_adjust)
           )
         },
         .options = furrr::furrr_options(
@@ -211,7 +222,11 @@ run_sample_size_analysis <- function(config, seeds, verbose = TRUE) {
           globals = list(
             run_single_lewbel_simulation = run_single_lewbel_simulation,
             generate_lewbel_data = generate_lewbel_data,
-            calculate_lewbel_bounds = calculate_lewbel_bounds
+            calculate_lewbel_bounds = calculate_lewbel_bounds,
+            extract_se_lm = extract_se_lm,
+            extract_se_ivreg = extract_se_ivreg,
+            get_critical_value = get_critical_value,
+            adjust_se_for_df = adjust_se_for_df
           )
         )
       )
@@ -283,7 +298,8 @@ run_sensitivity_analysis <- function(config, seeds, verbose = TRUE) {
             params = params_list,
             endog_var = config$endog_var_name,
             exog_vars = config$exog_var_names,
-            compute_bounds_se = FALSE
+            compute_bounds_se = FALSE,
+            df_adjust = ifelse(is.null(config$df_adjust), "asymptotic", config$df_adjust)
           )
         },
         .options = furrr::furrr_options(
@@ -291,7 +307,11 @@ run_sensitivity_analysis <- function(config, seeds, verbose = TRUE) {
           globals = list(
             run_single_lewbel_simulation = run_single_lewbel_simulation,
             generate_lewbel_data = generate_lewbel_data,
-            calculate_lewbel_bounds = calculate_lewbel_bounds
+            calculate_lewbel_bounds = calculate_lewbel_bounds,
+            extract_se_lm = extract_se_lm,
+            extract_se_ivreg = extract_se_ivreg,
+            get_critical_value = get_critical_value,
+            adjust_se_for_df = adjust_se_for_df
           )
         )
       )

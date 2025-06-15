@@ -9,8 +9,10 @@
 #' @param n_obs Integer. Sample size.
 #' @param params List. Parameters for the data generating process containing:
 #'   \itemize{
-#'     \item beta1_0, beta1_1: Parameters for first equation (beta1_1 can be a vector for multiple X)
-#'     \item beta2_0, beta2_1: Parameters for second equation (beta2_1 can be a vector for multiple X)
+#'     \item beta1_0, beta1_1: Parameters for first equation (beta1_1 can be
+#'       a vector for multiple X)
+#'     \item beta2_0, beta2_1: Parameters for second equation (beta2_1 can be
+#'       a vector for multiple X)
 #'     \item gamma1: Endogenous parameter (key parameter of interest)
 #'     \item alpha1, alpha2: Factor loadings for common factor U
 #'     \item delta_het: Heteroscedasticity strength parameter
@@ -44,7 +46,7 @@
 #'   alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
 #' )
 #' data <- generate_lewbel_data(1000, params)
-#' 
+#'
 #' # Multiple X variables
 #' params_multi <- list(
 #'   beta1_0 = 0.5, beta1_1 = c(1.5, 3.0), gamma1 = -0.8,
@@ -66,18 +68,19 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
     params$beta1_1 <- rep(params$beta1_1, 1)
     params$beta2_1 <- rep(params$beta2_1, 1)
   }
-  
+
   # Generate exogenous variables
   # nolint start: object_name_linter.
-  X_mat <- matrix(stats::rnorm(n_obs * n_x, mean = 2, sd = 1), 
-                  nrow = n_obs, ncol = n_x)
-  
+  X_mat <- matrix(stats::rnorm(n_obs * n_x, mean = 2, sd = 1),
+    nrow = n_obs, ncol = n_x
+  )
+
   # Generate Z instruments (one per X)
   Z_mat <- matrix(NA, nrow = n_obs, ncol = n_x)
   for (j in 1:n_x) {
     Z_mat[, j] <- X_mat[, j]^2 - mean(X_mat[, j]^2)
   }
-  
+
   # For heteroskedasticity, use the first Z by default
   # (can be extended to use multiple Z in future)
   Z_het <- Z_mat[, 1]
@@ -98,11 +101,14 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
 
   # Generate endogenous variables using all X variables
   Y2 <- params$beta2_0 + as.vector(X_mat %*% params$beta2_1) + epsilon2
-  Y1 <- params$beta1_0 + as.vector(X_mat %*% params$beta1_1) + params$gamma1 * Y2 + epsilon1
-  
+  Y1 <- params$beta1_0 + as.vector(X_mat %*% params$beta1_1) +
+    params$gamma1 * Y2 + epsilon1
+
   # Create output data frame
-  result_df <- data.frame(Y1 = Y1, Y2 = Y2, epsilon1 = epsilon1, epsilon2 = epsilon2)
-  
+  result_df <- data.frame(
+    Y1 = Y1, Y2 = Y2, epsilon1 = epsilon1, epsilon2 = epsilon2
+  )
+
   # Add X variables with appropriate names
   if (n_x == 1) {
     result_df$Xk <- X_mat[, 1]
