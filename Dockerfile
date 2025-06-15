@@ -52,35 +52,50 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && rm -rf /var/lib/apt/lists/*
 
 # Install remotes, devtools, and knitr for package management
-# Don't use cache mount here to ensure these essential packages are always available
-RUN R -e "install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat'), repos='https://cloud.r-project.org/')"
+# Use cache mount for faster builds but ensure packages are installed
+RUN --mount=type=cache,target=/var/cache/R/packages \
+    R -e "options(repos = 'https://cloud.r-project.org/'); \
+          .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
+          install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat'), \
+                         lib = '/usr/local/lib/R/site-library')"
 
 # Copy package metadata files first for better layer caching
 COPY DESCRIPTION NAMESPACE ./
 
 # Install core dependencies first (in order to handle dependency chains)
 # Note: nloptr requires libnlopt-dev which was already installed in system dependencies
-RUN R -e "install.packages(c('nloptr', 'minqa', 'RcppEigen'), repos='https://cloud.r-project.org/', type='source')" && \
-    R -e "install.packages(c('lme4'), repos='https://cloud.r-project.org/')" && \
-    R -e "install.packages(c('pbkrtest'), repos='https://cloud.r-project.org/')" && \
-    R -e "install.packages(c('car'), repos='https://cloud.r-project.org/')" && \
-    R -e "install.packages(c('AER'), repos='https://cloud.r-project.org/')"
+RUN --mount=type=cache,target=/var/cache/R/packages \
+    R -e "options(repos = 'https://cloud.r-project.org/'); \
+          .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
+          install.packages(c('nloptr', 'minqa', 'RcppEigen'), type='source', lib = '/usr/local/lib/R/site-library'); \
+          install.packages(c('lme4', 'pbkrtest', 'car', 'AER'), lib = '/usr/local/lib/R/site-library')"
 
 # Install remaining package dependencies
 # Ensure testthat is installed with all its dependencies for testing
-RUN R -e "install.packages(c('boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr', 'testthat'), repos='https://cloud.r-project.org/')" && \
-    R -e "if (!requireNamespace('testthat', quietly = TRUE)) stop('testthat installation failed')"
+RUN --mount=type=cache,target=/var/cache/R/packages \
+    R -e "options(repos = 'https://cloud.r-project.org/'); \
+          .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
+          install.packages(c('boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr', 'testthat'), \
+                         lib = '/usr/local/lib/R/site-library'); \
+          if (!requireNamespace('testthat', quietly = TRUE)) stop('testthat installation failed')"
 
 # Install package dependencies using remotes (ensure remotes is available)
 # Install both runtime and test dependencies (including Suggests)
-RUN R -e "if (!require('remotes', quietly = TRUE)) install.packages('remotes', repos='https://cloud.r-project.org/'); remotes::install_deps('.', dependencies = TRUE, repos='https://cloud.r-project.org/')"
+RUN --mount=type=cache,target=/var/cache/R/packages \
+    R -e "options(repos = 'https://cloud.r-project.org/'); \
+          .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
+          if (!require('remotes', quietly = TRUE)) install.packages('remotes', lib = '/usr/local/lib/R/site-library'); \
+          remotes::install_deps('.', dependencies = TRUE, lib = '/usr/local/lib/R/site-library')"
 
 # Copy source code and build package
 COPY . .
 
 # Build and install the package (ensure knitr is available)
 # Build with --no-build-vignettes to avoid vignette building issues in Docker
-RUN R -e "if (!require('knitr', quietly = TRUE)) install.packages('knitr', repos='https://cloud.r-project.org/')" && \
+RUN --mount=type=cache,target=/var/cache/R/packages \
+    R -e "options(repos = 'https://cloud.r-project.org/'); \
+          .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
+          if (!require('knitr', quietly = TRUE)) install.packages('knitr', lib = '/usr/local/lib/R/site-library')" && \
     R CMD build . --no-build-vignettes && \
     R CMD INSTALL *.tar.gz --with-keep.source && \
     # Verify installation
