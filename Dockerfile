@@ -59,6 +59,7 @@ RUN --mount=type=cache,target=/usr/local/lib/R/site-library \
 COPY DESCRIPTION NAMESPACE ./
 
 # Install core dependencies first (in order to handle dependency chains)
+# Note: nloptr requires libnlopt-dev which was already installed in system dependencies
 RUN R -e "install.packages(c('nloptr', 'minqa', 'RcppEigen'), repos='https://cloud.r-project.org/', type='source')" && \
     R -e "install.packages(c('lme4'), repos='https://cloud.r-project.org/')" && \
     R -e "install.packages(c('pbkrtest'), repos='https://cloud.r-project.org/')" && \
@@ -69,6 +70,7 @@ RUN R -e "install.packages(c('nloptr', 'minqa', 'RcppEigen'), repos='https://clo
 RUN R -e "install.packages(c('boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr', 'testthat'), repos='https://cloud.r-project.org/')"
 
 # Install package dependencies using remotes (ensure remotes is available)
+# Install both runtime and test dependencies (including Suggests)
 RUN R -e "if (!require('remotes', quietly = TRUE)) install.packages('remotes', repos='https://cloud.r-project.org/'); remotes::install_deps('.', dependencies = TRUE, repos='https://cloud.r-project.org/')"
 
 # Copy source code and build package
