@@ -11,7 +11,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval = FALSE  # Set to TRUE when packages are available
+  eval = FALSE # Set to TRUE when packages are available
 )
 ```
 
@@ -64,8 +64,8 @@ iv <- iv - mean(iv)
 
 # Run 2SLS
 model <- ivreg(Y1 ~ Xk + Y2 | Xk + iv, data = data)
-coef(model)["Y2"]  # -0.8009241
-sqrt(diag(vcov(model)))["Y2"]  # 0.00096109
+coef(model)["Y2"] # -0.8009241
+sqrt(diag(vcov(model)))["Y2"] # 0.00096109
 ```
 
 ### Stata Code (Produces Identical Results)
@@ -86,16 +86,23 @@ ivregress 2sls Y1 Xk (Y2 = iv)
 
 ```{r multiple-instruments}
 # Generate data with 3 X variables
-X1 <- rnorm(1000); X2 <- rnorm(1000); X3 <- rnorm(1000)
-Z1 <- X1^2 - mean(X1^2); Z2 <- X2^2 - mean(X2^2); Z3 <- X3^2 - mean(X3^2)
+X1 <- rnorm(1000)
+X2 <- rnorm(1000)
+X3 <- rnorm(1000)
+Z1 <- X1^2 - mean(X1^2)
+Z2 <- X2^2 - mean(X2^2)
+Z3 <- X3^2 - mean(X3^2)
 
 # ... generate Y2 and Y1 ...
 
 # Construct 3 Lewbel instruments
 e2_hat <- residuals(lm(Y2 ~ X1 + X2 + X3, data = data))
-iv1 <- (Z1 - mean(Z1)) * e2_hat; iv1 <- iv1 - mean(iv1)
-iv2 <- (Z2 - mean(Z2)) * e2_hat; iv2 <- iv2 - mean(iv2)
-iv3 <- (Z3 - mean(Z3)) * e2_hat; iv3 <- iv3 - mean(iv3)
+iv1 <- (Z1 - mean(Z1)) * e2_hat
+iv1 <- iv1 - mean(iv1)
+iv2 <- (Z2 - mean(Z2)) * e2_hat
+iv2 <- iv2 - mean(iv2)
+iv3 <- (Z3 - mean(Z3)) * e2_hat
+iv3 <- iv3 - mean(iv3)
 
 # Both hetid and Stata handle this identically
 model <- ivreg(Y1 ~ X1 + X2 + X3 + Y2 | X1 + X2 + X3 + iv1 + iv2 + iv3, data)
@@ -111,11 +118,11 @@ library(REndo)
 rendo_model <- hetErrorsIV(y ~ x + p | p | IIV(x), data = test_data)
 
 # This is equivalent to:
-iv_x <- (x - mean(x)) * e2_hat  # Uses X, not Z = X^2 - E[X^2]
+iv_x <- (x - mean(x)) * e2_hat # Uses X, not Z = X^2 - E[X^2]
 model_x <- ivreg(y ~ x + p | x + iv_x, data = test_data)
 
 # REndo matches the X-based approach exactly
-coef(rendo_model)["p"] == coef(model_x)["p"]  # TRUE
+coef(rendo_model)["p"] == coef(model_x)["p"] # TRUE
 ```
 
 ### Typical Differences
@@ -131,13 +138,13 @@ coef(rendo_model)["p"] == coef(model_x)["p"]  # TRUE
 ```{r df-adjustments}
 # hetid default: asymptotic (matches Stata)
 result_asymp <- run_single_lewbel_simulation(
-  sim_id = 1, params = params, 
-  df_adjust = "asymptotic"  # Default
+  sim_id = 1, params = params,
+  df_adjust = "asymptotic" # Default
 )
 
 # For finite sample SEs (matches base R)
 result_finite <- run_single_lewbel_simulation(
-  sim_id = 1, params = params, 
+  sim_id = 1, params = params,
   df_adjust = "finite"
 )
 
@@ -151,7 +158,7 @@ result_finite <- run_single_lewbel_simulation(
 # Function to verify all three implementations
 verify_lewbel_implementations <- function(n = 1000, seed = 12345) {
   set.seed(seed)
-  
+
   # Generate data
   params <- list(
     beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
@@ -159,45 +166,49 @@ verify_lewbel_implementations <- function(n = 1000, seed = 12345) {
     alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.5
   )
   data <- generate_lewbel_data(n, params)
-  test_data <- data.frame(y=data$Y1, x=data$Xk, p=data$Y2, z=data$Z)
-  
+  test_data <- data.frame(y = data$Y1, x = data$Xk, p = data$Y2, z = data$Z)
+
   # Standard Lewbel (hetid/Stata)
   e2_hat <- residuals(lm(p ~ x, data = test_data))
   iv_z <- (test_data$z - mean(test_data$z)) * e2_hat
   iv_z <- iv_z - mean(iv_z)
   model_z <- ivreg(y ~ x + p | x + iv_z, data = test_data)
-  
+
   # Alternative with X (REndo approach)
   iv_x <- (test_data$x - mean(test_data$x)) * e2_hat
   iv_x <- iv_x - mean(iv_x)
   model_x <- ivreg(y ~ x + p | x + iv_x, data = test_data)
-  
+
   # REndo (if available)
   if (requireNamespace("REndo", quietly = TRUE)) {
     rendo <- REndo::hetErrorsIV(y ~ x + p | p | IIV(x), data = test_data)
-    
+
     results <- data.frame(
       Method = c("hetid/Stata (Z=X²-E[X²])", "Manual with Z=X", "REndo hetErrorsIV"),
       Coefficient = c(coef(model_z)["p"], coef(model_x)["p"], coef(rendo)["p"]),
-      SE = c(sqrt(diag(vcov(model_z)))["p"], 
-             sqrt(diag(vcov(model_x)))["p"], 
-             sqrt(diag(vcov(rendo)))["p"])
+      SE = c(
+        sqrt(diag(vcov(model_z)))["p"],
+        sqrt(diag(vcov(model_x)))["p"],
+        sqrt(diag(vcov(rendo)))["p"]
+      )
     )
   } else {
     results <- data.frame(
       Method = c("hetid/Stata (Z=X²-E[X²])", "Manual with Z=X"),
       Coefficient = c(coef(model_z)["p"], coef(model_x)["p"]),
-      SE = c(sqrt(diag(vcov(model_z)))["p"], 
-             sqrt(diag(vcov(model_x)))["p"])
+      SE = c(
+        sqrt(diag(vcov(model_z)))["p"],
+        sqrt(diag(vcov(model_x)))["p"]
+      )
     )
   }
-  
+
   print(results, digits = 8)
-  
+
   # Verify Stata code
   cat("\nStata verification code:\n")
   cat("quietly reg p x\n")
-  cat("predict e2_hat, residuals\n") 
+  cat("predict e2_hat, residuals\n")
   cat("gen iv = (z - mean(z)) * e2_hat\n")
   cat("quietly sum iv\n")
   cat("replace iv = iv - r(mean)\n")
@@ -205,7 +216,7 @@ verify_lewbel_implementations <- function(n = 1000, seed = 12345) {
   cat("\nExpected Stata results:\n")
   cat("Coefficient:", coef(model_z)["p"], "\n")
   cat("Std. Error:", sqrt(diag(vcov(model_z)))["p"], "\n")
-  
+
   invisible(results)
 }
 
