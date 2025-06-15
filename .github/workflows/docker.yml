@@ -99,6 +99,18 @@ jobs:
         cache-to: type=gha,mode=max
         outputs: type=docker,dest=/tmp/${{ matrix.target }}-image.tar
 
+    - name: Save image tag
+      run: |
+        echo "${{ steps.meta.outputs.tags }}" | head -n 1 > /tmp/${{ matrix.target }}.tag
+      shell: bash
+
+    - name: Upload image tag artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: image-tag-${{ matrix.target }}
+        path: /tmp/${{ matrix.target }}.tag
+        retention-days: 7
+
     - name: Upload image artifact
       uses: actions/upload-artifact@v4
       with:
@@ -116,44 +128,63 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Download builder image
+    - name: Download builder image artifact
       uses: actions/download-artifact@v4
       with:
         name: docker-image-builder
         path: /tmp
 
+    - name: Download builder image tag artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: image-tag-builder
+        path: /tmp
+
     - name: Load Docker image
       run: docker load --input /tmp/builder-image.tar
 
+    - name: Get image name for tests
+      id: image_tag_step
+      run: echo "TAG_NAME=$(cat /tmp/builder.tag)" >> $GITHUB_OUTPUT
+      shell: bash
+
     - name: Run package tests
+      env:
+        IMAGE_NAME_FROM_TAG: ${{ steps.image_tag_step.outputs.TAG_NAME }}
       run: |
         # Get the image name from the loaded image
         IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep builder | head -1)
-        echo "Testing image: $IMAGE_NAME"
+        echo "Testing image: $IMAGE_NAME_FROM_TAG"
 
         # Run package tests
         # Since the package is already installed in the image, we'll test it directly
         # Mount workspace to access test files if needed
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
-          $IMAGE_NAME \
+          $IMAGE_NAME_FROM_TAG \
           bash -c "cd /workspace && R -e \"if (!requireNamespace('devtools', quietly = TRUE)) install.packages('devtools', repos='https://cloud.r-project.org/'); library(hetid); devtools::test()\""
 
     - name: Run R CMD check
+      env:
+        IMAGE_NAME_FROM_TAG: ${{ steps.image_tag_step.outputs.TAG_NAME }}
       run: |
         IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep builder | head -1)
+        echo "Testing image for R CMD check: $IMAGE_NAME_FROM_TAG"
 
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
-          $IMAGE_NAME \
+          $IMAGE_NAME_FROM_TAG \
           bash -c "R CMD build . && R CMD check --as-cran *.tar.gz"
 
     - name: Test package loading
+      env:
+        IMAGE_NAME_FROM_TAG: ${{ steps.image_tag_step.outputs.TAG_NAME }}
       run: |
         IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep builder | head -1)
+        echo "Testing package loading in image: $IMAGE_NAME_FROM_TAG"
 
-        docker run --rm $IMAGE_NAME \
+        docker run --rm $IMAGE_NAME_FROM_TAG \
           R -e "library(hetid); packageVersion('hetid'); cat('Package loaded successfully\n')"
 
   # Test production image functionality
@@ -162,26 +193,80 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Download production image
+    - name: Download production image artifact
       uses: actions/download-artifact@v4
       with:
         name: docker-image-production
         path: /tmp
 
+    - name: Download production image tag artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: image-tag-production
+        path: /tmp
+
     - name: Load Docker image
       run: docker load --input /tmp/production-image.tar
 
+    - name: Get image name for production tests
+      id: prod_image_tag_step
+      run: echo "TAG_NAME=$(cat /tmp/production.tag)" >> $GITHUB_OUTPUT
+      shell: bash
+
     - name: Test production image
+      env:
+        PROD_IMAGE_NAME_FROM_TAG: ${{ steps.prod_image_tag_step.outputs.TAG_NAME }}
       run: |
         IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep production | head -1)
-        echo "Testing production image: $IMAGE_NAME"
+        echo "Testing production image: $PROD_IMAGE_NAME_FROM_TAG"
 
         # Test basic functionality
-        docker run --rm $IMAGE_NAME \
+        docker run --rm $PROD_IMAGE_NAME_FROM_TAG \
           R -e "library(hetid); cat('Production image test passed\n')"
 
         # Test health check
-        docker run --rm --health-interval=5s --health-timeout=3s $IMAGE_NAME sleep 10
+        echo "Starting health check test for $PROD_IMAGE_NAME_FROM_TAG"
+        # Run container in detached mode, give it a name
+        docker run -d --name hetid_prod_health_test_container $PROD_IMAGE_NAME_FROM_TAG sleep 30
+
+        echo "Waiting for container to initialize and first health check..."
+        # Wait for initial start period (from Dockerfile HEALTHCHECK) + a bit
+        sleep 10 
+
+        HEALTHY=false
+        # Poll for health status
+        for i in $(seq 1 5); do # Poll a few times
+            HEALTH_STATUS=$(docker inspect --format='{{or .State.Health.Status "starting"}}' hetid_prod_health_test_container || echo "error_inspecting")
+            echo "Attempt $i: Health status is '$HEALTH_STATUS'"
+            if [ "$HEALTH_STATUS" = "healthy" ]; then
+                HEALTHY=true
+                break
+            fi
+            if [ "$HEALTH_STATUS" = "unhealthy" ]; then
+                echo "Container reported unhealthy."
+                docker logs hetid_prod_health_test_container
+                # Cleanup handled by finally block equivalent (explicit rm)
+                break 
+            fi
+            if [ "$HEALTH_STATUS" = "error_inspecting" ]; then
+                echo "Failed to inspect container. It might have exited prematurely."
+                docker logs hetid_prod_health_test_container || echo "Could not retrieve logs for exited container."
+                break
+            fi
+            sleep 5 # Wait before next poll
+        done
+
+        # Cleanup
+        echo "Cleaning up health test container..."
+        docker logs hetid_prod_health_test_container || echo "No logs to retrieve or container already removed."
+        docker rm -f hetid_prod_health_test_container || echo "Failed to remove or container already removed."
+
+        if [ "$HEALTHY" = true ]; then
+            echo "Health check passed: Container became healthy."
+        else
+            echo "Health check failed: Container did not become healthy in time or reported unhealthy."
+            exit 1
+        fi
 
   # Security scanning
   security-scan:
@@ -193,10 +278,16 @@ jobs:
       security-events: write
 
     steps:
-    - name: Download production image
+    - name: Download production image artifact
       uses: actions/download-artifact@v4
       with:
         name: docker-image-production
+        path: /tmp
+
+    - name: Download production image tag artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: image-tag-production
         path: /tmp
 
     - name: Load Docker image
@@ -206,7 +297,8 @@ jobs:
       id: get-image
       run: |
         IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep production | head -1)
-        echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_OUTPUT
+        echo "IMAGE_NAME=$(cat /tmp/production.tag)" >> $GITHUB_OUTPUT
+      shell: bash
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.31.0
@@ -347,3 +439,6 @@ jobs:
           docker-image-builder
           docker-image-production
           docker-image-development
+          image-tag-builder
+          image-tag-production
+          image-tag-development
