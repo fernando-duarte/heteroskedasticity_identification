@@ -21,6 +21,17 @@ on:
     # Run weekly on Mondays at 3 AM UTC
     - cron: '0 3 * * 1'
   workflow_dispatch:
+    inputs:
+      debug_oyster:
+        description: 'Enable debug mode for oysteR installation'
+        required: false
+        type: boolean
+        default: false
+      skip_cache:
+        description: 'Skip package cache to force fresh installation'
+        required: false
+        type: boolean
+        default: false
 
 # Set workflow-level permissions to read-only by default for security
 # Following 2025 best practices to minimize permissions
@@ -64,6 +75,7 @@ jobs:
 
       - name: Cache R packages
         id: cache
+        if: ${{ !inputs.skip_cache }}
         uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
         with:
           path: |
@@ -75,11 +87,12 @@ jobs:
             security-r-${{ runner.os }}-
 
       - name: Install security packages
-        if: steps.cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true' || inputs.skip_cache
         env:
           # Set OSS Index credentials if available (2025 best practice for oysteR)
           OSSINDEX_USER: ${{ secrets.OSSINDEX_USER }}
           OSSINDEX_TOKEN: ${{ secrets.OSSINDEX_TOKEN }}
+          GITHUB_DEBUG_OYSTER: ${{ inputs.debug_oyster }}
         run: |
           # Core packages
           install.packages(c("desc", "jsonlite", "lintr", "pkgdepends", "uuid"))
@@ -119,17 +132,38 @@ jobs:
           # Install oysteR with multiple fallback options
           oyster_installed <- FALSE
 
+          # Enable debug mode if requested
+          debug_mode <- as.logical(Sys.getenv("GITHUB_DEBUG_OYSTER", "FALSE"))
+          if (debug_mode) {
+            message("\n=== DEBUG MODE ENABLED ===")
+            message("R Version: ", R.version.string)
+            message("Platform: ", .Platform$OS.type)
+            message("Library paths:")
+            print(.libPaths())
+          }
+
           # Method 1: Try with pak (handles GitHub rate limits better)
           if (!oyster_installed) {
             tryCatch({
               message("Attempting to install oysteR with pak...")
-              pak::pkg_install("sonatype-nexus-community/oysteR", upgrade = FALSE)
+              if (debug_mode) {
+                pak::pkg_install("sonatype-nexus-community/oysteR", upgrade = FALSE, ask = FALSE)
+              } else {
+                pak::pkg_install("sonatype-nexus-community/oysteR", upgrade = FALSE)
+              }
               if (requireNamespace("oysteR", quietly = TRUE)) {
                 oyster_installed <- TRUE
                 message("Successfully installed oysteR with pak")
+                if (debug_mode) {
+                  message("oysteR version: ", packageVersion("oysteR"))
+                }
               }
             }, error = function(e) {
               message("pak installation failed: ", conditionMessage(e))
+              if (debug_mode) {
+                message("Full error:")
+                print(e)
+              }
             })
           }
 

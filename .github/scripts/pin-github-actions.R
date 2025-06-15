@@ -25,7 +25,10 @@ get_action_sha <- function(action, ref) {
 
   # Use gh CLI to get the commit SHA
   cmd <- sprintf(
-    "gh api repos/%s/%s/git/ref/tags/%s --jq '.object.sha' 2>/dev/null || gh api repos/%s/%s/git/ref/heads/%s --jq '.object.sha' 2>/dev/null",
+    paste0(
+      "gh api repos/%s/%s/git/ref/tags/%s --jq '.object.sha' 2>/dev/null || ",
+      "gh api repos/%s/%s/git/ref/heads/%s --jq '.object.sha' 2>/dev/null"
+    ),
     owner, repo, ref, owner, repo, ref
   )
 
@@ -36,7 +39,7 @@ get_action_sha <- function(action, ref) {
     return(NULL)
   }
 
-  return(sha)
+  sha
 }
 
 # Function to update a workflow file

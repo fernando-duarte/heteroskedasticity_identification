@@ -42,11 +42,15 @@ jobs:
 
       - name: Install security packages
         if: steps.cache.outputs.cache-hit != 'true'
+        env:
+          # Set OSS Index credentials if available (2025 best practice for oysteR)
+          OSSINDEX_USER: ${{ secrets.OSSINDEX_USER }}
+          OSSINDEX_TOKEN: ${{ secrets.OSSINDEX_TOKEN }}
         run: |
           # Core packages
           install.packages(c("desc", "jsonlite", "lintr", "pkgdepends", "uuid"))
-
-          # Install pak for better package management
+          
+          # Install pak for better package management (2025 recommended approach)
           if (!requireNamespace("pak", quietly = TRUE)) {
             install.packages("pak", repos = sprintf(
               "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
@@ -54,6 +58,28 @@ jobs:
               R.Version()$os,
               R.Version()$arch
             ))
+          }
+          
+          # Configure OSS Index authentication for oysteR if credentials are available
+          if (Sys.getenv("OSSINDEX_USER") != "" && Sys.getenv("OSSINDEX_TOKEN") != "") {
+            message("OSS Index credentials detected. oysteR will use authenticated requests.")
+            # Alternative: Create ~/.ossindex/.oss-index-config file
+            config_dir <- file.path(Sys.getenv("HOME"), ".ossindex")
+            if (!dir.exists(config_dir)) {
+              dir.create(config_dir, recursive = TRUE)
+            }
+            config_file <- file.path(config_dir, ".oss-index-config")
+            writeLines(c(
+              "# This config file is picked up by oysteR and other Sonatype apps",
+              "ossi:",
+              paste0("  Username: ", Sys.getenv("OSSINDEX_USER")),
+              paste0("  Token: ", Sys.getenv("OSSINDEX_TOKEN"))
+            ), config_file)
+            message("Created OSS Index config file for authentication")
+          } else {
+            message("No OSS Index credentials found. oysteR may hit rate limits.")
+            message("To avoid rate limits, set OSSINDEX_USER and OSSINDEX_TOKEN secrets in your repository.")
+            message("Register at https://ossindex.sonatype.org/ to get credentials.")
           }
 
           # Install oysteR with multiple fallback options

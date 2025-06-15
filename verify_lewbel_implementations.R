@@ -116,7 +116,8 @@ if (!is.null(overid_model)) {
 
   # Sargan test
   summ <- summary(overid_model, diagnostics = TRUE)
-  if ("diagnostics" %in% names(summ) && "Sargan" %in% rownames(summ$diagnostics)) {
+  if ("diagnostics" %in% names(summ) &&
+    "Sargan" %in% rownames(summ$diagnostics)) {
     sargan_p <- summ$diagnostics["Sargan", "p-value"]
     cat("   Sargan test p-value:", round(sargan_p, 4), "\n")
     if (sargan_p < 0.05) {
