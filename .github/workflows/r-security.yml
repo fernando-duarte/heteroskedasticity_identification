@@ -25,6 +25,7 @@ on:
 # Set workflow-level permissions to read-only by default for security
 permissions:
   contents: read
+  actions: read  # Required to read local reusable workflows
 
 # Improved concurrency control following 2025 best practices
 concurrency:
