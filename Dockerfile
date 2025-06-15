@@ -52,9 +52,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && rm -rf /var/lib/apt/lists/*
 
 # Install remotes, devtools, and knitr for package management
-# Use cache mount for faster builds but ensure packages are installed
-RUN --mount=type=cache,target=/var/cache/R/packages \
-    R -e "options(repos = 'https://cloud.r-project.org/'); \
+# Use NO cache mount here to ensure packages are installed in the image
+RUN R -e "options(repos = 'https://cloud.r-project.org/'); \
           .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
           install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat'), \
                          lib = '/usr/local/lib/R/site-library')"
@@ -64,16 +63,14 @@ COPY DESCRIPTION NAMESPACE ./
 
 # Install core dependencies first (in order to handle dependency chains)
 # Note: nloptr requires libnlopt-dev which was already installed in system dependencies
-RUN --mount=type=cache,target=/var/cache/R/packages \
-    R -e "options(repos = 'https://cloud.r-project.org/'); \
+RUN R -e "options(repos = 'https://cloud.r-project.org/'); \
           .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
           install.packages(c('nloptr', 'minqa', 'RcppEigen'), type='source', lib = '/usr/local/lib/R/site-library'); \
           install.packages(c('lme4', 'pbkrtest', 'car', 'AER'), lib = '/usr/local/lib/R/site-library')"
 
 # Install remaining package dependencies
 # Ensure testthat is installed with all its dependencies for testing
-RUN --mount=type=cache,target=/var/cache/R/packages \
-    R -e "options(repos = 'https://cloud.r-project.org/'); \
+RUN R -e "options(repos = 'https://cloud.r-project.org/'); \
           .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
           install.packages(c('boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr', 'testthat'), \
                          lib = '/usr/local/lib/R/site-library'); \

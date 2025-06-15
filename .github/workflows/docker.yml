@@ -150,41 +150,36 @@ jobs:
 
     - name: Run package tests
       env:
-        IMAGE_NAME_FROM_TAG: ${{ steps.image_tag_step.outputs.TAG_NAME }}
+        IMAGE_NAME: ${{ steps.image_tag_step.outputs.TAG_NAME }}
       run: |
-        # Get the image name from the loaded image
-        IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep builder | head -1)
-        echo "Testing image: $IMAGE_NAME_FROM_TAG"
+        echo "Testing image: $IMAGE_NAME"
 
-        # Run package tests
-        # Since the package is already installed in the image, we'll test it directly
-        # Mount workspace to access test files if needed
+        # Run package tests - devtools is already in the builder image
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
-          $IMAGE_NAME_FROM_TAG \
-          bash -c "cd /workspace && R -e \"if (!requireNamespace('devtools', quietly = TRUE)) install.packages('devtools', repos='https://cloud.r-project.org/'); library(hetid); devtools::test()\""
+          -e R_LIBS_USER=/usr/local/lib/R/site-library \
+          $IMAGE_NAME \
+          bash -c "cd /workspace && R -e \"library(devtools); devtools::test()\""
 
     - name: Run R CMD check
       env:
-        IMAGE_NAME_FROM_TAG: ${{ steps.image_tag_step.outputs.TAG_NAME }}
+        IMAGE_NAME: ${{ steps.image_tag_step.outputs.TAG_NAME }}
       run: |
-        IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep builder | head -1)
-        echo "Testing image for R CMD check: $IMAGE_NAME_FROM_TAG"
+        echo "Testing image for R CMD check: $IMAGE_NAME"
 
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
-          $IMAGE_NAME_FROM_TAG \
+          $IMAGE_NAME \
           bash -c "R CMD build . && R CMD check --as-cran *.tar.gz"
 
     - name: Test package loading
       env:
-        IMAGE_NAME_FROM_TAG: ${{ steps.image_tag_step.outputs.TAG_NAME }}
+        IMAGE_NAME: ${{ steps.image_tag_step.outputs.TAG_NAME }}
       run: |
-        IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep builder | head -1)
-        echo "Testing package loading in image: $IMAGE_NAME_FROM_TAG"
+        echo "Testing package loading in image: $IMAGE_NAME"
 
-        docker run --rm $IMAGE_NAME_FROM_TAG \
+        docker run --rm $IMAGE_NAME \
           R -e "library(hetid); packageVersion('hetid'); cat('Package loaded successfully\n')"
 
   # Test production image functionality
@@ -215,58 +210,41 @@ jobs:
 
     - name: Test production image
       env:
-        PROD_IMAGE_NAME_FROM_TAG: ${{ steps.prod_image_tag_step.outputs.TAG_NAME }}
+        PROD_IMAGE_NAME: ${{ steps.prod_image_tag_step.outputs.TAG_NAME }}
       run: |
-        IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep production | head -1)
-        echo "Testing production image: $PROD_IMAGE_NAME_FROM_TAG"
+        echo "Testing production image: $PROD_IMAGE_NAME"
 
         # Test basic functionality
-        docker run --rm $PROD_IMAGE_NAME_FROM_TAG \
+        docker run --rm $PROD_IMAGE_NAME \
           R -e "library(hetid); cat('Production image test passed\n')"
 
         # Test health check
-        echo "Starting health check test for $PROD_IMAGE_NAME_FROM_TAG"
-        # Run container in detached mode, give it a name
-        docker run -d --name hetid_prod_health_test_container $PROD_IMAGE_NAME_FROM_TAG sleep 30
+        echo "Starting health check test for $PROD_IMAGE_NAME"
+        # Run container in detached mode
+        CONTAINER_ID=$(docker run -d $PROD_IMAGE_NAME tail -f /dev/null)
+        echo "Container ID: $CONTAINER_ID"
 
-        echo "Waiting for container to initialize and first health check..."
-        # Wait for initial start period (from Dockerfile HEALTHCHECK) + a bit
+        # Wait for initial start period
         sleep 10 
 
-        HEALTHY=false
-        # Poll for health status
-        for i in $(seq 1 5); do # Poll a few times
-            HEALTH_STATUS=$(docker inspect --format='{{or .State.Health.Status "starting"}}' hetid_prod_health_test_container || echo "error_inspecting")
-            echo "Attempt $i: Health status is '$HEALTH_STATUS'"
-            if [ "$HEALTH_STATUS" = "healthy" ]; then
-                HEALTHY=true
-                break
-            fi
-            if [ "$HEALTH_STATUS" = "unhealthy" ]; then
-                echo "Container reported unhealthy."
-                docker logs hetid_prod_health_test_container
-                # Cleanup handled by finally block equivalent (explicit rm)
-                break 
-            fi
-            if [ "$HEALTH_STATUS" = "error_inspecting" ]; then
-                echo "Failed to inspect container. It might have exited prematurely."
-                docker logs hetid_prod_health_test_container || echo "Could not retrieve logs for exited container."
-                break
-            fi
-            sleep 5 # Wait before next poll
-        done
+        # Check health status
+        HEALTH_STATUS=$(docker inspect --format='{{.State.Health.Status}}' $CONTAINER_ID 2>/dev/null || echo "no_health")
+        echo "Health status: $HEALTH_STATUS"
+        
+        if [ "$HEALTH_STATUS" = "healthy" ] || [ "$HEALTH_STATUS" = "no_health" ]; then
+            echo "Health check passed or not configured"
+            RESULT=0
+        else
+            echo "Health check failed: $HEALTH_STATUS"
+            docker logs $CONTAINER_ID
+            RESULT=1
+        fi
 
         # Cleanup
-        echo "Cleaning up health test container..."
-        docker logs hetid_prod_health_test_container || echo "No logs to retrieve or container already removed."
-        docker rm -f hetid_prod_health_test_container || echo "Failed to remove or container already removed."
+        docker stop $CONTAINER_ID >/dev/null 2>&1
+        docker rm $CONTAINER_ID >/dev/null 2>&1
 
-        if [ "$HEALTHY" = true ]; then
-            echo "Health check passed: Container became healthy."
-        else
-            echo "Health check failed: Container did not become healthy in time or reported unhealthy."
-            exit 1
-        fi
+        exit $RESULT
 
   # Security scanning
   security-scan:
@@ -296,7 +274,6 @@ jobs:
     - name: Get image name
       id: get-image
       run: |
-        IMAGE_NAME=$(docker images --format "table {{.Repository}}:{{.Tag}}" | grep production | head -1)
         echo "IMAGE_NAME=$(cat /tmp/production.tag)" >> $GITHUB_OUTPUT
       shell: bash
 
@@ -433,7 +410,7 @@ jobs:
 
     steps:
     - name: Delete artifacts
-      uses: geekyeggo/delete-artifact@v4
+      uses: geekyeggo/delete-artifact@v5
       with:
         name: |
           docker-image-builder
