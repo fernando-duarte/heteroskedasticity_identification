@@ -2,9 +2,21 @@ name: R Security Checks
 
 on:
   push:
-    branches: [main, master]
+    paths: # From guide
+      - '**.R'
+      - '**.r'
+      - 'DESCRIPTION'
+      - 'renv.lock'
+      - '.github/workflows/r-security.yml'
+    branches: [ main, develop ] # From guide (main, master -> main, develop)
   pull_request:
-    branches: [main, master]
+    paths: # From guide
+      - '**.R'
+      - '**.r'
+      - 'DESCRIPTION'
+      - 'renv.lock'
+      - '.github/workflows/r-security.yml'
+    branches: [ main ] # From guide (main, master -> main)
   schedule:
     # Run weekly on Mondays at 3 AM UTC
     - cron: '0 3 * * 1'
@@ -16,12 +28,18 @@ permissions:
 
 # Improved concurrency control following 2025 best practices
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name != 'pull_request' || github.run_id }}
-  cancel-in-progress: ${{ github.event_name != 'schedule' }}
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  setup: # New setup job from guide
+    name: Setup R Environment and Security Tools
+    uses: ./.github/workflows/install-security-packages.yml
+    # Permissions for reusable workflow are defined within it or inherited.
+
   dependency-audit:
     name: R Dependency Security Audit
+    needs: setup # Added dependency on setup job
     runs-on: ubuntu-22.04
 
     permissions:
@@ -30,23 +48,15 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       with:
         persist-credentials: false
-        fetch-depth: 1
 
     - name: Setup R
       uses: r-lib/actions/setup-r@v2
       with:
+        r-version: '4.3.0' # Standardized R version from guide
         use-public-rspm: true
-
-    - name: Setup R dependencies
-      uses: r-lib/actions/setup-r-dependencies@v2
-      with:
-        extra-packages: |
-          any::oysteR
-          any::jsonlite
-          any::desc
 
     - name: Run oysteR security scan for installed packages
       id: oyster-scan
@@ -54,62 +64,95 @@ jobs:
         Rscript -e "
         library(oysteR)
         library(jsonlite)
-        
-        # Audit installed packages
-        audit_results <- audit_installed_r_pkgs(verbose = TRUE)
-        
-        # Extract vulnerabilities
-        vulns <- get_vulnerabilities(audit_results)
-        
-        if (!is.null(vulns) && nrow(vulns) > 0) {
-          cat('\\n==== VULNERABILITIES FOUND BY OYSTER ====\\n')
-          print(vulns)
-          
-          # Create SARIF output for GitHub Security tab
-          sarif <- list(
-            version = '2.1.0',
-            runs = list(list(
-              tool = list(driver = list(
-                name = 'oysteR',
-                version = as.character(packageVersion('oysteR')),
-                informationUri = 'https://github.com/sonatype-nexus-community/oysteR'
-              )),
-              results = lapply(seq_len(nrow(vulns)), function(i) {
-                vuln <- vulns[i, ]
-                list(
-                  ruleId = if (!is.na(vuln\$cvss_id)) vuln\$cvss_id else paste0('OSS-', i),
-                  level = if (!is.na(vuln\$cvss_score) && vuln\$cvss_score >= 7) 'error' else 'warning',
-                  message = list(text = paste(
-                    'Package:', vuln\$package,
-                    'Version:', vuln\$version,
-                    if (!is.na(vuln\$cvss_description)) paste('Description:', vuln\$cvss_description) else '',
-                    if (!is.na(vuln\$cvss_score)) paste('CVSS Score:', vuln\$cvss_score) else ''
-                  )),
-                  locations = list(list(
-                    physicalLocation = list(
-                      artifactLocation = list(
-                        uri = 'DESCRIPTION',
-                        uriBaseId = 'ROOTPATH'
-                      ),
-                      region = list(
-                        startLine = 1,
-                        startColumn = 1
+
+        tryCatch({
+          # Audit installed packages
+          audit_results <- audit_installed_r_pkgs(verbose = TRUE)
+
+          # Extract vulnerabilities
+          vulns <- get_vulnerabilities(audit_results)
+
+          if (!is.null(vulns) && nrow(vulns) > 0) {
+            cat('\\\\n==== VULNERABILITIES FOUND BY OYSTER ====\\\\n')
+            print(vulns)
+
+            # Create SARIF output for GitHub Security tab
+            sarif <- list(
+              version = '2.1.0',
+              runs = list(list(
+                tool = list(driver = list(
+                  name = 'oysteR',
+                  version = as.character(packageVersion('oysteR')),
+                  informationUri = 'https://github.com/sonatype-nexus-community/oysteR'
+                )),
+                results = lapply(seq_len(nrow(vulns)), function(i) {
+                  vuln <- vulns[i, ]
+                  list(
+                    ruleId = if (!is.na(vuln\\\$cvss_id)) vuln\\\$cvss_id else paste0('OSS-', i),
+                    level = if (!is.na(vuln\\\$cvss_score) && vuln\\\$cvss_score >= 7) 'error' else 'warning',
+                    message = list(text = paste(
+                      'Package:', vuln\\\$package,
+                      'Version:', vuln\\\$version,
+                      if (!is.na(vuln\\\$cvss_description)) paste('Description:', vuln\\\$cvss_description) else '',
+                      if (!is.na(vuln\\\$cvss_score)) paste('CVSS Score:', vuln\\\$cvss_score) else ''
+                    )),
+                    locations = list(list(
+                      physicalLocation = list(
+                        artifactLocation = list(
+                          uri = 'DESCRIPTION',
+                          uriBaseId = 'ROOTPATH'
+                        ),
+                        region = list(
+                          startLine = 1,
+                          startColumn = 1
+                        )
                       )
-                    )
-                  ))
-                )
-              })
-            ))
+                    ))
+                  )
+                })
+              ))
+            )
+            
+            jsonlite::write_json(sarif, 'oyster-audit.sarif', auto_unbox = TRUE, pretty = TRUE)
+            
+            # Verify file was created and is valid JSON (from guide)
+            if (!file.exists('oyster-audit.sarif')) {
+              stop('SARIF file oyster-audit.sarif was not created')
+            }
+            test_parse <- jsonlite::fromJSON('oyster-audit.sarif')
+            if (is.null(test_parse\\\$version)) {
+              stop('SARIF file oyster-audit.sarif appears to be malformed')
+            }
+            cat('SARIF file oyster-audit.sarif created successfully\\\\n')
+
+            # Set output to indicate vulnerabilities were found
+            cat('vulnerabilities_found=true >> \$GITHUB_OUTPUT\\\\n')
+          } else {
+            cat('\\\\nNo vulnerabilities found by oysteR.\\\\n')
+            # Create minimal valid SARIF if no vulnerabilities found (ensures SARIF file always exists)
+            minimal_sarif <- list(
+              version = '2.1.0',
+              `\\\$schema` = 'https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json',
+              runs = list()
+            )
+            jsonlite::write_json(minimal_sarif, 'oyster-audit.sarif', pretty = TRUE, auto_unbox = TRUE)
+            cat('Minimal SARIF file oyster-audit.sarif created as no vulnerabilities were found.\\\\n')
+            cat('vulnerabilities_found=false >> \$GITHUB_OUTPUT\\\\n')
+          }
+        }, error = function(e) {
+          cat('ERROR creating SARIF file oyster-audit.sarif:', conditionMessage(e), '\\\\n')
+          # Create minimal valid SARIF file on error (from guide)
+          minimal_sarif <- list(
+            version = '2.1.0',
+            `\\\$schema` = 'https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json',
+            runs = list()
           )
-          
-          write_json(sarif, 'oyster-audit.sarif', auto_unbox = TRUE, pretty = TRUE)
-          
-          # Set output to indicate vulnerabilities were found
-          cat('::set-output name=vulnerabilities_found::true\\n')
-        } else {
-          cat('\\nNo vulnerabilities found by oysteR.\\n')
-          cat('::set-output name=vulnerabilities_found::false\\n')
-        }
+          jsonlite::write_json(minimal_sarif, 'oyster-audit.sarif', pretty = TRUE, auto_unbox = TRUE)
+          cat('Minimal SARIF file oyster-audit.sarif created due to error.\\\\n')
+          # Ensure GITHUB_OUTPUT is set, indicating no vulns found to avoid breaking subsequent steps expecting this output
+          cat('vulnerabilities_found=false >> \$GITHUB_OUTPUT\\\\n')
+          quit(status = 1) # Fail R script, but continue-on-error for step will allow upload
+        })
         "
       continue-on-error: true
 
@@ -120,29 +163,29 @@ jobs:
         library(oysteR)
         library(desc)
         library(jsonlite)
-        
+
         # Get project dependencies from DESCRIPTION
         desc_obj <- desc::desc()
         deps <- desc_obj\$get_deps()
-        
+
         # Filter out R itself and base packages
-        pkg_names <- deps[deps\$type %in% c('Imports', 'Depends', 'Suggests') & 
+        pkg_names <- deps[deps\$type %in% c('Imports', 'Depends', 'Suggests') &
                          deps\$package != 'R', 'package']
-        
+
         if (length(pkg_names) > 0) {
           # Audit specific packages
-          audit_results <- audit(pkg = pkg_names, version = rep('*', length(pkg_names)), 
+          audit_results <- audit(pkg = pkg_names, version = rep('*', length(pkg_names)),
                                 type = rep('cran', length(pkg_names)))
-          
+
           vulns <- get_vulnerabilities(audit_results)
-          
+
           if (!is.null(vulns) && nrow(vulns) > 0) {
             cat('\\n==== PROJECT DEPENDENCY VULNERABILITIES ====\\n')
             print(vulns)
-            
+
             # Append to existing SARIF or create new one
             sarif_file <- 'project-deps-audit.sarif'
-            
+
             sarif <- list(
               version = '2.1.0',
               runs = list(list(
@@ -165,7 +208,7 @@ jobs:
                 })
               ))
             )
-            
+
             write_json(sarif, sarif_file, auto_unbox = TRUE, pretty = TRUE)
           }
         }
@@ -179,16 +222,16 @@ jobs:
           Rscript -e "
           library(oysteR)
           library(jsonlite)
-          
+
           # Audit renv.lock file
           audit_results <- audit_renv_lock('renv.lock')
-          
+
           vulns <- get_vulnerabilities(audit_results)
-          
+
           if (!is.null(vulns) && nrow(vulns) > 0) {
             cat('\\n==== RENV.LOCK VULNERABILITIES ====\\n')
             print(vulns)
-            
+
             # Create SARIF for renv findings
             sarif <- list(
               version = '2.1.0',
@@ -218,7 +261,7 @@ jobs:
                 })
               ))
             )
-            
+
             write_json(sarif, 'renv-audit.sarif', auto_unbox = TRUE, pretty = TRUE)
           }
           "
@@ -229,7 +272,7 @@ jobs:
 
     - name: Upload oysteR audit results
       if: always()
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
       with:
         sarif_file: 'oyster-audit.sarif'
         category: 'oyster-installed'
@@ -237,7 +280,7 @@ jobs:
 
     - name: Upload project dependencies audit results
       if: always()
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
       with:
         sarif_file: 'project-deps-audit.sarif'
         category: 'oyster-deps'
@@ -245,7 +288,7 @@ jobs:
 
     - name: Upload renv audit results
       if: always()
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
       with:
         sarif_file: 'renv-audit.sarif'
         category: 'oyster-renv'
@@ -264,39 +307,37 @@ jobs:
         persist-credentials: false
 
     - name: Setup R
-      uses: r-lib/actions/setup-r@e9b180e5e562cb7feb32abcc96c31f4d2a6c2a61 # v2.12.0
+      uses: r-lib/actions/setup-r@v2
       with:
+        r-version: '4.3.0' # Standardized R version
         use-public-rspm: true
 
-    - name: Setup dependencies for license check
-      uses: r-lib/actions/setup-r-dependencies@e9b180e5e562cb7feb32abcc96c31f4d2a6c2a61 # v2.12.0
-      with:
-        extra-packages: |
-          any::desc
-          any::licenses
+    - name: Install licenses package
+      run: install.packages("licenses")
+      shell: Rscript {0}
 
     - name: Check license compatibility
       run: |
         Rscript -e "
         library(desc)
-        
+
         # Get package license
         pkg_desc <- desc::desc()
         pkg_license <- pkg_desc\$get('License')[[1]]
         pkg_name <- pkg_desc\$get('Package')[[1]]
-        
+
         cat('Package:', pkg_name, '\\n')
         cat('License:', pkg_license, '\\n\\n')
-        
+
         # Get all dependencies
         deps <- pkg_desc\$get_deps()
-        
+
         # For each dependency, try to get its license
         cat('Checking dependency licenses...\\n')
-        
+
         # Get available packages info
         ap <- available.packages()
-        
+
         for (i in seq_len(nrow(deps))) {
           dep_name <- deps[i, 'package']
           if (dep_name != 'R') {
@@ -304,17 +345,17 @@ jobs:
             if (dep_name %in% rownames(ap)) {
               dep_license <- ap[dep_name, 'License']
               cat(' -', dep_name, ':', dep_license, '\\n')
-              
+
               # Basic compatibility check
               # GPL-3 is incompatible with some licenses
-              if (grepl('GPL-3', pkg_license) && 
+              if (grepl('GPL-3', pkg_license) &&
                   (grepl('MIT', dep_license) || grepl('BSD', dep_license))) {
                 cat('   WARNING: Potential license incompatibility\\n')
               }
             }
           }
         }
-        
+
         cat('\\nLicense check completed.\\n')
         cat('Note: This is a basic check. Consult legal advice for thorough license compliance.\\n')
         "
@@ -332,22 +373,16 @@ jobs:
         persist-credentials: false
 
     - name: Setup R
-      uses: r-lib/actions/setup-r@e9b180e5e562cb7feb32abcc96c31f4d2a6c2a61 # v2.12.0
+      uses: r-lib/actions/setup-r@v2
       with:
+        r-version: '4.3.0' # Standardized R version
         use-public-rspm: true
-
-    - name: Setup R dependencies
-      uses: r-lib/actions/setup-r-dependencies@e9b180e5e562cb7feb32abcc96c31f4d2a6c2a61 # v2.12.0
-      with:
-        extra-packages: |
-          any::lintr
-          any::goodpractice
 
     - name: Security-focused linting
       run: |
         Rscript -e "
         library(lintr)
-        
+
         # Define security-focused linters
         security_linters <- linters_with_defaults(
           # Check for potential security issues
@@ -372,19 +407,19 @@ jobs:
           no_tab_linter(),      # Avoid tabs for consistency
           trailing_whitespace_linter()  # Clean code
         )
-        
+
         # Run security linting
         lint_results <- lint_package(linters = security_linters)
-        
+
         if (length(lint_results) > 0) {
           print(lint_results)
           cat('\\n', length(lint_results), 'potential issues found.\\n')
-          
+
           # Count security-specific issues
-          security_issues <- grep('system|shell|setwd|Sys.setenv|eval|parse|source|file.remove|unlink', 
-                                 sapply(lint_results, function(x) x\$message), 
+          security_issues <- grep('system|shell|setwd|Sys.setenv|eval|parse|source|file.remove|unlink',
+                                 sapply(lint_results, function(x) x\$message),
                                  ignore.case = TRUE)
-          
+
           if (length(security_issues) > 0) {
             cat('\\n', length(security_issues), 'SECURITY-RELATED issues found!\\n')
             quit(status = 1)
@@ -399,7 +434,7 @@ jobs:
       run: |
         Rscript -e "
         library(goodpractice)
-        
+
         # Run good practices check focusing on security aspects
         gp_results <- gp(checks = c(
           'cyclocomp',                     # High complexity can hide security issues
@@ -407,7 +442,7 @@ jobs:
           'no_export_pattern',             # Be explicit about exports
           'truefalse_not_tf'              # Use TRUE/FALSE not T/F
         ))
-        
+
         print(gp_results)
         "
       continue-on-error: true
@@ -427,17 +462,10 @@ jobs:
         persist-credentials: false
 
     - name: Setup R for SBOM
-      uses: r-lib/actions/setup-r@e9b180e5e562cb7feb32abcc96c31f4d2a6c2a61 # v2.12.0
+      uses: r-lib/actions/setup-r@v2
       with:
+        r-version: '4.3.0' # Standardized R version
         use-public-rspm: true
-
-    - name: Setup dependencies for SBOM
-      uses: r-lib/actions/setup-r-dependencies@e9b180e5e562cb7feb32abcc96c31f4d2a6c2a61 # v2.12.0
-      with:
-        extra-packages: |
-          any::desc
-          any::jsonlite
-          any::pkgdepends
 
     - name: Generate SBOM (Software Bill of Materials)
       run: |
@@ -446,22 +474,23 @@ jobs:
         library(desc)
         library(jsonlite)
         library(pkgdepends)
-        
+        library(uuid)
+
         desc_obj <- desc::desc()
-        
+
         # Get all dependencies with versions
         deps <- desc_obj\$get_deps()
-        
+
         # Try to resolve actual versions
         pd <- new_pkg_deps(desc_obj\$get('Package')[[1]])
         pd\$solve()
         solution <- pd\$get_solution()
-        
+
         # Create SBOM in CycloneDX format
         sbom <- list(
           bomFormat = 'CycloneDX',
           specVersion = '1.5',
-          serialNumber = paste0('urn:uuid:', uuid::UUIDgenerate()),
+          serialNumber = paste0('urn:uuid:', UUIDgenerate()),
           version = 1,
           metadata = list(
             timestamp = format(Sys.time(), '%Y-%m-%dT%H:%M:%SZ'),
@@ -501,13 +530,13 @@ jobs:
             )
           )
         )
-        
+
         write_json(sbom, 'r-package-sbom.json', auto_unbox = TRUE, pretty = TRUE)
         cat('\\nSBOM generated successfully.\\n')
         "
 
     - name: Upload SBOM
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
       with:
         name: r-package-sbom
         path: r-package-sbom.json
@@ -515,8 +544,8 @@ jobs:
 
     - name: Dependency Review (PR only)
       if: github.event_name == 'pull_request'
-      uses: actions/dependency-review-action@v4
+      uses: actions/dependency-review-action@4081bf99e2866ebe428fc0477b69eb4fcda7220a # v4.4.0
       with:
         vulnerability-check: true
         license-check: true
-        fail-on-severity: high 
+        fail-on-severity: high

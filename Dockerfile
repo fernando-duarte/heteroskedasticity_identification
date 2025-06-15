@@ -87,6 +87,18 @@ RUN --mount=type=cache,target=/var/cache/R/packages \
           if (!require('remotes', quietly = TRUE)) install.packages('remotes', lib = '/usr/local/lib/R/site-library'); \
           remotes::install_deps('.', dependencies = TRUE, lib = '/usr/local/lib/R/site-library')"
 
+# Install security scanning tools (oysteR) for vulnerability checks
+RUN --mount=type=cache,target=/var/cache/R/packages \
+    R -e "options(repos = 'https://cloud.r-project.org/'); \
+          .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
+          if (!require('oysteR', quietly = TRUE)) install.packages('oysteR', lib = '/usr/local/lib/R/site-library'); \
+          library(oysteR); \
+          audit_results <- audit_installed_r_pkgs(verbose = FALSE); \
+          if (nrow(get_vulnerabilities(audit_results)) > 0) { \
+            print(get_vulnerabilities(audit_results)); \
+            warning('Security vulnerabilities found in dependencies!'); \
+          }"
+
 # Copy source code and build package
 COPY . .
 

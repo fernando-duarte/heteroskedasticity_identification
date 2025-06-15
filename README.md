@@ -212,15 +212,15 @@ The package supports both asymptotic and finite sample standard errors through t
 ```r
 # Asymptotic standard errors (default, matches Stata's ivreg2h)
 result_asymp <- run_single_lewbel_simulation(
-  sim_id = 1, 
-  params = params, 
+  sim_id = 1,
+  params = params,
   df_adjust = "asymptotic"
 )
 
 # Finite sample standard errors (matches R's lm())
 result_finite <- run_single_lewbel_simulation(
-  sim_id = 1, 
-  params = params, 
+  sim_id = 1,
+  params = params,
   df_adjust = "finite"
 )
 

@@ -13,6 +13,7 @@ amd
 api
 arg
 args
+asymp
 attr
 autoupdate
 availableCores
@@ -50,6 +51,7 @@ covr
 cran
 CRAN
 CRAN's
+crit
 csv
 Customizations
 dependabot
@@ -125,9 +127,11 @@ http
 https
 IDEs
 idx
+ifelse
 iiv
 iIV
 IIV
+infty
 integrations
 intercep
 internalInstruments
@@ -185,6 +189,7 @@ ncol
 neq
 neurogenomics
 nExported
+nFinite
 nGenerating
 nMain
 nnewline
@@ -227,6 +232,7 @@ png
 pnorm
 pre
 Pre
+qnorm
 pre-commit
 prebuild
 precommit
@@ -325,6 +331,7 @@ undebug
 Underidentification
 unlink
 unlist
+unname
 unsetenv
 usr
 vcov
@@ -338,6 +345,7 @@ wordlist
 WORDLIST
 writeLines
 WSL
+X'X
 Xcode
 xend
 xintercept

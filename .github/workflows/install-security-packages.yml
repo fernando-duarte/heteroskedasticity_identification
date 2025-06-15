@@ -1,0 +1,68 @@
+name: Install Security Packages
+
+on:
+  workflow_call:
+    outputs:
+      cache-hit:
+        description: 'Whether cache was hit'
+        value: ${{ jobs.install.outputs.cache-hit }}
+
+jobs:
+  install:
+    runs-on: ubuntu-22.04 # Consistent with r-security.yml
+    outputs:
+      cache-hit: ${{ steps.cache.outputs.cache-hit }}
+    steps:
+      - name: Checkout repository # Needed for hashFiles('DESCRIPTION')
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      
+      - name: Setup R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.3.0' # From guide
+          use-public-rspm: true
+
+      - name: Get R major.minor version # For cache key consistency
+        id: r-version-string
+        run: |
+          echo "version=$(Rscript -e "v <- getRversion(); cat(v\$major, v\$minor, sep='.')")" >> $GITHUB_OUTPUT
+        shell: bash
+
+      - name: Cache R packages
+        id: cache
+        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+        with:
+          path: |
+            ${{ env.R_LIBS_USER }}
+            ~/.cache/R # As per guide
+          key: security-r-${{ runner.os }}-${{ steps.r-version-string.outputs.version }}-${{ hashFiles('DESCRIPTION') }}-v2 # Key from guide, using major.minor R version
+          restore-keys: |
+            security-r-${{ runner.os }}-${{ steps.r-version-string.outputs.version }}-
+            security-r-${{ runner.os }}-
+
+      - name: Install security packages
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          # Core packages
+          install.packages(c("desc", "jsonlite", "lintr", "pkgdepends", "uuid"))
+          
+          # Install remotes for GitHub packages
+          if (!requireNamespace("remotes", quietly = TRUE)) {
+            install.packages("remotes")
+          }
+          
+          # Install oysteR from GitHub
+          remotes::install_github("sonatype-nexus-community/oysteR")
+          
+          # Install goodpractice
+          install.packages("goodpractice")
+          
+          # Verify installations
+          pkgs_to_verify <- c("oysteR", "desc", "jsonlite", "lintr", "goodpractice", "pkgdepends", "uuid")
+          for (pkg in pkgs_to_verify) {
+            if (!requireNamespace(pkg, quietly = TRUE)) {
+              stop(paste("Failed to install or verify package:", pkg))
+            }
+          }
+          cat("All security packages installed successfully\n")
+        shell: Rscript {0} 

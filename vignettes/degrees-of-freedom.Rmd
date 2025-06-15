@@ -50,7 +50,7 @@ params <- list(
 result_asymp <- run_single_lewbel_simulation(
   sim_id = 1,
   params = params,
-  df_adjust = "asymptotic"  # This is the default
+  df_adjust = "asymptotic" # This is the default
 )
 
 # Display results
@@ -78,10 +78,11 @@ cat("TSLS SE:", result_finite$tsls_se, "\n")
 
 # Calculate the adjustment factor
 n <- params$sample_size
-k <- 3  # intercept + 2 regressors
+k <- 3 # intercept + 2 regressors
 adjustment_factor <- sqrt(n / (n - k))
 cat("\nAdjustment factor:", adjustment_factor, "\n")
-cat("Ratio finite/asymptotic:", result_finite$tsls_se / result_asymp$tsls_se, "\n")
+cat("Ratio finite/asymptotic:",
+    result_finite$tsls_se / result_asymp$tsls_se, "\n")
 ```
 
 ## Impact on Confidence Intervals

@@ -8,6 +8,8 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  release:
+    types: [published]
 
 # Set workflow-level permissions to read-only by default for security
 permissions:
@@ -39,13 +41,16 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      # Enable CRAN incoming checks for release workflows
+      _R_CHECK_CRAN_INCOMING_: ${{ github.event_name == 'release' && 'true' || 'false' }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           # Security: Only fetch what's needed
           fetch-depth: 1
+          persist-credentials: false
 
       - name: Setup Pandoc
         uses: r-lib/actions/setup-pandoc@v2

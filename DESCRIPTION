@@ -27,13 +27,21 @@ Imports:
 Suggests:
     covr,
     curl (>= 5.0.0),
+    desc,
+    goodpractice,
     haven,
     ivreg,
+    jsonlite,
     knitr,
+    licenses,
+    lintr,
+    oysteR,
+    pkgdepends,
     REndo (>= 2.4.0),
     rmarkdown,
     RStata,
     testthat (>= 3.0.0),
+    uuid,
     withr
 VignetteBuilder:
     knitr

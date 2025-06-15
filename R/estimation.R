@@ -11,9 +11,9 @@
 #'   (default: FALSE).
 #' @param b_reps Integer. Number of bootstrap replications if compute_se = TRUE
 #'   (default: 100).
-#' @param df_adjust Character. Degrees of freedom adjustment: "asymptotic" (default)
-#'   or "finite". Note: This parameter currently only affects the interpretation
-#'   of bootstrap SEs, not the bounds calculation itself.
+#' @param df_adjust Character. Degrees of freedom adjustment: "asymptotic"
+#'   (default) or "finite". Note: This parameter currently only affects the
+#'   interpretation of bootstrap SEs, not the bounds calculation itself.
 #'
 #' @details
 #' Under the relaxed assumption
@@ -133,8 +133,8 @@ calculate_lewbel_bounds <- function(data,
 #'   (default: FALSE).
 #' @param return_models Logical. Whether to return the fitted model objects
 #'   (default: FALSE).
-#' @param df_adjust Character. Degrees of freedom adjustment: "asymptotic" (default)
-#'   or "finite". Affects standard errors and confidence intervals.
+#' @param df_adjust Character. Degrees of freedom adjustment: "asymptotic"
+#'   (default) or "finite". Affects standard errors and confidence intervals.
 #'
 #' @return If return_models = FALSE: A data.frame with one row containing
 #'   simulation results including OLS and 2SLS estimates, coverage indicators,
@@ -210,12 +210,14 @@ run_single_lewbel_simulation <- function(sim_id,
         # Extract SE with df adjustment
         all_se <- extract_se_lm(ols_model, df_adjust = df_adjust)
         ols_se <- all_se[endog_var]
-        
+
         # Get critical value
         n <- nobs(ols_model)
         k <- length(coef(ols_model))
-        crit_val <- get_critical_value(n, k, alpha = 0.05, df_adjust = df_adjust)
-        
+        crit_val <- get_critical_value(
+          n, k, alpha = 0.05, df_adjust = df_adjust
+        )
+
         ols_covers <- (params$gamma1 >= ols_est - crit_val * ols_se &&
           params$gamma1 <= ols_est + crit_val * ols_se)
       }
@@ -307,12 +309,14 @@ run_single_lewbel_simulation <- function(sim_id,
             # Extract SE with df adjustment
             all_se <- extract_se_ivreg(tsls_model, df_adjust = df_adjust)
             tsls_se <- all_se[endog_var]
-            
+
             # Get critical value
             n <- nobs(tsls_model)
             k <- length(coef(tsls_model))
-            crit_val <- get_critical_value(n, k, alpha = 0.05, df_adjust = df_adjust)
-            
+            crit_val <- get_critical_value(
+              n, k, alpha = 0.05, df_adjust = df_adjust
+            )
+
             tsls_covers <- (params$gamma1 >= tsls_est - crit_val * tsls_se &&
               params$gamma1 <= tsls_est + crit_val * tsls_se)
           }
