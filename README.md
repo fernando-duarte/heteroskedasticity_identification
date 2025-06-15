@@ -5,6 +5,8 @@
 [![Docker Build and Test](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/docker.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/docker.yml)
 [![pkgdown](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/pkgdown.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/pkgdown.yml)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![Codecov test coverage](https://codecov.io/gh/fernando-duarte/heteroskedasticity_identification/graph/badge.svg)](https://app.codecov.io/gh/fernando-duarte/heteroskedasticity_identification)
+[![Security Checks](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/r-security.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/r-security.yml)
 <!-- badges: end -->
 
 ## Overview
@@ -308,6 +310,27 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for deta
 - Coding standards
 - How to submit pull requests
 - Setting up your development environment
+
+### Security Setup for Contributors
+
+This repository uses automated security scanning with `oysteR` to check for vulnerabilities in R package dependencies. To avoid rate limiting issues when running security checks:
+
+1. **Register for OSS Index credentials** (free):
+   - Go to https://ossindex.sonatype.org/
+   - Create an account
+   - Get your API token from User Settings
+
+2. **For local development**, add to your `.Renviron`:
+   ```
+   OSSINDEX_USER=your-email@example.com
+   OSSINDEX_TOKEN=your-api-token
+   ```
+
+3. **For GitHub Actions** (maintainers only):
+   - Add `OSSINDEX_USER` and `OSSINDEX_TOKEN` as repository secrets
+   - Go to Settings → Secrets and variables → Actions
+
+See [.github/SECURITY_IMPROVEMENTS_2025.md](.github/SECURITY_IMPROVEMENTS_2025.md) for detailed information about our security practices.
 
 ## Research Focus
 

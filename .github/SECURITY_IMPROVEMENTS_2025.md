@@ -134,4 +134,4 @@ If you suspect a security incident:
 ---
 
 *Last Updated: June 2025*
-*Security Contact: [Insert your security contact]* 
+*Security Contact: [Insert your security contact]*

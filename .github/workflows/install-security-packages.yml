@@ -35,7 +35,7 @@ jobs:
           path: |
             ${{ env.R_LIBS_USER }}
             ~/.cache/R # As per guide
-          key: security-r-${{ runner.os }}-${{ steps.r-version-string.outputs.version }}-${{ hashFiles('DESCRIPTION') }}-v2 # Key from guide, using major.minor R version
+          key: security-r-${{ runner.os }}-${{ steps.r-version-string.outputs.version }}-${{ hashFiles('DESCRIPTION') }}-v3 # Bump cache version to match r-security.yml
           restore-keys: |
             security-r-${{ runner.os }}-${{ steps.r-version-string.outputs.version }}-
             security-r-${{ runner.os }}-
@@ -49,7 +49,7 @@ jobs:
         run: |
           # Core packages
           install.packages(c("desc", "jsonlite", "lintr", "pkgdepends", "uuid"))
-          
+
           # Install pak for better package management (2025 recommended approach)
           if (!requireNamespace("pak", quietly = TRUE)) {
             install.packages("pak", repos = sprintf(
@@ -59,7 +59,7 @@ jobs:
               R.Version()$arch
             ))
           }
-          
+
           # Configure OSS Index authentication for oysteR if credentials are available
           if (Sys.getenv("OSSINDEX_USER") != "" && Sys.getenv("OSSINDEX_TOKEN") != "") {
             message("OSS Index credentials detected. oysteR will use authenticated requests.")
