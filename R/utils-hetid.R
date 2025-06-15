@@ -130,6 +130,12 @@ ensure_stata_packages <- function() {
 }
 
 #' Generate consistent test data for all comparisons
+#'
+#' @param n Integer. Number of observations to generate (default: 1000).
+#' @param seed Integer. Random seed for reproducibility (default: 42).
+#'
+#' @return A data.frame with test data for Lewbel identification.
+#'
 #' @export
 generate_hetid_test_data <- function(n = 1000, seed = 42) {
   set.seed(seed)

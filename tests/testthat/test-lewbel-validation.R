@@ -5,7 +5,7 @@ library(AER)
 test_that("hetid methods work with pre-generated lewbel_sim data", {
   withr::with_seed(1, {
     # Load built-in test data
-    load("../../data/lewbel_sim.rda")
+    data("lewbel_sim", package = "hetid", envir = environment())
 
     # lewbel_sim has columns: id, y, P, X1, X2
     # where P is endogenous, X1 and X2 are exogenous

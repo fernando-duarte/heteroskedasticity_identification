@@ -51,8 +51,21 @@ jobs:
             install.packages("remotes")
           }
           
-          # Install oysteR from GitHub
-          remotes::install_github("sonatype-nexus-community/oysteR")
+          # Install oysteR - try from GitHub without auth, fall back to CRAN if available
+          tryCatch({
+            # Clear any existing PAT to avoid authentication issues
+            Sys.unsetenv("GITHUB_PAT")
+            Sys.unsetenv("GITHUB_TOKEN")
+            remotes::install_github("sonatype-nexus-community/oysteR", auth_token = "")
+          }, error = function(e) {
+            message("Failed to install oysteR from GitHub, trying CRAN...")
+            tryCatch({
+              install.packages("oysteR")
+            }, error = function(e2) {
+              # If not on CRAN, try GitHub again without auth requirement
+              remotes::install_github("sonatype-nexus-community/oysteR", upgrade = "never", auth_token = "")
+            })
+          })
           
           # Install goodpractice
           install.packages("goodpractice")

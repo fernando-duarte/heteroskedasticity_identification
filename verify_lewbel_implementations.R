@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 # ============================================================================
 # Verification Script for Lewbel Implementation Differences
-# 
+#
 # This script verifies the claims made in lewbel_implementations_comparison.tex
 # about differences between hetid, REndo, and Stata implementations
 # ============================================================================
@@ -110,7 +110,7 @@ if (!is.null(overid_model)) {
   se_overid <- sqrt(diag(vcov(overid_model)))["P"]
   cat("   Overidentified model coefficient:", round(coef_overid, 6), "\n")
   cat("   Overidentified model SE:", round(se_overid, 6), "\n")
-  
+
   # Sargan test
   summ <- summary(overid_model, diagnostics = TRUE)
   if ("diagnostics" %in% names(summ) && "Sargan" %in% rownames(summ$diagnostics)) {
@@ -143,18 +143,18 @@ if ("internalInstruments" %in% names(rendo_model)) {
 
 if (!is.null(rendo_iv_extracted)) {
   if (is.matrix(rendo_iv_extracted) || is.data.frame(rendo_iv_extracted)) {
-    cat("Instrument matrix dimensions:", 
+    cat("Instrument matrix dimensions:",
         nrow(rendo_iv_extracted), "x", ncol(rendo_iv_extracted), "\n")
     # Usually the generated instrument is the last column
     gen_iv <- rendo_iv_extracted[, ncol(rendo_iv_extracted)]
   } else {
     gen_iv <- rendo_iv_extracted
   }
-  
+
   cat("\nComparing extracted REndo instrument with our constructions:\n")
-  cat("  Correlation with standard Lewbel IV:", 
+  cat("  Correlation with standard Lewbel IV:",
       round(cor(as.numeric(gen_iv), lewbel_iv), 4), "\n")
-  cat("  Correlation with reverse regression IV:", 
+  cat("  Correlation with reverse regression IV:",
       round(cor(as.numeric(gen_iv), rendo_iv_manual), 4), "\n")
 }
 
@@ -191,7 +191,7 @@ rendo_weak <- suppressWarnings(
 cat("\nWith weak heteroskedasticity (delta_het = 0.1):\n")
 cat("  Standard Lewbel SE:", round(sqrt(diag(vcov(manual_weak)))["P"], 6), "\n")
 cat("  REndo SE:", round(sqrt(diag(vcov(rendo_weak)))["P"], 6), "\n")
-cat("  SE ratio:", round(sqrt(diag(vcov(rendo_weak)))["P"] / 
+cat("  SE ratio:", round(sqrt(diag(vcov(rendo_weak)))["P"] /
                         sqrt(diag(vcov(manual_weak)))["P"], 2), "x larger\n")
 
 # -----------------------------------------------------------------------------
@@ -201,14 +201,14 @@ cat("\n6. SUMMARY OF FINDINGS\n")
 cat("---------------------\n")
 
 summary_table <- data.frame(
-  Method = c("True value", "Standard Lewbel", "REndo hetErrorsIV", 
+  Method = c("True value", "Standard Lewbel", "REndo hetErrorsIV",
              "Overidentified (manual)", "Weak het - Lewbel", "Weak het - REndo"),
-  Coefficient = c(params$gamma1, coef_manual, coef_rendo, 
+  Coefficient = c(params$gamma1, coef_manual, coef_rendo,
                   ifelse(!is.null(overid_model), coef_overid, NA),
                   coef(manual_weak)["P"], coef(rendo_weak)["P"]),
-  Std_Error = c(NA, se_manual, se_rendo, 
+  Std_Error = c(NA, se_manual, se_rendo,
                 ifelse(!is.null(overid_model), se_overid, NA),
-                sqrt(diag(vcov(manual_weak)))["P"], 
+                sqrt(diag(vcov(manual_weak)))["P"],
                 sqrt(diag(vcov(rendo_weak)))["P"])
 )
 

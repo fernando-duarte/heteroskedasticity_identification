@@ -24,7 +24,8 @@ create_default_config(
   alpha2 = 1,
   tau_set_id = 0.2,
   endog_var_name = "Y2",
-  exog_var_names = "Xk"
+  exog_var_names = "Xk",
+  df_adjust = "asymptotic"
 )
 }
 \arguments{
@@ -81,6 +82,9 @@ analysis (default: c(0.4, 0.8, 1.2)).}
 
 \item{exog_var_names}{Character. Name of exogenous variable
 (default: "Xk").}
+
+\item{df_adjust}{Character. Degrees of freedom adjustment method
+(default: "asymptotic"). Options: "asymptotic", "finite".}
 }
 \value{
 A list containing all configuration parameters.

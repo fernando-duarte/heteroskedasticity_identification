@@ -6,6 +6,14 @@
 \usage{
 generate_hetid_test_data(n = 1000, seed = 42)
 }
+\arguments{
+\item{n}{Integer. Number of observations to generate (default: 1000).}
+
+\item{seed}{Integer. Random seed for reproducibility (default: 42).}
+}
+\value{
+A data.frame with test data for Lewbel identification.
+}
 \description{
 Generate consistent test data for all comparisons
 }

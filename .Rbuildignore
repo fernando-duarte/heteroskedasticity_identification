@@ -190,3 +190,15 @@
 ^vignettes/.*_cache$
 ^vignettes/figure$
 ^yarn\.lock$
+^CLAUDE\.md$
+^RENDO_COMPARISON_REPORT\.md$
+^RENDO_MATCHING_SUMMARY\.md$
+^REPLICATION_RESULTS\.md$
+^STATA_COMPARISON_REPORT\.md$
+^VALIDATION_COMPLETE\.md$
+^VALIDATION_IMPLEMENTATION_SUMMARY\.md$
+^WORKFLOWS\.md$
+^lewbel_implementations_comparison\.tex$
+^lewbel_methods_summary\.tex$
+^validate_hetid\.md$
+^verify_lewbel_implementations\.R$
