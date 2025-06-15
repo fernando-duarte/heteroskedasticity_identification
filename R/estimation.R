@@ -4,6 +4,8 @@
 #' a relaxed covariance restriction. Optionally computes bootstrap standard
 #' errors for the bounds.
 #'
+#' @importFrom stats coef lm nobs qnorm qt residuals vcov as.formula cov var sd
+#'
 #' @param data Data.frame. Dataset containing Y1, Y2, Xk, Z variables.
 #' @param tau Numeric. Relaxation parameter for covariance restriction
 #'   (0 <= tau < 1). When tau = 0, gives point identification.
@@ -202,8 +204,8 @@ run_single_lewbel_simulation <- function(sim_id,
       )
 
       if (is.null(ols_model)) {
-        ols_est <- NA
-        ols_se <- NA
+        ols_est <- NA_real_
+        ols_se <- NA_real_
         ols_covers <- NA
       } else {
         ols_est <- stats::coef(ols_model)[endog_var]
@@ -251,10 +253,10 @@ run_single_lewbel_simulation <- function(sim_id,
 
       # Check for invalid instrument
       if (any(is.na(lewbel_iv)) || stats::sd(lewbel_iv, na.rm = TRUE) < 1e-10) {
-        tsls_est <- NA
-        tsls_se <- NA
+        tsls_est <- NA_real_
+        tsls_se <- NA_real_
         tsls_covers <- NA
-        first_stage_f <- NA
+        first_stage_f <- NA_real_
       } else {
         # First-stage regression for F-statistic
         df$lewbel_iv <- lewbel_iv
@@ -269,7 +271,7 @@ run_single_lewbel_simulation <- function(sim_id,
         )
 
         if (is.null(first_stage)) {
-          first_stage_f <- NA
+          first_stage_f <- NA_real_
         } else {
           first_stage_f <- summary(first_stage)$fstatistic[1]
         }
@@ -287,8 +289,8 @@ run_single_lewbel_simulation <- function(sim_id,
         )
 
         if (is.null(tsls_model)) {
-          tsls_est <- NA
-          tsls_se <- NA
+          tsls_est <- NA_real_
+          tsls_se <- NA_real_
           tsls_covers <- NA
         } else {
           tsls_coef <- tryCatch(
@@ -301,8 +303,8 @@ run_single_lewbel_simulation <- function(sim_id,
           )
 
           if (is.na(tsls_coef) || is.null(tsls_summary)) {
-            tsls_est <- NA
-            tsls_se <- NA
+            tsls_est <- NA_real_
+            tsls_se <- NA_real_
             tsls_covers <- NA
           } else {
             tsls_est <- tsls_coef
@@ -381,23 +383,24 @@ run_single_lewbel_simulation <- function(sim_id,
     },
     error = function(e) {
       # Return a row with NA values if entire function fails
+      # Ensure NA values have correct types
       results_df <- data.frame(
         sim_id = sim_id,
         sample_size = params$sample_size,
         delta_het = params$delta_het,
-        ols_gamma1 = NA,
-        tsls_gamma1 = NA,
-        ols_se = NA,
-        tsls_se = NA,
+        ols_gamma1 = NA_real_,
+        tsls_gamma1 = NA_real_,
+        ols_se = NA_real_,
+        tsls_se = NA_real_,
         ols_coverage = NA,
         tsls_coverage = NA,
-        first_stage_F = NA,
-        bound_lower_tau0 = NA,
-        bound_upper_tau0 = NA,
-        bound_lower_tau_set = NA,
-        bound_upper_tau_set = NA,
-        bound_se_lower = NA,
-        bound_se_upper = NA,
+        first_stage_F = NA_real_,
+        bound_lower_tau0 = NA_real_,
+        bound_upper_tau0 = NA_real_,
+        bound_lower_tau_set = NA_real_,
+        bound_upper_tau_set = NA_real_,
+        bound_se_lower = NA_real_,
+        bound_se_upper = NA_real_,
         df_adjust = df_adjust
       )
 

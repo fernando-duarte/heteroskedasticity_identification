@@ -22,7 +22,6 @@ Imports:
     future,
     ggplot2,
     purrr,
-    rlang,
     stats,
     tidyr
 Suggests:

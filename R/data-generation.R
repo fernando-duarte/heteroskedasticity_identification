@@ -64,9 +64,13 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
       stop("For n_x > 1, beta1_1 and beta2_1 must be vectors of length n_x")
     }
   } else {
-    # Ensure scalar parameters are treated as length-1 vectors
-    params$beta1_1 <- rep(params$beta1_1, 1)
-    params$beta2_1 <- rep(params$beta2_1, 1)
+    # Ensure scalar parameters are treated as length-1 vectors for consistency
+    if (length(params$beta1_1) == 1) {
+      params$beta1_1 <- as.numeric(params$beta1_1)
+    }
+    if (length(params$beta2_1) == 1) {
+      params$beta2_1 <- as.numeric(params$beta2_1)
+    }
   }
 
   # Generate exogenous variables

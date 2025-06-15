@@ -68,6 +68,8 @@ generate_seed_matrix <- function(base_seed, n_experiments, n_reps_each) {
 #'   (default: "Y2").
 #' @param exog_var_names Character. Name of exogenous variable
 #'   (default: "Xk").
+#' @param df_adjust Character. Degrees of freedom adjustment method
+#'   (default: "asymptotic"). Options: "asymptotic", "finite".
 #'
 #' @return A list containing all configuration parameters.
 #'
@@ -103,7 +105,8 @@ create_default_config <- function(num_simulations = 200,
                                   alpha2 = 1.0,
                                   tau_set_id = 0.2,
                                   endog_var_name = "Y2",
-                                  exog_var_names = "Xk") {
+                                  exog_var_names = "Xk",
+                                  df_adjust = "asymptotic") {
   list(
     # Simulation Controls
     num_simulations = num_simulations,
@@ -138,7 +141,10 @@ create_default_config <- function(num_simulations = 200,
 
     # Auxiliary simulation controls
     n_reps_by_n = n_reps_by_n,
-    n_reps_by_delta = n_reps_by_delta
+    n_reps_by_delta = n_reps_by_delta,
+
+    # Statistical inference controls
+    df_adjust = df_adjust
   )
 }
 
