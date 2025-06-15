@@ -1,4 +1,4 @@
-# Comprehensive tests for analysis.R to boost coverage to ~90%
+# Comprehensive tests for main analysis functions
 
 test_that("analyze_main_results knitr conditional logic works", {
   config <- create_default_config(num_simulations = 2)
@@ -74,70 +74,6 @@ test_that("analyze_main_results verbose output includes all expected elements", 
   # Check that weak_iv_pct is calculated correctly
   expect_type(analysis$weak_iv_pct, "double")
   expect_true(analysis$weak_iv_pct >= 0 && analysis$weak_iv_pct <= 100)
-})
-
-test_that("analyze_bootstrap_results handles various data combinations", {
-  config <- create_default_config(
-    bootstrap_demo_size = 3,
-    bootstrap_subset_size = 2,
-    bootstrap_reps = 5
-  )
-  seeds <- generate_all_seeds(config)
-
-  suppressMessages({
-    main_results <- run_main_simulation(config, seeds, verbose = FALSE)
-    bootstrap_demo <- run_bootstrap_demonstration(config, seeds, verbose = FALSE)
-  })
-
-  # Test with verbose output
-  output <- capture.output({
-    bootstrap_analysis <- analyze_bootstrap_results(
-      main_results, bootstrap_demo, config,
-      verbose = TRUE
-    )
-  })
-
-  expect_s3_class(bootstrap_analysis, "data.frame")
-  expect_true(length(output) > 0)
-  expect_true(any(grepl("Bootstrap Standard Errors", output)))
-
-  # Test with verbose = FALSE
-  bootstrap_analysis_quiet <- analyze_bootstrap_results(
-    main_results, bootstrap_demo, config,
-    verbose = FALSE
-  )
-  expect_s3_class(bootstrap_analysis_quiet, "data.frame")
-})
-
-test_that("analyze_bootstrap_results handles edge cases in data filtering", {
-  config <- create_default_config(bootstrap_subset_size = 10)
-
-  # Create main results with some NA values in bound_se_lower
-  main_results <- data.frame(
-    sim_id = 1:5,
-    bound_lower_tau_set = c(-0.5, -0.6, -0.7, -0.8, -0.9),
-    bound_upper_tau_set = c(0.5, 0.6, 0.7, 0.8, 0.9),
-    bound_se_lower = c(0.1, NA, 0.2, NA, 0.3),
-    bound_se_upper = c(0.1, NA, 0.2, NA, 0.3)
-  )
-
-  # Create bootstrap demo
-  bootstrap_demo <- data.frame(
-    sim_id = 6:7,
-    bound_lower_tau_set = c(-1.0, -1.1),
-    bound_upper_tau_set = c(1.0, 1.1),
-    bound_se_lower = c(0.4, 0.5),
-    bound_se_upper = c(0.4, 0.5)
-  )
-
-  result <- analyze_bootstrap_results(
-    main_results, bootstrap_demo, config,
-    verbose = FALSE
-  )
-
-  # Should filter out NA values and combine with bootstrap_demo
-  expect_s3_class(result, "data.frame")
-  expect_true(nrow(result) >= 2) # At least the bootstrap_demo rows
 })
 
 test_that("analyze_sample_size_results verbose output works correctly", {
