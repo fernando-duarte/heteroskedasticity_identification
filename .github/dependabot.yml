@@ -30,7 +30,6 @@ updates:
       security-actions:
         patterns:
           - "aquasecurity/*"
-          - "github/codeql-action"
       artifact-actions:
         patterns:
           - "actions/upload-artifact"

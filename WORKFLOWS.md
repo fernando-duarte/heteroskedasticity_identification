@@ -9,7 +9,7 @@ The `hetid` package uses a comprehensive CI/CD pipeline to ensure code quality, 
 - ✅ Test the package across multiple operating systems and R versions
 - 🐳 Build and test Docker containers
 - 📖 Generate and deploy documentation
-- 🔒 Perform security analysis
+- 🔒 Perform Docker security scanning
 - 🔄 Maintain up-to-date dependencies
 
 ## Workflow Files
@@ -82,27 +82,20 @@ The `hetid` package uses a comprehensive CI/CD pipeline to ensure code quality, 
 2. Uploads as artifact
 3. Deploys to GitHub Pages environment
 
-### 4. Security Analysis Workflow (`codeql.yml`)
+### 4. Docker Security Scanning
 
-**Purpose**: Perform comprehensive security analysis on code and configurations.
-
-**Triggers**:
-- Push to `main`, `master`, or `develop` branches
-- Pull requests to `main` or `master`
-- Weekly schedule (Sundays at 3 AM UTC)
-- Manual workflow dispatch
+**Purpose**: Perform security analysis on Docker configurations and images.
 
 **Key Features**:
-- **CodeQL analysis**: Scans JavaScript/TypeScript code
-- **Dockerfile scanning**: Security analysis of Docker configurations
-- **Workflow scanning**: Checks GitHub Actions workflows for vulnerabilities
-- **Extended security queries**: Uses both security and quality query suites
+- **Dockerfile scanning**: Security analysis of Docker configurations using Trivy
+- **Image vulnerability scanning**: Scans built Docker images for vulnerabilities
 - **SARIF integration**: Results uploaded to GitHub Security tab
+- **Multi-severity scanning**: Checks for CRITICAL, HIGH, and MEDIUM severity issues
 
 **Scan Types**:
-1. **Code analysis**: JavaScript/TypeScript in the repository
-2. **Dockerfile security**: Vulnerability scanning of all Dockerfiles
-3. **Workflow security**: Security analysis of GitHub Actions workflows
+1. **Dockerfile security**: Vulnerability scanning of all Dockerfiles
+2. **Container image scanning**: Security analysis of built Docker images
+3. **Workflow security**: Security analysis of GitHub Actions workflows using Trivy
 
 ## Concurrency Management
 
@@ -131,10 +124,10 @@ This ensures that:
 - Vulnerabilities uploaded to Security tab
 - Scans for CRITICAL, HIGH, and MEDIUM severity issues
 
-### 3. Code Security
-- CodeQL analysis for supported languages
-- Extended security and quality queries
-- Weekly scheduled scans
+### 3. Workflow Security
+- Trivy scanning of GitHub Actions workflows
+- Configuration security analysis
+- Automated vulnerability detection
 
 ## Runner Specifications
 
@@ -147,7 +140,6 @@ All workflows use pinned runner versions for reproducibility:
 | rworkflows | Windows | 2022 |
 | docker | Ubuntu | 22.04 |
 | pkgdown | Ubuntu | 22.04 |
-| codeql | Ubuntu | 22.04 |
 
 ## Secrets and Permissions
 
@@ -176,7 +168,6 @@ Workflows request only necessary permissions:
 The README displays real-time status badges for all workflows:
 - R-CMD-check status
 - Docker build status
-- CodeQL analysis status
 - Documentation deployment status
 
 ## Maintenance

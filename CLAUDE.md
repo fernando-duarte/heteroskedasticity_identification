@@ -182,7 +182,6 @@ future::plan(future::sequential)
 
 - **R-CMD-check**: Multi-platform R package checking (Ubuntu, Windows, macOS)
 - **Docker**: Build, test, security scanning, multi-platform deployment
-- **CodeQL**: Security analysis
 - **pkgdown**: Automated documentation site generation
 
 ## Code Style Requirements

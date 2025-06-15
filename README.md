@@ -3,7 +3,6 @@
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/R-CMD-check.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/R-CMD-check.yml)
 [![Docker Build and Test](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/docker.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/docker.yml)
-[![CodeQL Security Analysis](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/codeql.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/codeql.yml)
 [![pkgdown](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/pkgdown.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/pkgdown.yml)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 <!-- badges: end -->
@@ -66,7 +65,6 @@ heteroskedasticity_identification/
 │   ├── workflows/
 │   │   ├── R-CMD-check.yml   # R package CI/CD
 │   │   ├── docker.yml        # Docker build and security
-│   │   ├── codeql.yml        # Security analysis
 │   │   └── pkgdown.yml       # Documentation site
 │   └── dependabot.yml       # Automated dependency updates
 └── inst/                # Installed files
@@ -147,7 +145,6 @@ The project uses several tools to maintain code quality:
 - **Pre-commit hooks**: Automatically format code, check for issues, and ensure consistency
 - **R CMD check**: Standard R package checks via GitHub Actions
 - **Docker security scanning**: Trivy vulnerability assessment with SARIF integration
-- **CodeQL analysis**: Static security analysis of source code and workflows
 - **Automated dependency updates**: Dependabot for GitHub Actions and Docker images
 - **Code coverage**: Test coverage reporting (to be implemented)
 - **pkgdown**: Automatic documentation website generation

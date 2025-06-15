@@ -2,7 +2,7 @@
 
 # CI/CD Local Simulation Script
 # Simulates the GitHub Actions workflows locally for testing and validation
-# Based on workflows: rworkflows.yml, docker.yml, pkgdown.yml, codeql.yml
+# Based on workflows: rworkflows.yml, docker.yml, pkgdown.yml
 
 set -e  # Exit on any error
 
@@ -242,7 +242,7 @@ simulate_security_scans() {
         return 0
     fi
 
-    print_section "Simulating Security Scans (codeql.yml)"
+    print_section "Simulating Security Scans (Docker Security)"
 
     # Check if trivy is available
     if command_exists trivy; then
