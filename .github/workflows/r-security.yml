@@ -296,6 +296,7 @@ jobs:
 
   license-check:
     name: R License Compatibility Check
+    needs: setup # Added dependency on setup job
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -362,6 +363,7 @@ jobs:
 
   code-quality:
     name: R Code Security Analysis
+    needs: setup # Added dependency on setup job
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -449,6 +451,7 @@ jobs:
 
   supply-chain:
     name: Supply Chain Security
+    needs: setup # Added dependency on setup job
     runs-on: ubuntu-22.04
 
     permissions:
