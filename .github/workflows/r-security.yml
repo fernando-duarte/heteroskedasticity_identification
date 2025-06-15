@@ -313,6 +313,23 @@ jobs:
         r-version: '4.3.0' # Standardized R version
         use-public-rspm: true
 
+    - name: Get R major.minor version
+      id: r-version-string
+      run: |
+        echo "version=$(Rscript -e "v <- getRversion(); cat(v\$major, v\$minor, sep='.')")" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Restore R packages cache
+      uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+      with:
+        path: |
+          ${{ env.R_LIBS_USER }}
+          ~/.cache/R
+        key: security-r-${{ runner.os }}-${{ steps.r-version-string.outputs.version }}-${{ hashFiles('DESCRIPTION') }}-v2
+        restore-keys: |
+          security-r-${{ runner.os }}-${{ steps.r-version-string.outputs.version }}-
+          security-r-${{ runner.os }}-
+
     - name: Install licenses package
       run: install.packages("licenses")
       shell: Rscript {0}
@@ -379,6 +396,23 @@ jobs:
       with:
         r-version: '4.3.0' # Standardized R version
         use-public-rspm: true
+
+    - name: Get R major.minor version
+      id: r-version-string
+      run: |
+        echo "version=$(Rscript -e "v <- getRversion(); cat(v\$major, v\$minor, sep='.')")" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Restore R packages cache
+      uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+      with:
+        path: |
+          ${{ env.R_LIBS_USER }}
+          ~/.cache/R
+        key: security-r-${{ runner.os }}-${{ steps.r-version-string.outputs.version }}-${{ hashFiles('DESCRIPTION') }}-v2
+        restore-keys: |
+          security-r-${{ runner.os }}-${{ steps.r-version-string.outputs.version }}-
+          security-r-${{ runner.os }}-
 
     - name: Security-focused linting
       run: |
@@ -469,6 +503,23 @@ jobs:
       with:
         r-version: '4.3.0' # Standardized R version
         use-public-rspm: true
+
+    - name: Get R major.minor version
+      id: r-version-string
+      run: |
+        echo "version=$(Rscript -e "v <- getRversion(); cat(v\$major, v\$minor, sep='.')")" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: Restore R packages cache
+      uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4.1.2
+      with:
+        path: |
+          ${{ env.R_LIBS_USER }}
+          ~/.cache/R
+        key: security-r-${{ runner.os }}-${{ steps.r-version-string.outputs.version }}-${{ hashFiles('DESCRIPTION') }}-v2
+        restore-keys: |
+          security-r-${{ runner.os }}-${{ steps.r-version-string.outputs.version }}-
+          security-r-${{ runner.os }}-
 
     - name: Generate SBOM (Software Bill of Materials)
       run: |
