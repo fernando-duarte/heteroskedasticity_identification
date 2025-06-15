@@ -127,10 +127,18 @@ calculate_lewbel_bounds <- function(data,
 #'   (default: "Xk").
 #' @param compute_bounds_se Logical. Whether to compute bootstrap SE for bounds
 #'   (default: FALSE).
+#' @param return_models Logical. Whether to return the fitted model objects
+#'   (default: FALSE).
 #'
-#' @return A data.frame with one row containing simulation results including:
-#'   OLS and 2SLS estimates, coverage indicators, first-stage F-statistic,
-#'   and identification bounds.
+#' @return If return_models = FALSE: A data.frame with one row containing 
+#'   simulation results including OLS and 2SLS estimates, coverage indicators, 
+#'   first-stage F-statistic, and identification bounds.
+#'   If return_models = TRUE: A list containing:
+#'   \itemize{
+#'     \item results: The data.frame described above
+#'     \item models: A list with ols_model, first_stage_model, tsls_model
+#'     \item data: The generated data
+#'   }
 #'
 #' @examples
 #' \dontrun{
@@ -144,6 +152,9 @@ calculate_lewbel_bounds <- function(data,
 #'   bootstrap_reps = config$bootstrap_reps
 #' )
 #' result <- run_single_lewbel_simulation(1, params)
+#' 
+#' # With models
+#' result_with_models <- run_single_lewbel_simulation(1, params, return_models = TRUE)
 #' }
 #'
 #' @export
@@ -151,14 +162,15 @@ run_single_lewbel_simulation <- function(sim_id,
                                          params,
                                          endog_var = "Y2",
                                          exog_vars = "Xk",
-                                         compute_bounds_se = FALSE) {
+                                         compute_bounds_se = FALSE,
+                                         return_models = FALSE) {
   # Wrap entire function in tryCatch for robustness
   tryCatch(
     {
       # Generate data
-      # TODO: Update generate_lewbel_data call if its return columns change,
-      # and then update references here (e.g., df$x_k, df$z_var etc.)
-      df <- generate_lewbel_data(params$sample_size, params)
+      # Support multiple X variables if n_x is specified in params
+      n_x <- if (!is.null(params$n_x)) params$n_x else 1
+      df <- generate_lewbel_data(params$sample_size, params, n_x = n_x)
 
       # Create formula strings
       # TODO: Update Y1, endog_var, exog_vars if column names change after
@@ -203,10 +215,20 @@ run_single_lewbel_simulation <- function(sim_id,
         e2_hat <- stats::residuals(second_stage_model)
       }
 
-      # Construct Lewbel instrument
-      # TODO: Update df$Z to df$z_var after R/data-generation.R refactor
-      lewbel_iv <- (df$Z - mean(df$Z)) * e2_hat
+      # Construct Lewbel instrument(s)
+      # Handle both single and multiple X variables
+      if (n_x == 1) {
+        lewbel_iv <- (df$Z - mean(df$Z)) * e2_hat
+      } else {
+        # For multiple X, we can use multiple instruments (one per Z)
+        # For now, use the first Z as in the original implementation
+        lewbel_iv <- (df$Z1 - mean(df$Z1)) * e2_hat
+      }
 
+      # Initialize model variables for return_models
+      first_stage <- NULL
+      tsls_model <- NULL
+      
       # Check for invalid instrument
       if (any(is.na(lewbel_iv)) || stats::sd(lewbel_iv, na.rm = TRUE) < 1e-10) {
         tsls_est <- NA
@@ -290,8 +312,8 @@ run_single_lewbel_simulation <- function(sim_id,
         error = function(e) list(bounds = c(NA, NA), se = c(NA, NA))
       )
 
-      # Return results
-      data.frame(
+      # Prepare results data frame
+      results_df <- data.frame(
         sim_id = sim_id,
         sample_size = params$sample_size,
         delta_het = params$delta_het,
@@ -307,10 +329,25 @@ run_single_lewbel_simulation <- function(sim_id,
         bound_se_lower = bounds_tau_set$se[1],
         bound_se_upper = bounds_tau_set$se[2]
       )
+      
+      # Return results based on return_models parameter
+      if (return_models) {
+        list(
+          results = results_df,
+          models = list(
+            ols_model = ols_model,
+            first_stage_model = first_stage,
+            tsls_model = tsls_model
+          ),
+          data = df
+        )
+      } else {
+        results_df
+      }
     },
     error = function(e) {
       # Return a row with NA values if entire function fails
-      data.frame(
+      results_df <- data.frame(
         sim_id = sim_id,
         sample_size = params$sample_size,
         delta_het = params$delta_het,
@@ -326,6 +363,20 @@ run_single_lewbel_simulation <- function(sim_id,
         bound_se_lower = NA,
         bound_se_upper = NA
       )
+      
+      if (return_models) {
+        list(
+          results = results_df,
+          models = list(
+            ols_model = NULL,
+            first_stage_model = NULL,
+            tsls_model = NULL
+          ),
+          data = NULL
+        )
+      } else {
+        results_df
+      }
     }
   )
 }

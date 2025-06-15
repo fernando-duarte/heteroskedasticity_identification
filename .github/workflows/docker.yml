@@ -131,11 +131,12 @@ jobs:
         echo "Testing image: $IMAGE_NAME"
 
         # Run package tests
+        # Since the package is already installed in the image, we'll test it directly
+        # Mount workspace to access test files if needed
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
-          -w /workspace \
           $IMAGE_NAME \
-          R -e "devtools::test()"
+          bash -c "cd /workspace && R -e \"if (!requireNamespace('devtools', quietly = TRUE)) install.packages('devtools', repos='https://cloud.r-project.org/'); library(hetid); devtools::test()\""
 
     - name: Run R CMD check
       run: |

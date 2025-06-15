@@ -26,9 +26,15 @@ Imports:
     tidyr
 Suggests:
     covr,
+    curl (>= 5.0.0),
+    haven,
+    ivreg,
     knitr,
+    REndo (>= 2.4.0),
     rmarkdown,
-    testthat (>= 3.0.0)
+    RStata,
+    testthat (>= 3.0.0),
+    withr
 VignetteBuilder:
     knitr
 Config/build/vignette-compression: both

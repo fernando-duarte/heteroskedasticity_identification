@@ -9,7 +9,8 @@ run_single_lewbel_simulation(
   params,
   endog_var = "Y2",
   exog_vars = "Xk",
-  compute_bounds_se = FALSE
+  compute_bounds_se = FALSE,
+  return_models = FALSE
 )
 }
 \arguments{
@@ -24,11 +25,20 @@ run_single_lewbel_simulation(
 
 \item{compute_bounds_se}{Logical. Whether to compute bootstrap SE for bounds
 (default: FALSE).}
+
+\item{return_models}{Logical. Whether to return the fitted model objects
+(default: FALSE).}
 }
 \value{
-A data.frame with one row containing simulation results including:
-OLS and 2SLS estimates, coverage indicators, first-stage F-statistic,
-and identification bounds.
+If return_models = FALSE: A data.frame with one row containing
+simulation results including OLS and 2SLS estimates, coverage indicators,
+first-stage F-statistic, and identification bounds.
+If return_models = TRUE: A list containing:
+\itemize{
+\item results: The data.frame described above
+\item models: A list with ols_model, first_stage_model, tsls_model
+\item data: The generated data
+}
 }
 \description{
 Executes a single Monte Carlo simulation run comparing OLS, 2SLS (Lewbel),
@@ -46,6 +56,9 @@ params <- list(
   bootstrap_reps = config$bootstrap_reps
 )
 result <- run_single_lewbel_simulation(1, params)
+
+# With models
+result_with_models <- run_single_lewbel_simulation(1, params, return_models = TRUE)
 }
 
 }
