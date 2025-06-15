@@ -1,4 +1,4 @@
-# Load hetid package
+# Core validation tests for hetid package
 library(hetid)
 library(AER)
 
@@ -146,4 +146,27 @@ test_that("Instrument order invariance holds", {
   
   # Should be identical
   expect_equal(iv1, iv2_reordered, tolerance = 1e-10)
+})
+
+test_that("generate_hetid_test_data creates valid data", {
+  # Test the new helper function
+  data <- generate_hetid_test_data(n = 500, seed = 123)
+  
+  # Check structure
+  expect_true(is.data.frame(data))
+  expect_equal(nrow(data), 500)
+  expect_true(all(c("y", "P", "X1", "Z", "lewbel_iv") %in% names(data)))
+  
+  # Check instrument properties
+  expect_equal(mean(data$lewbel_iv), 0, tolerance = 1e-10)
+  expect_true(var(data$lewbel_iv) > 0)
+  
+  # Check that we can run 2SLS with this data
+  tsls_model <- ivreg(
+    y ~ X1 + P | X1 + lewbel_iv,
+    data = data
+  )
+  
+  expect_s3_class(tsls_model, "ivreg")
+  expect_true(abs(coef(tsls_model)["P"] - (-0.8)) < 0.5)
 })
