@@ -35,6 +35,9 @@ jobs:
   setup: # New setup job from guide
     name: Setup R Environment and Security Tools
     uses: ./.github/workflows/install-security-packages.yml
+    permissions:
+      contents: read
+      actions: write  # Required for cache save operation
     # Permissions for reusable workflow are defined within it or inherited.
 
   dependency-audit:
