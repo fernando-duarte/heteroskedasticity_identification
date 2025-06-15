@@ -99,25 +99,20 @@ jobs:
         cache-to: type=gha,mode=max
         outputs: type=docker,dest=/tmp/${{ matrix.target }}-image.tar
 
-    - name: Save image tag
+    - name: Save image info
+      id: save-image
       run: |
-        echo "${{ steps.meta.outputs.tags }}" | head -n 1 > /tmp/${{ matrix.target }}.tag
-      shell: bash
-
-    - name: Upload image tag artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: image-tag-${{ matrix.target }}
-        path: /tmp/${{ matrix.target }}.tag
-        retention-days: 7
+        TAG=$(echo "${{ steps.meta.outputs.tags }}" | head -n 1)
+        echo "tag=${TAG}" >> $GITHUB_OUTPUT
+        echo "image-file=/tmp/${{ matrix.target }}-image.tar" >> $GITHUB_OUTPUT
 
     - name: Upload image artifact
       uses: actions/upload-artifact@v4
       with:
         name: docker-image-${{ matrix.target }}
         path: /tmp/${{ matrix.target }}-image.tar
-        retention-days: 7
-        compression-level: 6  # Good balance of speed vs size for Docker images
+        retention-days: 1
+        compression-level: 0  # Docker images are already compressed
 
   # Test package functionality in Docker
   docker-test:
@@ -134,19 +129,13 @@ jobs:
         name: docker-image-builder
         path: /tmp
 
-    - name: Download builder image tag artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: image-tag-builder
-        path: /tmp
-
     - name: Load Docker image
-      run: docker load --input /tmp/builder-image.tar
-
-    - name: Get image name for tests
+      run: |
+        docker load --input /tmp/builder-image.tar
+        # Get the loaded image tag
+        IMAGE_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "hetid|heteroskedasticity" | grep builder | head -n 1)
+        echo "TAG_NAME=${IMAGE_TAG}" >> $GITHUB_OUTPUT
       id: image_tag_step
-      run: echo "TAG_NAME=$(cat /tmp/builder.tag)" >> $GITHUB_OUTPUT
-      shell: bash
 
     - name: Run package tests
       env:
@@ -194,19 +183,13 @@ jobs:
         name: docker-image-production
         path: /tmp
 
-    - name: Download production image tag artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: image-tag-production
-        path: /tmp
-
     - name: Load Docker image
-      run: docker load --input /tmp/production-image.tar
-
-    - name: Get image name for production tests
+      run: |
+        docker load --input /tmp/production-image.tar
+        # Get the loaded image tag
+        IMAGE_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "hetid|heteroskedasticity" | grep production | head -n 1)
+        echo "TAG_NAME=${IMAGE_TAG}" >> $GITHUB_OUTPUT
       id: prod_image_tag_step
-      run: echo "TAG_NAME=$(cat /tmp/production.tag)" >> $GITHUB_OUTPUT
-      shell: bash
 
     - name: Test production image
       env:
@@ -262,20 +245,13 @@ jobs:
         name: docker-image-production
         path: /tmp
 
-    - name: Download production image tag artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: image-tag-production
-        path: /tmp
-
     - name: Load Docker image
-      run: docker load --input /tmp/production-image.tar
-
-    - name: Get image name
-      id: get-image
       run: |
-        echo "IMAGE_NAME=$(cat /tmp/production.tag)" >> $GITHUB_OUTPUT
-      shell: bash
+        docker load --input /tmp/production-image.tar
+        # Get the loaded image tag
+        IMAGE_TAG=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "hetid|heteroskedasticity" | grep production | head -n 1)
+        echo "IMAGE_NAME=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+      id: get-image
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.31.0
@@ -416,6 +392,3 @@ jobs:
           docker-image-builder
           docker-image-production
           docker-image-development
-          image-tag-builder
-          image-tag-production
-          image-tag-development

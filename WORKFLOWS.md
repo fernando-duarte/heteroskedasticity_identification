@@ -14,28 +14,30 @@ The `hetid` package uses a comprehensive CI/CD pipeline to ensure code quality, 
 
 ## Workflow Files
 
-### 1. R Package Workflow (`rworkflows.yml`)
+### 1. R Package Check Workflow (`R-CMD-check.yml`)
 
-**Purpose**: Main CI/CD workflow for R package testing, checking, and coverage reporting.
+**Purpose**: Main CI/CD workflow for R package testing and checking across multiple platforms.
 
 **Triggers**:
-- Push to branches: `master`, `main`, `devel`, `RELEASE_**`
+- Push to branches: `main`, `master`
 - Pull requests to the same branches
+- Release publications
 
 **Key Features**:
-- **Multi-platform testing**: Runs on Ubuntu 22.04, macOS 14, and Windows 2022
-- **R/Bioconductor versions**: Tests against both `devel` and `release` versions
-- **Concurrency control**: Prevents duplicate runs with `cancel-in-progress: true`
-- **Comprehensive checks**: Runs R CMD check, unit tests, code coverage, and builds documentation
+- **Multi-platform testing**: Runs on Ubuntu 22.04, macOS latest, and Windows latest
+- **R versions**: Tests against `release` and `oldrel` versions
+- **Concurrency control**: Smart concurrency with `cancel-in-progress: true`
+- **Comprehensive checks**: Runs R CMD check with CRAN standards
 
 **Matrix Configuration**:
 ```yaml
-- Ubuntu 22.04 with Bioconductor devel
-- macOS 14 with Bioconductor release
-- Windows 2022 with Bioconductor release
+- Ubuntu 22.04 with R release
+- Ubuntu 22.04 with R oldrel  
+- macOS latest with R release
+- Windows latest with R release
 ```
 
-**Dependencies**: Uses `neurogenomics/rworkflows@v1` action for standardized R package workflows.
+**Dependencies**: Uses `r-lib/actions` for standardized R package workflows.
 
 ### 2. Docker Workflow (`docker.yml`)
 
@@ -82,9 +84,33 @@ The `hetid` package uses a comprehensive CI/CD pipeline to ensure code quality, 
 2. Uploads as artifact
 3. Deploys to GitHub Pages environment
 
-### 4. Docker Security Scanning
+### 4. R Security Workflow (`r-security.yml`)
 
-**Purpose**: Perform security analysis on Docker configurations and images.
+**Purpose**: Comprehensive security analysis for R packages including vulnerability scanning, license checking, and code quality.
+
+**Triggers**:
+- Push to `main` or `develop` branches (when R files change)
+- Pull requests to `main` (when R files change)
+- Weekly schedule (Mondays at 3 AM UTC)
+- Manual workflow dispatch
+
+**Key Features**:
+- **Vulnerability scanning**: Uses oysteR for dependency vulnerability detection (optional)
+- **License compatibility**: Checks for license conflicts
+- **Security linting**: Detects potentially unsafe code patterns
+- **SBOM generation**: Creates Software Bill of Materials in CycloneDX format
+- **Good practices**: Runs goodpractice checks
+
+**Security Checks**:
+1. Dependency vulnerability scanning with oysteR (if available)
+2. License compatibility analysis
+3. Security-focused code linting (system calls, eval, etc.)
+4. Code quality and complexity analysis
+5. SBOM generation for supply chain security
+
+### 5. Docker Workflow (`docker.yml`)
+
+**Purpose**: Build, test, and deploy Docker containers with integrated security scanning.
 
 **Key Features**:
 - **Dockerfile scanning**: Security analysis of Docker configurations using Trivy
@@ -135,11 +161,12 @@ All workflows use pinned runner versions for reproducibility:
 
 | Workflow | Runner | Version |
 |----------|--------|---------|
-| rworkflows | Ubuntu | 22.04 |
-| rworkflows | macOS | 14 |
-| rworkflows | Windows | 2022 |
+| R-CMD-check | Ubuntu | 22.04 |
+| R-CMD-check | macOS | latest |
+| R-CMD-check | Windows | latest |
 | docker | Ubuntu | 22.04 |
 | pkgdown | Ubuntu | 22.04 |
+| r-security | Ubuntu | 22.04 |
 
 ## Secrets and Permissions
 
@@ -201,15 +228,27 @@ The README displays real-time status badges for all workflows:
 ### Getting Help
 - Check workflow logs in the Actions tab
 - Review similar issues in the repository
-- Consult the neurogenomics/rworkflows documentation
+- Consult the r-lib/actions documentation
 
 ## Future Improvements
 
-Planned enhancements tracked in `CI_CD_improvement_checklist.md`:
+Planned enhancements:
 - Performance monitoring metrics
 - Workflow failure notifications
 - Additional security scanning tools
+- Improved caching strategies
+
+## Additional Workflows
+
+### Claude Code Review Workflow (`claude-code-review.yml`)
+Automated code review workflow for pull requests using Claude AI.
+
+### Claude Workflow (`claude.yml`)
+Additional Claude-related automation for the project.
+
+### Install Security Packages Workflow (`install-security-packages.yml`)
+Reusable workflow for installing security-related R packages, called by other workflows.
 
 ---
 
-Last updated: December 2024
+Last updated: June 2025

@@ -34,7 +34,7 @@ jobs:
       matrix:
         config:
           - {os: ubuntu-22.04,   r: 'release'}
-          - {os: ubuntu-22.04,   r: 'devel'}
+          - {os: ubuntu-22.04,   r: 'oldrel'}
           - {os: windows-latest, r: 'release'}
           - {os: macos-latest,   r: 'release'}
 
@@ -62,15 +62,17 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
-      - name: Install dependencies
-        run: |
-          install.packages(c("remotes", "rcmdcheck"))
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_local(".", upgrade = "never")
-        shell: Rscript {0}
+      - name: Setup R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::rcmdcheck
+            any::remotes
+          needs: check
 
       - name: Check R package
         uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
           error-on: '"error"'
+          args: 'c("--no-manual", "--as-cran")'
