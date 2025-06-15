@@ -52,8 +52,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
     && rm -rf /var/lib/apt/lists/*
 
 # Install remotes, devtools, and knitr for package management
-RUN --mount=type=cache,target=/usr/local/lib/R/site-library \
-    R -e "install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown'), repos='https://cloud.r-project.org/')"
+# Don't use cache mount here to ensure these essential packages are always available
+RUN R -e "install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat'), repos='https://cloud.r-project.org/')"
 
 # Copy package metadata files first for better layer caching
 COPY DESCRIPTION NAMESPACE ./
@@ -84,7 +84,9 @@ RUN R -e "if (!require('knitr', quietly = TRUE)) install.packages('knitr', repos
     R CMD build . --no-build-vignettes && \
     R CMD INSTALL *.tar.gz --with-keep.source && \
     # Verify installation
-    R -e "library(hetid); packageVersion('hetid')"
+    R -e "library(hetid); packageVersion('hetid')" && \
+    # Verify devtools is available for testing
+    R -e "if (!requireNamespace('devtools', quietly = TRUE)) stop('devtools not available in builder stage')"
 
 #==============================================================================
 # Production Stage - Minimal runtime image

@@ -136,7 +136,7 @@ jobs:
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
           $IMAGE_NAME \
-          bash -c "cd /workspace && R -e \"library(hetid); devtools::test()\""
+          bash -c "cd /workspace && R -e \"if (!requireNamespace('devtools', quietly = TRUE)) install.packages('devtools', repos='https://cloud.r-project.org/'); library(hetid); devtools::test()\""
 
     - name: Run R CMD check
       run: |

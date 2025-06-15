@@ -9,12 +9,14 @@
 #' @param n_obs Integer. Sample size.
 #' @param params List. Parameters for the data generating process containing:
 #'   \itemize{
-#'     \item beta1_0, beta1_1: Parameters for first equation
-#'     \item beta2_0, beta2_1: Parameters for second equation
+#'     \item beta1_0, beta1_1: Parameters for first equation (beta1_1 can be a vector for multiple X)
+#'     \item beta2_0, beta2_1: Parameters for second equation (beta2_1 can be a vector for multiple X)
 #'     \item gamma1: Endogenous parameter (key parameter of interest)
 #'     \item alpha1, alpha2: Factor loadings for common factor U
 #'     \item delta_het: Heteroscedasticity strength parameter
 #'   }
+#' @param n_x Integer. Number of exogenous X variables to generate (default: 1).
+#'   If n_x > 1, beta1_1 and beta2_1 should be vectors of length n_x.
 #'
 #' @details
 #' The triangular model is:
@@ -29,25 +31,56 @@
 #' Z))
 #' with Z = \eqn{X^2 - E[X^2]} being the heteroscedasticity driver.
 #'
-#' @return A data.frame with columns Y1, Y2, Xk, Z, epsilon1, epsilon2.
+#' @return A data.frame with columns Y1, Y2, epsilon1, epsilon2, and:
+#'   - If n_x = 1: Xk, Z
+#'   - If n_x > 1: X1, X2, ..., Z1, Z2, ... (one Z per X)
 #'
 #' @examples
 #' \dontrun{
+#' # Single X variable (backward compatible)
 #' params <- list(
 #'   beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
 #'   beta2_0 = 1.0, beta2_1 = -1.0,
 #'   alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
 #' )
 #' data <- generate_lewbel_data(1000, params)
-#' head(data)
+#' 
+#' # Multiple X variables
+#' params_multi <- list(
+#'   beta1_0 = 0.5, beta1_1 = c(1.5, 3.0), gamma1 = -0.8,
+#'   beta2_0 = 1.0, beta2_1 = c(-1.0, 0.7),
+#'   alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
+#' )
+#' data_multi <- generate_lewbel_data(1000, params_multi, n_x = 2)
 #' }
 #'
 #' @export
-generate_lewbel_data <- function(n_obs, params) {
+generate_lewbel_data <- function(n_obs, params, n_x = 1) {
+  # Validate parameters for multiple X
+  if (n_x > 1) {
+    if (length(params$beta1_1) != n_x || length(params$beta2_1) != n_x) {
+      stop("For n_x > 1, beta1_1 and beta2_1 must be vectors of length n_x")
+    }
+  } else {
+    # Ensure scalar parameters are treated as length-1 vectors
+    params$beta1_1 <- rep(params$beta1_1, 1)
+    params$beta2_1 <- rep(params$beta2_1, 1)
+  }
+  
   # Generate exogenous variables
   # nolint start: object_name_linter.
-  Xk <- stats::rnorm(n_obs, mean = 2, sd = 1)
-  Z <- Xk^2 - mean(Xk^2)
+  X_mat <- matrix(stats::rnorm(n_obs * n_x, mean = 2, sd = 1), 
+                  nrow = n_obs, ncol = n_x)
+  
+  # Generate Z instruments (one per X)
+  Z_mat <- matrix(NA, nrow = n_obs, ncol = n_x)
+  for (j in 1:n_x) {
+    Z_mat[, j] <- X_mat[, j]^2 - mean(X_mat[, j]^2)
+  }
+  
+  # For heteroskedasticity, use the first Z by default
+  # (can be extended to use multiple Z in future)
+  Z_het <- Z_mat[, 1]
 
   # Generate mutually independent error components
   U <- stats::rnorm(n_obs)
@@ -55,7 +88,7 @@ generate_lewbel_data <- function(n_obs, params) {
 
   # Add safeguard for numerical stability
   # Cap the exponent to prevent overflow
-  exponent <- params$delta_het * Z
+  exponent <- params$delta_het * Z_het
   exponent <- pmin(pmax(exponent, -10), 10) # Cap between -10 and 10
   V2 <- stats::rnorm(n_obs) * sqrt(exp(exponent))
 
@@ -63,12 +96,28 @@ generate_lewbel_data <- function(n_obs, params) {
   epsilon1 <- params$alpha1 * U + V1
   epsilon2 <- params$alpha2 * U + V2
 
-  # Generate endogenous variables
-  Y2 <- params$beta2_0 + params$beta2_1 * Xk + epsilon2
-  Y1 <- params$beta1_0 + params$beta1_1 * Xk + params$gamma1 * Y2 + epsilon1
+  # Generate endogenous variables using all X variables
+  Y2 <- params$beta2_0 + as.vector(X_mat %*% params$beta2_1) + epsilon2
+  Y1 <- params$beta1_0 + as.vector(X_mat %*% params$beta1_1) + params$gamma1 * Y2 + epsilon1
+  
+  # Create output data frame
+  result_df <- data.frame(Y1 = Y1, Y2 = Y2, epsilon1 = epsilon1, epsilon2 = epsilon2)
+  
+  # Add X variables with appropriate names
+  if (n_x == 1) {
+    result_df$Xk <- X_mat[, 1]
+    result_df$Z <- Z_mat[, 1]
+  } else {
+    for (j in 1:n_x) {
+      result_df[[paste0("X", j)]] <- X_mat[, j]
+    }
+    for (j in 1:n_x) {
+      result_df[[paste0("Z", j)]] <- Z_mat[, j]
+    }
+  }
   # nolint end
 
-  data.frame(Y1, Y2, Xk, Z, epsilon1, epsilon2)
+  result_df
 }
 
 
