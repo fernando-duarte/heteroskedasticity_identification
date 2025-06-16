@@ -35,6 +35,11 @@ updates:
           - "actions/upload-artifact"
           - "actions/download-artifact"
           - "geekyeggo/delete-artifact"
+      r-actions:
+        # R-specific GitHub Actions grouped together
+        patterns:
+          - "r-lib/*"
+          - "neurogenomics/rworkflows"
 
   # Docker base images in Dockerfiles
   - package-ecosystem: "docker"
@@ -60,27 +65,3 @@ updates:
       rocker-images:
         patterns:
           - "rocker/*"
-
-  # R package dependencies (if using renv.lock)
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-      day: "monday"
-      time: "09:00"
-      timezone: "UTC"
-    open-pull-requests-limit: 2
-    reviewers:
-      - "fernando-duarte"
-    assignees:
-      - "fernando-duarte"
-    commit-message:
-      prefix: "deps"
-      include: "scope"
-    labels:
-      - "dependencies"
-      - "r-packages"
-    # Only update R-related actions monthly to avoid noise
-    allow:
-      - dependency-name: "neurogenomics/rworkflows"
-      - dependency-name: "r-lib/*"

@@ -1,8 +1,9 @@
 {
   "name": "hetid R 4.5.0 Development (VS Code + RStudio)",
 
-  // Use the new Rocker devcontainer image with R 4.5.0
-  "image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.5.0",
+  // Use the standard Rocker tidyverse image with latest R
+  // Note: Rocker images are currently amd64-only, will use emulation on ARM64
+  "image": "rocker/tidyverse:latest",
 
   // Modern devcontainer features
   "features": {
@@ -220,7 +221,8 @@
   "runArgs": [
     "--cap-add=SYS_PTRACE",
     "--security-opt",
-    "seccomp=unconfined"
+    "seccomp=unconfined",
+    "--platform=linux/amd64"
   ],
 
   // Wait for the container to be ready
