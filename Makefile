@@ -128,7 +128,7 @@ deploy-test: ## Test production image
 # Multi-platform builds (for CI/CD)
 build-multiplatform: ## Build multi-platform images
 	@echo "Building multi-platform images..."
-	./docker/scripts/build.sh -t production -p linux/amd64,linux/arm64 --push
+	./docker/scripts/build.sh -t production -p linux/amd64 --push
 
 # Development workflow shortcuts
 dev: dev-start ## Alias for dev-start
