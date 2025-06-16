@@ -48,15 +48,21 @@ RUN --mount=type=cache,target=/var/cache/apt \
     # Parallel processing support
     libopenmpi-dev \
     # Additional development utilities
-    pandoc \
     qpdf \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy pandoc from minimal image instead of installing via apt
+# This saves ~200MB compared to apt-get install pandoc
+COPY --from=pandoc/minimal:latest /usr/bin/pandoc /usr/local/bin/pandoc
+
 # Install pak for fast parallel package installation
-RUN R -e "install.packages('pak', repos = 'https://r-lib.github.io/p/pak/stable/')"
+# Use BuildKit cache mount for R package downloads
+RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
+    R -e "install.packages('pak', repos = 'https://r-lib.github.io/p/pak/stable/')"
 
 # Install comprehensive R development packages using pak (40-50% faster)
-RUN R -e "pak::pkg_install(c( \
+RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
+    R -e "pak::pkg_install(c( \
         'devtools', 'remotes', 'usethis', \
         'testthat', 'covr', 'lintr', 'styler', \
         'roxygen2', 'pkgdown', 'rmarkdown', 'knitr', \

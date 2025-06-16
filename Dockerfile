@@ -49,22 +49,27 @@ RUN --mount=type=cache,target=/var/cache/apt \
     libmpfr-dev \
     # Parallel processing support
     libopenmpi-dev \
-    # Pandoc for building vignettes
-    pandoc \
     # qpdf for R CMD check
     qpdf \
     # wget for downloading TinyTeX
     wget \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy pandoc from minimal image instead of installing via apt
+# This saves ~200MB compared to apt-get install pandoc
+COPY --from=pandoc/minimal:latest /usr/bin/pandoc /usr/local/bin/pandoc
+
 # Install pak for fast parallel package installation
-RUN R -e "options(repos = 'https://cloud.r-project.org/'); \
+# Use BuildKit cache mount for R package downloads
+RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
+    R -e "options(repos = 'https://cloud.r-project.org/'); \
           .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
           install.packages('pak', repos = 'https://r-lib.github.io/p/pak/stable/', \
                          lib = '/usr/local/lib/R/site-library')"
 
 # Install package management tools using pak (40-50% faster)
-RUN R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
+RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
+    R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
           pak::pkg_install(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat', 'tinytex'), \
                          lib = '/usr/local/lib/R/site-library')"
 
@@ -81,7 +86,8 @@ COPY DESCRIPTION NAMESPACE ./
 
 # Install all package dependencies using pak for parallel builds
 # Note: nloptr requires libnlopt-dev which was already installed in system dependencies
-RUN R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
+RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
+    R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
           pak::pkg_install(c('nloptr', 'minqa', 'RcppEigen', 'lme4', 'pbkrtest', 'car', 'AER', \
                            'boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr'), \
                          lib = '/usr/local/lib/R/site-library'); \
@@ -89,7 +95,8 @@ RUN R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
 
 # Install package dependencies using pak (faster than remotes)
 # Install both runtime and test dependencies (including Suggests)
-RUN R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
+RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
+    R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
           pak::local_install_deps(dependencies = TRUE)"
 
 # Install security scanning tools (oysteR) for vulnerability checks
@@ -112,7 +119,13 @@ RUN R CMD build . --no-build-vignettes && \
     # Verify installation
     R -e "library(hetid); packageVersion('hetid')" && \
     # Verify devtools is available for testing
-    R -e "if (!requireNamespace('devtools', quietly = TRUE)) stop('devtools not available in builder stage')"
+    R -e "if (!requireNamespace('devtools', quietly = TRUE)) stop('devtools not available in builder stage')" && \
+    # Strip build tools to reduce image size (saves ~250MB)
+    # Keep essential dev libraries that R packages might need at runtime
+    apt-get remove -y build-essential gfortran && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 #==============================================================================
 # Production Stage - Minimal runtime image
@@ -159,6 +172,9 @@ COPY --from=builder /usr/local/lib/R/site-library/ /usr/local/lib/R/site-library
 
 # Copy TinyTeX installation from builder
 COPY --from=builder /opt/TinyTeX /opt/TinyTeX
+
+# Copy pandoc from builder (was copied from minimal container)
+COPY --from=builder /usr/local/bin/pandoc /usr/local/bin/pandoc
 
 # Set working directory and ownership
 WORKDIR /app
