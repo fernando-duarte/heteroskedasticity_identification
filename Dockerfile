@@ -97,14 +97,16 @@ RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
 
 # Install TinyTeX for LaTeX support (much smaller than texlive)
 # This replaces ~3GB of texlive packages with ~150MB TinyTeX
-# TODO: Re-enable once ARM64 performance is improved
-# NOTE: When re-enabling, also remove --no-manual flag from docker.yml R CMD check
-# RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
-#     /opt/TinyTeX/bin/*/tlmgr path add
+# CACHING BEHAVIOR:
+# - TinyTeX installation is cached as a Docker layer (one-time cost: ~20-30 min on ARM64, ~10 min on x86)
+# - Subsequent builds with no changes: 0 seconds (uses cached layer)
+# - GitHub Actions cache via 'cache-from: type=gha' ensures persistence across workflow runs
+# - PDF generation during R CMD check: ~30-60 seconds (not cached, runs each time)
+RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
+    /opt/TinyTeX/bin/*/tlmgr path add
 
 # Ensure TinyTeX is in PATH for all subsequent operations
-# TODO: Re-enable once TinyTeX is installed
-# ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
+ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
 
 # Copy package metadata files first for better layer caching
 COPY DESCRIPTION NAMESPACE ./
@@ -227,8 +229,7 @@ RUN groupadd -r hetid && useradd -r -g hetid -m -s /bin/bash hetid
 COPY --from=builder /usr/local/lib/R/site-library/ /usr/local/lib/R/site-library/
 
 # Copy TinyTeX installation from builder
-# TODO: Re-enable once TinyTeX is installed in builder
-# COPY --from=builder /opt/TinyTeX /opt/TinyTeX
+COPY --from=builder /opt/TinyTeX /opt/TinyTeX
 
 # Copy pandoc from builder (was copied from minimal container)
 COPY --from=builder /usr/local/bin/pandoc /usr/local/bin/pandoc
@@ -248,7 +249,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 ENV R_LIBS_USER=/usr/local/lib/R/site-library
 ENV OMP_NUM_THREADS=1
 ENV OPENBLAS_NUM_THREADS=1
-# ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
+ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
 
 # Default command
 CMD ["R", "--slave", "-e", "library(hetid); cat('hetid package loaded successfully\\n')"]

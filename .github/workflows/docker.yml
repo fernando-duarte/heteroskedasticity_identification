@@ -194,13 +194,13 @@ jobs:
       run: |
         echo "Testing image for R CMD check: $IMAGE_NAME"
 
-        # Note: Using --no-manual flag since TinyTeX is temporarily disabled in Docker images
-        # This skips PDF manual generation which requires pdflatex
+        # TinyTeX is installed in Docker images for PDF manual generation
+        # The installation is cached as a Docker layer, so rebuilds are fast
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
           $IMAGE_NAME \
-          bash -c "R CMD build . && R CMD check --as-cran --no-manual *.tar.gz"
+          bash -c "R CMD build . && R CMD check --as-cran *.tar.gz"
 
     - name: Test package loading
       env:

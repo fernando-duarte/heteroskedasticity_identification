@@ -44,12 +44,13 @@ This document consolidates all Docker-related documentation for the hetid R pack
 
 ## Completed Optimizations
 
-### 1. ✅ TinyTeX Implementation (June 16, 2025)
+### 1. ✅ TinyTeX Implementation (Re-enabled June 16, 2025)
 **Impact**: 3GB reduction in image size
 - Replaced texlive packages (~3-4GB) with TinyTeX (~150MB)
-- Faster builds (5-10 minutes less)
-- Better ARM64 compatibility
-- Auto-expands with needed LaTeX packages
+- One-time installation cost: ~20-30 min on ARM64, ~10 min on x86
+- **Fully cached**: Subsequent builds with no changes take 0 seconds
+- GitHub Actions cache ensures persistence across workflow runs
+- PDF generation during tests: ~30-60 seconds (acceptable runtime cost)
 
 ### 2. ✅ GitHub Actions Cache Fix (June 16, 2025)
 **Impact**: Stabilized CI/CD build times
@@ -149,32 +150,28 @@ docker build --platform linux/amd64 -t hetid:dev -f Dockerfile.dev .
 
 **Why it's faster**: pak's parallel package installation (even with ~20% emulation overhead) beats sequential installation by 40-50%.
 
-### Re-enabling TinyTeX
+### TinyTeX Caching Strategy
 
-Currently disabled for faster testing. To re-enable:
+**Current Status**: ✅ Enabled (June 16, 2025)
 
-1. **Uncomment in Dockerfile** (lines 76-79):
-   ```dockerfile
-   RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
-       /opt/TinyTeX/bin/*/tlmgr path add
-   ```
+**Caching Behavior**:
+1. **Docker Layer Caching**: TinyTeX installation is a separate RUN command, creating its own layer
+2. **GitHub Actions Cache**: `cache-from: type=gha` preserves layers across workflow runs
+3. **Time Cost Analysis**:
+   - First build: 20-30 minutes (ARM64) or 10 minutes (x86_64)
+   - Subsequent builds (no changes): 0 seconds
+   - PDF generation during tests: 30-60 seconds (not cached, acceptable)
 
-2. **Uncomment PATH setting** (line 82):
-   ```dockerfile
-   ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
-   ```
+**Why it's enabled**:
+- One-time cost with effective caching
+- Enables complete R CMD check with PDF manual
+- Catches documentation issues before release
+- Small runtime cost for PDF generation is acceptable
 
-3. **Uncomment in production stage** (line 174):
-   ```dockerfile
-   COPY --from=builder /opt/TinyTeX /opt/TinyTeX
-   ```
-
-**When to re-enable**:
-- Need PDF vignette building
-- Using x86_64 emulation (faster TinyTeX install)
-- Production deployment requires LaTeX
-
-**Impact**: Adds ~20-30 minutes to build time on ARM64, ~10 minutes on x86_64
+**To disable (if needed)**:
+1. Comment out TinyTeX installation in Dockerfiles
+2. Add `--no-manual` flag to R CMD check in docker.yml
+3. Update comments to explain why it's disabled
 
 ## Implementation Roadmap
 

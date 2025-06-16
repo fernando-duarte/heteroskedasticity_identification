@@ -137,7 +137,7 @@ build-multiplatform: ## Build multi-platform images
 # Platform-specific targets for ARM64 users (Apple Silicon, etc.)
 dev-start-x86: ## Start dev with x86 emulation (40% faster on ARM64)
 	@echo "Starting development environment with x86_64 emulation..."
-	@echo "This provides faster builds on Apple Silicon by enabling pak"
+	@echo "This provides faster builds on Apple Silicon by enabling pak + TinyTeX"
 	DOCKER_DEFAULT_PLATFORM=linux/amd64 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d hetid-dev
 	@echo "RStudio Server available at: http://localhost:8787"
 
@@ -151,7 +151,7 @@ detect-arch: ## Show current architecture settings
 	@if [ "$$(uname -m)" = "arm64" ] || [ "$$(uname -m)" = "aarch64" ]; then \
 		echo ""; \
 		echo "💡 TIP: You're on ARM64. For faster builds, use:"; \
-		echo "   make dev-start-x86  (40% faster with pak support)"; \
+		echo "   make dev-start-x86  (40% faster with pak + TinyTeX support)"; \
 	fi
 
 # Development workflow shortcuts

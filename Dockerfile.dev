@@ -103,8 +103,11 @@ RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
           }"
 
 # Install TinyTeX for LaTeX support (replaces heavy texlive packages)
-# TODO: Currently enabled in dev image. Consider disabling for faster builds if PDF manual not needed
-# NOTE: If disabled, add --no-manual flag to R CMD check commands
+# CACHING BEHAVIOR:
+# - TinyTeX installation is cached as a Docker layer (one-time cost: ~20-30 min on ARM64, ~10 min on x86)
+# - Subsequent builds with no changes: 0 seconds (uses cached layer)
+# - GitHub Actions cache via 'cache-from: type=gha' ensures persistence across workflow runs
+# - PDF generation during R CMD check: ~30-60 seconds (not cached, runs each time)
 RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
     /opt/TinyTeX/bin/*/tlmgr path add
 
