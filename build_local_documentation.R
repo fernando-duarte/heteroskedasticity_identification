@@ -96,20 +96,29 @@ if (build_pdf) {
   log_message("\n4. Building PDF manual...")
   tryCatch({
     # Check if LaTeX is available
-    if (!tinytex::is_tinytex() && !tinytex::tinytex_root()) {
-      log_message("   Installing TinyTeX for PDF generation...")
+    latex_available <- Sys.which("pdflatex") != ""
+    if (!latex_available) {
+      log_message("   LaTeX not found. Attempting to install TinyTeX...")
+      if (!requireNamespace("tinytex", quietly = TRUE)) {
+        install.packages("tinytex")
+      }
       tinytex::install_tinytex()
     }
 
     # Build PDF manual
-    devtools::build_manual(path = ".")
+    pdf_path <- devtools::build_manual(path = ".")
 
-    # Find the generated PDF
-    pdf_files <- list.files(".", pattern = "hetid.*\\.pdf$", full.names = TRUE)
-    if (length(pdf_files) > 0) {
-      log_message("   ✓ PDF manual built successfully: ", pdf_files[1])
+    # Report the result
+    if (!is.null(pdf_path) && file.exists(pdf_path)) {
+      log_message("   ✓ PDF manual built successfully: ", basename(pdf_path))
     } else {
-      log_message("   ⚠ PDF manual may have been built but couldn't locate it")
+      # Find the generated PDF
+      pdf_files <- list.files(".", pattern = "hetid.*\\.pdf$", full.names = TRUE)
+      if (length(pdf_files) > 0) {
+        log_message("   ✓ PDF manual built successfully: ", basename(pdf_files[1]))
+      } else {
+        log_message("   ⚠ PDF manual may have been built but couldn't locate it")
+      }
     }
   }, error = function(e) {
     log_message("   ✗ Error building PDF manual: ", e$message)
