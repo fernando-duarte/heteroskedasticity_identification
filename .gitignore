@@ -287,3 +287,7 @@ packrat/src/
 credentials/
 /doc/
 /Meta/
+
+### Documentation build files ###
+documentation_index.html
+documentation_build_*.log

@@ -1,0 +1,32 @@
+# Ignore internal development documentation
+*_PLAN.md
+*_SUMMARY.md
+*_REPORT.md
+*_FIXES.md
+*_SUCCESS.md
+*_COMPLETE.md
+MAGIC_VARIABLES_*.md
+DOCKER*.md
+WORKFLOW*.md
+VALIDATION*.md
+REPLICATION*.md
+RENDO*.md
+STATA*.md
+CI_CD*.md
+PR_*.md
+CLAUDE.md
+error.md
+tmux.md
+validate_hetid.md
+documentation-patterns.md
+refactor_magic_variables_prompt.md
+long_files.md
+lewbel*.tex
+
+# Include only intended documentation
+!README.md
+!NEWS.md
+!LICENSE.md
+!CONTRIBUTING.md
+!.github/SECURITY.md
+!BUILD_DOCUMENTATION.md

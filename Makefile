@@ -162,6 +162,14 @@ docs-site: ## Build pkgdown site
 	@echo "Building pkgdown site..."
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec hetid-dev R -e "pkgdown::build_site()"
 
+docs-local: ## Build all documentation locally (roxygen, vignettes, pkgdown)
+	@echo "Building complete local documentation..."
+	Rscript build_local_documentation.R
+
+docs-local-pdf: ## Build all documentation locally including PDF manual
+	@echo "Building complete local documentation with PDF manual..."
+	Rscript build_local_documentation.R --pdf
+
 # Linting and formatting
 lint: ## Run lintr on package code
 	@echo "Running lintr..."

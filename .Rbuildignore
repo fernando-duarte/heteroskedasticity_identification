@@ -117,6 +117,7 @@
 ^\.lintr$
 ^\.notes$
 ^\.nyc_output$
+^\.pkgdownignore$
 ^\.pre-commit-config-.*\.yaml$
 ^\.pre-commit-config\.backup\.yaml$
 ^\.pre-commit-config\.yaml$
