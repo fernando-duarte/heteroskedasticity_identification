@@ -91,10 +91,13 @@ Choose your preferred development environment:
 
 2. **Start Developing**:
    - RStudio Server auto-opens on port 8787
+   - VS Code with R extensions ready to use
    - Package pre-loaded and ready to use
    - All tools and dependencies included
 
 **Features**: RStudio Server, VS Code, R 4.5.0, all dependencies, Git integration, Docker support
+
+> **New**: Modern devcontainer with R 4.5.0 available! Includes both VS Code and RStudio in one environment. See [.devcontainer/README-modern.md](.devcontainer/README-modern.md) for details.
 
 #### Option 2: Local Docker Development 🐳
 
@@ -108,6 +111,11 @@ Choose your preferred development environment:
    cd heteroskedasticity_identification
    make dev-start  # Launches RStudio at http://localhost:8787
    ```
+
+**R Versions**:
+- Production images: R 4.5.0 (updated June 2025)
+- CI/CD testing: Both R 4.5.0 (release) and R 4.4.x (oldrel)
+- Full compatibility maintained
 
 See [DOCKER.md](DOCKER.md) for comprehensive Docker documentation.
 

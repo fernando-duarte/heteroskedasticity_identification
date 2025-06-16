@@ -33,10 +33,14 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: ubuntu-22.04,   r: 'release'}
-          - {os: ubuntu-22.04,   r: 'oldrel'}
-          - {os: windows-latest, r: 'release'}
-          - {os: macos-latest,   r: 'release'}
+          # Test with R 4.5.0 (release) and R 4.4.x (oldrel)
+          - {os: ubuntu-22.04,   r: 'release'}  # R 4.5.0
+          - {os: ubuntu-22.04,   r: 'oldrel'}   # R 4.4.x
+          - {os: windows-latest, r: 'release'}  # R 4.5.0
+          - {os: macos-latest,   r: 'release'}  # R 4.5.0
+          # Optional: Add explicit version testing
+          # - {os: ubuntu-22.04,   r: '4.5.0'}
+          # - {os: ubuntu-22.04,   r: '4.4.3'}
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}

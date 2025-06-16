@@ -2,6 +2,8 @@
 
 This directory contains the configuration for GitHub Codespaces, enabling cloud-based development of the hetid R package with a fully configured environment.
 
+> **📢 New Option Available!** A modern devcontainer configuration with R 4.5.0 is now available, featuring both VS Code and RStudio in a single environment. See [QUICK_START.md](QUICK_START.md) for the 30-second setup or [README-modern.md](README-modern.md) for full details.
+
 ## What's Included
 
 ### Development Environment
@@ -10,6 +12,11 @@ This directory contains the configuration for GitHub Codespaces, enabling cloud-
 - **VS Code** with R extensions and development tools
 - **Git** configured for seamless GitHub integration
 - **Docker** support for container management
+
+### Configuration Options
+- **Traditional**: Docker Compose-based setup (current default)
+- **Modern**: Single-image devcontainer with enhanced features (NEW!)
+- Switch between them using: `./.devcontainer/switch-devcontainer.sh`
 
 ### Pre-configured Tools
 - R language support with syntax highlighting and debugging
