@@ -98,6 +98,7 @@ RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
 # Install TinyTeX for LaTeX support (much smaller than texlive)
 # This replaces ~3GB of texlive packages with ~150MB TinyTeX
 # TODO: Re-enable once ARM64 performance is improved
+# NOTE: When re-enabling, also remove --no-manual flag from docker.yml R CMD check
 # RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
 #     /opt/TinyTeX/bin/*/tlmgr path add
 
