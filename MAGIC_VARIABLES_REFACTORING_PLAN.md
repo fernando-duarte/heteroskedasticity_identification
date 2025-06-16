@@ -9,7 +9,7 @@ This document provides a comprehensive, step-by-step plan to refactor all magic 
 ### Required Packages
 Install these packages before starting:
 ```r
-install.packages(c("checkglobals", "rlang", "config", "options", "withr"))
+install.packages(c("checkglobals", "rlang", "options", "withr"))
 ```
 
 ### Verification Setup
@@ -53,6 +53,7 @@ install.packages(c("checkglobals", "rlang", "config", "options", "withr"))
 # After each file modification
 devtools::test()
 checkglobals::checkglobals("R/", verbose = TRUE)
+devtools::check()
 ```
 
 ### Step 1.2: Update Visualization Functions
@@ -80,84 +81,91 @@ devtools::check()
 
 ## Phase 2: Constants Extraction (Priority: HIGH)
 
-### Step 2.1: Create Constants Infrastructure
+### Step 2.1: Create Locked Constants Environment
 
 **Action**: Create `data-raw/internal-constants.R`
 
 ```r
 # data-raw/internal-constants.R
-.HETID_CONSTANTS <- list(
+# Create locked environment for immutable constants
+constants_env <- new.env(parent = emptyenv())
+
+# Populate constants
+with(constants_env, {
   # Statistical thresholds
-  WEAK_INSTRUMENT_F_THRESHOLD = 10L,
-  ALPHA_LEVEL = 0.05,
-  Z_CRITICAL_95 = 1.96,
+  WEAK_INSTRUMENT_F_THRESHOLD <- 10L
+  ALPHA_LEVEL <- 0.05
+  Z_CRITICAL_95 <- 1.96
 
   # Numerical tolerances
-  MIN_EXPONENT = -10L,
-  MAX_EXPONENT = 10L,
-  WEAK_ID_TOLERANCE = 1e-6,
-  INSTRUMENT_SD_THRESHOLD = 1e-10,
+  MIN_EXPONENT <- -10L
+  MAX_EXPONENT <- 10L
+  WEAK_ID_TOLERANCE <- 1e-6
+  INSTRUMENT_SD_THRESHOLD <- 1e-10
 
   # Default simulation parameters
-  DEFAULT_NUM_SIMULATIONS = 200L,
-  DEFAULT_MAIN_SAMPLE_SIZE = 500L,
-  DEFAULT_SAMPLE_SIZES = c(250L, 500L, 1000L, 2000L),
-  DEFAULT_VERIFICATION_SAMPLE_SIZE = 10000L,
-  DEFAULT_TEST_DATA_SIZE = 1000L,
+  DEFAULT_NUM_SIMULATIONS <- 200L
+  DEFAULT_MAIN_SAMPLE_SIZE <- 500L
+  DEFAULT_SAMPLE_SIZES <- c(250L, 500L, 1000L, 2000L)
+  DEFAULT_VERIFICATION_SAMPLE_SIZE <- 10000L
+  DEFAULT_TEST_DATA_SIZE <- 1000L
 
   # Bootstrap parameters
-  DEFAULT_BOOTSTRAP_REPS = 100L,
-  DEFAULT_BOOTSTRAP_SUBSET_SIZE = 10L,
-  DEFAULT_BOOTSTRAP_DEMO_SIZE = 5L,
+  DEFAULT_BOOTSTRAP_REPS <- 100L
+  DEFAULT_BOOTSTRAP_SUBSET_SIZE <- 10L
+  DEFAULT_BOOTSTRAP_DEMO_SIZE <- 5L
 
   # Demo parameters
-  DEMO_SAMPLE_SIZES = c(500L, 1000L),
-  DEMO_BOOTSTRAP_REPS = 50L,
-  DEMO_N_REPS = 50L,
-  DEMO_BOOTSTRAP_SIZE = 3L,
+  DEMO_SAMPLE_SIZES <- c(500L, 1000L)
+  DEMO_BOOTSTRAP_REPS <- 50L
+  DEMO_N_REPS <- 50L
+  DEMO_BOOTSTRAP_SIZE <- 3L
 
   # Parallel processing
-  DEFAULT_PARALLEL_WORKER_OFFSET = 1L,
+  DEFAULT_PARALLEL_WORKER_OFFSET <- 1L
 
   # Display formatting
-  DISPLAY_DIGITS = 4L,
-  BOOTSTRAP_TABLE_DISPLAY_LIMIT = 10L,
+  DISPLAY_DIGITS <- 4L
+  BOOTSTRAP_TABLE_DISPLAY_LIMIT <- 10L
 
   # Plotting constants
-  PLOT_BASE_FONT_SIZE = 14L,
-  PLOT_HISTOGRAM_BINS = 50L,
-  PLOT_LINE_WIDTH_THICK = 3L,
-  PLOT_LINE_WIDTH_NORMAL = 2L,
-  PLOT_LINE_WIDTH_THIN = 1L,
-  PLOT_BOOTSTRAP_DISPLAY_LIMIT = 20L,
-  PLOT_MIN_BOOTSTRAP_THRESHOLD = 5L,
+  PLOT_BASE_FONT_SIZE <- 14L
+  PLOT_HISTOGRAM_BINS <- 50L
+  PLOT_LINE_WIDTH_THICK <- 3L
+  PLOT_LINE_WIDTH_NORMAL <- 2L
+  PLOT_LINE_WIDTH_THIN <- 1L
+  PLOT_BOOTSTRAP_DISPLAY_LIMIT <- 20L
+  PLOT_MIN_BOOTSTRAP_THRESHOLD <- 5L
 
   # Mathematical constants
-  DEFAULT_X_MEAN = 2,
-  DEFAULT_X_SD = 1,
-  TWO_TAILED_MULTIPLIER = 2L,
-  POINT_ID_TAU = 0,
-  SUCCESS_EXIT_CODE = 0L,
+  DEFAULT_X_MEAN <- 2
+  DEFAULT_X_SD <- 1
+  TWO_TAILED_MULTIPLIER <- 2L
+  POINT_ID_TAU <- 0
+  SUCCESS_EXIT_CODE <- 0L
 
   # Seed management
-  DEFAULT_BASE_SEED = 123L,
-  DEFAULT_TEST_SEED = 42L,
-  SEED_MULTIPLIER_MAIN = 1000L,
-  SEED_MULTIPLIER_BOOTSTRAP = 3000L,
-  SEED_OFFSET_BY_N = 1L,
-  SEED_OFFSET_BY_DELTA = 2L,
+  DEFAULT_BASE_SEED <- 123L
+  DEFAULT_TEST_SEED <- 42L
+  SEED_MULTIPLIER_MAIN <- 1000L
+  SEED_MULTIPLIER_BOOTSTRAP <- 3000L
+  SEED_OFFSET_BY_N <- 1L
+  SEED_OFFSET_BY_DELTA <- 2L
 
   # Array indexing (for clarity)
-  FIRST_ELEMENT_IDX = 1L,
-  SECOND_ELEMENT_IDX = 2L,
-  LOWER_BOUND_IDX = 1L,
-  UPPER_BOUND_IDX = 2L,
-  FIRST_COLUMN_IDX = 1L,
-  F_STATISTIC_IDX = 1L
-)
+  FIRST_ELEMENT_IDX <- 1L
+  SECOND_ELEMENT_IDX <- 2L
+  LOWER_BOUND_IDX <- 1L
+  UPPER_BOUND_IDX <- 2L
+  FIRST_COLUMN_IDX <- 1L
+  F_STATISTIC_IDX <- 1L
+})
+
+# Lock environment to prevent modification
+lockEnvironment(constants_env, TRUE)
 
 # Save to R/sysdata.rda
-usethis::use_data(.HETID_CONSTANTS, internal = TRUE, overwrite = TRUE)
+usethis::use_data(constants_env, internal = TRUE, overwrite = TRUE)
 ```
 
 **Run**:
@@ -165,7 +173,47 @@ usethis::use_data(.HETID_CONSTANTS, internal = TRUE, overwrite = TRUE)
 source("data-raw/internal-constants.R")
 ```
 
-### Step 2.2: Create String Constants
+### Step 2.2: Create User Options System
+
+**Action**: Create `R/options.R`
+
+```r
+# R/options.R
+#' @importFrom options make_option_getter
+NULL
+
+#' Get hetid package options with fallback to constants
+#'
+#' @param option_name Character. Name of the option to retrieve
+#' @return The option value, falling back to constants_env if not set
+#' @keywords internal
+hetid_opt <- function(option_name) {
+  # Define option mappings to constants
+  option_map <- list(
+    "display_digits" = "DISPLAY_DIGITS",
+    "alpha_level" = "ALPHA_LEVEL",
+    "weak_f_threshold" = "WEAK_INSTRUMENT_F_THRESHOLD",
+    "parallel_offset" = "DEFAULT_PARALLEL_WORKER_OFFSET",
+    "bootstrap_reps" = "DEFAULT_BOOTSTRAP_REPS"
+  )
+
+  # Get R option with hetid prefix
+  r_option_name <- paste0("hetid.", option_name)
+  user_value <- getOption(r_option_name)
+
+  # If user hasn't set it, use constant
+  if (is.null(user_value)) {
+    const_name <- option_map[[option_name]]
+    if (!is.null(const_name) && exists(const_name, envir = constants_env)) {
+      return(get(const_name, envir = constants_env))
+    }
+  }
+
+  user_value
+}
+```
+
+### Step 2.3: Create String Constants
 
 **Action**: Create `R/string-constants.R`
 
@@ -242,47 +290,47 @@ source("data-raw/internal-constants.R")
 }
 ```
 
-### Step 2.3: Replace Magic Numbers in Statistical Functions
+### Step 2.4: Replace Magic Numbers in Statistical Functions
 
 **File: `R/analysis.R`**
 
 **Changes**:
-- Line 78: `mean(results_clean$first_stage_F < 10)` → `mean(results_clean$first_stage_F < .HETID_CONSTANTS$WEAK_INSTRUMENT_F_THRESHOLD)`
-- Line 121: `mean(results_clean$first_stage_F < 10)` → `mean(results_clean$first_stage_F < .HETID_CONSTANTS$WEAK_INSTRUMENT_F_THRESHOLD)`
-- Line 72: `digits = 4` → `digits = .HETID_CONSTANTS$DISPLAY_DIGITS`
-- Line 112: `digits = 4` → `digits = .HETID_CONSTANTS$DISPLAY_DIGITS`
-- Line 189: `n = 10` → `n = .HETID_CONSTANTS$BOOTSTRAP_TABLE_DISPLAY_LIMIT`
-- Line 194: `round(., 4)` → `round(., .HETID_CONSTANTS$DISPLAY_DIGITS)`
-- Line 251: `digits = 4` → `digits = .HETID_CONSTANTS$DISPLAY_DIGITS`
-- Line 309: `digits = 4` → `digits = .HETID_CONSTANTS$DISPLAY_DIGITS`
+- Line 78: `mean(results_clean$first_stage_F < 10)` → `mean(results_clean$first_stage_F < constants_env$WEAK_INSTRUMENT_F_THRESHOLD)`
+- Line 121: `mean(results_clean$first_stage_F < 10)` → `mean(results_clean$first_stage_F < constants_env$WEAK_INSTRUMENT_F_THRESHOLD)`
+- Line 72: `digits = 4` → `digits = hetid_opt("display_digits")`
+- Line 112: `digits = 4` → `digits = hetid_opt("display_digits")`
+- Line 189: `n = 10` → `n = constants_env$BOOTSTRAP_TABLE_DISPLAY_LIMIT`
+- Line 194: `round(., 4)` → `round(., hetid_opt("display_digits"))`
+- Line 251: `digits = 4` → `digits = hetid_opt("display_digits")`
+- Line 309: `digits = 4` → `digits = hetid_opt("display_digits")`
 
 **File: `R/data-generation.R`**
 
 **Changes**:
-- Line 74: `mean = 2, sd = 1` → `mean = .HETID_CONSTANTS$DEFAULT_X_MEAN, sd = .HETID_CONSTANTS$DEFAULT_X_SD`
-- Line 95: `pmin(pmax(exponent, -10), 10)` → `pmin(pmax(exponent, .HETID_CONSTANTS$MIN_EXPONENT), .HETID_CONSTANTS$MAX_EXPONENT)`
-- Line 176: `n_obs = 10000` → `n_obs = .HETID_CONSTANTS$DEFAULT_VERIFICATION_SAMPLE_SIZE`
-- Line 204: `p_value <- 2 * (1 - stats::pnorm(abs(test_stat)))` → `p_value <- .HETID_CONSTANTS$TWO_TAILED_MULTIPLIER * (1 - stats::pnorm(abs(test_stat)))`
-- Line 216: `if (p_value < 0.05)` → `if (p_value < .HETID_CONSTANTS$ALPHA_LEVEL)`
+- Line 74: `mean = 2, sd = 1` → `mean = constants_env$DEFAULT_X_MEAN, sd = constants_env$DEFAULT_X_SD`
+- Line 95: `pmin(pmax(exponent, -10), 10)` → `pmin(pmax(exponent, constants_env$MIN_EXPONENT), constants_env$MAX_EXPONENT)`
+- Line 176: `n_obs = 10000` → `n_obs = constants_env$DEFAULT_VERIFICATION_SAMPLE_SIZE`
+- Line 204: `p_value <- 2 * (1 - stats::pnorm(abs(test_stat)))` → `p_value <- constants_env$TWO_TAILED_MULTIPLIER * (1 - stats::pnorm(abs(test_stat)))`
+- Line 216: `if (p_value < 0.05)` → `if (p_value < hetid_opt("alpha_level"))`
 
 **File: `R/estimation.R`**
 
 **Changes**:
-- Line 58: `b_reps = 100` → `b_reps = .HETID_CONSTANTS$DEFAULT_BOOTSTRAP_REPS`
-- Line 77: `if (abs(cov_z_w2sq) < 1e-6)` → `if (abs(cov_z_w2sq) < .HETID_CONSTANTS$WEAK_ID_TOLERANCE)`
-- Line 114: `boot_result$t[, 1]` → `boot_result$t[, .HETID_CONSTANTS$LOWER_BOUND_IDX]`
-- Line 115: `boot_result$t[, 2]` → `boot_result$t[, .HETID_CONSTANTS$UPPER_BOUND_IDX]`
-- Line 220: `alpha = 0.05` → `alpha = .HETID_CONSTANTS$ALPHA_LEVEL`
-- Line 255: `stats::sd(lewbel_iv, na.rm = TRUE) < 1e-10` → `stats::sd(lewbel_iv, na.rm = TRUE) < .HETID_CONSTANTS$INSTRUMENT_SD_THRESHOLD`
-- Line 276: `summary(first_stage)$fstatistic[1]` → `summary(first_stage)$fstatistic[.HETID_CONSTANTS$F_STATISTIC_IDX]`
-- Line 320: `alpha = 0.05` → `alpha = .HETID_CONSTANTS$ALPHA_LEVEL`
-- Line 332: `calculate_lewbel_bounds(df, 0, ...)` → `calculate_lewbel_bounds(df, .HETID_CONSTANTS$POINT_ID_TAU, ...)`
-- Line 361: `bounds_tau0$bounds[1]` → `bounds_tau0$bounds[.HETID_CONSTANTS$LOWER_BOUND_IDX]`
-- Line 362: `bounds_tau0$bounds[2]` → `bounds_tau0$bounds[.HETID_CONSTANTS$UPPER_BOUND_IDX]`
-- Line 363: `bounds_tau_set$bounds[1]` → `bounds_tau_set$bounds[.HETID_CONSTANTS$LOWER_BOUND_IDX]`
-- Line 364: `bounds_tau_set$bounds[2]` → `bounds_tau_set$bounds[.HETID_CONSTANTS$UPPER_BOUND_IDX]`
-- Line 365: `bounds_tau_set$se[1]` → `bounds_tau_set$se[.HETID_CONSTANTS$LOWER_BOUND_IDX]`
-- Line 366: `bounds_tau_set$se[2]` → `bounds_tau_set$se[.HETID_CONSTANTS$UPPER_BOUND_IDX]`
+- Line 58: `b_reps = 100` → `b_reps = hetid_opt("bootstrap_reps")`
+- Line 77: `if (abs(cov_z_w2sq) < 1e-6)` → `if (abs(cov_z_w2sq) < constants_env$WEAK_ID_TOLERANCE)`
+- Line 114: `boot_result$t[, 1]` → `boot_result$t[, constants_env$LOWER_BOUND_IDX]`
+- Line 115: `boot_result$t[, 2]` → `boot_result$t[, constants_env$UPPER_BOUND_IDX]`
+- Line 220: `alpha = 0.05` → `alpha = hetid_opt("alpha_level")`
+- Line 255: `stats::sd(lewbel_iv, na.rm = TRUE) < 1e-10` → `stats::sd(lewbel_iv, na.rm = TRUE) < constants_env$INSTRUMENT_SD_THRESHOLD`
+- Line 276: `summary(first_stage)$fstatistic[1]` → `summary(first_stage)$fstatistic[constants_env$F_STATISTIC_IDX]`
+- Line 320: `alpha = 0.05` → `alpha = hetid_opt("alpha_level")`
+- Line 332: `calculate_lewbel_bounds(df, 0, ...)` → `calculate_lewbel_bounds(df, constants_env$POINT_ID_TAU, ...)`
+- Line 361: `bounds_tau0$bounds[1]` → `bounds_tau0$bounds[constants_env$LOWER_BOUND_IDX]`
+- Line 362: `bounds_tau0$bounds[2]` → `bounds_tau0$bounds[constants_env$UPPER_BOUND_IDX]`
+- Line 363: `bounds_tau_set$bounds[1]` → `bounds_tau_set$bounds[constants_env$LOWER_BOUND_IDX]`
+- Line 364: `bounds_tau_set$bounds[2]` → `bounds_tau_set$bounds[constants_env$UPPER_BOUND_IDX]`
+- Line 365: `bounds_tau_set$se[1]` → `bounds_tau_set$se[constants_env$LOWER_BOUND_IDX]`
+- Line 366: `bounds_tau_set$se[2]` → `bounds_tau_set$se[constants_env$UPPER_BOUND_IDX]`
 
 **Verification After Each File**:
 ```r
@@ -290,7 +338,7 @@ devtools::test()
 devtools::check()
 ```
 
-### Step 2.4: Replace String Constants
+### Step 2.5: Replace String Constants
 
 **File: `R/utils-df.R`**
 
@@ -309,22 +357,22 @@ devtools::check()
 **File: `R/utils.R`**
 
 **Changes**:
-- Line 89: `num_simulations = 200` → `num_simulations = .HETID_CONSTANTS$DEFAULT_NUM_SIMULATIONS`
-- Line 90: `main_sample_size = 500` → `main_sample_size = .HETID_CONSTANTS$DEFAULT_MAIN_SAMPLE_SIZE`
-- Line 91: `sample_sizes = c(250, 500, 1000, 2000)` → `sample_sizes = .HETID_CONSTANTS$DEFAULT_SAMPLE_SIZES`
-- Line 94: `n_reps_by_n = 100` → `n_reps_by_n = .HETID_CONSTANTS$DEFAULT_BOOTSTRAP_REPS`
-- Line 95: `n_reps_by_delta = 100` → `n_reps_by_delta = .HETID_CONSTANTS$DEFAULT_BOOTSTRAP_REPS`
-- Line 96: `bootstrap_reps = 100` → `bootstrap_reps = .HETID_CONSTANTS$DEFAULT_BOOTSTRAP_REPS`
-- Line 97: `bootstrap_subset_size = 10` → `bootstrap_subset_size = .HETID_CONSTANTS$DEFAULT_BOOTSTRAP_SUBSET_SIZE`
-- Line 98: `bootstrap_demo_size = 5` → `bootstrap_demo_size = .HETID_CONSTANTS$DEFAULT_BOOTSTRAP_DEMO_SIZE`
+- Line 89: `num_simulations = 200` → `num_simulations = constants_env$DEFAULT_NUM_SIMULATIONS`
+- Line 90: `main_sample_size = 500` → `main_sample_size = constants_env$DEFAULT_MAIN_SAMPLE_SIZE`
+- Line 91: `sample_sizes = c(250, 500, 1000, 2000)` → `sample_sizes = constants_env$DEFAULT_SAMPLE_SIZES`
+- Line 94: `n_reps_by_n = 100` → `n_reps_by_n = constants_env$DEFAULT_BOOTSTRAP_REPS`
+- Line 95: `n_reps_by_delta = 100` → `n_reps_by_delta = constants_env$DEFAULT_BOOTSTRAP_REPS`
+- Line 96: `bootstrap_reps = 100` → `bootstrap_reps = hetid_opt("bootstrap_reps")`
+- Line 97: `bootstrap_subset_size = 10` → `bootstrap_subset_size = constants_env$DEFAULT_BOOTSTRAP_SUBSET_SIZE`
+- Line 98: `bootstrap_demo_size = 5` → `bootstrap_demo_size = constants_env$DEFAULT_BOOTSTRAP_DEMO_SIZE`
 - Line 107: `endog_var_name = "Y2"` → `endog_var_name = .hetid_strings()$variables$DEFAULT_ENDOG_VAR`
 - Line 108: `exog_var_names = "Xk"` → `exog_var_names = .hetid_strings()$variables$DEFAULT_EXOG_VARS`
 - Line 109: `df_adjust = "asymptotic"` → `df_adjust = .hetid_strings()$df_adjust$ASYMPTOTIC`
-- Line 115: `set_seed = 123` → `set_seed = .HETID_CONSTANTS$DEFAULT_BASE_SEED`
-- Line 172: `config$set_seed * 1000` → `config$set_seed * .HETID_CONSTANTS$SEED_MULTIPLIER_MAIN`
-- Line 174: `config$set_seed + 1` → `config$set_seed + .HETID_CONSTANTS$SEED_OFFSET_BY_N`
-- Line 179: `config$set_seed + 2` → `config$set_seed + .HETID_CONSTANTS$SEED_OFFSET_BY_DELTA`
-- Line 183: `config$set_seed * 3000` → `config$set_seed * .HETID_CONSTANTS$SEED_MULTIPLIER_BOOTSTRAP`
+- Line 115: `set_seed = 123` → `set_seed = constants_env$DEFAULT_BASE_SEED`
+- Line 172: `config$set_seed * 1000` → `config$set_seed * constants_env$SEED_MULTIPLIER_MAIN`
+- Line 174: `config$set_seed + 1` → `config$set_seed + constants_env$SEED_OFFSET_BY_N`
+- Line 179: `config$set_seed + 2` → `config$set_seed + constants_env$SEED_OFFSET_BY_DELTA`
+- Line 183: `config$set_seed * 3000` → `config$set_seed * constants_env$SEED_MULTIPLIER_BOOTSTRAP`
 
 ## Phase 3: Simulation and Parallel Processing Constants
 
@@ -451,32 +499,66 @@ devtools::document()
 
 # 5. Build and install
 devtools::install()
+
+# 6. Performance check (if applicable)
+system.time(run_main_simulation(create_default_config(num_simulations = 5)))
 ```
 
-### Step 5.2: Behavioral Verification
+### Step 5.2: Enhanced Behavioral Verification
 
 **Create verification script** `tests/testthat/test-refactoring-verification.R`:
 
 ```r
-test_that("refactoring preserves exact behavior", {
-  # Test that constants have expected values
-  expect_equal(.HETID_CONSTANTS$WEAK_INSTRUMENT_F_THRESHOLD, 10)
-  expect_equal(.HETID_CONSTANTS$ALPHA_LEVEL, 0.05)
-  expect_equal(.HETID_CONSTANTS$Z_CRITICAL_95, 1.96)
+test_that("constants environment is locked and immutable", {
+  # Test that constants environment exists and is locked
+  expect_true(exists("constants_env"))
+  expect_true(environmentIsLocked(constants_env))
 
-  # Test string constants
+  # Test that constants cannot be modified
+  expect_error(
+    constants_env$WEAK_INSTRUMENT_F_THRESHOLD <- 999,
+    "cannot change value of locked binding"
+  )
+
+  # Test that constants have expected values
+  expect_equal(constants_env$WEAK_INSTRUMENT_F_THRESHOLD, 10)
+  expect_equal(constants_env$ALPHA_LEVEL, 0.05)
+  expect_equal(constants_env$Z_CRITICAL_95, 1.96)
+})
+
+test_that("options system works correctly", {
+  # Test default values from constants
+  expect_equal(hetid_opt("display_digits"), 4)
+  expect_equal(hetid_opt("alpha_level"), 0.05)
+
+  # Test user override capability
+  old_option <- getOption("hetid.display_digits")
+  options(hetid.display_digits = 6)
+  expect_equal(hetid_opt("display_digits"), 6)
+
+  # Restore original option
+  if (is.null(old_option)) {
+    options(hetid.display_digits = NULL)
+  } else {
+    options(hetid.display_digits = old_option)
+  }
+})
+
+test_that("string constants function works", {
   strings <- .hetid_strings()
   expect_equal(strings$df_adjust$ASYMPTOTIC, "asymptotic")
   expect_equal(strings$df_adjust$FINITE, "finite")
   expect_equal(strings$columns$STD_ERROR, "Std. Error")
+})
 
+test_that("refactoring preserves exact function behavior", {
   # Test that functions still work with same inputs/outputs
   config <- create_default_config()
   expect_equal(config$num_simulations, 200)
   expect_equal(config$main_sample_size, 500)
   expect_equal(config$alpha1, -0.5)
 
-  # Test data generation
+  # Test data generation reproducibility
   params <- list(
     beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
     beta2_0 = 1.0, beta2_1 = -1.0,
@@ -491,6 +573,26 @@ test_that("refactoring preserves exact behavior", {
 
   expect_equal(data1, data2)
   expect_true(all(c("Y1", "Y2", "Xk", "Z") %in% names(data1)))
+})
+
+test_that("snapshot testing for critical functions", {
+  skip_on_cran()
+
+  # Test data generation snapshot
+  params <- list(
+    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
+    beta2_0 = 1.0, beta2_1 = -1.0,
+    alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
+  )
+
+  set.seed(42)
+  data_snapshot <- generate_lewbel_data(10, params)
+  expect_snapshot_value(data_snapshot, style = "serialize")
+
+  # Test bounds calculation snapshot
+  set.seed(42)
+  bounds_snapshot <- calculate_lewbel_bounds(data_snapshot, tau = 0.2)
+  expect_snapshot_value(bounds_snapshot, style = "serialize")
 })
 
 test_that("visualization functions work with constants", {
@@ -515,7 +617,7 @@ test_that("visualization functions work with constants", {
 })
 ```
 
-### Step 5.3: Performance Verification
+### Step 5.3: Enhanced Performance Verification
 
 **Create performance test** `tests/testthat/test-performance-unchanged.R`:
 
@@ -526,14 +628,45 @@ test_that("refactoring does not impact performance", {
   config <- create_default_config(num_simulations = 10)
   seeds <- generate_all_seeds(config)
 
+  # Baseline timing for comparison
+  baseline_time <- 30  # seconds - adjust based on your system
+
   # Time a small simulation
   timing <- system.time({
     results <- run_main_simulation(config, seeds, verbose = FALSE)
   })
 
-  # Should complete in reasonable time (adjust threshold as needed)
-  expect_lt(timing[["elapsed"]], 30)
+  # Should complete within 105% of baseline (5% tolerance)
+  expect_lt(timing[["elapsed"]], baseline_time * 1.05)
   expect_equal(nrow(results), 10)
+
+  # Test that constants access is fast
+  constant_timing <- system.time({
+    for (i in 1:1000) {
+      val <- constants_env$WEAK_INSTRUMENT_F_THRESHOLD
+    }
+  })
+  expect_lt(constant_timing[["elapsed"]], 0.1)  # Should be very fast
+
+  # Test that options access is reasonable
+  options_timing <- system.time({
+    for (i in 1:1000) {
+      val <- hetid_opt("display_digits")
+    }
+  })
+  expect_lt(options_timing[["elapsed"]], 1.0)  # Should be reasonably fast
+})
+
+test_that("memory usage is reasonable", {
+  skip_on_cran()
+
+  # Test that constants don't consume excessive memory
+  const_size <- object.size(constants_env)
+  expect_lt(as.numeric(const_size), 10000)  # Less than 10KB
+
+  # Test that string constants function is lightweight
+  strings_size <- object.size(.hetid_strings())
+  expect_lt(as.numeric(strings_size), 5000)  # Less than 5KB
 })
 ```
 
@@ -542,7 +675,7 @@ test_that("refactoring does not impact performance", {
 ### Step 6.1: Update Documentation
 
 **Update DESCRIPTION**:
-- Add `rlang` to Imports
+- Add `rlang` and `options` to Imports
 - Update version number
 - Add note about constants refactoring in NEWS.md
 
@@ -552,16 +685,24 @@ test_that("refactoring does not impact performance", {
 
 ## Major Changes
 
-* Refactored all magic numbers and strings to use named constants
+* Refactored all magic numbers and strings to use locked constants environment
 * Replaced globalVariables() with .data pronoun for NSE variables
+* Added user-configurable options system with hetid_opt()
 * Improved code maintainability and reduced magic number usage
+
+## New Features
+
+* Users can now override package defaults using options (e.g., options(hetid.display_digits = 6))
+* Immutable constants environment prevents accidental modification
+* Enhanced test coverage with snapshot testing and performance verification
 
 ## Internal Changes
 
-* Added .HETID_CONSTANTS for numeric constants
+* Added locked constants_env for numeric constants
 * Added .hetid_strings() for string constants
+* Added hetid_opt() for user-configurable options
 * Updated all visualization functions to use consistent constants
-* Enhanced test coverage for constant usage
+* Enhanced test coverage for constant usage and immutability
 ```
 
 ### Step 6.2: Final Verification
@@ -632,9 +773,11 @@ The refactoring is complete and successful when:
 2. ✅ **R CMD check passes**: `devtools::check()` with no errors/warnings/notes
 3. ✅ **No globalVariables**: `checkglobals::checkglobals()` reports no issues
 4. ✅ **No magic numbers**: Manual review finds no hardcoded constants
-5. ✅ **Behavior preserved**: All function outputs identical to baseline
-6. ✅ **Performance maintained**: No significant performance degradation
-7. ✅ **Documentation updated**: All changes documented in NEWS.md
+5. ✅ **Behavior preserved**: All function outputs identical to baseline (verified by snapshot tests)
+6. ✅ **Performance maintained**: No significant performance degradation (≤5% tolerance)
+7. ✅ **Constants immutable**: Environment is locked and cannot be modified
+8. ✅ **Options system works**: Users can override defaults via options()
+9. ✅ **Documentation updated**: All changes documented in NEWS.md
 
 ## Rollback Plan
 
@@ -647,12 +790,12 @@ If any step fails:
 ## Timeline Estimate
 
 - **Phase 1 (NSE)**: 2-3 hours
-- **Phase 2 (Constants)**: 4-6 hours
+- **Phase 2 (Constants & Options)**: 5-7 hours
 - **Phase 3 (Simulation)**: 2-3 hours
 - **Phase 4 (Visualization)**: 2-3 hours
-- **Phase 5 (Verification)**: 2-3 hours
+- **Phase 5 (Enhanced Verification)**: 3-4 hours
 - **Phase 6 (Documentation)**: 1-2 hours
 
-**Total**: 13-20 hours for a junior developer
+**Total**: 15-22 hours for a junior developer
 
 This plan ensures that the refactoring is systematic, verifiable, and maintains exact behavioral compatibility while implementing all 2025 best practices for magic variables in R packages.
