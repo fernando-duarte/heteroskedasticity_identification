@@ -41,6 +41,7 @@ claude
 cli
 CLI
 cmd
+const
 CMD
 codebase
 codecov

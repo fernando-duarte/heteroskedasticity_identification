@@ -30,13 +30,13 @@ create_default_config(
 }
 \arguments{
 \item{num_simulations}{Integer. Number of main simulation runs
-(default: 200).}
+(default: 1000).}
 
 \item{main_sample_size}{Integer. Primary sample size for main results
-(default: 500).}
+(default: 1000).}
 
 \item{sample_sizes}{Integer vector. Sample sizes for consistency analysis
-(default: c(250, 500, 1000, 2000)).}
+(default: c(500, 1000, 2000)).}
 
 \item{delta_het}{Numeric. Heteroscedasticity strength parameter
 (default: 1.2).}

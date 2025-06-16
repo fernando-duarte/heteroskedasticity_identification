@@ -103,6 +103,7 @@ reference:
 - title: "Utilities"
   desc: "Helper functions for checking optional dependencies and Stata integration"
   contents:
+  - hetid_opt
   - has_curl
   - has_haven
   - has_rendo

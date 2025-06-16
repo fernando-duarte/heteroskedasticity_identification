@@ -93,13 +93,16 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
       config$gamma1 >= results_clean$bound_lower_tau_set &
         config$gamma1 <= results_clean$bound_upper_tau_set
     ),
-    `Point ID Check` = tryCatch({
-      stats::cor(
-        (results_clean$bound_upper_tau0 + results_clean$bound_lower_tau0) / 2,
-        results_clean$tsls_gamma1,
-        use = "complete.obs"
-      )
-    }, error = function(e) NA_real_),
+    `Point ID Check` = tryCatch(
+      {
+        stats::cor(
+          (results_clean$bound_upper_tau0 + results_clean$bound_lower_tau0) / 2,
+          results_clean$tsls_gamma1,
+          use = "complete.obs"
+        )
+      },
+      error = function(e) NA_real_
+    ),
     check.names = FALSE
   )
 
@@ -181,11 +184,11 @@ analyze_bootstrap_results <- function(results_main,
 
     # Select columns
     bootstrap_selected <- dplyr::select(bootstrap_examples,
-      .data$sim_id,
-      lower = .data$bound_lower_tau_set,
-      upper = .data$bound_upper_tau_set,
-      se_lower = .data$bound_se_lower,
-      se_upper = .data$bound_se_upper
+      "sim_id",
+      lower = "bound_lower_tau_set",
+      upper = "bound_upper_tau_set",
+      se_lower = "bound_se_lower",
+      se_upper = "bound_se_upper"
     )
 
     # Slice and round
@@ -193,7 +196,7 @@ analyze_bootstrap_results <- function(results_main,
     bootstrap_table <- dplyr::mutate(
       bootstrap_table,
       dplyr::across(
-        dplyr::where(is.numeric) & !.data$sim_id,
+        dplyr::where(is.numeric) & !"sim_id",
         ~ round(., hetid_opt("display_digits"))
       )
     )
