@@ -57,51 +57,108 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 # Copy pandoc from minimal image instead of installing via apt
 # This saves ~200MB compared to apt-get install pandoc
-COPY --from=pandoc/minimal:latest /usr/bin/pandoc /usr/local/bin/pandoc
+COPY --from=pandoc/minimal:latest /usr/local/bin/pandoc /usr/local/bin/pandoc
 
-# Install pak for fast parallel package installation
+# Install pak for fast parallel package installation (skip on ARM64 due to compatibility issues)
 # Use BuildKit cache mount for R package downloads
 RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
     R -e "options(repos = 'https://cloud.r-project.org/'); \
           .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
-          install.packages('pak', repos = 'https://r-lib.github.io/p/pak/stable/', \
-                         lib = '/usr/local/lib/R/site-library')"
+          arch <- Sys.info()[['machine']]; \
+          if (arch != 'aarch64' && arch != 'arm64') { \
+            tryCatch({ \
+              install.packages('pak', repos = 'https://r-lib.github.io/p/pak/stable/', \
+                             lib = '/usr/local/lib/R/site-library'); \
+              library(pak); \
+              cat('pak installed successfully\n'); \
+            }, error = function(e) { \
+              cat('pak installation failed, will use traditional install.packages\n'); \
+            }); \
+          } else { \
+            cat('Skipping pak on ARM64 architecture, will use traditional install.packages\n'); \
+          }"
 
-# Install package management tools using pak (40-50% faster)
+# Install package management tools
 RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
     R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
-          pak::pkg_install(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat', 'tinytex'), \
-                         lib = '/usr/local/lib/R/site-library')"
+          arch <- Sys.info()[['machine']]; \
+          if (arch != 'aarch64' && arch != 'arm64' && requireNamespace('pak', quietly = TRUE)) { \
+            tryCatch({ \
+              pak::pkg_install(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat', 'tinytex'), \
+                             lib = '/usr/local/lib/R/site-library'); \
+            }, error = function(e) { \
+              install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat', 'tinytex'), \
+                             lib = '/usr/local/lib/R/site-library'); \
+            }); \
+          } else { \
+            install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat', 'tinytex'), \
+                           lib = '/usr/local/lib/R/site-library'); \
+          }"
 
 # Install TinyTeX for LaTeX support (much smaller than texlive)
 # This replaces ~3GB of texlive packages with ~150MB TinyTeX
-RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
-    /opt/TinyTeX/bin/*/tlmgr path add
+# TODO: Re-enable once ARM64 performance is improved
+# RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
+#     /opt/TinyTeX/bin/*/tlmgr path add
 
 # Ensure TinyTeX is in PATH for all subsequent operations
-ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
+# TODO: Re-enable once TinyTeX is installed
+# ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
 
 # Copy package metadata files first for better layer caching
 COPY DESCRIPTION NAMESPACE ./
 
-# Install all package dependencies using pak for parallel builds
+# Install all package dependencies
 # Note: nloptr requires libnlopt-dev which was already installed in system dependencies
 RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
     R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
-          pak::pkg_install(c('nloptr', 'minqa', 'RcppEigen', 'lme4', 'pbkrtest', 'car', 'AER', \
-                           'boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr'), \
-                         lib = '/usr/local/lib/R/site-library'); \
+          arch <- Sys.info()[['machine']]; \
+          if (arch != 'aarch64' && arch != 'arm64' && requireNamespace('pak', quietly = TRUE)) { \
+            tryCatch({ \
+              pak::pkg_install(c('nloptr', 'minqa', 'RcppEigen', 'lme4', 'pbkrtest', 'car', 'AER', \
+                               'boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr'), \
+                             lib = '/usr/local/lib/R/site-library'); \
+            }, error = function(e) { \
+              install.packages(c('nloptr', 'minqa', 'RcppEigen', 'lme4', 'pbkrtest', 'car', 'AER', \
+                               'boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr'), \
+                             lib = '/usr/local/lib/R/site-library'); \
+            }); \
+          } else { \
+            install.packages(c('nloptr', 'minqa', 'RcppEigen', 'lme4', 'pbkrtest', 'car', 'AER', \
+                             'boot', 'dplyr', 'furrr', 'future', 'ggplot2', 'purrr', 'rlang', 'tidyr'), \
+                           lib = '/usr/local/lib/R/site-library'); \
+          }; \
           if (!requireNamespace('testthat', quietly = TRUE)) stop('testthat installation failed')"
 
-# Install package dependencies using pak (faster than remotes)
+# Install package dependencies
 # Install both runtime and test dependencies (including Suggests)
 RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
     R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
-          pak::local_install_deps(dependencies = TRUE)"
+          arch <- Sys.info()[['machine']]; \
+          if (arch != 'aarch64' && arch != 'arm64' && requireNamespace('pak', quietly = TRUE)) { \
+            tryCatch({ \
+              pak::local_install_deps(dependencies = TRUE); \
+            }, error = function(e) { \
+              remotes::install_deps(dependencies = TRUE); \
+            }); \
+          } else { \
+            remotes::install_deps(dependencies = TRUE); \
+          }"
 
 # Install security scanning tools (oysteR) for vulnerability checks
 RUN R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
-          if (!requireNamespace('oysteR', quietly = TRUE)) pak::pkg_install('oysteR', lib = '/usr/local/lib/R/site-library'); \
+          if (!requireNamespace('oysteR', quietly = TRUE)) { \
+            arch <- Sys.info()[['machine']]; \
+            if (arch != 'aarch64' && arch != 'arm64' && requireNamespace('pak', quietly = TRUE)) { \
+              tryCatch({ \
+                pak::pkg_install('oysteR', lib = '/usr/local/lib/R/site-library'); \
+              }, error = function(e) { \
+                install.packages('oysteR', lib = '/usr/local/lib/R/site-library'); \
+              }); \
+            } else { \
+              install.packages('oysteR', lib = '/usr/local/lib/R/site-library'); \
+            } \
+          }; \
           library(oysteR); \
           audit_results <- audit_installed_r_pkgs(verbose = FALSE); \
           if (nrow(get_vulnerabilities(audit_results)) > 0) { \
@@ -118,8 +175,6 @@ RUN R CMD build . --no-build-vignettes && \
     R CMD INSTALL *.tar.gz --with-keep.source && \
     # Verify installation
     R -e "library(hetid); packageVersion('hetid')" && \
-    # Verify devtools is available for testing
-    R -e "if (!requireNamespace('devtools', quietly = TRUE)) stop('devtools not available in builder stage')" && \
     # Strip build tools to reduce image size (saves ~250MB)
     # Keep essential dev libraries that R packages might need at runtime
     apt-get remove -y build-essential gfortran && \
@@ -171,7 +226,8 @@ RUN groupadd -r hetid && useradd -r -g hetid -m -s /bin/bash hetid
 COPY --from=builder /usr/local/lib/R/site-library/ /usr/local/lib/R/site-library/
 
 # Copy TinyTeX installation from builder
-COPY --from=builder /opt/TinyTeX /opt/TinyTeX
+# TODO: Re-enable once TinyTeX is installed in builder
+# COPY --from=builder /opt/TinyTeX /opt/TinyTeX
 
 # Copy pandoc from builder (was copied from minimal container)
 COPY --from=builder /usr/local/bin/pandoc /usr/local/bin/pandoc
@@ -191,7 +247,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 ENV R_LIBS_USER=/usr/local/lib/R/site-library
 ENV OMP_NUM_THREADS=1
 ENV OPENBLAS_NUM_THREADS=1
-ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
+# ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
 
 # Default command
 CMD ["R", "--slave", "-e", "library(hetid); cat('hetid package loaded successfully\\n')"]

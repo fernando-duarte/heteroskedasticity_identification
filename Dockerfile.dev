@@ -53,22 +53,54 @@ RUN --mount=type=cache,target=/var/cache/apt \
 
 # Copy pandoc from minimal image instead of installing via apt
 # This saves ~200MB compared to apt-get install pandoc
-COPY --from=pandoc/minimal:latest /usr/bin/pandoc /usr/local/bin/pandoc
+COPY --from=pandoc/minimal:latest /usr/local/bin/pandoc /usr/local/bin/pandoc
 
-# Install pak for fast parallel package installation
+# Install pak for fast parallel package installation (skip on ARM64 due to compatibility issues)
 # Use BuildKit cache mount for R package downloads
 RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
-    R -e "install.packages('pak', repos = 'https://r-lib.github.io/p/pak/stable/')"
+    R -e "arch <- Sys.info()[['machine']]; \
+          if (arch != 'aarch64' && arch != 'arm64') { \
+            tryCatch({ \
+              install.packages('pak', repos = 'https://r-lib.github.io/p/pak/stable/'); \
+              library(pak); \
+              cat('pak installed successfully\n'); \
+            }, error = function(e) { \
+              cat('pak installation failed, will use traditional install.packages\n'); \
+            }); \
+          } else { \
+            cat('Skipping pak on ARM64 architecture, will use traditional install.packages\n'); \
+          }"
 
-# Install comprehensive R development packages using pak (40-50% faster)
+# Install comprehensive R development packages
 RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
-    R -e "pak::pkg_install(c( \
-        'devtools', 'remotes', 'usethis', \
-        'testthat', 'covr', 'lintr', 'styler', \
-        'roxygen2', 'pkgdown', 'rmarkdown', 'knitr', \
-        'profvis', 'bench', 'here', 'fs', 'glue', 'cli', \
-        'tinytex' \
-    ), lib = .libPaths()[1])"
+    R -e "arch <- Sys.info()[['machine']]; \
+          if (arch != 'aarch64' && arch != 'arm64' && requireNamespace('pak', quietly = TRUE)) { \
+            tryCatch({ \
+              pak::pkg_install(c( \
+                'devtools', 'remotes', 'usethis', \
+                'testthat', 'covr', 'lintr', 'styler', \
+                'roxygen2', 'pkgdown', 'rmarkdown', 'knitr', \
+                'profvis', 'bench', 'here', 'fs', 'glue', 'cli', \
+                'tinytex' \
+              ), lib = .libPaths()[1]); \
+            }, error = function(e) { \
+              install.packages(c( \
+                'devtools', 'remotes', 'usethis', \
+                'testthat', 'covr', 'lintr', 'styler', \
+                'roxygen2', 'pkgdown', 'rmarkdown', 'knitr', \
+                'profvis', 'bench', 'here', 'fs', 'glue', 'cli', \
+                'tinytex' \
+              ), lib = .libPaths()[1]); \
+            }); \
+          } else { \
+            install.packages(c( \
+              'devtools', 'remotes', 'usethis', \
+              'testthat', 'covr', 'lintr', 'styler', \
+              'roxygen2', 'pkgdown', 'rmarkdown', 'knitr', \
+              'profvis', 'bench', 'here', 'fs', 'glue', 'cli', \
+              'tinytex' \
+            ), lib = .libPaths()[1]); \
+          }"
 
 # Install TinyTeX for LaTeX support (replaces heavy texlive packages)
 RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \

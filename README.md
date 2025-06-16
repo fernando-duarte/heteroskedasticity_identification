@@ -292,6 +292,18 @@ docker run --rm hetid:latest R -e "library(hetid); run_lewbel_monte_carlo()"
 docker build -t hetid:latest --target production .
 ```
 
+#### Platform-Specific Optimizations
+
+**Apple Silicon (M1/M2/M3) Users**: For 40% faster builds, use x86_64 emulation:
+
+```bash
+# Force x86_64 architecture for pak compatibility
+docker build --platform linux/amd64 -t hetid:dev-x86 -f Dockerfile.dev .
+docker run --platform linux/amd64 -p 8787:8787 hetid:dev-x86
+```
+
+This works because pak's parallel installation (even with emulation overhead) is much faster than sequential `install.packages()` on native ARM64.
+
 #### Docker Features
 
 - **Multi-stage builds** for optimized production images

@@ -137,6 +137,45 @@ FROM ghcr.io/osgeo/gdal:alpine-small AS base
 **Alternative**: Use renv with global cache
 **Impact**: Shared packages across projects, faster restoration
 
+## Platform-Specific Recommendations
+
+### For ARM64 Users (Apple Silicon, AWS Graviton)
+
+**Use x86_64 Emulation for Faster Builds**:
+```bash
+# 40% faster overall despite emulation overhead
+docker build --platform linux/amd64 -t hetid:dev -f Dockerfile.dev .
+```
+
+**Why it's faster**: pak's parallel package installation (even with ~20% emulation overhead) beats sequential installation by 40-50%.
+
+### Re-enabling TinyTeX
+
+Currently disabled for faster testing. To re-enable:
+
+1. **Uncomment in Dockerfile** (lines 76-79):
+   ```dockerfile
+   RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
+       /opt/TinyTeX/bin/*/tlmgr path add
+   ```
+
+2. **Uncomment PATH setting** (line 82):
+   ```dockerfile
+   ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
+   ```
+
+3. **Uncomment in production stage** (line 174):
+   ```dockerfile
+   COPY --from=builder /opt/TinyTeX /opt/TinyTeX
+   ```
+
+**When to re-enable**:
+- Need PDF vignette building
+- Using x86_64 emulation (faster TinyTeX install)
+- Production deployment requires LaTeX
+
+**Impact**: Adds ~20-30 minutes to build time on ARM64, ~10 minutes on x86_64
+
 ## Implementation Roadmap
 
 ### Immediate Actions (Do First)

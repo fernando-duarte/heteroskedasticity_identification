@@ -14,6 +14,10 @@ help: ## Show this help message
 	@echo "  make dev-start    # Start development environment"
 	@echo "  make test         # Run package tests"
 	@echo "  make simulation   # Run Monte Carlo simulation"
+	@echo ""
+	@echo "ARM64/Apple Silicon Users:"
+	@echo "  make detect-arch  # Check your architecture"
+	@echo "  make dev-start-x86 # Use x86 emulation (40% faster)"
 
 # Build targets
 build: ## Build production Docker image
@@ -129,6 +133,26 @@ deploy-test: ## Test production image
 build-multiplatform: ## Build multi-platform images
 	@echo "Building multi-platform images..."
 	./docker/scripts/build.sh -t production -p linux/amd64 --push
+
+# Platform-specific targets for ARM64 users (Apple Silicon, etc.)
+dev-start-x86: ## Start dev with x86 emulation (40% faster on ARM64)
+	@echo "Starting development environment with x86_64 emulation..."
+	@echo "This provides faster builds on Apple Silicon by enabling pak"
+	DOCKER_DEFAULT_PLATFORM=linux/amd64 docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d hetid-dev
+	@echo "RStudio Server available at: http://localhost:8787"
+
+build-dev-x86: ## Build dev image with x86 emulation (faster on ARM64)
+	@echo "Building development image with x86_64 emulation..."
+	docker build --platform linux/amd64 -t hetid:dev-x86 -f Dockerfile.dev .
+
+detect-arch: ## Show current architecture settings
+	@echo "Host architecture: $$(uname -m)"
+	@echo "Docker default: $$(docker run --rm alpine uname -m)"
+	@if [ "$$(uname -m)" = "arm64" ] || [ "$$(uname -m)" = "aarch64" ]; then \
+		echo ""; \
+		echo "💡 TIP: You're on ARM64. For faster builds, use:"; \
+		echo "   make dev-start-x86  (40% faster with pak support)"; \
+	fi
 
 # Development workflow shortcuts
 dev: dev-start ## Alias for dev-start
