@@ -23,6 +23,6 @@ Null
 Conditionally print messages.
 Allows developers to easily control verbosity of functions,
 and meet Bioconductor requirements that dictate the message
-must first be stored to a variable before passing to \link[base]{message}.
+must first be stored to a variable before passing to message().
 }
 \keyword{internal}
