@@ -1,9 +1,5 @@
-# Global variables to avoid R CMD check NOTEs
-utils::globalVariables(c(
-  "bound_se_lower", "sim_id", "bound_lower_tau_set", "bound_upper_tau_set",
-  "bound_se_upper", "sample_size", "tsls_gamma1", "first_stage_F",
-  "delta_het"
-))
+#' @importFrom rlang .data
+NULL
 
 #' Analyze Main Simulation Results
 #'
@@ -69,13 +65,13 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
 
   if (verbose) {
     if (requireNamespace("knitr", quietly = TRUE)) {
-      print(knitr::kable(summary_table, digits = 4))
+      print(knitr::kable(summary_table, digits = hetid_opt("display_digits")))
     } else {
       print(summary_table)
     }
 
     # Weak instrument diagnostics
-    weak_iv_pct <- mean(results_clean$first_stage_F < 10) * 100
+    weak_iv_pct <- mean(results_clean$first_stage_F < constants_env$WEAK_INSTRUMENT_F_THRESHOLD) * 100
     cat(sprintf(
       paste0(
         "\nWeak instrument diagnostic: %.1f%% of simulations have ",
@@ -109,7 +105,7 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
       "\n"
     ))
     if (requireNamespace("knitr", quietly = TRUE)) {
-      print(knitr::kable(bounds_summary, digits = 4))
+      print(knitr::kable(bounds_summary, digits = hetid_opt("display_digits")))
     } else {
       print(bounds_summary)
     }
@@ -118,7 +114,7 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
   list(
     summary_table = summary_table,
     bounds_summary = bounds_summary,
-    weak_iv_pct = mean(results_clean$first_stage_F < 10) * 100,
+    weak_iv_pct = mean(results_clean$first_stage_F < constants_env$WEAK_INSTRUMENT_F_THRESHOLD) * 100,
     results_clean = results_clean
   )
 }
@@ -156,7 +152,7 @@ analyze_bootstrap_results <- function(results_main,
                                       verbose = TRUE) {
   # Combine bootstrap examples
   # First filter results_main
-  filtered_main <- dplyr::filter(results_main, !is.na(bound_se_lower))
+  filtered_main <- dplyr::filter(results_main, !is.na(.data$bound_se_lower))
   sliced_main <- dplyr::slice_head(
     filtered_main,
     n = config$bootstrap_subset_size
@@ -178,20 +174,20 @@ analyze_bootstrap_results <- function(results_main,
 
     # Select columns
     bootstrap_selected <- dplyr::select(bootstrap_examples,
-      sim_id,
-      lower = bound_lower_tau_set,
-      upper = bound_upper_tau_set,
-      se_lower = bound_se_lower,
-      se_upper = bound_se_upper
+      .data$sim_id,
+      lower = .data$bound_lower_tau_set,
+      upper = .data$bound_upper_tau_set,
+      se_lower = .data$bound_se_lower,
+      se_upper = .data$bound_se_upper
     )
 
     # Slice and round
-    bootstrap_table <- dplyr::slice_head(bootstrap_selected, n = 10)
+    bootstrap_table <- dplyr::slice_head(bootstrap_selected, n = constants_env$BOOTSTRAP_TABLE_DISPLAY_LIMIT)
     bootstrap_table <- dplyr::mutate(
       bootstrap_table,
       dplyr::across(
-        dplyr::where(is.numeric) & !sim_id,
-        ~ round(., 4)
+        dplyr::where(is.numeric) & !.data$sim_id,
+        ~ round(., hetid_opt("display_digits"))
       )
     )
 
@@ -231,14 +227,14 @@ analyze_sample_size_results <- function(results_by_n,
                                         config,
                                         verbose = TRUE) {
   # Group by sample size and summarize
-  grouped_n <- dplyr::group_by(results_by_n, sample_size)
+  grouped_n <- dplyr::group_by(results_by_n, .data$sample_size)
   n_summary <- dplyr::summarise(
     grouped_n,
-    `2SLS Bias` = mean(tsls_gamma1, na.rm = TRUE) - config$gamma1,
+    `2SLS Bias` = mean(.data$tsls_gamma1, na.rm = TRUE) - config$gamma1,
     `2SLS RMSE` = sqrt(
-      mean((tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)
+      mean((.data$tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)
     ),
-    `Avg First-Stage F` = mean(first_stage_F, na.rm = TRUE),
+    `Avg First-Stage F` = mean(.data$first_stage_F, na.rm = TRUE),
     .groups = "drop"
   )
 
@@ -248,7 +244,7 @@ analyze_sample_size_results <- function(results_by_n,
       "\n"
     ))
     if (requireNamespace("knitr", quietly = TRUE)) {
-      print(knitr::kable(n_summary, digits = 4))
+      print(knitr::kable(n_summary, digits = hetid_opt("display_digits")))
     } else {
       print(n_summary)
     }
@@ -285,16 +281,16 @@ analyze_sensitivity_results <- function(results_by_delta,
                                         config,
                                         verbose = TRUE) {
   # Group by delta_het and summarize
-  grouped_delta <- dplyr::group_by(results_by_delta, delta_het)
+  grouped_delta <- dplyr::group_by(results_by_delta, .data$delta_het)
   delta_summary <- dplyr::summarise(
     grouped_delta,
-    `2SLS Bias` = mean(tsls_gamma1, na.rm = TRUE) - config$gamma1,
+    `2SLS Bias` = mean(.data$tsls_gamma1, na.rm = TRUE) - config$gamma1,
     `2SLS RMSE` = sqrt(
-      mean((tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)
+      mean((.data$tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)
     ),
-    `Avg First-Stage F` = mean(first_stage_F, na.rm = TRUE),
+    `Avg First-Stage F` = mean(.data$first_stage_F, na.rm = TRUE),
     `Bounds Width` = mean(
-      bound_upper_tau_set - bound_lower_tau_set,
+      .data$bound_upper_tau_set - .data$bound_lower_tau_set,
       na.rm = TRUE
     ),
     .groups = "drop"
@@ -306,7 +302,7 @@ analyze_sensitivity_results <- function(results_by_delta,
       "\n"
     ))
     if (requireNamespace("knitr", quietly = TRUE)) {
-      print(knitr::kable(delta_summary, digits = 4))
+      print(knitr::kable(delta_summary, digits = hetid_opt("display_digits")))
     } else {
       print(delta_summary)
     }
