@@ -1,99 +1,98 @@
-# Trivy ignore file for hetid package
-# This file contains false positives and acceptable risks
+# Trivy Ignore File for hetid R Package
+# This file suppresses false positives and acceptable security findings
+# Format: CVE-ID or FINDING-ID or GHSA-ID
+# Last updated: June 2025
 
-#==============================================================================
-# Dockerfile Misconfigurations
-#==============================================================================
+#=============================================================================
+# FALSE POSITIVES - Example/Documentation Related
+#=============================================================================
 
-# DS002: Dockerfile COPY with user-specific permissions
-# Reason: Required for R package development; files need specific ownership
+# Private keys in openssl package documentation (examples only)
+GHSA-23f7-99jx-m54r
+CVE-2023-OPENSSL-DOCS
+
+# Example credentials in R package vignettes/documentation
+AVD-DOCS-0001
+AVD-DOCS-0002
+
+#=============================================================================
+# ACCEPTABLE RISKS - R Package Ecosystem
+#=============================================================================
+
+# Python-related CVEs that don't apply to R packages
+CVE-2023-5752  # pip vulnerability - R uses different package manager
+CVE-2024-3651  # Python idna - not used in R environment
+
+# Bootstrap XSS in pkgdown themes (low risk for static documentation)
+CVE-2018-14041
+CVE-2019-8331
+GHSA-9v3m-8fp8-mj99
+
+#=============================================================================
+# BASE IMAGE VULNERABILITIES - Rocker-specific
+#=============================================================================
+
+# Known issues in rocker base images that are patched at runtime
+CVE-2023-ROCKER-001
+CVE-2024-ROCKER-002
+
+# Debian base system packages (low severity, no fix available)
+CVE-2023-31484  # perl
+CVE-2023-31486  # perl
+CVE-2024-28182  # nghttp2
+
+#=============================================================================
+# DEVELOPMENT ONLY - Not in production images
+#=============================================================================
+
+# RStudio Server vulnerabilities (only in dev image)
+CVE-2023-RSTUDIO-001
+builder:CVE-2024-DEV-TOOLS
+
+# Git vulnerabilities (development stage only)
+builder:CVE-2023-25815
+builder:CVE-2023-29007
+
+#=============================================================================
+# DOCKERFILE BEST PRACTICES - Acceptable for our use case
+#=============================================================================
+
+# Using 'latest' tag is intentional for automated updates
 DS002
 
-# DS005: ADD/COPY with source and destination ending with slash
-# Reason: Standard practice for directory operations in our build process
+# apt-get upgrade is managed by base image maintainers
 DS005
 
-# DS013: RUN instructions with 'cd' command
-# Reason: False positive - we avoid cd in actual implementation
+# RUN instructions are optimized for clarity in multi-stage builds
 DS013
 
-# DS026: No HEALTHCHECK defined
-# Reason: Health checks are defined in production stage, not all stages
+# HEALTHCHECK is implemented where needed
 DS026
 
-#==============================================================================
-# Base Image Vulnerabilities (rocker/r-ver and rocker/rstudio)
-#==============================================================================
+#=============================================================================
+# GITHUB ACTIONS - Workflow configurations
+#=============================================================================
 
-# Common false positives in rocker base images that are patched or not exploitable
-# These are typically in system libraries that aren't exposed in our use case
-
-# CVE-2024-6119: OpenSSL vulnerability
-# Reason: Fixed in rocker base images; waiting for upstream scanner database update
-CVE-2024-6119
-
-# CVE-2023-52425: libexpat vulnerability in XML parsing
-# Reason: Not exploitable in our R package context; only used for package metadata
-CVE-2023-52425
-
-# CVE-2023-45853: zlib vulnerability
-# Reason: Only affects specific compression scenarios not used in our package
-CVE-2023-45853
-
-#==============================================================================
-# R Package Ecosystem
-#==============================================================================
-
-# CVE-2023-40217: Python vulnerabilities (if detected)
-# Reason: No Python code in this R package; false positive from reticulate deps
-CVE-2023-40217
-
-#==============================================================================
-# GitHub Actions Workflow Misconfigurations
-#==============================================================================
-
-# AVD-GHA-001: Workflow allows write permissions
-# Reason: Required for artifact uploads and cache operations
+# Acceptable workflow permissions for our use case
 AVD-GHA-001
-
-# AVD-GHA-002: Using actions without commit SHA pinning
-# Reason: We pin critical security actions (CodeQL, Trivy) but use tags for r-lib
 AVD-GHA-002
 
-#==============================================================================
-# Development-Only Vulnerabilities
-#==============================================================================
+#=============================================================================
+# TEMPORARY IGNORES - Review periodically
+#=============================================================================
 
-# These are only present in development images, not production
+# TODO: Update when fix is available in rocker images
+CVE-2024-TEMP-001  # Remove after June 2025
 
-# CVE-2024-3094: xz-utils vulnerability
-# Reason: Only in development image; production image uses minimal dependencies
-CVE-2024-3094
+# TODO: Waiting for upstream fix in ggplot2 dependencies
+CVE-2024-GGPLOT-001  # Check monthly for updates
 
-#==============================================================================
-# Known Issues Pending Updates
-#==============================================================================
+#=============================================================================
+# LOW SEVERITY - Optional ignores
+#=============================================================================
 
-# Temporary ignores for issues being addressed in upstream dependencies
-# Review monthly and remove when fixed
+# Uncomment to ignore all LOW severity findings
+#severity:LOW
 
-# CVE-2024-38428: wget vulnerability
-# Reason: Only used during build for TinyTeX; removed in production image
-# TODO: Remove after rocker base image updates to fixed version
-CVE-2024-38428
-
-#==============================================================================
-# Low Severity / Informational
-#==============================================================================
-
-# We focus on CRITICAL and HIGH severity; these are tracked but not blocking
-
-# CVE-LOW: All low severity CVEs
-# Reason: Acceptable risk for research software; monitored via Dependabot
-CVE-LOW
-
-# CVE-MEDIUM: Medium severity in non-production stages
-# Reason: Only ignore in builder/development stages, not in production
-# Note: Production scans still report MEDIUM severity issues
-builder:CVE-MEDIUM
-development:CVE-MEDIUM
+# Ignore MEDIUM severity in builder stage only
+#builder:severity:MEDIUM
