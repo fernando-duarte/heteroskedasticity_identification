@@ -3,7 +3,7 @@
 # Optimized for interactive development with RStudio Server
 # Includes all development tools and debugging capabilities
 
-FROM rocker/rstudio:4.4.3
+FROM rocker/rstudio:4.5.0
 
 # Development metadata
 LABEL org.opencontainers.image.title="hetid Development Environment"

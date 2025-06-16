@@ -6,9 +6,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is **hetid**, an R package implementing Lewbel (2012)'s identification through heteroskedasticity method for econometric models with endogenous regressors. The package provides tools for estimation and inference when traditional instrumental variables are unavailable.
 
+## R Version Information
+
+- **Current R Version**: 4.5.0 (as of June 2025)
+- **Previous Version**: 4.4.3 (still supported in CI/CD)
+- **Compatibility**: Package tested with both versions
+
 ## Development Commands
 
 ### Docker-based Development (Recommended)
+
+#### Option A: Traditional Docker Setup (R 4.5.0)
 ```bash
 # Start development environment with RStudio Server at http://localhost:8787
 make dev-start
@@ -28,6 +36,13 @@ make dev-r
 # Open shell in development container
 make dev-shell
 ```
+
+#### Option B: Modern DevContainer (VS Code + RStudio)
+- Uses `ghcr.io/rocker-org/devcontainer/tidyverse:4.5.0`
+- Includes both VS Code and RStudio Server
+- Enhanced with radian console and httpgd graphics
+- Python pre-installed for pre-commit hooks
+- See `.devcontainer/README-modern.md` for details
 
 ### Simulation Commands
 ```bash

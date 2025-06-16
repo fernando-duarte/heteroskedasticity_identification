@@ -18,13 +18,13 @@ This document consolidates all Docker-related documentation for the hetid R pack
 ### Image Structure
 
 1. **Production Image** (`hetid:latest`)
-   - Base: `rocker/r-ver:4.4.3`
+   - Base: `rocker/r-ver:4.5.0`
    - Size: ~550MB (optimized with TinyTeX and pandoc minimal)
    - Purpose: Package execution and simulations
    - Features: Non-root user, minimal attack surface
 
 2. **Development Image** (`hetid:dev`)
-   - Base: `rocker/rstudio:4.4.3`
+   - Base: `rocker/rstudio:4.5.0`
    - Size: ~1.1GB (reduced from ~4GB)
    - Purpose: Interactive development with RStudio Server
    - Features: Full development toolchain, debugging tools
@@ -32,6 +32,12 @@ This document consolidates all Docker-related documentation for the hetid R pack
 3. **Builder Stage** (intermediate)
    - Purpose: Compile and build all dependencies
    - Shared by production stage via COPY commands
+
+4. **Modern DevContainer** (NEW)
+   - Base: `ghcr.io/rocker-org/devcontainer/tidyverse:4.5.0`
+   - Size: ~1.3GB (includes both VS Code and RStudio)
+   - Purpose: Unified development for VS Code and RStudio users
+   - Features: radian console, httpgd graphics, Python integration
 
 ### Key Components
 
@@ -51,6 +57,13 @@ This document consolidates all Docker-related documentation for the hetid R pack
 - **Fully cached**: Subsequent builds with no changes take 0 seconds
 - GitHub Actions cache ensures persistence across workflow runs
 - PDF generation during tests: ~30-60 seconds (acceptable runtime cost)
+
+### 1.5. ✅ R Version Update (June 16, 2025)
+**Impact**: Latest R features and security updates
+- Updated all images to R 4.5.0 (released April 11, 2025)
+- Maintained compatibility testing with R 4.4.x
+- Improved ARM64 performance and pak compatibility
+- Better pipe operator performance and error messages
 
 ### 2. ✅ GitHub Actions Cache Fix (June 16, 2025)
 **Impact**: Stabilized CI/CD build times

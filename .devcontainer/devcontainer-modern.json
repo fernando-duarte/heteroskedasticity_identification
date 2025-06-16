@@ -1,0 +1,231 @@
+{
+  "name": "hetid R 4.5.0 Development (VS Code + RStudio)",
+
+  // Use the new Rocker devcontainer image with R 4.5.0
+  "image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.5.0",
+
+  // Modern devcontainer features
+  "features": {
+    // R-specific features from Rocker
+    "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
+      "packages": "AER,boot,dplyr,furrr,future,ggplot2,purrr,rlang,tidyr,devtools,testthat,knitr,rmarkdown,lintr,styler,covr,pkgdown,here,fs,glue,cli,bench,profvis",
+      "installSystemRequirements": true
+    },
+    "ghcr.io/rocker-org/devcontainer-features/r-history:1": {},
+    "ghcr.io/rocker-org/devcontainer-features/pandoc:1": {},
+    "ghcr.io/rocker-org/devcontainer-features/quarto:1": {},
+
+    // Python for pre-commit hooks
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11",
+      "installTools": true
+    },
+
+    // Git and GitHub integration
+    "ghcr.io/devcontainers/features/git:1": {
+      "ppa": true,
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "installDirectlyFromGitHubRelease": true,
+      "version": "latest"
+    },
+
+    // Additional development tools
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": false,
+      "installOhMyZsh": true,
+      "upgradePackages": true
+    }
+  },
+
+  // VS Code customizations
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // R language support
+        "REditorSupport.r",
+        "RDebugger.r-debugger",
+
+        // Data science and visualization
+        "quarto.quarto",
+        "ms-toolsai.jupyter",
+        "ms-python.python",
+
+        // Development tools
+        "ms-vscode.vscode-json",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-docker",
+
+        // Git and GitHub
+        "GitHub.vscode-pull-request-github",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-vscode.live-share",
+
+        // Code quality
+        "streetsidesoftware.code-spell-checker",
+        "EditorConfig.EditorConfig",
+
+        // Markdown and documentation
+        "yzhang.markdown-all-in-one",
+        "DavidAnson.vscode-markdownlint"
+      ],
+
+      "settings": {
+        // R settings for modern development
+        "r.rterm.linux": "/usr/local/bin/radian",
+        "r.rpath.linux": "/usr/local/bin/R",
+        "r.bracketedPaste": true,
+        "r.plot.useHttpgd": true,
+        "r.lsp.enabled": true,
+        "r.lsp.diagnostics": true,
+        "r.sessionWatcher": true,
+        "r.alwaysUseActiveTerminal": true,
+
+        // R code formatting
+        "[r]": {
+          "editor.wordSeparators": "`~!@#%$^&*()-=+[{]}\\|;:'\",<>/?",
+          "editor.rulers": [80],
+          "editor.tabSize": 2,
+          "editor.insertSpaces": true,
+          "editor.formatOnSave": false
+        },
+
+        // Python settings for pre-commit
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.pylintEnabled": true,
+
+        // Terminal settings
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash"
+          },
+          "zsh": {
+            "path": "/usr/bin/zsh"
+          },
+          "radian": {
+            "path": "/usr/local/bin/radian",
+            "args": ["--no-save", "--no-restore"]
+          },
+          "R": {
+            "path": "/usr/local/bin/R",
+            "args": ["--interactive", "--no-save", "--no-restore"]
+          }
+        },
+
+        // File associations
+        "files.associations": {
+          "*.R": "r",
+          "*.Rmd": "rmd",
+          "*.qmd": "quarto",
+          "*.Rproj": "xml"
+        },
+
+        // Editor settings
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "editor.rulers": [80, 120],
+        "files.trimTrailingWhitespace": true,
+        "files.insertFinalNewline": true,
+        "files.encoding": "utf8",
+
+        // Git settings
+        "git.enableSmartCommit": true,
+        "git.confirmSync": false,
+        "git.autofetch": true,
+
+        // Docker settings
+        "docker.showStartPage": false
+      }
+    }
+  },
+
+  // Port forwarding for RStudio Server and other services
+  "forwardPorts": [
+    8787,  // RStudio Server (already included in tidyverse image)
+    8080,  // httpgd for VS Code plots
+    3838,  // Shiny apps
+    4321   // Quarto preview
+  ],
+
+  "portsAttributes": {
+    "8787": {
+      "label": "RStudio Server",
+      "onAutoForward": "openBrowserOnce",
+      "requireLocalPort": false,
+      "protocol": "http"
+    },
+    "8080": {
+      "label": "R Graphics (httpgd)",
+      "onAutoForward": "silent",
+      "requireLocalPort": false
+    },
+    "3838": {
+      "label": "Shiny Apps",
+      "onAutoForward": "notify"
+    },
+    "4321": {
+      "label": "Quarto Preview",
+      "onAutoForward": "openPreview"
+    }
+  },
+
+  // Lifecycle hooks
+  "onCreate": "R -e 'if (!requireNamespace(\"renv\", quietly = TRUE)) install.packages(\"renv\")' && pip install --user pre-commit",
+
+  "postCreateCommand": "pre-commit install && R -e 'devtools::install_deps(dependencies = TRUE)' && echo 'Setup complete! RStudio Server: http://localhost:8787'",
+
+  "postStartCommand": "echo '🚀 Development environment ready!' && echo '📊 RStudio Server: http://localhost:8787' && echo '📈 R Graphics: http://localhost:8080' && echo '💻 VS Code: Use R extension or radian terminal'",
+
+  "postAttachCommand": "echo 'Welcome to hetid R development! Run \"make help\" for available commands.'",
+
+  // Container user (rstudio user is default in rocker images)
+  "remoteUser": "rstudio",
+
+  // Environment variables
+  "remoteEnv": {
+    "DISABLE_AUTH": "true",
+    "ROOT": "true",
+    "RSTUDIO_WHICH_R": "/usr/local/bin/R",
+    "R_LIBS_USER": "/usr/local/lib/R/site-library",
+    "RENV_PATHS_CACHE": "/renv/cache",
+    "QUARTO_PYTHON": "/usr/local/bin/python"
+  },
+
+  // Working directory
+  "workspaceFolder": "/home/rstudio/workspace",
+
+  // Mounts for better performance and persistence
+  "mounts": [
+    // Persist renv cache across rebuilds
+    "source=hetid-renv-cache,target=/renv/cache,type=volume",
+    // Persist R packages across rebuilds
+    "source=hetid-r-packages,target=/usr/local/lib/R/site-library,type=volume",
+    // Persist user home directory items
+    "source=hetid-rstudio-config,target=/home/rstudio/.config,type=volume"
+  ],
+
+  // Resource requirements
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+
+  // Additional options
+  "runArgs": [
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+
+  // Wait for the container to be ready
+  "waitFor": "postCreateCommand",
+
+  // Update content command (runs when rebuilding)
+  "updateContentCommand": "R -e 'devtools::install_deps(dependencies = TRUE)'"
+}
