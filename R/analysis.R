@@ -71,7 +71,9 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
     }
 
     # Weak instrument diagnostics
-    weak_iv_pct <- mean(results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD")) * 100
+    weak_iv_pct <- mean(results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), na.rm = TRUE) * 100
+    # If all F-statistics are NA, set weak_iv_pct to 0
+    if (is.nan(weak_iv_pct)) weak_iv_pct <- 0
     cat(sprintf(
       paste0(
         "\nWeak instrument diagnostic: %.1f%% of simulations have ",
@@ -116,7 +118,10 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
   list(
     summary_table = summary_table,
     bounds_summary = bounds_summary,
-    weak_iv_pct = mean(results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD")) * 100,
+    weak_iv_pct = {
+      pct <- mean(results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), na.rm = TRUE) * 100
+      if (is.nan(pct)) 0 else pct
+    },
     results_clean = results_clean
   )
 }

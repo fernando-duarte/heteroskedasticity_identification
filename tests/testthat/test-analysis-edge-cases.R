@@ -10,11 +10,13 @@ test_that("analyze_main_results handles empty results", {
   # We expect multiple warnings (one for each mean() call), but since
   # expect_warning() only captures one warning at a time in testthat edition 3,
   # we suppress them here and document their expected nature
-  expect_error(
-    suppressWarnings(
-      analyze_main_results(empty_results, config, verbose = FALSE)
-    )
-  )
+  suppressWarnings({
+    analysis_empty <- analyze_main_results(empty_results, config, verbose = FALSE)
+  })
+
+  expect_type(analysis_empty, "list")
+  # Should have NA values for empty results
+  expect_true(is.na(analysis_empty$bounds_summary$`Point ID Check`))
 
   # All NA results
   na_results <- data.frame(
@@ -30,10 +32,13 @@ test_that("analyze_main_results handles empty results", {
     bound_upper_tau_set = rep(NA_real_, 3)
   )
 
-  # With all NA values, correlation calculation will fail
-  expect_error(
-    analyze_main_results(na_results, config, verbose = FALSE)
-  )
+  # With all NA values, correlation calculation returns NA but function succeeds
+  suppressWarnings({
+    analysis_na <- analyze_main_results(na_results, config, verbose = FALSE)
+  })
+
+  expect_type(analysis_na, "list")
+  expect_true(is.na(analysis_na$bounds_summary$`Point ID Check`))
 })
 
 test_that("analyze_main_results handles extreme values", {

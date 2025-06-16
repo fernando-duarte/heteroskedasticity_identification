@@ -1,4 +1,9 @@
 test_that("hetid works on simulated UK Engel curve-like data", {
+  # Skip if AER is not available
+  if (!requireNamespace("AER", quietly = TRUE)) {
+    skip("AER package not available")
+  }
+
   # Since external data may not be available, simulate similar data
   # This mimics UK food share Engel curve analysis
 
@@ -95,6 +100,11 @@ test_that("hetid works on simulated UK Engel curve-like data", {
 })
 
 test_that("hetid performs well on simulated data with realistic properties", {
+  # Skip if AER is not available
+  if (!requireNamespace("AER", quietly = TRUE)) {
+    skip("AER package not available")
+  }
+
   # Create a larger, more realistic dataset
   n <- 2000
   set.seed(12345)
@@ -151,6 +161,11 @@ test_that("hetid performs well on simulated data with realistic properties", {
 
 test_that("hetid handles edge cases in real-world style data", {
   skip_on_cran()
+
+  # Skip if AER is not available
+  if (!requireNamespace("AER", quietly = TRUE)) {
+    skip("AER package not available")
+  }
 
   # Test with data that has some challenging properties
   n <- 300
