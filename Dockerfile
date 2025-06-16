@@ -49,6 +49,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
     libmpfr-dev \
     # Parallel processing support
     libopenmpi-dev \
+    # Pandoc for building vignettes
+    pandoc \
     && rm -rf /var/lib/apt/lists/*
 
 # Install remotes, devtools, and knitr for package management
