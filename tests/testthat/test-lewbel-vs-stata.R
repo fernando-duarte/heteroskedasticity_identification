@@ -94,7 +94,7 @@ exit
 
   # Compare results (we've seen 0.004% difference for coef, 2.3% for SE)
   expect_equal(as.numeric(hetid_coef), expected_stata_coef,
-    tolerance = 0.002,  # Increased from 1e-3 to handle small numerical differences
+    tolerance = 0.002, # Increased from 1e-3 to handle small numerical differences
     label = "Coefficient comparison"
   )
   expect_equal(as.numeric(hetid_se), expected_stata_se,
@@ -205,7 +205,7 @@ exit
 
   # Compare results
   expect_equal(as.numeric(hetid_coef), expected_stata_coef,
-    tolerance = 0.01,  # Increased tolerance to handle cross-platform differences
+    tolerance = 0.01, # Increased tolerance to handle cross-platform differences
     label = "Coefficient comparison (multiple X)"
   )
   expect_equal(as.numeric(hetid_se), expected_stata_se,

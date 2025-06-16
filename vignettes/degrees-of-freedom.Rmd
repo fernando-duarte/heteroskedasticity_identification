@@ -96,8 +96,8 @@ The `df_adjust` parameter affects both standard errors and critical values:
 n <- 200
 k <- 3
 # Temporarily use default critical values to avoid build issues
-crit_asymp <- 1.96  # get_critical_value(n, k, alpha = 0.05, df_adjust = "asymptotic")
-crit_finite <- 1.98  # get_critical_value(n, k, alpha = 0.05, df_adjust = "finite")
+crit_asymp <- 1.96 # get_critical_value(n, k, alpha = 0.05, df_adjust = "asymptotic")
+crit_finite <- 1.98 # get_critical_value(n, k, alpha = 0.05, df_adjust = "finite")
 
 cat("Critical values for 95% CI:\n")
 cat("Asymptotic (normal):", crit_asymp, "\n")
