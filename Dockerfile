@@ -51,20 +51,26 @@ RUN --mount=type=cache,target=/var/cache/apt \
     libopenmpi-dev \
     # Pandoc for building vignettes
     pandoc \
-    # LaTeX tools for R CMD check PDF manual generation
-    texlive-latex-base \
-    texlive-fonts-recommended \
-    texlive-latex-extra \
-    texlive-fonts-extra \
+    # qpdf for R CMD check
     qpdf \
+    # wget for downloading TinyTeX
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Install remotes, devtools, and knitr for package management
 # Use NO cache mount here to ensure packages are installed in the image
 RUN R -e "options(repos = 'https://cloud.r-project.org/'); \
           .libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
-          install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat'), \
+          install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat', 'tinytex'), \
                          lib = '/usr/local/lib/R/site-library')"
+
+# Install TinyTeX for LaTeX support (much smaller than texlive)
+# This replaces ~3GB of texlive packages with ~150MB TinyTeX
+RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
+    /opt/TinyTeX/bin/*/tlmgr path add
+
+# Ensure TinyTeX is in PATH for all subsequent operations
+ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
 
 # Copy package metadata files first for better layer caching
 COPY DESCRIPTION NAMESPACE ./
@@ -163,6 +169,9 @@ RUN groupadd -r hetid && useradd -r -g hetid -m -s /bin/bash hetid
 # Copy installed R packages from builder
 COPY --from=builder /usr/local/lib/R/site-library/ /usr/local/lib/R/site-library/
 
+# Copy TinyTeX installation from builder
+COPY --from=builder /opt/TinyTeX /opt/TinyTeX
+
 # Set working directory and ownership
 WORKDIR /app
 RUN chown -R hetid:hetid /app
@@ -178,6 +187,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 ENV R_LIBS_USER=/usr/local/lib/R/site-library
 ENV OMP_NUM_THREADS=1
 ENV OPENBLAS_NUM_THREADS=1
+ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
 
 # Default command
 CMD ["R", "--slave", "-e", "library(hetid); cat('hetid package loaded successfully\\n')"]
