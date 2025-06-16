@@ -30,7 +30,7 @@ done
 echo -e "\n📁 Checking required files..."
 files=(
     "DESCRIPTION"
-    "Dockerfile" 
+    "Dockerfile"
     "Dockerfile.dev"
     "_pkgdown.yml"
 )

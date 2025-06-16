@@ -34,7 +34,7 @@ jobs:
   security-check:
     name: Security Analysis
     runs-on: ubuntu-22.04
-    
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -84,7 +84,7 @@ jobs:
               paste0('  Token: ', Sys.getenv('OSSINDEX_TOKEN'))
             ), config_file)
           }
-          
+
           # Try pak first (should be installed by setup-r-dependencies)
           if (requireNamespace('pak', quietly = TRUE)) {
             library(pak)
@@ -103,7 +103,7 @@ jobs:
               install.packages('oysteR')
             })
           }
-          
+
           if (requireNamespace('oysteR', quietly = TRUE)) {
             cat('oysteR installed successfully\n')
           }
@@ -120,7 +120,7 @@ jobs:
       run: |
         Rscript -e "
         library(jsonlite)
-        
+
         # Create SARIF structure
         create_sarif <- function(results = NULL) {
           list(
@@ -129,19 +129,19 @@ jobs:
             runs = if(is.null(results)) list() else results
           )
         }
-        
+
         # Check if oysteR is available
         if (requireNamespace('oysteR', quietly = TRUE)) {
           library(oysteR)
-          
+
           tryCatch({
             # Audit installed packages
             audit_results <- audit_installed_r_pkgs(verbose = TRUE)
             vulns <- get_vulnerabilities(audit_results)
-            
+
             if (!is.null(vulns) && nrow(vulns) > 0) {
               cat('Found', nrow(vulns), 'vulnerabilities\n')
-              
+
               # Create SARIF results
               results <- list(list(
                 tool = list(driver = list(
@@ -160,7 +160,7 @@ jobs:
                   )
                 })
               ))
-              
+
               sarif <- create_sarif(results)
             } else {
               cat('No vulnerabilities found\n')
@@ -174,7 +174,7 @@ jobs:
           cat('oysteR not available, skipping vulnerability scan\n')
           sarif <- create_sarif()
         }
-        
+
         # Write SARIF file
         write_json(sarif, 'dependency-scan.sarif', auto_unbox = TRUE, pretty = TRUE)
         "
@@ -192,21 +192,21 @@ jobs:
       run: |
         Rscript -e "
         library(desc)
-        
+
         # Get package license
         pkg_desc <- desc::desc()
         pkg_license <- pkg_desc\$get('License')[[1]]
         pkg_name <- pkg_desc\$get('Package')[[1]]
-        
+
         cat('Package:', pkg_name, '\n')
         cat('License:', pkg_license, '\n\n')
-        
+
         # Get dependencies
         deps <- pkg_desc\$get_deps()
         deps <- deps[deps\$type %in% c('Imports', 'Depends') & deps\$package != 'R', ]
-        
+
         cat('Checking', nrow(deps), 'dependencies...\n')
-        
+
         # Basic license compatibility check
         if (grepl('GPL-3', pkg_license)) {
           cat('\nNote: GPL-3 license requires careful consideration of dependencies\n')
@@ -218,7 +218,7 @@ jobs:
       run: |
         Rscript -e "
         library(lintr)
-        
+
         # Define security-focused linters
         security_linters <- linters_with_defaults(
           absolute_path_linter(),
@@ -230,10 +230,10 @@ jobs:
             'parse' = 'Avoid parse() for security reasons'
           ))
         )
-        
+
         # Run linting
         lint_results <- lint_package(linters = security_linters)
-        
+
         if (length(lint_results) > 0) {
           print(lint_results)
           cat('\n', length(lint_results), 'potential issues found.\n')
@@ -247,7 +247,7 @@ jobs:
       run: |
         Rscript -e "
         library(goodpractice)
-        
+
         # Run focused checks
         gp_results <- gp(checks = c(
           'cyclocomp',
@@ -255,7 +255,7 @@ jobs:
           'no_export_pattern',
           'truefalse_not_tf'
         ))
-        
+
         print(gp_results)
         "
       continue-on-error: true
@@ -267,12 +267,12 @@ jobs:
         library(jsonlite)
         library(pkgdepends)
         library(uuid)
-        
+
         desc_obj <- desc::desc()
-        
+
         # Get dependencies
         deps <- desc_obj\$get_deps()
-        
+
         # Create simple SBOM
         sbom <- list(
           bomFormat = 'CycloneDX',
@@ -295,7 +295,7 @@ jobs:
             )
           })
         )
-        
+
         write_json(sbom, 'r-package-sbom.json', auto_unbox = TRUE, pretty = TRUE)
         cat('SBOM generated successfully.\n')
         "

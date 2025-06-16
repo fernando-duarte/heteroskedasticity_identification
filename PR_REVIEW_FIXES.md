@@ -5,7 +5,7 @@ All issues identified in the PR review have been addressed. Here's what was fixe
 
 ### 1. ✅ r-security.yml - Missing `remotes` package
 **Issue**: Workflow tried to use `remotes::install_github()` without ensuring it was installed
-**Fix**: 
+**Fix**:
 - Added `any::remotes` and `any::pak` to the setup-r-dependencies step
 - Added proper checks for package availability before using them
 - Added fallback to `install.packages()` if neither pak nor remotes are available

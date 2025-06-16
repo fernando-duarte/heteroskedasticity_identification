@@ -32,7 +32,7 @@ The `hetid` package uses a comprehensive CI/CD pipeline to ensure code quality, 
 **Matrix Configuration**:
 ```yaml
 - Ubuntu 22.04 with R release
-- Ubuntu 22.04 with R oldrel  
+- Ubuntu 22.04 with R oldrel
 - macOS latest with R release
 - Windows latest with R release
 ```

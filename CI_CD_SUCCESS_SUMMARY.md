@@ -4,7 +4,7 @@
 
 ### ✅ R-CMD-check - ALL PLATFORMS PASSING
 - **ubuntu-22.04 (release)**: ✅ SUCCESS
-- **ubuntu-22.04 (oldrel)**: ✅ SUCCESS  
+- **ubuntu-22.04 (oldrel)**: ✅ SUCCESS
 - **windows-latest (release)**: ✅ SUCCESS
 - **macos-latest (release)**: ✅ SUCCESS
 

@@ -113,7 +113,7 @@ jobs:
         else
           echo "Warning: Tag file was not created"
         fi
-        
+
     - name: Upload image artifact
       uses: actions/upload-artifact@v4
       with:
@@ -121,7 +121,7 @@ jobs:
         path: /tmp/${{ matrix.target }}-image.tar
         retention-days: 1
         compression-level: 0  # Docker images are already compressed
-        
+
     - name: Upload tag artifact
       uses: actions/upload-artifact@v4
       with:
@@ -149,7 +149,7 @@ jobs:
       with:
         name: docker-tag-builder
         path: /tmp
-    
+
     - name: Verify downloaded artifacts
       run: |
         echo "Contents of /tmp:"
@@ -159,7 +159,7 @@ jobs:
         else
           echo "Warning: builder-tag.txt not found"
         fi
-        
+
     - name: Load Docker image
       run: |
         docker load --input /tmp/builder-image.tar
@@ -226,7 +226,7 @@ jobs:
       with:
         name: docker-tag-production
         path: /tmp
-    
+
     - name: Verify downloaded production artifacts
       run: |
         echo "Contents of /tmp:"
@@ -236,7 +236,7 @@ jobs:
         else
           echo "Warning: production-tag.txt not found"
         fi
-        
+
     - name: Load Docker image
       run: |
         docker load --input /tmp/production-image.tar
@@ -311,7 +311,7 @@ jobs:
       with:
         name: docker-tag-production
         path: /tmp
-    
+
     - name: Verify downloaded security scan artifacts
       run: |
         echo "Contents of /tmp:"
@@ -321,7 +321,7 @@ jobs:
         else
           echo "Warning: production-tag.txt not found"
         fi
-        
+
     - name: Load Docker image
       run: |
         docker load --input /tmp/production-image.tar

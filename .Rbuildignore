@@ -83,9 +83,9 @@
 ^Thumbs\.db$
 ^VALIDATION_COMPLETE\.md$
 ^VALIDATION_IMPLEMENTATION_SUMMARY\.md$
+^WORKFLOWS\.md$
 ^WORKFLOW_FIXES_SUMMARY\.md$
 ^WORKFLOW_STATUS_SUMMARY\.md$
-^WORKFLOWS\.md$
 ^\#.*\#$
 ^\.#.*$
 ^\.DS_Store$
@@ -197,9 +197,9 @@
 ^scripts$
 ^setup_env\.sh$
 ^simulate_ci_cd\.sh$
-^test_workflows\.sh$
 ^simulation-results$
 ^tags$
+^test_workflows\.sh$
 ^tests/testthat/\.cache$
 ^tmux\.md$
 ^tools$
