@@ -33,7 +33,6 @@ Suggests:
     ivreg,
     jsonlite,
     knitr,
-    licenses,
     lintr,
     oysteR,
     pkgdepends,

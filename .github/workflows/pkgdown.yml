@@ -31,12 +31,12 @@ jobs:
         with:
           use-public-rspm: true
 
-      - name: Install dependencies
-        run: |
-          install.packages(c("remotes", "pkgdown"))
-          remotes::install_deps(dependencies = TRUE)
-          remotes::install_local(".", upgrade = "never")
-        shell: Rscript {0}
+      - name: Setup R dependencies
+        uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::pkgdown
+          needs: website
 
       - name: Build site
         run: |
