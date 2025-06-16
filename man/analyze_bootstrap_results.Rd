@@ -11,7 +11,7 @@ analyze_bootstrap_results(results_main, bootstrap_demo, config, verbose = TRUE)
 
 \item{bootstrap_demo}{Data.frame. Bootstrap demonstration results.}
 
-\item{config}{List. Configuration object.}
+\item{config}{List. Configuration object from create_default_config().}
 
 \item{verbose}{Logical. Whether to print output (default: TRUE).}
 }
@@ -22,10 +22,8 @@ A data.frame with bootstrap examples.
 Analyzes and displays bootstrap standard error results for set
 identification bounds.
 }
-\details{
-For enhanced table formatting in verbose output, install the knitr package:
-\code{install.packages("knitr")}. When knitr is not available,
-tables are displayed in plain text format.
+\note{
+For enhanced table formatting in verbose output, install the knitr package.
 }
 \examples{
 \dontrun{

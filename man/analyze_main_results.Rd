@@ -9,9 +9,9 @@ analyze_main_results(results, config, verbose = TRUE)
 \arguments{
 \item{results}{Data.frame. Results from run_main_simulation().}
 
-\item{config}{List. Configuration object used for the simulation.}
+\item{config}{List. Configuration object from create_default_config().}
 
-\item{verbose}{Logical. Whether to print detailed output (default: TRUE).}
+\item{verbose}{Logical. Whether to print output (default: TRUE).}
 }
 \value{
 A list containing summary tables and statistics.
@@ -20,10 +20,8 @@ A list containing summary tables and statistics.
 Provides comprehensive analysis of the main Monte Carlo simulation results,
 including performance metrics for point estimators and set identification.
 }
-\details{
-For enhanced table formatting in verbose output, install the knitr package:
-\code{install.packages("knitr")}. When knitr is not available,
-tables are displayed in plain text format.
+\note{
+For enhanced table formatting in verbose output, install the knitr package.
 }
 \examples{
 \dontrun{

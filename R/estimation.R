@@ -13,8 +13,8 @@
 #'   (default: FALSE).
 #' @param b_reps Integer. Number of bootstrap replications if compute_se = TRUE
 #'   (default: 100).
-#' @param df_adjust Character. Degrees of freedom adjustment: "asymptotic"
-#'   (default) or "finite". Note: This parameter currently only affects the
+#' @template param-df-adjust
+#' @details Note: This parameter currently only affects the
 #'   interpretation of bootstrap SEs, not the bounds calculation itself.
 #'
 #' @details
@@ -135,8 +135,7 @@ calculate_lewbel_bounds <- function(data,
 #'   (default: FALSE).
 #' @param return_models Logical. Whether to return the fitted model objects
 #'   (default: FALSE).
-#' @param df_adjust Character. Degrees of freedom adjustment: "asymptotic"
-#'   (default) or "finite". Affects standard errors and confidence intervals.
+#' @template param-df-adjust
 #'
 #' @return If return_models = FALSE: A data.frame with one row containing
 #'   simulation results including OLS and 2SLS estimates, coverage indicators,

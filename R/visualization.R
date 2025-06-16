@@ -4,9 +4,9 @@
 #' estimators.
 #'
 #' @param results_clean Data.frame. Cleaned simulation results.
-#' @param config List. Configuration object containing true parameter values.
+#' @template param-config-viz
 #'
-#' @return A ggplot2 object.
+#' @template return-ggplot
 #'
 #' @examples
 #' \dontrun{
@@ -69,9 +69,9 @@ plot_estimator_distributions <- function(results_clean, config) {
 #' Creates a boxplot showing 2SLS estimate consistency across sample sizes.
 #'
 #' @param results_by_n Data.frame. Results from sample size analysis.
-#' @param config List. Configuration object containing true parameter values.
+#' @template param-config-viz
 #'
-#' @return A ggplot2 object.
+#' @template return-ggplot
 #'
 #' @examples
 #' \dontrun{
@@ -112,9 +112,9 @@ plot_sample_size_consistency <- function(results_by_n, config) {
 #' Creates a boxplot showing 2SLS performance by heteroscedasticity strength.
 #'
 #' @param results_by_delta Data.frame. Results from sensitivity analysis.
-#' @param config List. Configuration object containing true parameter values.
+#' @template param-config-viz
 #'
-#' @return A ggplot2 object.
+#' @template return-ggplot
 #'
 #' @examples
 #' \dontrun{
@@ -155,10 +155,10 @@ plot_het_sensitivity <- function(results_by_delta, config) {
 #' threshold.
 #'
 #' @param results_clean Data.frame. Cleaned simulation results.
-#' @param config List. Optional. Configuration object (not currently used).
+#' @template param-config-optional
 #' @param weak_iv_pct Numeric. Percentage of simulations with weak instruments.
 #'
-#' @return A ggplot2 object.
+#' @template return-ggplot
 #'
 #' @examples
 #' \dontrun{
@@ -217,7 +217,7 @@ plot_first_stage_f_dist <- function(results_clean,
 #'
 #' @param bootstrap_examples Data.frame. Bootstrap examples with standard
 #'   errors.
-#' @param config List. Configuration object containing true parameter values.
+#' @template param-config-viz
 #'
 #' @return A ggplot2 object or NULL if insufficient data.
 #'

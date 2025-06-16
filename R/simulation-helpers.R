@@ -4,8 +4,7 @@
 #' support for degrees of freedom adjustment.
 #'
 #' @param config Configuration list from create_default_config()
-#' @param df_adjust Character. Degrees of freedom adjustment: "asymptotic"
-#'   (default) or "finite". Affects standard errors and confidence intervals.
+#' @template param-df-adjust
 #' @param verbose Logical. Whether to print progress messages (default: TRUE)
 #'
 #' @return List containing simulation results and configuration

@@ -3,9 +3,9 @@
 #' Executes the main Monte Carlo simulation to evaluate the performance of
 #' Lewbel's (2012) heteroscedasticity-based identification strategy.
 #'
-#' @param config List. Configuration object from create_default_config().
-#' @param seeds List. Seed object from generate_all_seeds().
-#' @param verbose Logical. Whether to print progress messages (default: TRUE).
+#' @template param-config
+#' @template param-seeds
+#' @template param-verbose-progress
 #'
 #' @return A data.frame containing results from all simulation runs.
 #'
@@ -89,9 +89,9 @@ run_main_simulation <- function(config, seeds, verbose = TRUE) {
 #' Runs a separate demonstration of bootstrap standard errors for
 #' set identification bounds.
 #'
-#' @param config List. Configuration object from create_default_config().
-#' @param seeds List. Seed object from generate_all_seeds().
-#' @param verbose Logical. Whether to print progress messages (default: TRUE).
+#' @template param-config
+#' @template param-seeds
+#' @template param-verbose-progress
 #'
 #' @return A data.frame containing bootstrap demonstration results.
 #'
@@ -168,9 +168,9 @@ run_bootstrap_demonstration <- function(config, seeds, verbose = TRUE) {
 #'
 #' Analyzes the consistency of estimators across different sample sizes.
 #'
-#' @param config List. Configuration object from create_default_config().
-#' @param seeds List. Seed object from generate_all_seeds().
-#' @param verbose Logical. Whether to print progress messages (default: TRUE).
+#' @template param-config
+#' @template param-seeds
+#' @template param-verbose-progress
 #'
 #' @return A data.frame containing results for different sample sizes.
 #'
@@ -256,9 +256,9 @@ run_sample_size_analysis <- function(config, seeds, verbose = TRUE) {
 #'
 #' Analyzes sensitivity of results to heteroscedasticity strength.
 #'
-#' @param config List. Configuration object from create_default_config().
-#' @param seeds List. Seed object from generate_all_seeds().
-#' @param verbose Logical. Whether to print progress messages (default: TRUE).
+#' @template param-config
+#' @template param-seeds
+#' @template param-verbose-progress
 #'
 #' @return A data.frame containing results for different heteroscedasticity
 #'   parameters.

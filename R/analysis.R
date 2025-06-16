@@ -11,13 +11,10 @@ utils::globalVariables(c(
 #' including performance metrics for point estimators and set identification.
 #'
 #' @param results Data.frame. Results from run_main_simulation().
-#' @param config List. Configuration object used for the simulation.
-#' @param verbose Logical. Whether to print detailed output (default: TRUE).
+#' @template param-config
+#' @template param-verbose
 #'
-#' @details
-#' For enhanced table formatting in verbose output, install the knitr package:
-#' \code{install.packages("knitr")}. When knitr is not available,
-#' tables are displayed in plain text format.
+#' @template note-knitr
 #'
 #' @return A list containing summary tables and statistics.
 #'
@@ -134,13 +131,10 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
 #'
 #' @param results_main Data.frame. Main simulation results.
 #' @param bootstrap_demo Data.frame. Bootstrap demonstration results.
-#' @param config List. Configuration object.
-#' @param verbose Logical. Whether to print output (default: TRUE).
+#' @template param-config
+#' @template param-verbose
 #'
-#' @details
-#' For enhanced table formatting in verbose output, install the knitr package:
-#' \code{install.packages("knitr")}. When knitr is not available,
-#' tables are displayed in plain text format.
+#' @template note-knitr
 #'
 #' @return A data.frame with bootstrap examples.
 #'
@@ -217,13 +211,10 @@ analyze_bootstrap_results <- function(results_main,
 #' Analyzes consistency of estimators across different sample sizes.
 #'
 #' @param results_by_n Data.frame. Results from run_sample_size_analysis().
-#' @param config List. Configuration object.
-#' @param verbose Logical. Whether to print output (default: TRUE).
+#' @template param-config
+#' @template param-verbose
 #'
-#' @details
-#' For enhanced table formatting in verbose output, install the knitr package:
-#' \code{install.packages("knitr")}. When knitr is not available,
-#' tables are displayed in plain text format.
+#' @template note-knitr
 #'
 #' @return A data.frame with sample size analysis.
 #'
@@ -272,13 +263,10 @@ analyze_sample_size_results <- function(results_by_n,
 #' Analyzes sensitivity of results to heteroscedasticity strength.
 #'
 #' @param results_by_delta Data.frame. Results from run_sensitivity_analysis().
-#' @param config List. Configuration object.
-#' @param verbose Logical. Whether to print output (default: TRUE).
+#' @template param-config
+#' @template param-verbose
 #'
-#' @details
-#' For enhanced table formatting in verbose output, install the knitr package:
-#' \code{install.packages("knitr")}. When knitr is not available,
-#' tables are displayed in plain text format.
+#' @template note-knitr
 #'
 #' @return A data.frame with sensitivity analysis.
 #'
@@ -334,7 +322,7 @@ analyze_sensitivity_results <- function(results_by_delta,
 #'
 #' @param analysis List. Optional. Analysis results object containing
 #'   simulation metrics.
-#' @param config List. Optional. Configuration object (not currently used).
+#' @template param-config-optional
 #' @param verbose Logical. Whether to print the summary (default: TRUE).
 #'
 #' @examples

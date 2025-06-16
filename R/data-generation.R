@@ -20,15 +20,11 @@
 #' @param n_x Integer. Number of exogenous X variables to generate (default: 1).
 #'   If n_x > 1, beta1_1 and beta2_1 should be vectors of length n_x.
 #'
+#' @template details-triangular-model
+#'
+#' @template details-error-structure
+#'
 #' @details
-#' The triangular model is:
-#' \deqn{Y_1 = \beta_{1,0} + \beta_{1,1}X + \gamma_1 Y_2 + \epsilon_1}
-#' \deqn{Y_2 = \beta_{2,0} + \beta_{2,1}X + \epsilon_2}
-#'
-#' The error structure follows a single-factor model:
-#' \deqn{\epsilon_1 = \alpha_1 U + V_1}
-#' \deqn{\epsilon_2 = \alpha_2 U + V_2}
-#'
 #' where U, V_1 are independent standard normal, and V_2 ~ N(0, exp(\eqn{\delta}
 #' Z))
 #' with Z = \eqn{X^2 - E[X^2]} being the heteroscedasticity driver.

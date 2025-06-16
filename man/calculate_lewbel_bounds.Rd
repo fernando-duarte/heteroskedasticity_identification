@@ -24,9 +24,8 @@ calculate_lewbel_bounds(
 \item{b_reps}{Integer. Number of bootstrap replications if compute_se = TRUE
 (default: 100).}
 
-\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic"
-(default) or "finite". Note: This parameter currently only affects the
-interpretation of bootstrap SEs, not the bounds calculation itself.}
+\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic" (default) or
+"finite". Affects standard errors and confidence intervals.}
 }
 \value{
 A list containing:
@@ -42,6 +41,9 @@ a relaxed covariance restriction. Optionally computes bootstrap standard
 errors for the bounds.
 }
 \details{
+Note: This parameter currently only affects the
+interpretation of bootstrap SEs, not the bounds calculation itself.
+
 Under the relaxed assumption
 |Corr(Z, \eqn{\epsilon_1 \epsilon_2})| <= tau |Corr(Z, \eqn{\epsilon_2^2})|,
 the parameter gamma_1 is set-identified. The bounds are computed as the

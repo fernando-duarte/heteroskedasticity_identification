@@ -9,7 +9,7 @@ analyze_sensitivity_results(results_by_delta, config, verbose = TRUE)
 \arguments{
 \item{results_by_delta}{Data.frame. Results from run_sensitivity_analysis().}
 
-\item{config}{List. Configuration object.}
+\item{config}{List. Configuration object from create_default_config().}
 
 \item{verbose}{Logical. Whether to print output (default: TRUE).}
 }
@@ -19,10 +19,8 @@ A data.frame with sensitivity analysis.
 \description{
 Analyzes sensitivity of results to heteroscedasticity strength.
 }
-\details{
-For enhanced table formatting in verbose output, install the knitr package:
-\code{install.packages("knitr")}. When knitr is not available,
-tables are displayed in plain text format.
+\note{
+For enhanced table formatting in verbose output, install the knitr package.
 }
 \examples{
 \dontrun{

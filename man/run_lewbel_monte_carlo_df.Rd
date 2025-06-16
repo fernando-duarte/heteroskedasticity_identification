@@ -9,8 +9,8 @@ run_lewbel_monte_carlo_df(config, df_adjust = "asymptotic", verbose = TRUE)
 \arguments{
 \item{config}{Configuration list from create_default_config()}
 
-\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic"
-(default) or "finite". Affects standard errors and confidence intervals.}
+\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic" (default) or
+"finite". Affects standard errors and confidence intervals.}
 
 \item{verbose}{Logical. Whether to print progress messages (default: TRUE)}
 }

@@ -9,7 +9,7 @@ analyze_sample_size_results(results_by_n, config, verbose = TRUE)
 \arguments{
 \item{results_by_n}{Data.frame. Results from run_sample_size_analysis().}
 
-\item{config}{List. Configuration object.}
+\item{config}{List. Configuration object from create_default_config().}
 
 \item{verbose}{Logical. Whether to print output (default: TRUE).}
 }
@@ -19,10 +19,8 @@ A data.frame with sample size analysis.
 \description{
 Analyzes consistency of estimators across different sample sizes.
 }
-\details{
-For enhanced table formatting in verbose output, install the knitr package:
-\code{install.packages("knitr")}. When knitr is not available,
-tables are displayed in plain text format.
+\note{
+For enhanced table formatting in verbose output, install the knitr package.
 }
 \examples{
 \dontrun{
