@@ -31,6 +31,7 @@ Calloc
 carlo
 cb
 cdot
+checkglobals
 Checksums
 chromote
 ci
@@ -76,11 +77,13 @@ dfr
 DGP
 diag
 discoverability
+DO's
 doc'
 Dockerfile
 DockerHub
 dockerignore
 DOCTYPE
+DON'Ts
 dontrun
 dplyr
 dta
@@ -123,7 +126,6 @@ Geospatial
 getenv
 gfortran
 ggplot
-Graviton
 gh
 github
 gitignore
@@ -132,6 +134,7 @@ globals
 globalVariables
 goodpractice
 Grafana
+Graviton
 grDevices
 gregexpr
 grepl
@@ -270,7 +273,6 @@ oldrel
 ols
 OMP
 ons
-pak's
 onwards
 OPENBLAS
 OpenHands
@@ -287,6 +289,7 @@ OWASP
 oysteR
 packageVersion
 pak
+pak's
 pandoc
 Pandoc
 parallelised
@@ -373,6 +376,7 @@ SEs
 setdiff
 setenv
 setequal
+setwd
 sh'
 sha
 SHA
@@ -406,6 +410,7 @@ suppressPackageStartupMessages
 suppressWarnings
 suses
 Sys
+sysdata
 tempfile
 testability
 tests'

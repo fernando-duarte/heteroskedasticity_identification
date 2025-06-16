@@ -21,12 +21,10 @@ This document catalogs all magic numbers and strings found in the R package code
 ### Weak Instrument F-Statistic Threshold: `10`
 
 **Definition Location:**
-- `R/analysis.R:81` - `weak_iv_pct <- mean(results_clean$first_stage_F < 10) * 100`
-- `R/analysis.R:124` - `weak_iv_pct = mean(results_clean$first_stage_F < 10) * 100`
-- `R/visualization.R:182` - `weak_iv_pct <- mean(results_clean$first_stage_F < 10, na.rm = TRUE) * 100`
+- `R/analysis.R:78` - `weak_iv_pct <- mean(results_clean$first_stage_F < 10) * 100`
+- `R/analysis.R:121` - `weak_iv_pct = mean(results_clean$first_stage_F < 10) * 100`
 - `R/visualization.R:196` - `ggplot2::geom_vline(xintercept = 10, linetype = "dashed", color = "red")`
 - `R/visualization.R:198` - `label = "F = 10"`
-- `R/visualization.R:328` - `weak_iv_pct <- mean(results_clean$first_stage_F < 10, na.rm = TRUE) * 100`
 
 **Usage Downstream:**
 - Used for weak instrument detection in `analyze_main_results`.
@@ -39,9 +37,7 @@ This document catalogs all magic numbers and strings found in the R package code
 ### P-Value Significance Level: `0.05`
 
 **Definition Location:**
-- `R/data-generation.R:220` - `if (p_value < 0.05)`
-- `R/estimation.R:221` - `alpha = 0.05, df_adjust = df_adjust`
-- `R/estimation.R:321` - `alpha = 0.05, df_adjust = df_adjust`
+- `R/data-generation.R:216` - `if (p_value < 0.05)`
 - `R/utils-df.R:27` - `get_critical_value <- function(n, k, alpha = 0.05, ...)`
 
 **Usage Downstream:**
@@ -73,7 +69,7 @@ This document catalogs all magic numbers and strings found in the R package code
 ### Exponent Safety Bounds: `-10` and `10`
 
 **Definition Location:**
-- `R/data-generation.R:99` - `exponent <- pmin(pmax(exponent, -10), 10)`
+- `R/data-generation.R:95` - `exponent <- pmin(pmax(exponent, -10), 10)`
 
 **Usage Downstream:**
 - Prevents numerical overflow in exponential calculations within `generate_lewbel_data`.
@@ -99,7 +95,7 @@ This document catalogs all magic numbers and strings found in the R package code
 ### Standard Deviation Threshold: `1e-10`
 
 **Definition Location:**
-- `R/estimation.R:256` - `stats::sd(lewbel_iv, na.rm = TRUE) < 1e-10`
+- `R/estimation.R:255` - `stats::sd(lewbel_iv, na.rm = TRUE) < 1e-10`
 
 **Usage Downstream:**
 - Checks for invalid (zero-variance) Lewbel instruments in `run_single_lewbel_simulation`.
@@ -119,12 +115,13 @@ This document catalogs all magic numbers and strings found in the R package code
 - `R/utils.R:89` - `num_simulations = 200`
 - `R/utils.R:90` - `main_sample_size = 500`
 - `R/utils.R:91` - `sample_sizes = c(250, 500, 1000, 2000)`
-- `R/data-generation.R:180` - `n_obs = 10000` (in `verify_lewbel_assumptions`)
 - `R/utils-hetid.R:140` - `n = 1000` (in `generate_hetid_test_data`)
+- `R/data-generation.R:141` - `n_obs = 10000` (default verification sample size)
 
 **Usage Downstream:**
 - Used throughout simulation functions as default parameters.
 - Referenced in `create_default_config()` and other utility functions.
+- Default sample size for assumption verification in `verify_lewbel_assumptions`.
 
 **Context:** Default simulation configuration values for sample sizes and replications.
 
@@ -262,6 +259,20 @@ This document catalogs all magic numbers and strings found in the R package code
 
 **Recommendation:** Extract to named constants `DF_ADJUST_ASYMPTOTIC = "asymptotic"`, `DF_ADJUST_FINITE = "finite"`.
 
+### Standard Error Column Name: `"Std. Error"`
+
+**Definition Location:**
+- `R/utils-df.R:74` - `summ$coefficients[, "Std. Error"]`
+- `R/utils-df.R:79` - `summ$coefficients[, "Std. Error"] * sqrt((n - k) / n)`
+
+**Usage Downstream:**
+- Used in `extract_se_lm` to extract standard errors from lm model summary.
+- Column name reference for accessing standard error values from coefficient matrices.
+
+**Context:** Standard column name in R's lm summary coefficient matrices.
+
+**Recommendation:** Extract to named constant `STD_ERROR_COL_NAME = "Std. Error"`.
+
 ### Stata Package Names: `"ranktest"`, `"ivreg2"`, `"ivreg2h"`
 
 **Definition Location:**
@@ -378,30 +389,40 @@ This document catalogs all magic numbers and strings found in the R package code
 #### Digits for Display: `4`
 
 **Definition Location:**
-- `R/analysis.R:75` - `print(knitr::kable(summary_table, digits = 4))`
-- `R/analysis.R:115` - `print(knitr::kable(bounds_summary, digits = 4))`
-- `R/analysis.R:200` - `~ round(., 4)`
-- `R/analysis.R:260` - `print(knitr::kable(n_summary, digits = 4))`
-- `R/analysis.R:321` - `print(knitr::kable(delta_summary, digits = 4))`
+- `R/analysis.R:72` - `print(knitr::kable(summary_table, digits = 4))`
+- `R/analysis.R:112` - `print(knitr::kable(bounds_summary, digits = 4))`
+- `R/analysis.R:194` - `~ round(., 4)` (rounding digits in bootstrap table)
+- `R/analysis.R:251` - `print(knitr::kable(n_summary, digits = 4))`
+- `R/analysis.R:309` - `print(knitr::kable(delta_summary, digits = 4))`
 
 **Usage Downstream:**
-- Used for consistent decimal precision in table displays.
+- Used for consistent decimal precision in table displays and data rounding.
 
-**Context:** Standard precision for statistical output tables.
+**Context:** Standard precision for statistical output tables and numeric formatting.
 
 **Recommendation:** Extract to named constant `DISPLAY_DIGITS = 4`.
+
+#### Bootstrap Table Display Limit: `10`
+
+**Definition Location:**
+- `R/analysis.R:189` - `bootstrap_table <- dplyr::slice_head(bootstrap_selected, n = 10)`
+
+**Usage Downstream:**
+- Limits the number of bootstrap examples shown in analysis output tables.
+
+**Context:** Display limit for bootstrap standard error examples to maintain readability.
+
+**Recommendation:** Extract to named constant `BOOTSTRAP_TABLE_DISPLAY_LIMIT = 10`.
 
 #### Plotting Display Constants
 
 **Definition Location:**
 - `R/visualization.R:60, 106, 148, 209, 276` - `base_size = 14` (Font size)
 - `R/visualization.R:195` - `bins = 50` (Histogram bins)
-- `R/visualization.R:46, 255, 262` - `linewidth = 1`, `linewidth = 3`, `linewidth = 2` (Line widths)
-- `R/visualization.R:50` - `hjust = 1.5`, `vjust = 1.1` (Text positioning)
+- `R/visualization.R:255, 262` - `linewidth = 3`, `linewidth = 2` (Line widths)
+- `R/visualization.R:199` - `hjust = -0.5`, `vjust = 1.5` (Text positioning)
 - `R/visualization.R:62` - `"#d95f02"`, `"#1b9e77"` (Color hex codes)
-- `R/visualization.R:184` - `weak_iv_pct <- 0` (Default weak IV percentage)
 - `R/visualization.R:244` - `slice_head(bootstrap_examples, n = 20)` (Display limit)
-- `R/analysis.R:195` - `slice_head(bootstrap_selected, n = 10)` (Display limit)
 - `R/visualization.R:239` - `if (nrow(bootstrap_examples) < 5)` (Minimum display threshold)
 
 **Usage Downstream:**
@@ -432,14 +453,14 @@ This document catalogs all magic numbers and strings found in the R package code
 ### Miscellaneous Numeric Constants
 
 **Definition Location:**
-- `R/data-generation.R:78` - `mean = 2`, `sd = 1` (Normal distribution parameters for X generation)
-- `R/data-generation.R:90` - `Z_het <- Z_mat[, 1]` (Matrix column index)
+- `R/data-generation.R:74` - `mean = 2`, `sd = 1` (Normal distribution parameters for X generation)
+- `R/data-generation.R:86` - `Z_het <- Z_mat[, 1]` (Matrix column index)
 - `R/data-generation.R:208` - `p_value <- 2 * (1 - stats::pnorm(abs(test_stat)))` (Two-tailed test multiplier)
 - `R/estimation.R:114-115` - `boot_result$t[, 1]`, `boot_result$t[, 2]` (Bootstrap result indices)
 - `R/estimation.R:277` - `summary(first_stage)$fstatistic[1]` (F-statistic index)
 - `R/estimation.R:333` - `calculate_lewbel_bounds(df, 0, ...)` (Tau for point identification)
 - `R/simulation.R:29` - `seeds$main[1]` (First seed index)
-- `R/utils-hetid.R:128` - `result == 0` (Success return code)
+- `R/utils-hetid.R:122` - `result == 0` (Success return code)
 
 **Usage Downstream:**
 - Default parameters for data generation and statistical distributions.
@@ -468,24 +489,23 @@ This comprehensive analysis examined all 14 R files in the package using systema
 ### By File Location
 
 #### R/analysis.R
-- Lines 75, 115, 200, 260, 321: `4` (display digits)
-- Lines 81, 124: `10` (F-statistic threshold)
-- Line 195: `10` (display limit)
+- Lines 72, 112, 194, 251, 309: `4` (display digits and rounding)
+- Lines 78, 121: `10` (F-statistic threshold)
+- Line 189: `10` (bootstrap table display limit)
 
 #### R/data-generation.R
-- Line 78: `2`, `1` (normal distribution parameters)
-- Line 90: `1` (matrix column index)
-- Line 99: `-10`, `10` (exponent bounds)
-- Line 180: `10000` (default verification sample size)
-- Line 208: `2` (two-tailed test multiplier)
-- Line 220: `0.05` (p-value threshold)
+- Line 74: `2`, `1` (normal distribution parameters)
+- Line 86: `1` (matrix column index)
+- Line 95: `-10`, `10` (exponent bounds)
+- Line 141: `10000` (default verification sample size)
+- Line 204: `2` (two-tailed test multiplier)
+- Line 216: `0.05` (p-value threshold)
 
 #### R/estimation.R
 - Line 58: `100` (default bootstrap reps)
 - Line 77: `1e-6` (weak identification tolerance)
 - Lines 114-115: `1`, `2` (bootstrap result indices)
-- Lines 221, 321: `0.05` (alpha significance level)
-- Line 256: `1e-10` (instrument SD threshold)
+- Line 255: `1e-10` (instrument SD threshold)
 - Line 277: `1` (F-statistic index)
 - Line 333: `0` (tau for point identification)
 
@@ -514,25 +534,25 @@ This comprehensive analysis examined all 14 R files in the package using systema
 #### R/utils-df.R
 - Lines 9, 27, 41, 69: `"asymptotic"`, `"finite"` (df_adjust parameters)
 - Line 27: `0.05` (default alpha)
+- Lines 74, 79: `"Std. Error"` (column name string)
 
 #### R/utils-hetid.R
 - Lines 32-34, 56-58: Stata executable names
 - Lines 39-41, 73-75: macOS Stata application paths
 - Lines 98, 120: `".do"`, `".log"` (file extensions)
-- Lines 101, 106, 111: `"ranktest"`, `"ivreg2"`, `"ivreg2h"` (Stata packages)
-- Line 128: `0` (success return code)
+- Lines 100, 105, 110: `"ranktest"`, `"ivreg2"`, `"ivreg2h"` (Stata packages)
+- Line 122: `0` (success return code)
 - Line 140: `1000`, `42` (test data size and seed)
 - Lines 143-147: Model parameter defaults
 - Lines 152-154: Column name remapping strings
 
 #### R/visualization.R
 - Lines 31-32: Plot data column names and labels
-- Lines 46, 255, 262: `1`, `3`, `2` (line widths)
-- Line 50: `1.5`, `1.1` (text positioning)
+- Lines 255, 262: `3`, `2` (line widths)
+- Line 199: `-0.5`, `1.5` (text positioning)
 - Lines 60, 106, 148, 209, 276: `14` (base font size)
 - Line 62: `"#d95f02"`, `"#1b9e77"` (color hex codes)
-- Lines 182, 196, 328: `10` (F-statistic threshold)
-- Line 184: `0` (default weak IV percentage)
+- Line 196: `10` (F-statistic threshold)
 - Line 195: `50` (histogram bins)
 - Line 239: `5` (minimum bootstrap examples)
 - Line 244: `20` (plot display limit)
@@ -543,6 +563,7 @@ This comprehensive analysis examined all 14 R files in the package using systema
 **Files Analyzed:** 14 R files
 **Search Methods:** Comprehensive regex patterns for numeric literals, string constants, and magic values
 **Verification:** Cross-referenced with actual code locations and usage patterns
+**Last Updated:** 2025-06-16
 **Status:** Complete inventory of all magic values in the codebase
 
-This documentation now accurately reflects all magic numbers and string literals found in the package, with corrected locations and comprehensive coverage of previously undocumented values.
+This documentation accurately reflects all magic numbers and string literals found in the package, with verified line numbers and comprehensive coverage of all documented values. The documentation has been updated to reflect the current state of the codebase as of June 2025.
