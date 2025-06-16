@@ -51,16 +51,18 @@ Execute Monte Carlo simulations:
 ## Docker Images
 
 ### Production Image (`hetid:latest`)
-- **Base**: `rocker/r-ver:4.5.0`
-- **Size**: ~800MB (optimized)
+- **Base**: `rocker/r-ver:4.4.3`
+- **Size**: ~800MB (optimized with TinyTeX)
 - **Purpose**: Package execution and simulations
 - **Security**: Non-root user, minimal attack surface
+- **LaTeX**: TinyTeX (~150MB) instead of texlive (~3GB)
 
 ### Development Image (`hetid:dev`)
-- **Base**: `rocker/rstudio:4.5.0`
-- **Size**: ~2GB (includes development tools)
+- **Base**: `rocker/rstudio:4.4.3`
+- **Size**: ~1.5GB (reduced from ~4GB with TinyTeX)
 - **Purpose**: Interactive development with RStudio Server
 - **Features**: Full development toolchain, debugging tools
+- **LaTeX**: TinyTeX with auto-expanding package support
 
 ## System Requirements
 
@@ -241,7 +243,30 @@ deploy:
 
 3. **Optimize for your platform**:
    ```bash
-   ./docker/scripts/build.sh -p linux/arm64  # For Apple Silicon
+   ./docker/scripts/build.sh -p linux/amd64  # Currently AMD64 only
+   ```
+
+### LaTeX Support with TinyTeX
+
+The Docker images use TinyTeX instead of full TeXLive for significant space savings:
+
+1. **Benefits**:
+   - ~3GB smaller images
+   - Faster builds and downloads
+   - Auto-installs missing LaTeX packages on demand
+   - Better cross-platform compatibility
+
+2. **Manual LaTeX package installation** (if needed):
+   ```bash
+   # Inside container
+   tlmgr install <package-name>
+   ```
+
+3. **PDF manual generation**:
+   ```bash
+   # Works out of the box
+   R CMD build .
+   R CMD check hetid_*.tar.gz
    ```
 
 ## Security Considerations

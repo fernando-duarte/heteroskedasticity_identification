@@ -18,19 +18,31 @@ build_pdf <- "--pdf" %in% args
 required_packages <- c("devtools", "roxygen2", "pkgdown", "knitr", "rmarkdown")
 
 # Check and install missing packages
-missing_packages <- required_packages[!required_packages %in% installed.packages()[, "Package"]]
+missing_packages <- required_packages[
+  !required_packages %in% installed.packages()[, "Package"]
+]
 if (length(missing_packages) > 0) {
-  message("Installing missing packages: ", paste(missing_packages, collapse = ", "))
+  message(
+    "Installing missing packages: ",
+    paste(missing_packages, collapse = ", ")
+  )
   install.packages(missing_packages)
 }
 
 # Set up logging
-log_file <- paste0("documentation_build_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".log")
+log_file <- paste0(
+  "documentation_build_",
+  format(Sys.time(), "%Y%m%d_%H%M%S"),
+  ".log"
+)
 message("Starting documentation build. Logging to: ", log_file)
 
 # Function to log messages
 log_message <- function(msg, ...) {
-  full_msg <- paste0("[", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "] ", msg, ...)
+  full_msg <- paste0(
+    "[", format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "] ",
+    msg, ...
+  )
   message(full_msg)
   cat(full_msg, "\n", file = log_file, append = TRUE)
 }
@@ -40,90 +52,116 @@ log_message("==== Starting hetid Documentation Build ====")
 
 # Step 1: Update roxygen documentation
 log_message("\n1. Updating roxygen2 documentation...")
-tryCatch({
-  devtools::document()
-  log_message("   ✓ Roxygen documentation updated successfully")
-}, error = function(e) {
-  log_message("   ✗ Error updating roxygen documentation: ", e$message)
-  stop("Documentation build failed at roxygen2 step")
-})
+tryCatch(
+  {
+    devtools::document()
+    log_message("   ✓ Roxygen documentation updated successfully")
+  },
+  error = function(e) {
+    log_message("   ✗ Error updating roxygen documentation: ", e$message)
+    stop("Documentation build failed at roxygen2 step")
+  }
+)
 
 # Step 2: Build vignettes
 log_message("\n2. Building package vignettes...")
-tryCatch({
-  devtools::build_vignettes()
+tryCatch(
+  {
+    devtools::build_vignettes()
 
-  # Copy built vignettes to inst/doc if they don't exist there
-  if (!dir.exists("inst/doc")) {
-    dir.create("inst/doc", recursive = TRUE)
-  }
-
-  # List vignettes that were built
-  vignette_files <- list.files("doc", pattern = "\\.(html|pdf)$", full.names = TRUE)
-  if (length(vignette_files) > 0) {
-    log_message("   Built vignettes:")
-    for (vf in vignette_files) {
-      log_message("     - ", basename(vf))
+    # Copy built vignettes to inst/doc if they don't exist there
+    if (!dir.exists("inst/doc")) {
+      dir.create("inst/doc", recursive = TRUE)
     }
-  }
 
-  log_message("   ✓ Vignettes built successfully")
-}, error = function(e) {
-  log_message("   ✗ Error building vignettes: ", e$message)
-  log_message("   Continuing with documentation build...")
-})
+    # List vignettes that were built
+    vignette_files <- list.files(
+      "doc",
+      pattern = "\\.(html|pdf)$", full.names = TRUE
+    )
+    if (length(vignette_files) > 0) {
+      log_message("   Built vignettes:")
+      for (vf in vignette_files) {
+        log_message("     - ", basename(vf))
+      }
+    }
+
+    log_message("   ✓ Vignettes built successfully")
+  },
+  error = function(e) {
+    log_message("   ✗ Error building vignettes: ", e$message)
+    log_message("   Continuing with documentation build...")
+  }
+)
 
 # Step 3: Build pkgdown site
 log_message("\n3. Building pkgdown website...")
-tryCatch({
-  # Clean previous build
-  if (dir.exists("docs")) {
-    log_message("   Cleaning previous pkgdown build...")
+tryCatch(
+  {
+    # Clean previous build
+    if (dir.exists("docs")) {
+      log_message("   Cleaning previous pkgdown build...")
+    }
+
+    # Build the site
+    pkgdown::build_site(preview = FALSE, quiet = FALSE)
+
+    log_message("   ✓ pkgdown site built successfully")
+    log_message("   Website available at: docs/index.html")
+  },
+  error = function(e) {
+    log_message("   ✗ Error building pkgdown site: ", e$message)
+    log_message("   Continuing with documentation build...")
   }
-
-  # Build the site
-  pkgdown::build_site(preview = FALSE, quiet = FALSE)
-
-  log_message("   ✓ pkgdown site built successfully")
-  log_message("   Website available at: docs/index.html")
-}, error = function(e) {
-  log_message("   ✗ Error building pkgdown site: ", e$message)
-  log_message("   Continuing with documentation build...")
-})
+)
 
 # Step 4: Optionally build PDF manual
 if (build_pdf) {
   log_message("\n4. Building PDF manual...")
-  tryCatch({
-    # Check if LaTeX is available
-    latex_available <- Sys.which("pdflatex") != ""
-    if (!latex_available) {
-      log_message("   LaTeX not found. Attempting to install TinyTeX...")
-      if (!requireNamespace("tinytex", quietly = TRUE)) {
-        install.packages("tinytex")
+  tryCatch(
+    {
+      # Check if LaTeX is available
+      latex_available <- Sys.which("pdflatex") != ""
+      if (!latex_available) {
+        log_message("   LaTeX not found. Attempting to install TinyTeX...")
+        if (!requireNamespace("tinytex", quietly = TRUE)) {
+          install.packages("tinytex")
+        }
+        tinytex::install_tinytex()
       }
-      tinytex::install_tinytex()
-    }
 
-    # Build PDF manual
-    pdf_path <- devtools::build_manual(path = ".")
+      # Build PDF manual
+      pdf_path <- devtools::build_manual(path = ".")
 
-    # Report the result
-    if (!is.null(pdf_path) && file.exists(pdf_path)) {
-      log_message("   ✓ PDF manual built successfully: ", basename(pdf_path))
-    } else {
-      # Find the generated PDF
-      pdf_files <- list.files(".", pattern = "hetid.*\\.pdf$", full.names = TRUE)
-      if (length(pdf_files) > 0) {
-        log_message("   ✓ PDF manual built successfully: ", basename(pdf_files[1]))
+      # Report the result
+      if (!is.null(pdf_path) && file.exists(pdf_path)) {
+        log_message("   ✓ PDF manual built successfully: ", basename(pdf_path))
       } else {
-        log_message("   ⚠ PDF manual may have been built but couldn't locate it")
+        # Find the generated PDF
+        pdf_files <- list.files(
+          ".", pattern = "hetid.*\\.pdf$",
+          full.names = TRUE
+        )
+        if (length(pdf_files) > 0) {
+          log_message(
+            "   ✓ PDF manual built successfully: ",
+            basename(pdf_files[1])
+          )
+        } else {
+          log_message(
+            "   ⚠ PDF manual may have been built but couldn't locate it"
+          )
+        }
       }
+    },
+    error = function(e) {
+      log_message("   ✗ Error building PDF manual: ", e$message)
+      log_message(
+        "   Note: PDF manual requires LaTeX. Install with: ",
+        "tinytex::install_tinytex()"
+      )
     }
-  }, error = function(e) {
-    log_message("   ✗ Error building PDF manual: ", e$message)
-    log_message("   Note: PDF manual requires LaTeX. Install with: tinytex::install_tinytex()")
-  })
+  )
 }
 
 # Step 5: Generate documentation summary
@@ -150,8 +188,9 @@ if (build_pdf) {
 
 # Step 6: Create quick access HTML page
 log_message("\n6. Creating documentation index...")
-tryCatch({
-  index_content <- paste0('<!DOCTYPE html>
+tryCatch(
+  {
+    index_content <- paste0('<!DOCTYPE html>
 <html>
 <head>
     <title>hetid Package Documentation</title>
@@ -167,7 +206,8 @@ tryCatch({
 </head>
 <body>
     <h1>hetid: Identification Through Heteroskedasticity</h1>
-    <p>Local documentation for the hetid R package implementing Lewbel (2012) method.</p>
+    <p>Local documentation for the hetid R package implementing
+    Lewbel (2012) method.</p>
 
     <div class="section">
         <h2>Package Website</h2>
@@ -180,9 +220,12 @@ tryCatch({
     <div class="section">
         <h2>Vignettes</h2>
         <ul>
-            <li><a href="doc/getting-started.html">Getting Started with hetid</a></li>
-            <li><a href="doc/package-comparison.html">Comparing Lewbel (2012) Implementations</a></li>
-            <li><a href="doc/degrees-of-freedom.html">Degrees of Freedom Adjustments</a></li>
+            <li><a href="doc/getting-started.html">
+              Getting Started with hetid</a></li>
+            <li><a href="doc/package-comparison.html">
+              Comparing Lewbel (2012) Implementations</a></li>
+            <li><a href="doc/degrees-of-freedom.html">
+              Degrees of Freedom Adjustments</a></li>
         </ul>
     </div>
 
@@ -191,20 +234,23 @@ tryCatch({
         <ul>
             <li><a href="NEWS.md">Package NEWS</a></li>
             <li><a href="README.md">README</a></li>
-            <li><a href="https://github.com/fernando-duarte/heteroskedasticity_identification">GitHub Repository</a></li>
+            <li><a href="https://github.com/fernando-duarte/heteroskedasticity_identification">
+              GitHub Repository</a></li>
         </ul>
     </div>
 
     <p style="margin-top: 50px; color: #666; font-size: 0.9em;">
-        Generated on ', format(Sys.time(), "%Y-%m-%d %H:%M:%S"), '</p>
+        Generated on ', format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "</p>
 </body>
-</html>')
+</html>")
 
-  writeLines(index_content, "documentation_index.html")
-  log_message("   ✓ Created documentation_index.html")
-}, error = function(e) {
-  log_message("   ✗ Error creating documentation index: ", e$message)
-})
+    writeLines(index_content, "documentation_index.html")
+    log_message("   ✓ Created documentation_index.html")
+  },
+  error = function(e) {
+    log_message("   ✗ Error creating documentation index: ", e$message)
+  }
+)
 
 log_message("\n==== Documentation Build Complete ====")
 log_message("View local documentation at: documentation_index.html")

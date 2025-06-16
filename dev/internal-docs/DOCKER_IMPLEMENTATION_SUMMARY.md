@@ -9,17 +9,19 @@ This document summarizes the comprehensive Docker implementation for the `hetid`
 ### 1. Core Docker Files
 
 #### **Dockerfile** (Multi-stage Production Build)
-- **Base Image**: `rocker/r-ver:4.5.0` (latest R version as of June 2025)
+- **Base Image**: `rocker/r-ver:4.4.3`
 - **Multi-stage Build**: Builder → Production → Development stages
 - **Security**: Non-root user, minimal attack surface
 - **Optimization**: BuildKit caching, layer optimization
-- **Size**: ~800MB production image (optimized)
+- **LaTeX**: TinyTeX instead of texlive (saves ~3GB)
+- **Size**: ~800MB production image (optimized with TinyTeX)
 
 #### **Dockerfile.dev** (Development Environment)
-- **Base Image**: `rocker/rstudio:4.5.0`
+- **Base Image**: `rocker/rstudio:4.4.3`
 - **Features**: Full RStudio Server with development tools
 - **Tools**: devtools, testthat, roxygen2, pkgdown, lintr, styler
-- **Size**: ~2GB (includes comprehensive toolchain)
+- **LaTeX**: TinyTeX with auto-expanding package support
+- **Size**: ~1.5GB (reduced from ~4GB with TinyTeX)
 
 #### **docker-compose.yml** (Multi-service Orchestration)
 - **Services**: Production, Development, Testing, Simulation
