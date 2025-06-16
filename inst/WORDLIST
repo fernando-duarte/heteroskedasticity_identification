@@ -278,6 +278,7 @@ rworkflows
 SARIF
 sd
 se
+setdiff
 semver
 SEs
 setenv

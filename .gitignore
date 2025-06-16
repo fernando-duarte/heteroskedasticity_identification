@@ -291,3 +291,7 @@ credentials/
 ### Documentation build files ###
 documentation_index.html
 documentation_build_*.log
+
+# R test artifacts
+tests/testthat/*.log
+tests/testthat/Rplots.pdf

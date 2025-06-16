@@ -7,7 +7,7 @@ repos:
     # Style files using styler
     - id: style-files
       name: Style R files
-      entry: Rscript inst/hooks/style-files.R
+      entry: Rscript inst/hooks/style-files.R --cache
       language: system
       files: '\.(R|r|Rmd|rmd|Rnw|rnw|Rprofile|qmd)$'
       exclude: |
