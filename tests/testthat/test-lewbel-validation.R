@@ -1,5 +1,10 @@
 # Core validation tests for hetid package
 library(hetid)
+
+# Skip all tests if AER is not available
+if (!requireNamespace("AER", quietly = TRUE)) {
+  skip("AER package not available")
+}
 library(AER)
 
 test_that("hetid methods work with pre-generated lewbel_sim data", {

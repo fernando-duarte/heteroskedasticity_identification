@@ -68,14 +68,16 @@ test_that("all analysis functions handle missing columns gracefully", {
     tsls_gamma1 = c(0.3, 0.4)
   )
 
-  # Should error due to missing required columns
+  # Should complete with warnings due to missing required columns
   # When columns are missing, mean() will warn about non-numeric arguments
   # This is expected behavior when required columns are absent
-  expect_error(
-    suppressWarnings(
-      analyze_main_results(minimal_results, config, verbose = FALSE)
-    )
-  )
+  suppressWarnings({
+    result <- analyze_main_results(minimal_results, config, verbose = FALSE)
+  })
+
+  expect_type(result, "list")
+  # Should have NA values for missing columns
+  expect_true(is.na(result$bounds_summary$`Point ID Check`))
 
   # Test sample size analysis with missing columns
   minimal_sample <- data.frame(

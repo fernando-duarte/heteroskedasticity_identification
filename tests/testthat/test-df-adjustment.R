@@ -1,6 +1,11 @@
 # Test degrees of freedom adjustment functionality
 library(testthat)
 library(hetid)
+
+# Skip all tests if AER is not available
+if (!requireNamespace("AER", quietly = TRUE)) {
+  skip("AER package not available")
+}
 library(AER)
 
 test_that("df_adjust parameter works in run_single_lewbel_simulation", {

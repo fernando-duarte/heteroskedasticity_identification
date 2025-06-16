@@ -74,7 +74,7 @@ calculate_lewbel_bounds <- function(data,
     cov_z_w2sq <- stats::cov(d$Z, d$W2^2)
 
     # Check for weak identification
-    if (abs(cov_z_w2sq) < 1e-6) {
+    if (abs(cov_z_w2sq) < hetid_const("WEAK_ID_TOLERANCE")) {
       return(c(NA, NA))
     }
 
@@ -217,7 +217,7 @@ run_single_lewbel_simulation <- function(sim_id,
         k <- length(coef(ols_model))
         crit_val <- get_critical_value(
           n, k,
-          alpha = 0.05, df_adjust = df_adjust
+          alpha = hetid_const("ALPHA_LEVEL"), df_adjust = df_adjust
         )
 
         ols_covers <- (params$gamma1 >= ols_est - crit_val * ols_se &&
@@ -252,7 +252,7 @@ run_single_lewbel_simulation <- function(sim_id,
       tsls_model <- NULL
 
       # Check for invalid instrument
-      if (any(is.na(lewbel_iv)) || stats::sd(lewbel_iv, na.rm = TRUE) < 1e-10) {
+      if (any(is.na(lewbel_iv)) || stats::sd(lewbel_iv, na.rm = TRUE) < hetid_const("INSTRUMENT_SD_THRESHOLD")) {
         tsls_est <- NA_real_
         tsls_se <- NA_real_
         tsls_covers <- NA
@@ -276,17 +276,25 @@ run_single_lewbel_simulation <- function(sim_id,
           first_stage_f <- summary(first_stage)$fstatistic[1]
         }
 
-        # 2SLS estimation using AER::ivreg
+        # 2SLS estimation using ivreg (try multiple packages)
         iv_formula_str <- paste(
           "Y1 ~", endog_var, "+", paste(exog_vars, collapse = " + "),
           "|", paste(exog_vars, collapse = " + "), "+ lewbel_iv"
         )
         iv_formula <- stats::as.formula(iv_formula_str)
 
-        tsls_model <- tryCatch(
-          AER::ivreg(iv_formula, data = df),
-          error = function(e) NULL
-        )
+        tsls_model <- tryCatch({
+          # Try ivreg package first (standalone)
+          if (requireNamespace("ivreg", quietly = TRUE)) {
+            ivreg::ivreg(iv_formula, data = df)
+          } else if (requireNamespace("AER", quietly = TRUE)) {
+            # Fallback to AER::ivreg
+            AER::ivreg(iv_formula, data = df)
+          } else {
+            # No IV regression package available
+            NULL
+          }
+        }, error = function(e) NULL)
 
         if (is.null(tsls_model)) {
           tsls_est <- NA_real_
@@ -317,7 +325,7 @@ run_single_lewbel_simulation <- function(sim_id,
             k <- length(coef(tsls_model))
             crit_val <- get_critical_value(
               n, k,
-              alpha = 0.05, df_adjust = df_adjust
+              alpha = hetid_const("ALPHA_LEVEL"), df_adjust = df_adjust
             )
 
             tsls_covers <- (params$gamma1 >= tsls_est - crit_val * tsls_se &&

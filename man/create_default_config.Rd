@@ -5,16 +5,16 @@
 \title{Create Default Configuration for Lewbel Monte Carlo Simulations}
 \usage{
 create_default_config(
-  num_simulations = 200,
-  main_sample_size = 500,
-  sample_sizes = c(250, 500, 1000, 2000),
+  num_simulations = hetid_const("DEFAULT_NUM_SIMULATIONS"),
+  main_sample_size = hetid_const("DEFAULT_MAIN_SAMPLE_SIZE"),
+  sample_sizes = hetid_const("DEFAULT_SAMPLE_SIZES"),
   delta_het = 0.8,
   delta_het_values = c(0.4, 0.8, 1.2),
-  n_reps_by_n = 100,
-  n_reps_by_delta = 100,
-  bootstrap_reps = 100,
-  bootstrap_subset_size = 10,
-  bootstrap_demo_size = 5,
+  n_reps_by_n = hetid_const("DEFAULT_BOOTSTRAP_REPS"),
+  n_reps_by_delta = hetid_const("DEFAULT_BOOTSTRAP_REPS"),
+  bootstrap_reps = hetid_const("DEFAULT_BOOTSTRAP_REPS"),
+  bootstrap_subset_size = hetid_const("DEFAULT_BOOTSTRAP_SUBSET_SIZE"),
+  bootstrap_demo_size = hetid_const("DEFAULT_BOOTSTRAP_DEMO_SIZE"),
   beta1_0 = 0.5,
   beta1_1 = 1.5,
   gamma1 = -0.8,
@@ -30,13 +30,13 @@ create_default_config(
 }
 \arguments{
 \item{num_simulations}{Integer. Number of main simulation runs
-(default: 1000).}
+(default: 200).}
 
 \item{main_sample_size}{Integer. Primary sample size for main results
-(default: 1000).}
+(default: 500).}
 
 \item{sample_sizes}{Integer vector. Sample sizes for consistency analysis
-(default: c(500, 1000, 2000)).}
+(default: c(250, 500, 1000, 2000)).}
 
 \item{delta_het}{Numeric. Heteroscedasticity strength parameter
 (default: 1.2).}
