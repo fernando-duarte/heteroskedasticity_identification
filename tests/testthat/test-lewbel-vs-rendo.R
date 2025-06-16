@@ -33,7 +33,11 @@ test_that("hetid matches Stata approach exactly", {
   expect_equal(as.numeric(coef(model)["Y2"]), expected_coef, tolerance = 1e-6)
 
   # Check SE matches (with asymptotic df adjustment)
-  expect_equal(as.numeric(sqrt(diag(vcov(model)))["Y2"]), expected_se, tolerance = 1e-5)
+  expect_equal(
+    as.numeric(sqrt(diag(vcov(model)))["Y2"]),
+    expected_se,
+    tolerance = 1e-5
+  )
 })
 
 test_that("REndo uses X instead of Z for instruments", {
@@ -64,7 +68,9 @@ test_that("REndo uses X instead of Z for instruments", {
   model_x <- ivreg(y ~ x + p | x + iv_x, data = test_data)
 
   # REndo's hetErrorsIV
-  rendo <- suppressMessages(hetErrorsIV(y ~ x + p | p | IIV(x), data = test_data))
+  rendo <- suppressMessages(
+    hetErrorsIV(y ~ x + p | p | IIV(x), data = test_data)
+  )
 
   # REndo should match the X-based approach, not the Z-based
   expect_equal(
@@ -101,34 +107,46 @@ test_that("hetid with multiple instruments matches theoretical expectations", {
   n <- 1000
 
   # Generate multiple X and Z variables
-  X1 <- rnorm(n)
-  X2 <- rnorm(n)
-  X3 <- rnorm(n)
-  Z1 <- X1^2 - mean(X1^2)
-  Z2 <- X2^2 - mean(X2^2)
-  Z3 <- X3^2 - mean(X3^2)
+  x1 <- rnorm(n)
+  x2 <- rnorm(n)
+  x3 <- rnorm(n)
+  z1 <- x1^2 - mean(x1^2)
+  z2 <- x2^2 - mean(x2^2)
+  z3 <- x3^2 - mean(x3^2)
 
   # Generate Y2 and Y1 following Lewbel structure
-  epsilon2 <- sqrt(0.5 + 0.5 * (Z1^2 + Z2^2 + Z3^2)) * rnorm(n)
-  Y2 <- 1 + X1 - X2 + 0.5 * X3 + epsilon2
+  epsilon2 <- sqrt(0.5 + 0.5 * (z1^2 + z2^2 + z3^2)) * rnorm(n)
+  y2 <- 1 + x1 - x2 + 0.5 * x3 + epsilon2
   epsilon1 <- rnorm(n)
-  Y1 <- 0.5 + 1.5 * X1 + 2 * X2 - 0.5 * X3 - 0.8 * Y2 + epsilon1
+  y1 <- 0.5 + 1.5 * x1 + 2 * x2 - 0.5 * x3 - 0.8 * y2 + epsilon1
 
-  data <- data.frame(Y1 = Y1, Y2 = Y2, X1 = X1, X2 = X2, X3 = X3, Z1 = Z1, Z2 = Z2, Z3 = Z3)
+  data <- data.frame(
+    Y1 = y1, Y2 = y2, X1 = x1, X2 = x2, X3 = x3,
+    Z1 = z1, Z2 = z2, Z3 = z3
+  )
 
   # Construct multiple Lewbel instruments
   e2_hat <- residuals(lm(Y2 ~ X1 + X2 + X3, data = data))
-  iv1 <- (Z1 - mean(Z1)) * e2_hat
+  iv1 <- (z1 - mean(z1)) * e2_hat
   iv1 <- iv1 - mean(iv1)
-  iv2 <- (Z2 - mean(Z2)) * e2_hat
+  iv2 <- (z2 - mean(z2)) * e2_hat
   iv2 <- iv2 - mean(iv2)
-  iv3 <- (Z3 - mean(Z3)) * e2_hat
+  iv3 <- (z3 - mean(z3)) * e2_hat
   iv3 <- iv3 - mean(iv3)
 
   # Test with 1, 2, and 3 instruments
-  model1 <- ivreg(Y1 ~ X1 + X2 + X3 + Y2 | X1 + X2 + X3 + iv1, data = data)
-  model2 <- ivreg(Y1 ~ X1 + X2 + X3 + Y2 | X1 + X2 + X3 + iv1 + iv2, data = data)
-  model3 <- ivreg(Y1 ~ X1 + X2 + X3 + Y2 | X1 + X2 + X3 + iv1 + iv2 + iv3, data = data)
+  model1 <- ivreg(
+    Y1 ~ X1 + X2 + X3 + Y2 | X1 + X2 + X3 + iv1,
+    data = data
+  )
+  model2 <- ivreg(
+    Y1 ~ X1 + X2 + X3 + Y2 | X1 + X2 + X3 + iv1 + iv2,
+    data = data
+  )
+  model3 <- ivreg(
+    Y1 ~ X1 + X2 + X3 + Y2 | X1 + X2 + X3 + iv1 + iv2 + iv3,
+    data = data
+  )
 
   # More instruments should typically reduce SE (more efficient)
   se1 <- sqrt(diag(vcov(model1)))["Y2"]
@@ -183,11 +201,15 @@ test_that("REndo warns appropriately about weak instruments", {
   params_strong$delta_het <- 2.0
 
   data_strong <- generate_lewbel_data(500, params_strong)
-  test_data_strong <- data.frame(y = data_strong$Y1, x = data_strong$Xk, p = data_strong$Y2)
+  test_data_strong <- data.frame(
+    y = data_strong$Y1, x = data_strong$Xk, p = data_strong$Y2
+  )
 
   # Should not warn with strong heteroskedasticity
   expect_no_warning(
-    suppressMessages(hetErrorsIV(y ~ x + p | p | IIV(x), data = test_data_strong))
+    suppressMessages(
+      hetErrorsIV(y ~ x + p | p | IIV(x), data = test_data_strong)
+    )
   )
 })
 
@@ -206,7 +228,10 @@ test_that("Both hetid and REndo handle edge cases appropriately", {
 
   set.seed(456)
   small_data <- generate_lewbel_data(50, params)
-  test_data <- data.frame(y = small_data$Y1, x = small_data$Xk, p = small_data$Y2, z = small_data$Z)
+  test_data <- data.frame(
+    y = small_data$Y1, x = small_data$Xk,
+    p = small_data$Y2, z = small_data$Z
+  )
 
   # Construct standard Lewbel IV
   e2_hat <- residuals(lm(p ~ x, data = test_data))
@@ -246,7 +271,10 @@ test_that("Both hetid and REndo handle edge cases appropriately", {
     # Small samples typically have larger SEs than large samples
     # With n=50 and true gamma=-0.8, SE might still be reasonable
     expect_true(se_hetid > 0.001, label = "Small sample produces reasonable SE")
-    expect_true(se_rendo > 0.001, label = "Small sample produces reasonable SE in REndo")
+    expect_true(
+      se_rendo > 0.001,
+      label = "Small sample produces reasonable SE in REndo"
+    )
   }
 })
 

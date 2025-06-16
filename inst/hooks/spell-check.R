@@ -7,7 +7,10 @@ args <- commandArgs(trailingOnly = TRUE)
 
 # Check if spelling is installed
 if (!requireNamespace("spelling", quietly = TRUE)) {
-  stop("spelling package is not installed. Please install it with: install.packages('spelling')")
+  stop(
+    "spelling package is not installed. Please install it with: ",
+    "install.packages('spelling')"
+  )
 }
 
 # Load custom wordlist if it exists

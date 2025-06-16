@@ -5,7 +5,10 @@
 
 # Check if desc is installed
 if (!requireNamespace("desc", quietly = TRUE)) {
-  stop("desc package is not installed. Please install it with: install.packages('desc')")
+  stop(
+    "desc package is not installed. ",
+    "Please install it with: install.packages('desc')"
+  )
 }
 
 # Read current DESCRIPTION

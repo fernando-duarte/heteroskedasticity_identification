@@ -53,8 +53,10 @@ test_that("generate_lewbel_data handles extreme coefficients", {
   )
 
   data_zero <- generate_lewbel_data(50, params_zero)
-  expect_equal(data_zero$Y2[1], data_zero$epsilon2[1]) # Y2 = epsilon2
-  expect_equal(data_zero$Y1[1], data_zero$epsilon1[1]) # Y1 = epsilon1
+  # Y2 = epsilon2 when all coefficients are zero
+  expect_equal(data_zero$Y2[1], data_zero$epsilon2[1])
+  # Y1 = epsilon1 when all coefficients are zero
+  expect_equal(data_zero$Y1[1], data_zero$epsilon1[1])
 })
 
 test_that("generate_lewbel_data handles edge sample sizes", {
@@ -76,6 +78,19 @@ test_that("generate_lewbel_data handles edge sample sizes", {
   # Check statistical properties with large sample
   expect_true(abs(mean(data_large$Xk) - 2) < 0.1) # Should be close to 2
   expect_true(abs(sd(data_large$Xk) - 1) < 0.1) # Should be close to 1
+
+  # Generate data and check intermediate calculations
+  n_obs <- 1000
+  x_k <- rnorm(n_obs, mean = 2, sd = 10) # Large variance in X
+  z_val <- x_k^2 - mean(x_k^2)
+
+  # Manually check exponent capping
+  exponent <- params_extreme$delta_het * z_val
+  exponent_capped <- pmin(pmax(exponent, -10), 10)
+
+  expect_true(all(exponent_capped >= -10))
+  expect_true(all(exponent_capped <= 10))
+  expect_true(any(exponent != exponent_capped)) # Some should be capped
 })
 
 test_that("generate_lewbel_data with missing parameters", {
@@ -126,11 +141,11 @@ test_that("exponent capping works correctly", {
 
   # Generate data and check intermediate calculations
   n_obs <- 1000
-  Xk <- rnorm(n_obs, mean = 2, sd = 10) # Large variance in X
-  Z <- Xk^2 - mean(Xk^2)
+  x_k <- rnorm(n_obs, mean = 2, sd = 10) # Large variance in X
+  z_val <- x_k^2 - mean(x_k^2)
 
   # Manually check exponent capping
-  exponent <- params_extreme$delta_het * Z
+  exponent <- params_extreme$delta_het * z_val
   exponent_capped <- pmin(pmax(exponent, -10), 10)
 
   expect_true(all(exponent_capped >= -10))

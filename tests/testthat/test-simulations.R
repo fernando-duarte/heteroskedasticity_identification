@@ -32,13 +32,17 @@ test_that("run_main_simulation works", {
 
   expect_s3_class(main_results, "data.frame")
   expect_equal(nrow(main_results), 3)
-  expect_true(all(c("ols_gamma1", "tsls_gamma1", "first_stage_F") %in% names(main_results)))
+  expect_true(all(c(
+    "ols_gamma1", "tsls_gamma1", "first_stage_F"
+  ) %in% names(main_results)))
   expect_true(all(!is.na(main_results$ols_gamma1)))
   expect_true(all(!is.na(main_results$tsls_gamma1)))
 })
 
 test_that("run_sample_size_analysis works", {
-  config_tiny <- create_default_config(n_reps_by_n = 2, sample_sizes = c(100, 200))
+  config_tiny <- create_default_config(
+    n_reps_by_n = 2, sample_sizes = c(100, 200)
+  )
   seeds_tiny <- generate_all_seeds(config_tiny)
 
   suppressMessages({
@@ -52,7 +56,9 @@ test_that("run_sample_size_analysis works", {
 })
 
 test_that("run_sensitivity_analysis works", {
-  config_sens <- create_default_config(n_reps_by_delta = 2, delta_het_values = c(0.8, 1.2))
+  config_sens <- create_default_config(
+    n_reps_by_delta = 2, delta_het_values = c(0.8, 1.2)
+  )
   seeds_sens <- generate_all_seeds(config_sens)
 
   suppressMessages({
@@ -66,7 +72,9 @@ test_that("run_sensitivity_analysis works", {
 })
 
 test_that("run_bootstrap_demonstration works", {
-  config_boot <- create_default_config(bootstrap_demo_size = 2, bootstrap_reps = 5)
+  config_boot <- create_default_config(
+    bootstrap_demo_size = 2, bootstrap_reps = 5
+  )
   seeds_boot <- generate_all_seeds(config_boot)
 
   suppressMessages({
@@ -76,7 +84,9 @@ test_that("run_bootstrap_demonstration works", {
   expect_s3_class(bootstrap_demo, "data.frame")
   expect_true("sim_id" %in% names(bootstrap_demo))
   expect_true(nrow(bootstrap_demo) >= 2) # At least 2 demo_size
-  expect_true(all(c("bound_lower_tau_set", "bound_upper_tau_set") %in% names(bootstrap_demo)))
+  expect_true(all(c(
+    "bound_lower_tau_set", "bound_upper_tau_set"
+  ) %in% names(bootstrap_demo)))
 })
 
 test_that("run_lewbel_demo works", {
@@ -85,7 +95,9 @@ test_that("run_lewbel_demo works", {
   })
 
   expect_type(demo_results, "list")
-  expect_true(all(c("config", "results_main", "analysis") %in% names(demo_results)))
+  expect_true(all(c(
+    "config", "results_main", "analysis"
+  ) %in% names(demo_results)))
   expect_s3_class(demo_results$results_main, "data.frame")
   expect_type(demo_results$analysis, "list")
 })

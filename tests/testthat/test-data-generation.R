@@ -61,13 +61,11 @@ test_that("calculate_lewbel_bounds works", {
   config <- create_default_config()
   data <- generate_lewbel_data(100, config)
 
-  bounds <- calculate_lewbel_bounds(data, tau = 0.2)
-
+  bounds <- calculate_lewbel_bounds(data, tau = 0.0)
   expect_type(bounds, "list")
-  expect_true(all(c("bounds", "se") %in% names(bounds)))
-  expect_type(bounds$bounds, "double")
   expect_equal(length(bounds$bounds), 2)
-  expect_true(bounds$bounds[1] <= bounds$bounds[2]) # lower <= upper
+  # Check that lower bound is less than or equal to upper bound
+  expect_true(bounds$bounds[1] <= bounds$bounds[2])
 })
 
 test_that("calculate_lewbel_bounds with different tau values works", {

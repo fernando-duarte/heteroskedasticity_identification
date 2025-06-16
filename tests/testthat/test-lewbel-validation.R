@@ -15,8 +15,8 @@ test_that("hetid methods work with pre-generated lewbel_sim data", {
     e2_hat <- residuals(first_stage)
 
     # Construct Lewbel instrument using X2 for heteroskedasticity
-    Z2 <- lewbel_sim$X2^2 - mean(lewbel_sim$X2^2)
-    lewbel_iv <- (Z2 - mean(Z2)) * e2_hat
+    z2_val <- lewbel_sim$X2^2 - mean(lewbel_sim$X2^2)
+    lewbel_iv <- (z2_val - mean(z2_val)) * e2_hat
     # Ensure instrument is exactly mean-zero
     lewbel_iv <- lewbel_iv - mean(lewbel_iv)
     lewbel_sim$lewbel_iv <- lewbel_iv
@@ -28,10 +28,10 @@ test_that("hetid methods work with pre-generated lewbel_sim data", {
     )
 
     # Extract coefficient for P
-    coef_P <- coef(tsls_model)["P"]
+    coef_p_val <- coef(tsls_model)["P"]
 
     # Test that coefficient is reasonable (true value is -1.0)
-    expect_true(coef_P < -0.8 && coef_P > -1.2)
+    expect_true(coef_p_val < -0.8 && coef_p_val > -1.2)
 
     # Test that instrument is mean-zero
     expect_equal(mean(lewbel_iv), 0, tolerance = 1e-10)
@@ -128,8 +128,8 @@ test_that("Instrument order invariance holds", {
   # Create instrument with original order
   first_stage1 <- lm(Y2 ~ Xk, data = data1)
   e2_hat1 <- residuals(first_stage1)
-  Z1 <- data1$Z
-  iv1 <- (Z1 - mean(Z1)) * e2_hat1
+  z1_val <- data1$Z
+  iv1 <- (z1_val - mean(z1_val)) * e2_hat1
 
   # Shuffle and recreate
   shuffled_idx <- sample(n)
@@ -137,8 +137,8 @@ test_that("Instrument order invariance holds", {
 
   first_stage2 <- lm(Y2 ~ Xk, data = data2)
   e2_hat2 <- residuals(first_stage2)
-  Z2 <- data2$Z
-  iv2 <- (Z2 - mean(Z2)) * e2_hat2
+  z2_val <- data2$Z
+  iv2 <- (z2_val - mean(z2_val)) * e2_hat2
 
   # Reorder back
   reorder_idx <- order(shuffled_idx)

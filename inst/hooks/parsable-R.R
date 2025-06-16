@@ -16,7 +16,7 @@ if (length(args) > 0) {
         NULL
       },
       error = function(e) {
-        return(e)
+        e
       }
     )
 

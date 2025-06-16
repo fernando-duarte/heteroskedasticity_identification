@@ -106,7 +106,7 @@ test_that("adjust_se_for_df works correctly", {
 
   # Edge case: n = k + 1
   se_adj_edge <- adjust_se_for_df(se_orig, n = 4, k = 3, df_adjust = "finite")
-  expect_equal(se_adj_edge, se_orig * 2) # sqrt(4/1) = 2
+  expect_equal(se_adj_edge, se_orig * 2)
 })
 
 test_that("ivreg SE extraction works correctly", {

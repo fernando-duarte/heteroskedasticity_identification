@@ -18,7 +18,9 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(hetid)
 library(AER)
-# library(REndo)  # Uncomment if available
+if (requireNamespace("REndo", quietly = TRUE)) {
+  library(REndo)
+}
 ```
 
 ## Overview

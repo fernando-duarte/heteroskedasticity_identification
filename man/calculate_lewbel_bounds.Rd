@@ -24,8 +24,8 @@ calculate_lewbel_bounds(
 \item{b_reps}{Integer. Number of bootstrap replications if compute_se = TRUE
 (default: 100).}
 
-\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic" (default) or
-"finite". Affects standard errors and confidence intervals.}
+\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic"
+(default) or "finite". Affects standard errors and confidence intervals.}
 }
 \value{
 A list containing:

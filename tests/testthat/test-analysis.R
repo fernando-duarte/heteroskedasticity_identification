@@ -6,12 +6,18 @@ test_that("analyze_main_results works", {
 
   suppressMessages({
     main_results <- run_main_simulation(config_small, seeds_small)
-    analysis <- analyze_main_results(main_results, config_small, verbose = FALSE)
+    analysis <- analyze_main_results(
+      main_results, config_small,
+      verbose = FALSE
+    )
   })
 
   expect_type(analysis, "list")
   # Correct expected names based on actual function implementation
-  expect_true(all(c("summary_table", "bounds_summary", "weak_iv_pct", "results_clean") %in% names(analysis)))
+  expect_true(all(
+    c("summary_table", "bounds_summary", "weak_iv_pct", "results_clean") %in%
+      names(analysis)
+  ))
   expect_s3_class(analysis$summary_table, "data.frame")
   expect_type(analysis$weak_iv_pct, "double")
   expect_s3_class(analysis$bounds_summary, "data.frame")
@@ -23,12 +29,18 @@ test_that("analyze_main_results works", {
 })
 
 test_that("analyze_sample_size_results works", {
-  config_tiny <- create_default_config(n_reps_by_n = 2, sample_sizes = c(100, 200))
+  config_tiny <- create_default_config(
+    n_reps_by_n = 2,
+    sample_sizes = c(100, 200)
+  )
   seeds_tiny <- generate_all_seeds(config_tiny)
 
   suppressMessages({
     sample_results <- run_sample_size_analysis(config_tiny, seeds_tiny)
-    sample_analysis <- analyze_sample_size_results(sample_results, config_tiny, verbose = FALSE)
+    sample_analysis <- analyze_sample_size_results(
+      sample_results, config_tiny,
+      verbose = FALSE
+    )
   })
 
   # analyze_sample_size_results returns a data.frame directly, not a list
@@ -38,12 +50,18 @@ test_that("analyze_sample_size_results works", {
 })
 
 test_that("analyze_sensitivity_results works", {
-  config_sens <- create_default_config(n_reps_by_delta = 2, delta_het_values = c(0.8, 1.2))
+  config_sens <- create_default_config(
+    n_reps_by_delta = 2,
+    delta_het_values = c(0.8, 1.2)
+  )
   seeds_sens <- generate_all_seeds(config_sens)
 
   suppressMessages({
     sens_results <- run_sensitivity_analysis(config_sens, seeds_sens)
-    sens_analysis <- analyze_sensitivity_results(sens_results, config_sens, verbose = FALSE)
+    sens_analysis <- analyze_sensitivity_results(
+      sens_results, config_sens,
+      verbose = FALSE
+    )
   })
 
   # analyze_sensitivity_results returns a data.frame directly, not a list
@@ -53,13 +71,19 @@ test_that("analyze_sensitivity_results works", {
 })
 
 test_that("analyze_bootstrap_results works", {
-  config_boot <- create_default_config(bootstrap_demo_size = 2, bootstrap_reps = 5)
+  config_boot <- create_default_config(
+    bootstrap_demo_size = 2,
+    bootstrap_reps = 5
+  )
   seeds_boot <- generate_all_seeds(config_boot)
 
   suppressMessages({
     main_results <- run_main_simulation(config_boot, seeds_boot)
     bootstrap_demo <- run_bootstrap_demonstration(config_boot, seeds_boot)
-    bootstrap_analysis <- analyze_bootstrap_results(main_results, bootstrap_demo, config_boot, verbose = FALSE)
+    bootstrap_analysis <- analyze_bootstrap_results(
+      main_results, bootstrap_demo, config_boot,
+      verbose = FALSE
+    )
   })
 
   # analyze_bootstrap_results returns a data.frame directly, not a list
@@ -73,7 +97,10 @@ test_that("print_simulation_summary works", {
 
   suppressMessages({
     main_results <- run_main_simulation(config_small, seeds_small)
-    analysis <- analyze_main_results(main_results, config_small, verbose = FALSE)
+    analysis <- analyze_main_results(
+      main_results, config_small,
+      verbose = FALSE
+    )
   })
 
   # Test that function runs without error
@@ -95,7 +122,10 @@ test_that("print_simulation_summary with different calling patterns works", {
 
   suppressMessages({
     main_results <- run_main_simulation(config_small, seeds_small)
-    analysis <- analyze_main_results(main_results, config_small, verbose = FALSE)
+    analysis <- analyze_main_results(
+      main_results, config_small,
+      verbose = FALSE
+    )
   })
 
   # Test with verbose = FALSE to avoid output during testing

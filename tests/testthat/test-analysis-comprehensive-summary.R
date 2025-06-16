@@ -1,5 +1,6 @@
 # Tests for simulation summary and error handling functions
-# Covers print_simulation_summary() with various parameter combinations and edge cases
+# Covers print_simulation_summary() with various parameter combinations
+# and edge cases
 # Also tests missing column handling across all analysis functions
 # Dependencies: testthat, hetid package functions
 
@@ -32,13 +33,15 @@ test_that("print_simulation_summary handles all parameter combinations", {
 })
 
 test_that("print_simulation_summary handles edge cases in verbose parameter", {
-  # Test with list as verbose parameter - should produce output (defaults to TRUE)
+  # Test with list as verbose parameter - should produce output
+  # (defaults to TRUE)
   output1 <- capture.output(
     print_simulation_summary(verbose = list(a = 1, b = 2))
   )
   expect_true(length(output1) > 0)
 
-  # Test with vector as verbose parameter - should produce output (defaults to TRUE)
+  # Test with vector as verbose parameter - should produce output
+  # (defaults to TRUE)
   output2 <- capture.output(
     print_simulation_summary(verbose = c(TRUE, FALSE, TRUE))
   )

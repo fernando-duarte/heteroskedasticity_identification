@@ -12,7 +12,10 @@ test_that("analyze_bootstrap_results handles various data combinations", {
 
   suppressMessages({
     main_results <- run_main_simulation(config, seeds, verbose = FALSE)
-    bootstrap_demo <- run_bootstrap_demonstration(config, seeds, verbose = FALSE)
+    bootstrap_demo <- run_bootstrap_demonstration(
+      config, seeds,
+      verbose = FALSE
+    )
   })
 
   # Test with verbose output

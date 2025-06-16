@@ -1,5 +1,6 @@
 # Tests for analysis function edge cases and robustness
-# Covers correlation edge cases, zero variance scenarios, extreme values, and formatting
+# Covers correlation edge cases, zero variance scenarios, extreme values,
+# and formatting
 # Includes single row data frames and verbose output formatting tests
 # Dependencies: testthat, hetid package functions
 
@@ -61,10 +62,12 @@ test_that("analyze_main_results handles zero variance cases", {
   })
 
   # Should handle zero variance gracefully
-  # RMSE is calculated against config$gamma1, so won't be 0 unless estimates equal gamma1
+  # RMSE is calculated against config$gamma1, so won\'t be 0 unless
+  # estimates equal gamma1
   expect_type(analysis$summary_table$RMSE, "double")
   expect_true(all(is.finite(analysis$summary_table$RMSE)))
-  expect_equal(analysis$weak_iv_pct, 0) # No weak instruments (F=10 > 10 threshold)
+  # No weak instruments (F=10 > 10 threshold)
+  expect_equal(analysis$weak_iv_pct, 0)
 })
 
 test_that("analysis functions handle single row data frames", {

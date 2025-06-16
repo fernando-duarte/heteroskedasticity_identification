@@ -4,7 +4,8 @@ library(AER)
 
 test_that("hetid matches Stata ivreg2h on single X", {
   # Pre-computed Stata results for comparison when Stata is not available
-  # These were obtained by running Stata ivreg2h with the same data (seed=42, n=1000)
+  # These were obtained by running Stata ivreg2h with the same data
+  # (seed=42, n=1000)
   expected_stata_coef <- -0.8009241
   expected_stata_se <- 0.00096109
 
@@ -20,7 +21,8 @@ test_that("hetid matches Stata ivreg2h on single X", {
   hetid_se <- sqrt(diag(vcov(hetid_model)))["P"]
 
   # Check if we can run actual Stata comparison
-  can_run_stata <- has_stata() && has_haven() && !identical(Sys.getenv("NOT_CRAN"), "")
+  can_run_stata <- has_stata() && has_haven() &&
+    !identical(Sys.getenv("NOT_CRAN"), "")
 
   if (can_run_stata && requireNamespace("haven", quietly = TRUE)) {
     library(haven)
@@ -94,7 +96,8 @@ exit
 
   # Compare results (we've seen 0.004% difference for coef, 2.3% for SE)
   expect_equal(as.numeric(hetid_coef), expected_stata_coef,
-    tolerance = 0.002, # Increased from 1e-3 to handle small numerical differences
+    # Increased from 1e-3 to handle small numerical differences
+    tolerance = 0.002,
     label = "Coefficient comparison"
   )
   expect_equal(as.numeric(hetid_se), expected_stata_se,
@@ -128,13 +131,13 @@ test_that("hetid matches Stata ivreg2h with multiple X", {
   e2_hat <- residuals(first_stage)
 
   # Use both Z1 and Z2 for instruments
-  Z1_demeaned <- data$Z1 - mean(data$Z1)
-  Z2_demeaned <- data$Z2 - mean(data$Z2)
+  z1_demeaned <- data$Z1 - mean(data$Z1)
+  z2_demeaned <- data$Z2 - mean(data$Z2)
 
-  data$lewbel_iv1 <- Z1_demeaned * e2_hat
+  data$lewbel_iv1 <- z1_demeaned * e2_hat
   data$lewbel_iv1 <- data$lewbel_iv1 - mean(data$lewbel_iv1)
 
-  data$lewbel_iv2 <- Z2_demeaned * e2_hat
+  data$lewbel_iv2 <- z2_demeaned * e2_hat
   data$lewbel_iv2 <- data$lewbel_iv2 - mean(data$lewbel_iv2)
 
   # Run hetid with both instruments
@@ -146,7 +149,8 @@ test_that("hetid matches Stata ivreg2h with multiple X", {
   hetid_se <- sqrt(diag(vcov(hetid_model)))["P"]
 
   # Check if we can run actual Stata comparison
-  can_run_stata <- has_stata() && has_haven() && !identical(Sys.getenv("NOT_CRAN"), "")
+  can_run_stata <- has_stata() && has_haven() &&
+    !identical(Sys.getenv("NOT_CRAN"), "")
 
   if (can_run_stata && requireNamespace("haven", quietly = TRUE)) {
     library(haven)

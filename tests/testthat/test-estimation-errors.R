@@ -91,7 +91,8 @@ test_that("run_single_lewbel_simulation handles weak instruments", {
     sample_size = 20, # Small sample size
     beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
     beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = 0.01, alpha2 = 0.01, delta_het = 0.01, # Very weak heteroskedasticity
+    # Very weak heteroskedasticity
+    alpha1 = 0.01, alpha2 = 0.01, delta_het = 0.01,
     tau_set_id = 0.2, bootstrap_reps = 5
   )
 

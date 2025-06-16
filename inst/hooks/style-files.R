@@ -7,7 +7,10 @@ args <- commandArgs(trailingOnly = TRUE)
 
 # Check if styler is installed
 if (!requireNamespace("styler", quietly = TRUE)) {
-  stop("styler package is not installed. Please install it with: install.packages('styler')")
+  stop(
+    "styler package is not installed. ",
+    "Please install it with: install.packages('styler')"
+  )
 }
 
 # Style the files

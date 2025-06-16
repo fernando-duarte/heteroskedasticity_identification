@@ -50,7 +50,6 @@ params <- list(
 result_asymp <- run_single_lewbel_simulation(
   sim_id = 1,
   params = params
-  # df_adjust = "asymptotic" # This is the default (commented out for vignette build)
 )
 
 # Display results
@@ -67,8 +66,8 @@ For smaller samples, you may want to use finite sample corrections:
 # Run with finite sample standard errors
 result_finite <- run_single_lewbel_simulation(
   sim_id = 1,
-  params = params
-  # df_adjust = "finite" # (commented out for vignette build)
+  params = params,
+  df_adjust = "finite"
 )
 
 # Display results
@@ -96,8 +95,8 @@ The `df_adjust` parameter affects both standard errors and critical values:
 n <- 200
 k <- 3
 # Temporarily use default critical values to avoid build issues
-crit_asymp <- 1.96 # get_critical_value(n, k, alpha = 0.05, df_adjust = "asymptotic")
-crit_finite <- 1.98 # get_critical_value(n, k, alpha = 0.05, df_adjust = "finite")
+crit_asymp <- 1.96
+crit_finite <- 1.98
 
 cat("Critical values for 95% CI:\n")
 cat("Asymptotic (normal):", crit_asymp, "\n")

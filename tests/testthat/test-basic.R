@@ -45,6 +45,8 @@ test_that("generate_all_seeds works", {
 
   expect_type(all_seeds, "list")
   # Correct expected names based on actual function implementation
-  expect_true(all(c("main", "by_n", "by_delta", "bootstrap_demo") %in% names(all_seeds)))
+  expect_true(all(
+    c("main", "by_n", "by_delta", "bootstrap_demo") %in% names(all_seeds)
+  ))
   expect_equal(length(all_seeds$main), 5)
 })

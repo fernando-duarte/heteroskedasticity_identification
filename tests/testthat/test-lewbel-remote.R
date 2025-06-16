@@ -56,8 +56,8 @@ test_that("hetid works on simulated UK Engel curve-like data", {
   e2_hat <- residuals(first_stage)
 
   # Construct Lewbel instrument
-  Z <- uk_data$age^2 - mean(uk_data$age^2)
-  lewbel_iv <- (Z - mean(Z)) * e2_hat
+  z_val <- uk_data$age^2 - mean(uk_data$age^2)
+  lewbel_iv <- (z_val - mean(z_val)) * e2_hat
   uk_data$lewbel_iv <- lewbel_iv
 
   # 2SLS estimation
@@ -78,7 +78,8 @@ test_that("hetid works on simulated UK Engel curve-like data", {
     coef_hetid <- coef(tsls_hetid)
     coef_rendo <- coef(fit_rendo)
 
-    # Coefficients should be similar (but may differ due to different Z functions)
+    # Coefficients should be similar
+    # (but may differ due to different Z functions)
     # REndo uses X directly while hetid uses Z = X^2 - E[X^2]
     expect_equal(
       coef_hetid,

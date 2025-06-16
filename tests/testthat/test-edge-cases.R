@@ -93,7 +93,10 @@ test_that("analysis functions handle minimal data", {
 
   suppressMessages({
     main_results_minimal <- run_main_simulation(config_minimal, seeds_minimal)
-    analysis_minimal <- analyze_main_results(main_results_minimal, config_minimal, verbose = FALSE)
+    analysis_minimal <- analyze_main_results(
+      main_results_minimal, config_minimal,
+      verbose = FALSE
+    )
   })
 
   expect_type(analysis_minimal, "list")
@@ -103,7 +106,9 @@ test_that("analysis functions handle minimal data", {
 
 test_that("print functions handle various input types", {
   # Test print_simulation_summary with different verbose types
-  expect_output(print_simulation_summary(verbose = c(TRUE, FALSE))) # Vector input
+  expect_output(
+    print_simulation_summary(verbose = c(TRUE, FALSE)) # Vector input
+  )
   expect_output(print_simulation_summary(verbose = list(TRUE))) # List input
   expect_silent(print_simulation_summary(verbose = 1)) # Numeric input
 })

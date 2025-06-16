@@ -139,7 +139,8 @@ if (build_pdf) {
       } else {
         # Find the generated PDF
         pdf_files <- list.files(
-          ".", pattern = "hetid.*\\.pdf$",
+          ".",
+          pattern = "hetid.*\\.pdf$",
           full.names = TRUE
         )
         if (length(pdf_files) > 0) {
@@ -190,7 +191,8 @@ if (build_pdf) {
 log_message("\n6. Creating documentation index...")
 tryCatch(
   {
-    index_content <- paste0('<!DOCTYPE html>
+    index_content <- paste0(
+      '<!DOCTYPE html>
 <html>
 <head>
     <title>hetid Package Documentation</title>
@@ -234,15 +236,20 @@ tryCatch(
         <ul>
             <li><a href="NEWS.md">Package NEWS</a></li>
             <li><a href="README.md">README</a></li>
-            <li><a href="https://github.com/fernando-duarte/heteroskedasticity_identification">
-              GitHub Repository</a></li>
+            <li>
+              <a href="https://github.com/fernando-duarte/',
+      'heteroskedasticity_identification">
+                <i class="fab fa-github"></i> GitHub
+              </a>
+            </li>
         </ul>
     </div>
 
     <p style="margin-top: 50px; color: #666; font-size: 0.9em;">
         Generated on ', format(Sys.time(), "%Y-%m-%d %H:%M:%S"), "</p>
 </body>
-</html>")
+</html>"
+    )
 
     writeLines(index_content, "documentation_index.html")
     log_message("   ✓ Created documentation_index.html")
