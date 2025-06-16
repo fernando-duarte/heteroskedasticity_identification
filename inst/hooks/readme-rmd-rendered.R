@@ -11,7 +11,10 @@ if (!file.exists("README.Rmd")) {
 
 # Check if rmarkdown is installed
 if (!requireNamespace("rmarkdown", quietly = TRUE)) {
-  stop("rmarkdown package is not installed. Please install it with: install.packages('rmarkdown')")
+  stop(
+    "rmarkdown package is not installed. Please install it with: ",
+    "install.packages('rmarkdown')"
+  )
 }
 
 # Get modification times
@@ -21,7 +24,10 @@ md_time <- if (md_exists) file.info("README.md")$mtime else NA
 
 # Check if README.md needs updating
 if (!md_exists || rmd_time > md_time) {
-  cat("README.md is out of sync with README.Rmd\n")
-  cat("Please run: rmarkdown::render('README.Rmd', output_format = 'github_document')\n")
+  cat("README.Rmd has changed but README.md hasn't been re-rendered.\n")
+  cat(
+    "Please run: rmarkdown::render('README.Rmd', ",
+    "output_format = 'github_document')\n"
+  )
   quit(status = 1)
 }

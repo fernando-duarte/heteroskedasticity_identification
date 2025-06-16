@@ -16,7 +16,10 @@ test_that("plot_estimator_distributions works", {
 })
 
 test_that("plot_sample_size_consistency works", {
-  config_tiny <- create_default_config(n_reps_by_n = 2, sample_sizes = c(100, 200))
+  config_tiny <- create_default_config(
+    n_reps_by_n = 2,
+    sample_sizes = c(100, 200)
+  )
   seeds_tiny <- generate_all_seeds(config_tiny)
 
   suppressMessages({
@@ -31,7 +34,10 @@ test_that("plot_sample_size_consistency works", {
 })
 
 test_that("plot_het_sensitivity works", {
-  config_sens <- create_default_config(n_reps_by_delta = 2, delta_het_values = c(0.8, 1.2))
+  config_sens <- create_default_config(
+    n_reps_by_delta = 2,
+    delta_het_values = c(0.8, 1.2)
+  )
   seeds_sens <- generate_all_seeds(config_sens)
 
   suppressMessages({
@@ -77,13 +83,19 @@ test_that("plot_first_stage_f_dist with explicit weak_iv_pct works", {
 })
 
 test_that("plot_bootstrap_ci works", {
-  config_boot <- create_default_config(bootstrap_demo_size = 2, bootstrap_reps = 5)
+  config_boot <- create_default_config(
+    bootstrap_demo_size = 2,
+    bootstrap_reps = 5
+  )
   seeds_boot <- generate_all_seeds(config_boot)
 
   suppressMessages({
     main_results <- run_main_simulation(config_boot, seeds_boot)
     bootstrap_demo <- run_bootstrap_demonstration(config_boot, seeds_boot)
-    bootstrap_analysis <- analyze_bootstrap_results(main_results, bootstrap_demo, config_boot, verbose = FALSE)
+    bootstrap_analysis <- analyze_bootstrap_results(
+      main_results, bootstrap_demo, config_boot,
+      verbose = FALSE
+    )
   })
 
   plot_result <- plot_bootstrap_ci(bootstrap_analysis, config_boot)

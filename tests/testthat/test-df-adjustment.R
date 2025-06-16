@@ -36,7 +36,8 @@ test_that("df_adjust parameter works in run_single_lewbel_simulation", {
   expect_equal(result_asymp$df_adjust, "asymptotic")
   expect_equal(result_finite$df_adjust, "finite")
 
-  # Check that SEs are included (they're in the data frame, not as separate columns)
+  # Check that SEs are included
+  # (they're in the data frame, not as separate columns)
   expect_true(!is.na(result_asymp$ols_gamma1))
   expect_true(!is.na(result_asymp$tsls_gamma1))
 
@@ -78,7 +79,10 @@ test_that("extract_se functions work correctly", {
 
 test_that("get_critical_value returns correct values", {
   # For large n, should approach normal
-  crit_asymp <- get_critical_value(10000, 3, alpha = 0.05, df_adjust = "asymptotic")
+  crit_asymp <- get_critical_value(
+    10000, 3,
+    alpha = 0.05, df_adjust = "asymptotic"
+  )
   expect_equal(crit_asymp, qnorm(0.975), tolerance = 1e-10)
 
   # For finite sample, should use t-distribution
@@ -100,7 +104,10 @@ test_that("adjust_se_for_df works correctly", {
   expect_equal(se_adj, se_orig)
 
   # Test finite sample adjustment
-  se_adj_finite <- adjust_se_for_df(se_orig, n = 100, k = 3, df_adjust = "finite")
+  se_adj_finite <- adjust_se_for_df(
+    se_orig,
+    n = 100, k = 3, df_adjust = "finite"
+  )
   expected <- se_orig * sqrt(100 / 97)
   expect_equal(se_adj_finite, expected, tolerance = 1e-10)
 

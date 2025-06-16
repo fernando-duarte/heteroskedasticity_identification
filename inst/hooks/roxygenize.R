@@ -5,7 +5,10 @@
 
 # Check if roxygen2 is installed
 if (!requireNamespace("roxygen2", quietly = TRUE)) {
-  stop("roxygen2 package is not installed. Please install it with: install.packages('roxygen2')")
+  stop(
+    "roxygen2 package is not installed. Please install it with: ",
+    "install.packages('roxygen2')"
+  )
 }
 
 # Get the current documentation state

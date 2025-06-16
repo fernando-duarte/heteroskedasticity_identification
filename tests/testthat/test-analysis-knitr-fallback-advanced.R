@@ -112,13 +112,22 @@ test_that("all analysis functions work with minimal valid data", {
   )
 
   # Test all functions with minimal data
-  main_analysis <- analyze_main_results(minimal_complete, config, verbose = FALSE)
+  main_analysis <- analyze_main_results(
+    minimal_complete, config,
+    verbose = FALSE
+  )
   expect_type(main_analysis, "list")
 
-  sample_analysis <- analyze_sample_size_results(minimal_complete, config, verbose = FALSE)
+  sample_analysis <- analyze_sample_size_results(
+    minimal_complete, config,
+    verbose = FALSE
+  )
   expect_s3_class(sample_analysis, "data.frame")
 
-  sens_analysis <- analyze_sensitivity_results(minimal_complete, config, verbose = FALSE)
+  sens_analysis <- analyze_sensitivity_results(
+    minimal_complete, config,
+    verbose = FALSE
+  )
   expect_s3_class(sens_analysis, "data.frame")
 
   bootstrap_analysis <- analyze_bootstrap_results(

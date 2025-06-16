@@ -23,7 +23,10 @@ test_that("knitr fallback works when knitr is not available", {
 
   # Test analyze_bootstrap_results
   suppressMessages({
-    bootstrap_demo <- run_bootstrap_demonstration(config, seeds, verbose = FALSE)
+    bootstrap_demo <- run_bootstrap_demonstration(
+      config, seeds,
+      verbose = FALSE
+    )
   })
 
   output2 <- capture.output({
@@ -44,7 +47,10 @@ test_that("knitr fallback works when knitr is not available", {
   )
 
   output3 <- capture.output({
-    analysis3 <- analyze_sample_size_results(sample_data, config, verbose = TRUE)
+    analysis3 <- analyze_sample_size_results(
+      sample_data, config,
+      verbose = TRUE
+    )
   })
   expect_true(length(output3) > 0)
   expect_s3_class(analysis3, "data.frame")
@@ -123,11 +129,23 @@ test_that("analyze_bootstrap_results handles different bootstrap_subset_size", {
   seeds_large <- generate_all_seeds(config_large)
 
   suppressMessages({
-    main_small <- run_main_simulation(config_small, seeds_small, verbose = FALSE)
-    bootstrap_small <- run_bootstrap_demonstration(config_small, seeds_small, verbose = FALSE)
+    main_small <- run_main_simulation(
+      config_small, seeds_small,
+      verbose = FALSE
+    )
+    bootstrap_small <- run_bootstrap_demonstration(
+      config_small, seeds_small,
+      verbose = FALSE
+    )
 
-    main_large <- run_main_simulation(config_large, seeds_large, verbose = FALSE)
-    bootstrap_large <- run_bootstrap_demonstration(config_large, seeds_large, verbose = FALSE)
+    main_large <- run_main_simulation(
+      config_large, seeds_large,
+      verbose = FALSE
+    )
+    bootstrap_large <- run_bootstrap_demonstration(
+      config_large, seeds_large,
+      verbose = FALSE
+    )
   })
 
   analysis_small <- analyze_bootstrap_results(

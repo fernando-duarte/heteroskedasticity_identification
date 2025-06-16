@@ -201,8 +201,11 @@ rendo_weak <- suppressWarnings(
 cat("\nWith weak heteroskedasticity (delta_het = 0.1):\n")
 cat("  Standard Lewbel SE:", round(sqrt(diag(vcov(manual_weak)))["P"], 6), "\n")
 cat("  REndo SE:", round(sqrt(diag(vcov(rendo_weak)))["P"], 6), "\n")
-cat("  SE ratio:", round(sqrt(diag(vcov(rendo_weak)))["P"] /
-  sqrt(diag(vcov(manual_weak)))["P"], 2), "x larger\n")
+cat(
+  "  SE ratio:", round(sqrt(diag(vcov(rendo_weak)))["P"] /
+    sqrt(diag(vcov(manual_weak)))["P"], 2),
+  "x larger\n"
+)
 
 # -----------------------------------------------------------------------------
 # 6. Summary Statistics

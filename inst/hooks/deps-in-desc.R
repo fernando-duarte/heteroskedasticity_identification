@@ -7,7 +7,10 @@ args <- commandArgs(trailingOnly = TRUE)
 
 # Check if desc is installed
 if (!requireNamespace("desc", quietly = TRUE)) {
-  stop("desc package is not installed. Please install it with: install.packages('desc')")
+  stop(
+    "desc package is not installed. Please install it with: ",
+    "install.packages('desc')"
+  )
 }
 
 if (length(args) > 0) {
@@ -21,6 +24,11 @@ if (length(args) > 0) {
 
   missing_deps <- character()
 
+  # Define R base packages to exclude
+  base_packages <- c(
+    "base", "methods", "utils", "stats", "graphics", "grDevices", "datasets"
+  )
+
   for (file in args) {
     # Read file content
     content <- readLines(file, warn = FALSE)
@@ -32,30 +40,47 @@ if (length(args) > 0) {
       line_without_comment <- sub("#.*$", "", line)
 
       # Check for library() or require()
-      lib_match <- gregexpr("\\b(library|require)\\s*\\(\\s*['\"]?([^)'\"]+)['\"]?\\s*\\)", line_without_comment)
+      lib_match <- gregexpr(
+        "\\b(library|require)\\s*\\(\\s*['\"]?([^)'\"]+)['\"]?\\s*\\)",
+        line_without_comment
+      )
       if (lib_match[[1]][1] != -1) {
         # Extract package names
         matches <- regmatches(line_without_comment, lib_match)[[1]]
         for (match in matches) {
-          pkg_name <- sub(".*\\(\\s*['\"]?([^)'\"]+)['\"]?\\s*\\).*", "\\1", match)
-          # Skip if it's the package itself
-          if (pkg_name != package_name && !pkg_name %in% declared_deps && !pkg_name %in% missing_deps) {
+          pkg_name <- sub(
+            ".*\\(\\s*['\"]?([^)'\"]+)['\"]?\\s*\\).*",
+            "\\1", match
+          )
+          # Check if package is not self-reference and not declared
+          if (pkg_name != package_name &&
+            !pkg_name %in% declared_deps &&
+            !pkg_name %in% missing_deps) {
             missing_deps <- c(missing_deps, pkg_name)
-            cat("Package", pkg_name, "used in", file, "line", i, "but not in DESCRIPTION\n")
+            cat(
+              "Package", pkg_name, "used in", file, "line", i,
+              "but not in DESCRIPTION\n"
+            )
           }
         }
       }
 
       # Check for :: usage
-      ns_match <- gregexpr("\\b([a-zA-Z][a-zA-Z0-9.]*)::", line_without_comment)
+      ns_match <- gregexpr("([a-zA-Z][a-zA-Z0-9.]*)::", line_without_comment)
       if (ns_match[[1]][1] != -1) {
+        # Extract package names
         matches <- regmatches(line_without_comment, ns_match)[[1]]
         for (match in matches) {
           pkg_name <- sub("::$", "", match)
-          # Skip if it's the package itself
-          if (pkg_name != package_name && !pkg_name %in% declared_deps && !pkg_name %in% missing_deps) {
+          # Check if package is not self-reference and not declared
+          if (pkg_name != package_name &&
+            !pkg_name %in% declared_deps &&
+            !pkg_name %in% missing_deps) {
             missing_deps <- c(missing_deps, pkg_name)
-            cat("Package", pkg_name, "used in", file, "line", i, "but not in DESCRIPTION\n")
+            cat(
+              "Package", pkg_name, "used in", file, "line", i,
+              "but not in DESCRIPTION\n"
+            )
           }
         }
       }

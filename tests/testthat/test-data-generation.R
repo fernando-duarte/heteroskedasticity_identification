@@ -11,7 +11,9 @@ test_that("generate_lewbel_data works", {
   expect_s3_class(data, "data.frame")
   expect_equal(nrow(data), 100)
   # Correct expected column names based on actual function implementation
-  expect_true(all(c("Y1", "Y2", "Xk", "Z", "epsilon1", "epsilon2") %in% names(data)))
+  expect_true(all(
+    c("Y1", "Y2", "Xk", "Z", "epsilon1", "epsilon2") %in% names(data)
+  ))
   expect_type(data$Y1, "double")
   expect_type(data$Y2, "double")
   expect_type(data$Xk, "double")
@@ -23,7 +25,9 @@ test_that("generate_lewbel_data with config works", {
 
   expect_s3_class(data, "data.frame")
   expect_equal(nrow(data), 50)
-  expect_true(all(c("Y1", "Y2", "Xk", "Z", "epsilon1", "epsilon2") %in% names(data)))
+  expect_true(all(
+    c("Y1", "Y2", "Xk", "Z", "epsilon1", "epsilon2") %in% names(data)
+  ))
 })
 
 test_that("verify_lewbel_assumptions with data and config works", {
@@ -50,10 +54,14 @@ test_that("verify_lewbel_assumptions with params works", {
     alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
   )
 
-  verification <- verify_lewbel_assumptions(n_obs = 100, params = params, verbose = FALSE)
+  verification <- verify_lewbel_assumptions(
+    n_obs = 100, params = params, verbose = FALSE
+  )
 
   expect_type(verification, "list")
-  expect_true(all(c("cov_z_e1e2", "cov_z_e2sq", "cov_e1_e2") %in% names(verification)))
+  expect_true(all(
+    c("cov_z_e1e2", "cov_z_e2sq", "cov_e1_e2") %in% names(verification)
+  ))
   expect_equal(nrow(verification$data), 100)
 })
 

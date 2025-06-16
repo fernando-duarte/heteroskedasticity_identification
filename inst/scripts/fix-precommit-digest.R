@@ -26,11 +26,17 @@ if (is.null(current_version) || current_version < required_version) {
     {
       install.packages("digest", repos = "https://cloud.r-project.org/")
       new_version <- packageVersion("digest")
-      cat("Successfully installed digest version:", as.character(new_version), "\n")
+      cat(
+        "Successfully installed digest version:",
+        as.character(new_version), "\n"
+      )
 
       if (new_version < required_version) {
         cat("WARNING: Installed version is still older than required.\n")
-        cat("You may need to update your R version or wait for CRAN to update.\n")
+        cat(
+          "You may need to update your R version or ",
+          "wait for CRAN to update.\n"
+        )
       }
     },
     error = function(e) {

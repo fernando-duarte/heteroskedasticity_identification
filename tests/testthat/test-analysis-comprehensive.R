@@ -1,5 +1,6 @@
-# Tests for core analysis functions - main functionality and verbose output
-# Covers analyze_main_results(), analyze_sample_size_results(), analyze_sensitivity_results()
+# Comprehensive tests for analysis.R functions
+# Covers analyze_main_results(), analyze_sample_size_results(),
+# and the analyze_sensitivity_results() function
 # Focuses on standard functionality, configuration handling, and verbose output
 # Dependencies: testthat, hetid package functions, knitr (conditional)
 
@@ -54,30 +55,33 @@ test_that("analyze_main_results handles different config parameters", {
   expect_equal(nrow(analysis2$summary_table), 2)
 })
 
-test_that("analyze_main_results verbose output includes all expected elements", {
-  config <- create_default_config(num_simulations = 3)
-  seeds <- generate_all_seeds(config)
+test_that(
+  "analyze_main_results verbose output includes all expected elements",
+  {
+    config <- create_default_config(num_simulations = 3)
+    seeds <- generate_all_seeds(config)
 
-  suppressMessages({
-    results <- run_main_simulation(config, seeds, verbose = FALSE)
-  })
+    suppressMessages({
+      results <- run_main_simulation(config, seeds, verbose = FALSE)
+    })
 
-  # Capture all verbose output
-  output <- capture.output({
-    analysis <- analyze_main_results(results, config, verbose = TRUE)
-  })
+    # Capture all verbose output
+    output <- capture.output({
+      analysis <- analyze_main_results(results, config, verbose = TRUE)
+    })
 
-  # Check for all expected output elements
-  expect_true(any(grepl("Main simulation:", output)))
-  expect_true(any(grepl("True value of gamma1:", output)))
-  expect_true(any(grepl("Performance of Point Estimators", output)))
-  expect_true(any(grepl("Weak instrument diagnostic:", output)))
-  expect_true(any(grepl("Performance of Set Identification", output)))
+    # Check for all expected output elements
+    expect_true(any(grepl("Main simulation:", output)))
+    expect_true(any(grepl("True value of gamma1:", output)))
+    expect_true(any(grepl("Performance of Point Estimators", output)))
+    expect_true(any(grepl("Weak instrument diagnostic:", output)))
+    expect_true(any(grepl("Performance of Set Identification", output)))
 
-  # Check that weak_iv_pct is calculated correctly
-  expect_type(analysis$weak_iv_pct, "double")
-  expect_true(analysis$weak_iv_pct >= 0 && analysis$weak_iv_pct <= 100)
-})
+    # Check that weak_iv_pct is calculated correctly
+    expect_type(analysis$weak_iv_pct, "double")
+    expect_true(analysis$weak_iv_pct >= 0 && analysis$weak_iv_pct <= 100)
+  }
+)
 
 test_that("analyze_sample_size_results verbose output works correctly", {
   config <- create_default_config(

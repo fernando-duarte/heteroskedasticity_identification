@@ -7,7 +7,10 @@ args <- commandArgs(trailingOnly = TRUE)
 
 # Check if lintr is installed
 if (!requireNamespace("lintr", quietly = TRUE)) {
-  stop("lintr package is not installed. Please install it with: install.packages('lintr')")
+  stop(
+    "lintr package is not installed. Please install it with: ",
+    "install.packages('lintr')"
+  )
 }
 
 # Lint the files
