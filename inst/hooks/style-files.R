@@ -17,31 +17,51 @@ if (!requireNamespace("styler", quietly = TRUE)) {
   )
 }
 
-# Activate cache for performance if requested
-if (use_cache) {
-  styler::cache_activate()
-  cat("Styler cache activated\n")
-}
-
 # Style the files
 if (length(files) > 0) {
   changed_files <- FALSE
 
   for (file in files) {
-    # Check if file needs styling
-    original_content <- readLines(file)
+    # Check if file exists
+    if (!file.exists(file)) {
+      cat("Warning: File does not exist:", file, "\n")
+      next
+    }
 
-    # Style the file with explicit tidyverse settings
-    styler::style_file(
-      file,
-      style = styler::tidyverse_style(
-        indent_by = 2,
-        strict = TRUE
-      )
+    # Check if file needs styling
+    original_content <- tryCatch(
+      {
+        readLines(file, warn = FALSE)
+      },
+      error = function(e) {
+        cat("Error reading file:", file, "-", e$message, "\n")
+        NULL
+      }
+    )
+
+    if (is.null(original_content)) next
+
+    # Style the file
+    tryCatch(
+      {
+        styler::style_file(file, dry = "off")
+      },
+      error = function(e) {
+        cat("Error styling file:", file, "-", e$message, "\n")
+      }
     )
 
     # Check if file was changed
-    new_content <- readLines(file)
+    new_content <- tryCatch(
+      {
+        readLines(file, warn = FALSE)
+      },
+      error = function(e) {
+        cat("Error reading styled file:", file, "-", e$message, "\n")
+        original_content
+      }
+    )
+
     if (!identical(original_content, new_content)) {
       changed_files <- TRUE
       cat("Styled:", file, "\n")

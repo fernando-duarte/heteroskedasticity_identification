@@ -49,6 +49,7 @@
 ^.*_cache$
 ^.*_files$
 ^.*~$
+^BUILD_DOCUMENTATION\.md$
 ^CI_CD_SIMULATION_SUMMARY\.md$
 ^CI_CD_SUCCESS_SUMMARY\.md$
 ^CI_CD_improvement_checklist\.md$
@@ -140,6 +141,7 @@
 ^benchmark$
 ^benchmarks$
 ^bookdown$
+^build_local_documentation\.R$
 ^check_monitor_status\.sh$
 ^code_to_do\.md$
 ^codecov\.yml$
@@ -155,6 +157,7 @@
 ^docker-compose\.dev\.yml$
 ^docker-compose\.yml$
 ^docs$
+^documentation_index\.html$
 ^enable_github_pages\.sh$
 ^error\.md$
 ^examples$
@@ -175,6 +178,7 @@
 ^lewbel_methods_summary\.tex$
 ^local-todo\.md$
 ^make\.R$
+^man-roxygen$
 ^misc$
 ^monitor\.log$
 ^monitor_pr_checks\.sh$

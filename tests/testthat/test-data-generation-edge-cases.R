@@ -79,6 +79,14 @@ test_that("generate_lewbel_data handles edge sample sizes", {
   expect_true(abs(mean(data_large$Xk) - 2) < 0.1) # Should be close to 2
   expect_true(abs(sd(data_large$Xk) - 1) < 0.1) # Should be close to 1
 
+  # Test with extreme parameters for edge case testing
+  params_extreme <- list(
+    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
+    beta2_0 = 1.0, beta2_1 = -1.0,
+    alpha1 = -0.5, alpha2 = 1.0,
+    delta_het = 10 # Large multiplier for testing
+  )
+
   # Generate data and check intermediate calculations
   n_obs <- 1000
   x_k <- rnorm(n_obs, mean = 2, sd = 10) # Large variance in X

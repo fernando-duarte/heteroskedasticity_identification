@@ -19,7 +19,8 @@ if (length(args) > 0) {
   package_name <- desc_obj$get("Package")
   declared_deps <- unique(c(
     desc_obj$get_deps()$package,
-    "base", "methods", "utils", "stats", "graphics", "grDevices", "datasets" # Base packages
+    # Base packages
+    "base", "methods", "utils", "stats", "graphics", "grDevices", "datasets"
   ))
 
   missing_deps <- character()
