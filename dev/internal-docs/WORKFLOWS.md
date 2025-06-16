@@ -232,9 +232,6 @@ Automated code review workflow for pull requests using Claude AI.
 ### Claude Workflow (`claude.yml`)
 Additional Claude-related automation for the project.
 
-### Install Security Packages Workflow (`install-security-packages.yml`)
-Reusable workflow for installing security-related R packages, called by other workflows.
-
 ---
 
 Last updated: June 2025
