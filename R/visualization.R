@@ -21,15 +21,16 @@
 #' @export
 plot_estimator_distributions <- function(results_clean, config) {
   # Select and reshape data
-  plot_data <- dplyr::select(results_clean, .data$ols_gamma1, .data$tsls_gamma1)
+  plot_data <- dplyr::select(results_clean, "ols_gamma1", "tsls_gamma1")
   plot_data_long <- tidyr::pivot_longer(plot_data,
     cols = dplyr::everything(),
     names_to = "Estimator", values_to = "Estimate"
   )
   plot_data_long <- dplyr::mutate(plot_data_long,
-    Estimator = dplyr::recode(.data$Estimator,
-      !!.hetid_strings()$plot_labels$OLS_COLUMN := .hetid_strings()$plot_labels$OLS_BIASED,
-      !!.hetid_strings()$plot_labels$TSLS_COLUMN := .hetid_strings()$plot_labels$TSLS_LEWBEL
+    Estimator = dplyr::case_when(
+      .data$Estimator == .hetid_strings()$plot_labels$OLS_COLUMN ~ .hetid_strings()$plot_labels$OLS_BIASED,
+      .data$Estimator == .hetid_strings()$plot_labels$TSLS_COLUMN ~ .hetid_strings()$plot_labels$TSLS_LEWBEL,
+      TRUE ~ .data$Estimator
     )
   )
 
@@ -43,7 +44,7 @@ plot_estimator_distributions <- function(results_clean, config) {
       xintercept = config$gamma1,
       linetype = "dashed",
       color = "red",
-      linewidth = constants_env$PLOT_LINE_WIDTH_THIN
+      linewidth = hetid_const("PLOT_LINE_WIDTH_THIN")
     ) +
     ggplot2::annotate("text",
       x = config$gamma1, y = Inf, label = paste("True =", config$gamma1),
@@ -57,11 +58,11 @@ plot_estimator_distributions <- function(results_clean, config) {
       ),
       x = "Estimated gamma1", y = "Density"
     ) +
-    ggplot2::theme_minimal(base_size = constants_env$PLOT_BASE_FONT_SIZE) +
+    ggplot2::theme_minimal(base_size = hetid_const("PLOT_BASE_FONT_SIZE")) +
     ggplot2::scale_fill_manual(
-      values = c(
-        !!.hetid_strings()$plot_labels$OLS_BIASED := .hetid_strings()$plot_colors$OLS_COLOR,
-        !!.hetid_strings()$plot_labels$TSLS_LEWBEL := .hetid_strings()$plot_colors$TSLS_COLOR
+      values = setNames(
+        c(.hetid_strings()$plot_colors$OLS_COLOR, .hetid_strings()$plot_colors$TSLS_COLOR),
+        c(.hetid_strings()$plot_labels$OLS_BIASED, .hetid_strings()$plot_labels$TSLS_LEWBEL)
       )
     )
 }
@@ -106,7 +107,7 @@ plot_sample_size_consistency <- function(results_by_n, config) {
       ),
       x = "Sample Size", y = "2SLS Estimate of gamma1"
     ) +
-    ggplot2::theme_minimal(base_size = constants_env$PLOT_BASE_FONT_SIZE)
+    ggplot2::theme_minimal(base_size = hetid_const("PLOT_BASE_FONT_SIZE"))
 }
 
 
@@ -148,7 +149,7 @@ plot_het_sensitivity <- function(results_by_delta, config) {
       x = "Delta (Heteroscedasticity Parameter)",
       y = "2SLS Estimate of gamma1"
     ) +
-    ggplot2::theme_minimal(base_size = constants_env$PLOT_BASE_FONT_SIZE)
+    ggplot2::theme_minimal(base_size = hetid_const("PLOT_BASE_FONT_SIZE"))
 }
 
 
@@ -169,7 +170,7 @@ plot_het_sensitivity <- function(results_by_delta, config) {
 #' seeds <- generate_all_seeds(config)
 #' results <- run_main_simulation(config, seeds)
 #' results_clean <- na.omit(results)
-#' weak_iv_pct <- mean(results_clean$first_stage_F < constants_env$WEAK_INSTRUMENT_F_THRESHOLD) * 100
+#' weak_iv_pct <- mean(results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD")) * 100
 #' p4 <- plot_first_stage_f_dist(results_clean, weak_iv_pct)
 #' print(p4)
 #' }
@@ -182,7 +183,7 @@ plot_first_stage_f_dist <- function(results_clean,
   if (is.null(weak_iv_pct)) {
     # Calculate weak_iv_pct if not provided
     if ("first_stage_F" %in% names(results_clean)) {
-      weak_iv_pct <- mean(results_clean$first_stage_F < constants_env$WEAK_INSTRUMENT_F_THRESHOLD, na.rm = TRUE) * 100
+      weak_iv_pct <- mean(results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), na.rm = TRUE) * 100
     } else {
       weak_iv_pct <- 0
     }
@@ -195,21 +196,21 @@ plot_first_stage_f_dist <- function(results_clean,
   }
 
   ggplot2::ggplot(results_clean, ggplot2::aes(x = .data$first_stage_F)) +
-    ggplot2::geom_histogram(bins = constants_env$PLOT_HISTOGRAM_BINS, fill = "steelblue", alpha = 0.7) +
-    ggplot2::geom_vline(xintercept = constants_env$WEAK_INSTRUMENT_F_THRESHOLD, linetype = "dashed", color = "red") +
+    ggplot2::geom_histogram(bins = hetid_const("PLOT_HISTOGRAM_BINS"), fill = "steelblue", alpha = 0.7) +
+    ggplot2::geom_vline(xintercept = hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), linetype = "dashed", color = "red") +
     ggplot2::annotate("text",
-      x = constants_env$WEAK_INSTRUMENT_F_THRESHOLD, y = Inf, label = paste("F =", constants_env$WEAK_INSTRUMENT_F_THRESHOLD),
+      x = hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), y = Inf, label = paste("F =", hetid_const("WEAK_INSTRUMENT_F_THRESHOLD")),
       color = "red", angle = 90, vjust = 1.5, hjust = -0.5
     ) +
     ggplot2::labs(
       title = "Distribution of First-Stage F-Statistics",
       subtitle = sprintf(
-        paste0("%.1f%% have F < ", constants_env$WEAK_INSTRUMENT_F_THRESHOLD, " (weak instrument threshold)"),
+        paste0("%.1f%% have F < ", hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), " (weak instrument threshold)"),
         weak_iv_pct
       ),
       x = "First-Stage F-Statistic", y = "Count"
     ) +
-    ggplot2::theme_minimal(base_size = constants_env$PLOT_BASE_FONT_SIZE)
+    ggplot2::theme_minimal(base_size = hetid_const("PLOT_BASE_FONT_SIZE"))
 }
 
 
@@ -239,30 +240,30 @@ plot_first_stage_f_dist <- function(results_clean,
 #'
 #' @export
 plot_bootstrap_ci <- function(bootstrap_examples, config) {
-  if (nrow(bootstrap_examples) < constants_env$PLOT_MIN_BOOTSTRAP_THRESHOLD) {
+  if (nrow(bootstrap_examples) < hetid_const("PLOT_MIN_BOOTSTRAP_THRESHOLD")) {
     return(NULL)
   }
 
   # Prepare data
-  plot_data <- dplyr::slice_head(bootstrap_examples, n = constants_env$PLOT_BOOTSTRAP_DISPLAY_LIMIT)
+  plot_data <- dplyr::slice_head(bootstrap_examples, n = hetid_const("PLOT_BOOTSTRAP_DISPLAY_LIMIT"))
   plot_data <- dplyr::mutate(plot_data, sim_id_ordered = dplyr::row_number())
 
   # Create plot
   ggplot2::ggplot(plot_data) +
     ggplot2::geom_segment(
       ggplot2::aes(
-        x = .data$bound_lower_tau_set - constants_env$Z_CRITICAL_95 * .data$bound_se_lower,
-        xend = .data$bound_upper_tau_set + constants_env$Z_CRITICAL_95 * .data$bound_se_upper,
+        x = .data$bound_lower_tau_set - hetid_const("Z_CRITICAL_95") * .data$bound_se_lower,
+        xend = .data$bound_upper_tau_set + hetid_const("Z_CRITICAL_95") * .data$bound_se_upper,
         y = .data$sim_id_ordered, yend = .data$sim_id_ordered
       ),
-      color = "lightgray", linewidth = constants_env$PLOT_LINE_WIDTH_THICK, alpha = 0.5
+      color = "lightgray", linewidth = hetid_const("PLOT_LINE_WIDTH_THICK"), alpha = 0.5
     ) +
     ggplot2::geom_segment(
       ggplot2::aes(
         x = .data$bound_lower_tau_set, xend = .data$bound_upper_tau_set,
         y = .data$sim_id_ordered, yend = .data$sim_id_ordered
       ),
-      color = "steelblue", linewidth = constants_env$PLOT_LINE_WIDTH_NORMAL
+      color = "steelblue", linewidth = hetid_const("PLOT_LINE_WIDTH_NORMAL")
     ) +
     ggplot2::geom_vline(
       xintercept = config$gamma1, linetype = "dashed", color = "red"
@@ -276,7 +277,7 @@ plot_bootstrap_ci <- function(bootstrap_examples, config) {
       ),
       x = "gamma1", y = "Example"
     ) +
-    ggplot2::theme_minimal(base_size = constants_env$PLOT_BASE_FONT_SIZE) +
+    ggplot2::theme_minimal(base_size = hetid_const("PLOT_BASE_FONT_SIZE")) +
     ggplot2::theme(
       axis.text.y = ggplot2::element_blank(),
       axis.ticks.y = ggplot2::element_blank()
@@ -328,7 +329,7 @@ generate_all_plots <- function(results_main,
   }
 
   results_clean <- stats::na.omit(results_main)
-  weak_iv_pct <- mean(results_clean$first_stage_F < constants_env$WEAK_INSTRUMENT_F_THRESHOLD, na.rm = TRUE) * 100
+  weak_iv_pct <- mean(results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), na.rm = TRUE) * 100
 
   # Generate all plots
   plots <- list(

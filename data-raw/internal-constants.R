@@ -70,6 +70,11 @@ constants_env$UPPER_BOUND_IDX <- 2L
 constants_env$FIRST_COLUMN_IDX <- 1L
 constants_env$F_STATISTIC_IDX <- 1L
 
+# Lock all bindings in the environment
+for (name in ls(constants_env)) {
+  lockBinding(name, constants_env)
+}
+
 # Lock environment to prevent modification
 lockEnvironment(constants_env, TRUE)
 

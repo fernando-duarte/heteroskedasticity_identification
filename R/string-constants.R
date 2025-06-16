@@ -1,5 +1,5 @@
 #' Internal string constants
-#' @keywords internal
+#' @export
 .hetid_strings <- function() {
   list(
     # Degrees of freedom adjustment methods

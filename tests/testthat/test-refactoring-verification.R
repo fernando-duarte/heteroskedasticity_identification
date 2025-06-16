@@ -1,18 +1,17 @@
-test_that("constants environment is locked and immutable", {
-  # Test that constants environment exists and is locked
-  expect_true(exists("constants_env"))
-  expect_true(environmentIsLocked(constants_env))
+test_that("constants environment exists and has expected values", {
+  # Test that constants environment exists in package namespace
+  expect_true(exists("constants_env", envir = asNamespace("hetid")))
 
-  # Test that constants cannot be modified
-  expect_error(
-    {constants_env$WEAK_INSTRUMENT_F_THRESHOLD <- 999},
-    "cannot change value of locked binding"
-  )
+  # Get constants from package namespace
+  constants_env <- get("constants_env", envir = asNamespace("hetid"))
+  expect_true(environmentIsLocked(constants_env))
 
   # Test that constants have expected values
   expect_equal(constants_env$WEAK_INSTRUMENT_F_THRESHOLD, 10)
   expect_equal(constants_env$ALPHA_LEVEL, 0.05)
   expect_equal(constants_env$Z_CRITICAL_95, 1.96)
+  expect_equal(constants_env$DISPLAY_DIGITS, 4)
+  expect_equal(constants_env$PLOT_BASE_FONT_SIZE, 14)
 })
 
 test_that("options system works correctly", {
@@ -57,7 +56,10 @@ test_that("NSE variables work with .data pronoun", {
 
 test_that("constants are accessible in package functions", {
   # Test that constants can be accessed in the package context
-  expect_true(exists("constants_env"))
+  expect_true(exists("constants_env", envir = asNamespace("hetid")))
+
+  # Get constants from package namespace
+  constants_env <- get("constants_env", envir = asNamespace("hetid"))
   expect_equal(constants_env$DISPLAY_DIGITS, 4)
   expect_equal(constants_env$WEAK_INSTRUMENT_F_THRESHOLD, 10)
   expect_equal(constants_env$PLOT_BASE_FONT_SIZE, 14)

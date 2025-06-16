@@ -3,6 +3,11 @@
 # - hetid and Stata use Z = X^2 - E[X^2] (identical results)
 # - REndo uses Z = X (valid but different)
 library(hetid)
+
+# Skip all tests if AER is not available
+if (!requireNamespace("AER", quietly = TRUE)) {
+  skip("AER package not available")
+}
 library(AER)
 
 test_that("hetid matches Stata approach exactly", {

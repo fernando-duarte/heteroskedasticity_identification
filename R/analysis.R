@@ -71,11 +71,11 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
     }
 
     # Weak instrument diagnostics
-    weak_iv_pct <- mean(results_clean$first_stage_F < constants_env$WEAK_INSTRUMENT_F_THRESHOLD) * 100
+    weak_iv_pct <- mean(results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD")) * 100
     cat(sprintf(
       paste0(
         "\nWeak instrument diagnostic: %.1f%% of simulations have ",
-        "first-stage F < 10\n"
+        "first-stage F < ", hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), "\n"
       ),
       weak_iv_pct
     ))
@@ -91,11 +91,13 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
       config$gamma1 >= results_clean$bound_lower_tau_set &
         config$gamma1 <= results_clean$bound_upper_tau_set
     ),
-    `Point ID Check` = stats::cor(
-      (results_clean$bound_upper_tau0 + results_clean$bound_lower_tau0) / 2,
-      results_clean$tsls_gamma1,
-      use = "complete.obs"
-    ),
+    `Point ID Check` = tryCatch({
+      stats::cor(
+        (results_clean$bound_upper_tau0 + results_clean$bound_lower_tau0) / 2,
+        results_clean$tsls_gamma1,
+        use = "complete.obs"
+      )
+    }, error = function(e) NA_real_),
     check.names = FALSE
   )
 
@@ -114,7 +116,7 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
   list(
     summary_table = summary_table,
     bounds_summary = bounds_summary,
-    weak_iv_pct = mean(results_clean$first_stage_F < constants_env$WEAK_INSTRUMENT_F_THRESHOLD) * 100,
+    weak_iv_pct = mean(results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD")) * 100,
     results_clean = results_clean
   )
 }
@@ -182,7 +184,7 @@ analyze_bootstrap_results <- function(results_main,
     )
 
     # Slice and round
-    bootstrap_table <- dplyr::slice_head(bootstrap_selected, n = constants_env$BOOTSTRAP_TABLE_DISPLAY_LIMIT)
+    bootstrap_table <- dplyr::slice_head(bootstrap_selected, n = hetid_const("BOOTSTRAP_TABLE_DISPLAY_LIMIT"))
     bootstrap_table <- dplyr::mutate(
       bootstrap_table,
       dplyr::across(

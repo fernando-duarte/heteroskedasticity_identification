@@ -1,6 +1,8 @@
 Package: hetid
 Title: Identification Through Heteroskedasticity a La Lewbel (2012)
 Version: 0.1.0
+Author: Fernando Duarte [aut, cre] (<https://orcid.org/0000-0002-8495-6936>)
+Maintainer: Fernando Duarte <fernando_duarte@brown.edu>
 Authors@R:
     person("Fernando", "Duarte", , "fernando_duarte@brown.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-8495-6936"))
@@ -13,9 +15,8 @@ URL: https://github.com/fernando-duarte/heteroskedasticity_identification
 BugReports:
     https://github.com/fernando-duarte/heteroskedasticity_identification/issues
 Depends:
-    R (>= 4.2)
+    R (>= 4.1)
 Imports:
-    AER,
     boot,
     dplyr,
     furrr,
@@ -26,6 +27,7 @@ Imports:
     stats,
     tidyr
 Suggests:
+    AER,
     covr,
     curl (>= 5.0.0),
     desc,
@@ -43,8 +45,6 @@ Suggests:
     testthat (>= 3.0.0),
     uuid,
     withr
-VignetteBuilder:
-    knitr
 Config/build/vignette-compression: both
 Config/Needs/website: pkgdown
 Config/testthat/edition: 3

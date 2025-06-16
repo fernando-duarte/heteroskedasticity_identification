@@ -36,7 +36,14 @@ test_that("run_main_simulation works", {
     "ols_gamma1", "tsls_gamma1", "first_stage_F"
   ) %in% names(main_results)))
   expect_true(all(!is.na(main_results$ols_gamma1)))
-  expect_true(all(!is.na(main_results$tsls_gamma1)))
+
+  # 2SLS results depend on availability of AER or ivreg packages
+  if (requireNamespace("AER", quietly = TRUE) || requireNamespace("ivreg", quietly = TRUE)) {
+    expect_true(all(!is.na(main_results$tsls_gamma1)))
+  } else {
+    # If neither package is available, tsls_gamma1 should be NA
+    expect_true(all(is.na(main_results$tsls_gamma1)))
+  }
 })
 
 test_that("run_sample_size_analysis works", {
