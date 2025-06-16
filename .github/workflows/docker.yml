@@ -81,8 +81,8 @@ jobs:
         push: false
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        cache-from: type=gha,scope=buildkit-${{ matrix.target }}
+        cache-to: type=gha,mode=min,scope=buildkit-${{ matrix.target }}
         outputs: type=docker,dest=/tmp/${{ matrix.target }}-image.tar
 
     - name: Build Docker image (development)
@@ -95,8 +95,8 @@ jobs:
         push: false
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        cache-from: type=gha,scope=buildkit-${{ matrix.target }}
+        cache-to: type=gha,mode=min,scope=buildkit-${{ matrix.target }}
         outputs: type=docker,dest=/tmp/${{ matrix.target }}-image.tar
 
     - name: Save image info
@@ -446,8 +446,8 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        cache-from: type=gha,scope=buildkit-${{ matrix.target }}
+        cache-to: type=gha,mode=min,scope=buildkit-${{ matrix.target }}
 
     - name: Build and push Docker image (development)
       if: matrix.target == 'development'
@@ -459,8 +459,8 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
+        cache-from: type=gha,scope=buildkit-${{ matrix.target }}
+        cache-to: type=gha,mode=min,scope=buildkit-${{ matrix.target }}
 
   # Cleanup artifacts
   cleanup:

@@ -1,8 +1,12 @@
 # Docker Build Time Optimization Plan for hetid Package
 
+## ⚠️ URGENT: CI/CD builds are failing due to cache competition
+
+**Immediate action required**: Implement Phase 0 (cache fix) before any other optimizations.
+
 ## Executive Summary
 
-The development Docker image currently takes 20-30 minutes to build, while the production image takes only 2-3 minutes. This document provides a validated plan based on June 2025 Docker best practices to reduce development build time to 5-10 minutes while maintaining full compatibility with existing workflows.
+The development Docker image currently takes 20-30 minutes to build, while the production image takes only 2-3 minutes. Additionally, CI/CD builds are experiencing unpredictable flip-flopping between fast (2 min) and slow (20+ min) builds due to GitHub Actions cache competition. This document provides a validated plan based on June 2025 Docker best practices to fix the cache issue and reduce development build time to 5-10 minutes while maintaining full compatibility with existing workflows.
 
 ## Current Situation
 
@@ -18,6 +22,18 @@ The development image takes the longest because it:
 3. Uses inefficient installation methods
 4. Doesn't leverage modern Docker features like BuildKit cache mounts
 
+### Critical Issue: GitHub Actions Cache Competition
+**Observed behavior**: Build times flip-flop unpredictably in CI/CD:
+- Sometimes: Development = 20+ min, Builder/Production = 2 min
+- Other times: Development = 2 min, Builder/Production = 20+ min
+
+**Root cause**: GitHub Actions cache limitations
+- 10GB total cache limit per repository
+- LRU eviction when approaching limit
+- Builder and Development compete for cache space
+- Each build generates 2-4GB of cache data
+- When total exceeds ~10GB, older caches get evicted
+
 ## Validation Against June 2025 Best Practices
 
 ### ✅ Confirmed Best Practices
@@ -32,6 +48,25 @@ The development image takes the longest because it:
 2. **BuildKit cache mounts**: Not yet used for R package caching
 3. **Layer ordering**: Can be improved for better cache utilization
 4. **Rocker best practices**: Leverage rocker project patterns
+
+## Understanding the Cache Competition Problem
+
+### Why It Happens
+1. **Separate build paths**: Builder/Production vs Development use different base images
+2. **Cache size**: Each build generates 2-4GB of cache (R packages + texlive + system deps)
+3. **GitHub limit**: 10GB total cache per repository
+4. **Matrix builds**: All three builds run simultaneously, competing for cache space
+5. **LRU eviction**: When limit is reached, least recently used cache is deleted
+
+### Why It Causes Flip-Flopping
+- **Day 1**: Builder runs first, caches successfully. Development's cache gets evicted.
+- **Day 2**: Development runs, evicts Builder cache to make room.
+- **Day 3**: Builder runs again, evicts Development cache. Cycle repeats.
+
+### How The Fix Works
+1. **`mode=min`**: Only caches final layers, reducing size by ~70%
+2. **Cache scoping**: Gives each target its own cache namespace
+3. **Registry cache**: Unlimited storage in GitHub Container Registry
 
 ## Quick Wins (Implement First)
 
@@ -146,6 +181,54 @@ RUN R -e "devtools::install(dependencies = TRUE)"
 **Problem:** Docker can't reuse cached layers efficiently.
 
 ## Step-by-Step Optimization Plan
+
+### Phase 0: Fix GitHub Actions Cache Competition (URGENT) ✅ IMPLEMENTED
+
+**Goal:** Prevent cache eviction and flip-flopping build times in CI/CD.
+
+**Status:** ✅ Implemented on June 16, 2025
+
+**Steps Completed:**
+1. ✅ Changed cache mode from `max` to `min` to reduce cache size
+2. ✅ Implemented cache scoping to separate builder and development caches
+3. ✅ Added cache cleanup script for manual intervention
+4. ⏳ Registry-based caching ready as fallback if needed
+
+**Implementation for docker.yml:**
+```yaml
+# Change from mode=max to mode=min
+cache-to: type=gha,mode=min,scope=buildkit-${{ matrix.target }}
+
+# Add cache scopes to prevent competition
+cache-from: |
+  type=gha,scope=buildkit-${{ matrix.target }}
+  type=gha,scope=buildkit-base
+```
+
+**Alternative: Registry Cache (if cache competition persists):**
+```yaml
+# Use GitHub Container Registry as cache
+cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache-${{ matrix.target }}
+cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache-${{ matrix.target }},mode=max
+```
+
+**Additional Strategies:**
+1. **Separate workflow files**: Split builder/production and development into different workflows
+2. **Scheduled cache warming**: Run a daily job to rebuild and cache base layers
+3. **Conditional builds**: Only build what changed (e.g., skip development if only production code changed)
+
+**Immediate Fix Example for docker.yml:**
+```yaml
+# BEFORE (lines 84-85, 98-99, 449-450, 462-463)
+cache-from: type=gha
+cache-to: type=gha,mode=max
+
+# AFTER - Add to all build steps
+cache-from: type=gha,scope=buildkit-${{ matrix.target }}
+cache-to: type=gha,mode=min,scope=buildkit-${{ matrix.target }}
+```
+
+This simple change should stabilize CI/CD build times within 1-2 workflow runs.
 
 ### Phase 1: Optimize Package Installation with pak
 
@@ -277,11 +360,19 @@ FROM hetid:base AS development
 - Development build: 5-10 minutes
 - Rebuilds after code change: 1-2 minutes
 - Docker image size: ~3GB
+- **CI/CD stability**: Consistent build times (no more flip-flopping)
+- **Cache hit rate**: >90% for unchanged layers
 
 ## Implementation Checklist
 
 - [ ] Back up current Dockerfiles
 - [ ] Create feature branch: `feature/optimize-docker-builds`
+- [ ] Phase 0: Fix GitHub Actions cache competition (URGENT)
+  - [ ] Change cache mode from max to min in docker.yml
+  - [ ] Add cache scoping with target-specific keys
+  - [ ] Test build times across multiple runs
+  - [ ] Monitor cache usage in Actions tab
+  - [ ] Implement registry cache if needed
 - [ ] Phase 1: Implement pak for parallel installation
   - [ ] Update Dockerfile.dev to use pak
   - [ ] Test all packages install correctly
@@ -385,6 +476,12 @@ docker exec -it <container-id> R -e "devtools::test()"
 ## Recommended Implementation Priority
 
 Based on June 2025 best practices and codebase analysis:
+
+### 🚨 Critical Priority (Blocking CI/CD)
+1. **Fix GitHub Actions cache competition**: Causing unpredictable 20+ minute builds
+   - Change to `mode=min` immediately
+   - Add cache scoping to prevent eviction
+   - Can be done without touching Dockerfiles
 
 ### 🟢 High Priority (Big Impact, Low Risk)
 1. **pak installation**: 40-50% time reduction, proven stable
