@@ -50,6 +50,7 @@
 ^.*_files$
 ^.*~$
 ^CI_CD_SIMULATION_SUMMARY\.md$
+^CI_CD_SUCCESS_SUMMARY\.md$
 ^CI_CD_improvement_checklist\.md$
 ^CLAUDE\.md$
 ^CODE_OF_CONDUCT\.md$
@@ -60,11 +61,14 @@
 ^DOCKER_IMPLEMENTATION_SUMMARY\.md$
 ^Dockerfile$
 ^Dockerfile\.dev$
+^FINAL_DOCKER_FIXES\.md$
 ^LICENSE\.md$
 ^Makefile$
 ^Meta$
 ^Meta/$
 ^NEWS\.Rmd$
+^PR_FINAL_FIXES\.md$
+^PR_REVIEW_FIXES\.md$
 ^README\.Rmd$
 ^README\.html$
 ^README_CI_CD_SIMULATION\.md$
@@ -79,6 +83,8 @@
 ^Thumbs\.db$
 ^VALIDATION_COMPLETE\.md$
 ^VALIDATION_IMPLEMENTATION_SUMMARY\.md$
+^WORKFLOW_FIXES_SUMMARY\.md$
+^WORKFLOW_STATUS_SUMMARY\.md$
 ^WORKFLOWS\.md$
 ^\#.*\#$
 ^\.#.*$
@@ -149,6 +155,7 @@
 ^docker-compose\.yml$
 ^docs$
 ^enable_github_pages\.sh$
+^error\.md$
 ^examples$
 ^hetid\.Rcheck$
 ^hetid_.*\.tar\.gz$
@@ -190,9 +197,11 @@
 ^scripts$
 ^setup_env\.sh$
 ^simulate_ci_cd\.sh$
+^test_workflows\.sh$
 ^simulation-results$
 ^tags$
 ^tests/testthat/\.cache$
+^tmux\.md$
 ^tools$
 ^tutorials$
 ^validate_hetid\.md$

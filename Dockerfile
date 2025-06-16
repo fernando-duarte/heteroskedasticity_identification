@@ -51,6 +51,12 @@ RUN --mount=type=cache,target=/var/cache/apt \
     libopenmpi-dev \
     # Pandoc for building vignettes
     pandoc \
+    # LaTeX tools for R CMD check PDF manual generation
+    texlive-latex-base \
+    texlive-fonts-recommended \
+    texlive-latex-extra \
+    texlive-fonts-extra \
+    qpdf \
     && rm -rf /var/lib/apt/lists/*
 
 # Install remotes, devtools, and knitr for package management
