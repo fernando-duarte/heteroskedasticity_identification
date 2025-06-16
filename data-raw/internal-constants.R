@@ -1,4 +1,3 @@
-# data-raw/internal-constants.R
 # Create locked environment for immutable constants
 constants_env <- new.env(parent = emptyenv())
 

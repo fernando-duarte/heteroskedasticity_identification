@@ -488,3 +488,10 @@ httpgd
 IntelliSense
 Jupyter
 LSP
+asNamespace
+emptyenv
+environmentIsLocked
+getOption
+lockBinding
+lockEnvironment
+setNames

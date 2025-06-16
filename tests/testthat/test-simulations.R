@@ -38,7 +38,8 @@ test_that("run_main_simulation works", {
   expect_true(all(!is.na(main_results$ols_gamma1)))
 
   # 2SLS results depend on availability of AER or ivreg packages
-  if (requireNamespace("AER", quietly = TRUE) || requireNamespace("ivreg", quietly = TRUE)) {
+  if (requireNamespace("AER", quietly = TRUE) ||
+    requireNamespace("ivreg", quietly = TRUE)) {
     expect_true(all(!is.na(main_results$tsls_gamma1)))
   } else {
     # If neither package is available, tsls_gamma1 should be NA

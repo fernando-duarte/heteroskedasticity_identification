@@ -86,33 +86,35 @@ generate_seed_matrix <- function(base_seed, n_experiments, n_reps_each) {
 #' }
 #'
 #' @export
-create_default_config <- function(num_simulations = hetid_const("DEFAULT_NUM_SIMULATIONS"),
-                                  main_sample_size = hetid_const("DEFAULT_MAIN_SAMPLE_SIZE"),
-                                  sample_sizes = hetid_const("DEFAULT_SAMPLE_SIZES"),
-                                  delta_het = 0.8,
-                                  delta_het_values = c(0.4, 0.8, 1.2),
-                                  n_reps_by_n = hetid_const("DEFAULT_BOOTSTRAP_REPS"),
-                                  n_reps_by_delta = hetid_const("DEFAULT_BOOTSTRAP_REPS"),
-                                  bootstrap_reps = hetid_const("DEFAULT_BOOTSTRAP_REPS"),
-                                  bootstrap_subset_size = hetid_const("DEFAULT_BOOTSTRAP_SUBSET_SIZE"),
-                                  bootstrap_demo_size = hetid_const("DEFAULT_BOOTSTRAP_DEMO_SIZE"),
-                                  beta1_0 = 0.5,
-                                  beta1_1 = 1.5,
-                                  gamma1 = -0.8,
-                                  beta2_0 = 1.0,
-                                  beta2_1 = -1.0,
-                                  alpha1 = -0.5,
-                                  alpha2 = 1.0,
-                                  tau_set_id = 0.2,
-                                  endog_var_name = "Y2",
-                                  exog_var_names = "Xk",
-                                  df_adjust = "asymptotic") {
+create_default_config <- function(
+    num_simulations = hetid_const("DEFAULT_NUM_SIMULATIONS"), # nolint: object_usage_linter.
+    main_sample_size = hetid_const("DEFAULT_MAIN_SAMPLE_SIZE"),
+    sample_sizes = hetid_const("DEFAULT_SAMPLE_SIZES"),
+    delta_het = 0.8,
+    delta_het_values = c(0.4, 0.8, 1.2),
+    n_reps_by_n = hetid_const("DEFAULT_BOOTSTRAP_REPS"),
+    n_reps_by_delta = hetid_const("DEFAULT_BOOTSTRAP_REPS"),
+    bootstrap_reps = hetid_const("DEFAULT_BOOTSTRAP_REPS"),
+    bootstrap_subset_size = hetid_const("DEFAULT_BOOTSTRAP_SUBSET_SIZE"),
+    bootstrap_demo_size = hetid_const("DEFAULT_BOOTSTRAP_DEMO_SIZE"),
+    beta1_0 = 0.5,
+    beta1_1 = 1.5,
+    gamma1 = -0.8,
+    beta2_0 = 1.0,
+    beta2_1 = -1.0,
+    alpha1 = -0.5,
+    alpha2 = 1.0,
+    tau_set_id = 0.2,
+    endog_var_name = "Y2",
+    exog_var_names = "Xk",
+    df_adjust = "asymptotic") {
   list(
     # Simulation Controls
     num_simulations = num_simulations,
     sample_sizes = sample_sizes,
     main_sample_size = main_sample_size,
-    set_seed = hetid_const("DEFAULT_BASE_SEED"), # Base seed, not configurable through function arg
+    # Base seed, not configurable through function arg
+    set_seed = hetid_const("DEFAULT_BASE_SEED"), # nolint: object_usage_linter.
 
     # True Model Parameters (Triangular System)
     beta1_0 = beta1_0,
@@ -169,7 +171,8 @@ create_default_config <- function(num_simulations = hetid_const("DEFAULT_NUM_SIM
 #' @export
 generate_all_seeds <- function(config) {
   list(
-    main = 1:config$num_simulations + config$set_seed * hetid_const("SEED_MULTIPLIER_MAIN"),
+    main = 1:config$num_simulations + config$set_seed *
+      hetid_const("SEED_MULTIPLIER_MAIN"),
     by_n = generate_seed_matrix(
       base_seed = config$set_seed + hetid_const("SEED_OFFSET_BY_N"),
       n_experiments = length(config$sample_sizes),
@@ -180,6 +183,7 @@ generate_all_seeds <- function(config) {
       n_experiments = length(config$delta_het_values),
       n_reps_each = config$n_reps_by_delta
     ),
-    bootstrap_demo = 1:config$bootstrap_demo_size + config$set_seed * hetid_const("SEED_MULTIPLIER_BOOTSTRAP")
+    bootstrap_demo = 1:config$bootstrap_demo_size + config$set_seed *
+      hetid_const("SEED_MULTIPLIER_BOOTSTRAP")
   )
 }

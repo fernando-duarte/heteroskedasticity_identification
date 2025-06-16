@@ -71,7 +71,10 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
     }
 
     # Weak instrument diagnostics
-    weak_iv_pct <- mean(results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), na.rm = TRUE) * 100
+    weak_iv_pct <- mean(
+      results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"),
+      na.rm = TRUE
+    ) * 100
     # If all F-statistics are NA, set weak_iv_pct to 0
     if (is.nan(weak_iv_pct)) weak_iv_pct <- 0
     cat(sprintf(
@@ -122,7 +125,11 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
     summary_table = summary_table,
     bounds_summary = bounds_summary,
     weak_iv_pct = {
-      pct <- mean(results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), na.rm = TRUE) * 100
+      pct <- mean(
+        results_clean$first_stage_F <
+          hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"),
+        na.rm = TRUE
+      ) * 100
       if (is.nan(pct)) 0 else pct
     },
     results_clean = results_clean
@@ -192,7 +199,10 @@ analyze_bootstrap_results <- function(results_main,
     )
 
     # Slice and round
-    bootstrap_table <- dplyr::slice_head(bootstrap_selected, n = hetid_const("BOOTSTRAP_TABLE_DISPLAY_LIMIT"))
+    bootstrap_table <- dplyr::slice_head(
+      bootstrap_selected,
+      n = hetid_const("BOOTSTRAP_TABLE_DISPLAY_LIMIT")
+    )
     bootstrap_table <- dplyr::mutate(
       bootstrap_table,
       dplyr::across(

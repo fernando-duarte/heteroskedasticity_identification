@@ -44,11 +44,11 @@ test_that("string constants function works", {
 test_that("NSE variables work with .data pronoun", {
   # Test that .data is properly imported and works
   test_data <- data.frame(x = 1:5, y = 6:10)
-  
+
   # This should work without errors
   result <- dplyr::filter(test_data, .data$x > 2)
   expect_equal(nrow(result), 3)
-  
+
   # Test grouping with .data
   grouped_result <- dplyr::group_by(test_data, .data$x)
   expect_s3_class(grouped_result, "grouped_df")
