@@ -1,4 +1,5 @@
-url: https://github.com/fernando-duarte/heteroskedasticity_identification
+url: https://fernando-duarte.github.io/heteroskedasticity_identification/
+destination: docs
 
 template:
   bootstrap: 5
@@ -16,7 +17,7 @@ authors:
 
 navbar:
   structure:
-    left:  [intro, reference, articles, tutorials, news]
+    left:  [intro, reference, articles, news]
     right: [search, github]
   components:
     home:
@@ -32,8 +33,6 @@ navbar:
         href: articles/getting-started.html
       - text: Comparing Lewbel (2012) Implementations
         href: articles/package-comparison.html
-      - text: Degrees of Freedom Adjustments
-        href: articles/degrees-of-freedom.html
     github:
       icon: fab fa-github fa-lg
       href: https://github.com/fernando-duarte/heteroskedasticity_identification
@@ -103,7 +102,6 @@ reference:
 - title: "Utilities"
   desc: "Helper functions for checking optional dependencies and Stata integration"
   contents:
-  - hetid_opt
   - has_curl
   - has_haven
   - has_rendo
@@ -111,3 +109,4 @@ reference:
   - has_stata
   - ensure_stata_packages
   - get_stata_path
+  - hetid_opt
