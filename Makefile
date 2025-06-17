@@ -22,49 +22,49 @@ help: ## Show this help message
 # Build targets
 build: ## Build production Docker image
 	@echo "Building production image..."
-	./docker/scripts/build.sh -t production
+	./dev/docker/scripts/build.sh -t production
 
 build-dev: ## Build development Docker image
 	@echo "Building development image..."
-	./docker/scripts/build.sh -t development
+	./dev/docker/scripts/build.sh -t development
 
 build-all: ## Build all Docker images
 	@echo "Building all images..."
-	./docker/scripts/build.sh -t builder
-	./docker/scripts/build.sh -t production
-	./docker/scripts/build.sh -t development
+	./dev/docker/scripts/build.sh -t builder
+	./dev/docker/scripts/build.sh -t production
+	./dev/docker/scripts/build.sh -t development
 
 # Development targets
 dev-start: ## Start development environment with RStudio
 	@echo "Starting development environment..."
-	./docker/scripts/dev.sh start -d
+	./dev/docker/scripts/dev.sh start -d
 	@echo "RStudio Server available at: http://localhost:8787"
 
 dev-stop: ## Stop development environment
 	@echo "Stopping development environment..."
-	./docker/scripts/dev.sh stop
+	./dev/docker/scripts/dev.sh stop
 
 dev-restart: ## Restart development environment
 	@echo "Restarting development environment..."
-	./docker/scripts/dev.sh restart
+	./dev/docker/scripts/dev.sh restart
 
 dev-shell: ## Open shell in development container
-	./docker/scripts/dev.sh shell
+	./dev/docker/scripts/dev.sh shell
 
 dev-r: ## Open R console in development container
-	./docker/scripts/dev.sh r-console
+	./dev/docker/scripts/dev.sh r-console
 
 dev-logs: ## Show development container logs
-	./docker/scripts/dev.sh logs -f
+	./dev/docker/scripts/dev.sh logs -f
 
 # Testing targets
 test: ## Run package tests in container
 	@echo "Running package tests..."
-	./docker/scripts/dev.sh test
+	./dev/docker/scripts/dev.sh test
 
 check: ## Run R CMD check in container
 	@echo "Running R CMD check..."
-	./docker/scripts/dev.sh check
+	./dev/docker/scripts/dev.sh check
 
 test-ci: ## Run tests for CI/CD (builds fresh image)
 	@echo "Running CI tests..."
@@ -73,33 +73,33 @@ test-ci: ## Run tests for CI/CD (builds fresh image)
 # Simulation targets
 simulation: ## Run main Monte Carlo simulation
 	@echo "Running main simulation..."
-	./docker/scripts/simulation.sh run -t main -n 1000
+	./dev/docker/scripts/simulation.sh run -t main -n 1000
 
 simulation-quick: ## Run quick simulation (100 iterations)
 	@echo "Running quick simulation..."
-	./docker/scripts/simulation.sh run -t main -n 100
+	./dev/docker/scripts/simulation.sh run -t main -n 100
 
 simulation-bootstrap: ## Run bootstrap demonstration
 	@echo "Running bootstrap demonstration..."
-	./docker/scripts/simulation.sh run -t bootstrap -n 100
+	./dev/docker/scripts/simulation.sh run -t bootstrap -n 100
 
 simulation-sensitivity: ## Run sensitivity analysis
 	@echo "Running sensitivity analysis..."
-	./docker/scripts/simulation.sh run -t sensitivity -n 500
+	./dev/docker/scripts/simulation.sh run -t sensitivity -n 500
 
 simulation-status: ## Show running simulations
-	./docker/scripts/simulation.sh status
+	./dev/docker/scripts/simulation.sh status
 
 simulation-results: ## Show latest simulation results
-	./docker/scripts/simulation.sh results
+	./dev/docker/scripts/simulation.sh results
 
 # Utility targets
 status: ## Show status of all containers
 	@echo "Development environment status:"
-	./docker/scripts/dev.sh status
+	./dev/docker/scripts/dev.sh status
 	@echo ""
 	@echo "Simulation status:"
-	./docker/scripts/simulation.sh status
+	./dev/docker/scripts/simulation.sh status
 
 logs: ## Show logs from all hetid containers
 	@echo "Showing logs from hetid containers..."
@@ -109,7 +109,7 @@ logs: ## Show logs from all hetid containers
 # Cleanup targets
 clean: ## Clean up development environment
 	@echo "Cleaning up development environment..."
-	./docker/scripts/dev.sh clean
+	./dev/docker/scripts/dev.sh clean
 
 docker-clean: ## Clean up all Docker resources (containers, images, volumes)
 	@echo "WARNING: This will remove all hetid Docker resources"
@@ -123,7 +123,7 @@ docker-clean: ## Clean up all Docker resources (containers, images, volumes)
 # Production targets
 deploy-build: ## Build production image with latest tag
 	@echo "Building production image for deployment..."
-	./docker/scripts/build.sh -t production --tag-latest
+	./dev/docker/scripts/build.sh -t production --tag-latest
 
 deploy-test: ## Test production image
 	@echo "Testing production image..."
@@ -132,7 +132,7 @@ deploy-test: ## Test production image
 # Multi-platform builds (for CI/CD)
 build-multiplatform: ## Build multi-platform images
 	@echo "Building multi-platform images..."
-	./docker/scripts/build.sh -t production -p linux/amd64 --push
+	./dev/docker/scripts/build.sh -t production -p linux/amd64 --push
 
 # Platform-specific targets for ARM64 users (Apple Silicon, etc.)
 dev-start-x86: ## Start dev with x86 emulation (40% faster on ARM64)

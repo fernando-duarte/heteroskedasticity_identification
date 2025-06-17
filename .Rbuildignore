@@ -156,7 +156,6 @@
 ^dev/.*$
 ^diary\.md$
 ^doc$
-^docker$
 ^docker-compose\.dev\.yml$
 ^docker-compose\.yml$
 ^docs$
@@ -197,18 +196,15 @@
 ^planning$
 ^planning\.md$
 ^pr_logs$
-^quick_ci_test\.sh$
 ^renv$
 ^renv\.lock$
 ^revdep$
 ^scratch$
 ^scripts$
 ^setup_env\.sh$
-^simulate_ci_cd\.sh$
 ^simulation-results$
 ^tags$
 ^test_docker_workflow\.sh$
-^test_workflows\.sh$
 ^tests/testthat/\.cache$
 ^tmux\.md$
 ^tools$
