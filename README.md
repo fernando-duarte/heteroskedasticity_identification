@@ -81,33 +81,6 @@ data <- generate_lewbel_data(n = 100, config = config)
 result <- run_single_lewbel_simulation(1, config)
 ```
 
-## Documentation and Vignettes
-
-The package includes comprehensive documentation with three detailed vignettes:
-
-### 1. Getting Started (`vignette("getting-started")`)
-- Introduction to the hetid package
-- Basic usage examples
-- Understanding Lewbel (2012) methodology
-- Quick start guide for new users
-
-### 2. Package Comparison (`vignette("package-comparison")`)
-- Detailed comparison with REndo package
-- Validation against Stata's ivreg2h
-- Understanding implementation differences
-- Choosing the right approach for your research
-
-### 3. Degrees of Freedom (`vignette("degrees-of-freedom")`)
-- Asymptotic vs. finite sample standard errors
-- When to use each approach
-- Practical implications for inference
-- Comparison with other software
-
-### Additional Documentation
-- **Function reference**: Complete documentation for all exported functions
-- **pkgdown website**: [https://fernando-duarte.github.io/heteroskedasticity_identification/](https://fernando-duarte.github.io/heteroskedasticity_identification/)
-- **Development guides**: See `dev/internal-docs/` for technical documentation
-
 ## Research Focus
 
 This project implements the identification through heteroskedasticity methodology of Lewbel (2012) for econometric models with endogenous regressors. The package provides:
