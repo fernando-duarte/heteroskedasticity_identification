@@ -63,67 +63,23 @@ For comprehensive development setup instructions, code quality tools, and contri
 
 ## Usage
 
-### GitHub Codespaces (Easiest) ☁️
+For comprehensive usage examples, advanced features, and troubleshooting, see **[USAGE.md](USAGE.md)**.
 
-**Zero-setup cloud development**:
-
-1. **Launch**: Click "Code" → "Codespaces" → "Create codespace"
-2. **Access RStudio**: Click port 8787 in VS Code Ports tab
-3. **Start coding**: Package pre-loaded, all tools ready
-
-```bash
-# In Codespaces terminal - helpful shortcuts available:
-hetid_demo    # Run package demonstration
-hetid_test    # Run comprehensive tests
-hetid_sim     # Run quick Monte Carlo simulation
-rdev          # Load package in development mode
-```
-
-### Local Installation
+### Quick Start
 
 ```r
+# Install and load
+devtools::install_github("fernando-duarte/heteroskedasticity_identification")
 library(hetid)
 
 # Quick demonstration
 run_lewbel_demo()
 
-# Create default configuration
+# Basic workflow
 config <- create_default_config()
-
-# Generate example data
 data <- generate_lewbel_data(n = 100, config = config)
-
-# Run single simulation
 result <- run_single_lewbel_simulation(1, config)
-
-# Run full Monte Carlo study
-mc_results <- run_lewbel_monte_carlo(config)
 ```
-
-### Degrees of Freedom Adjustment
-
-The package supports both asymptotic and finite sample standard errors through the `df_adjust` parameter:
-
-```r
-# Asymptotic standard errors (default, matches Stata's ivreg2h)
-result_asymp <- run_single_lewbel_simulation(
-  sim_id = 1,
-  params = params,
-  df_adjust = "asymptotic"
-)
-
-# Finite sample standard errors (matches R's lm())
-result_finite <- run_single_lewbel_simulation(
-  sim_id = 1,
-  params = params,
-  df_adjust = "finite"
-)
-
-# Compare methods using the helper function
-comparison <- compare_df_adjustments(config)
-```
-
-For more details, see `vignette("degrees-of-freedom")`.
 
 ## Documentation and Vignettes
 
