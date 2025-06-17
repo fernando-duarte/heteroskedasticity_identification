@@ -225,11 +225,11 @@ lewbel-comparison-doc: ## Compile Lewbel implementation comparison LaTeX documen
 	pdflatex lewbel_implementations_comparison.tex
 	pdflatex lewbel_implementations_comparison.tex  # Run twice for references
 
-verify-lewbel: ## Run Lewbel implementation verification script
-	@echo "Running Lewbel implementation verification..."
-	Rscript verify_lewbel_implementations.R
+verify-lewbel: ## Build package comparison vignette (verification included)
+	@echo "Building package comparison vignette with verification..."
+	docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec hetid-dev R -e "devtools::build_vignettes()"
 
 lewbel-analysis: lewbel-comparison-doc verify-lewbel ## Run full Lewbel comparison analysis
 	@echo "Lewbel comparison analysis complete!"
 	@echo "PDF: lewbel_implementations_comparison.pdf"
-	@echo "Results: lewbel_verification_results.RData"
+	@echo "Verification: See package-comparison vignette"

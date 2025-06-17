@@ -1,0 +1,184 @@
+---
+title: "Getting Started with hetid"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with hetid}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+```{r setup}
+library(hetid)
+```
+
+> **Note**: For enhanced table formatting in analysis output, consider installing the `knitr` package: `install.packages("knitr")`. The package works without it, but provides nicer formatted tables when available.
+
+## Introduction
+
+The `hetid` package implements the identification through heteroskedasticity method developed by Lewbel (2012) for time-series models with endogenous regressors. This method provides a way to identify and estimate causal effects when traditional instrumental variables are not available, using heteroskedasticity in the error terms as a source of identification.
+
+### The Lewbel (2012) Method
+
+Consider a triangular system of equations:
+
+$$Y_1 = \beta_{1,0} + \beta_{1,1}X + \gamma_1 Y_2 + \epsilon_1$$
+$$Y_2 = \beta_{2,0} + \beta_{2,1}X + \epsilon_2$$
+
+Where:
+- $Y_2$ is endogenous in the first equation (i.e., $\text{Cov}(\epsilon_1, \epsilon_2) \neq 0$)
+- $X$ is exogenous
+- $\gamma_1$ is the parameter of interest
+
+Lewbel's method uses heteroskedasticity in $\epsilon_2$ to construct instruments. The key identifying assumptions are:
+1. $\text{Cov}(Z, \epsilon_1\epsilon_2) = 0$ where $Z = X^2 - E[X^2]$
+2. $\text{Cov}(Z, \epsilon_2^2) \neq 0$ (heteroskedasticity)
+
+## Generating Data
+
+The package provides a function to generate data that satisfies Lewbel's assumptions:
+
+```{r generate-data}
+# Set parameters for the data generating process
+params <- list(
+  beta1_0 = 0.5, # Intercept in first equation
+  beta1_1 = 1.5, # Coefficient on X in first equation
+  gamma1 = -0.8, # Endogenous parameter (true value)
+  beta2_0 = 1.0, # Intercept in second equation
+  beta2_1 = -1.0, # Coefficient on X in second equation
+  alpha1 = -0.5, # Factor loading for error correlation
+  alpha2 = 1.0, # Factor loading for error correlation
+  delta_het = 1.2 # Heteroskedasticity strength
+)
+
+# Generate a sample
+set.seed(123)
+data <- generate_lewbel_data(n_obs = 1000, params = params)
+head(data)
+```
+
+## Verifying Assumptions
+
+Before proceeding with estimation, it's important to verify that the data satisfies Lewbel's key assumptions:
+
+```{r verify-assumptions}
+# Verify the assumptions
+verify_lewbel_assumptions(data = data, config = params, verbose = TRUE)
+```
+
+## Estimation
+
+### Point Identification
+
+When the covariance restriction holds exactly, we can obtain point estimates using 2SLS with Lewbel instruments:
+
+```{r point-estimation}
+# Run a single simulation to demonstrate estimation
+result <- run_single_lewbel_simulation(
+  sim_id = 1,
+  params = c(params, list(
+    sample_size = 1000,
+    tau_set_id = 0.2,
+    bootstrap_reps = 100
+  ))
+)
+
+# Display results
+cat("True gamma1:", params$gamma1, "\n")
+cat("OLS estimate:", round(result$ols_gamma1, 3), "\n")
+cat("2SLS (Lewbel) estimate:", round(result$tsls_gamma1, 3), "\n")
+cat("First-stage F-statistic:", round(result$first_stage_F, 1), "\n")
+```
+
+### Set Identification
+
+When we relax the covariance restriction to allow for some correlation between $Z$ and $\epsilon_1\epsilon_2$, we obtain set identification:
+
+```{r set-identification}
+# Calculate bounds under exact identification (tau = 0)
+bounds_exact <- calculate_lewbel_bounds(data, tau = 0)
+cat("Bounds under exact identification (tau = 0):\n")
+cat(
+  "[", round(bounds_exact$bounds[1], 3), ",",
+  round(bounds_exact$bounds[2], 3), "]\n"
+)
+
+# Calculate bounds under relaxed assumption (tau = 0.2)
+bounds_relaxed <- calculate_lewbel_bounds(data, tau = 0.2)
+cat("\nBounds under relaxed assumption (tau = 0.2):\n")
+cat(
+  "[", round(bounds_relaxed$bounds[1], 3), ",",
+  round(bounds_relaxed$bounds[2], 3), "]\n"
+)
+
+# With bootstrap standard errors
+bounds_with_se <- calculate_lewbel_bounds(
+  data,
+  tau = 0.2,
+  compute_se = TRUE,
+  b_reps = 100
+)
+cat("\nBounds with standard errors:\n")
+cat(
+  "Lower bound:", round(bounds_with_se$bounds[1], 3),
+  "(SE:", round(bounds_with_se$se[1], 3), ")\n"
+)
+cat(
+  "Upper bound:", round(bounds_with_se$bounds[2], 3),
+  "(SE:", round(bounds_with_se$se[2], 3), ")\n"
+)
+```
+
+## Monte Carlo Simulation
+
+The package includes functions for running Monte Carlo simulations to assess the performance of the estimators:
+
+```{r monte-carlo, eval=FALSE}
+# Example: Run a small Monte Carlo study
+# (Not executed in vignette to save time)
+library(purrr)
+library(dplyr)
+
+# Run 100 simulations
+n_sims <- 100
+sim_params <- c(params, list(
+  sample_size = 500,
+  tau_set_id = 0.2,
+  bootstrap_reps = 50
+))
+
+results <- map_dfr(1:n_sims, ~ run_single_lewbel_simulation(.x, sim_params))
+
+# Summarize results
+summary_stats <- results |>
+  summarise(
+    ols_bias = mean(ols_gamma1 - params$gamma1, na.rm = TRUE),
+    tsls_bias = mean(tsls_gamma1 - params$gamma1, na.rm = TRUE),
+    ols_coverage = mean(ols_coverage, na.rm = TRUE),
+    tsls_coverage = mean(tsls_coverage, na.rm = TRUE),
+    avg_first_stage_F = mean(first_stage_F, na.rm = TRUE)
+  )
+
+print(summary_stats)
+```
+
+## Conclusion
+
+The `hetid` package provides a complete implementation of Lewbel's (2012) identification through heteroskedasticity method. Key features include:
+
+- Data generation that satisfies the identifying assumptions
+- Functions to verify these assumptions
+- Point estimation via 2SLS with Lewbel instruments
+- Set identification when the covariance restriction is relaxed
+- Bootstrap inference for the identified sets
+- Monte Carlo simulation tools for performance assessment
+
+For more details on the theoretical background, see Lewbel, A. (2012). "Using Heteroscedasticity to Identify and Estimate Mismeasured and Endogenous Regressor Models." *Journal of Business & Economic Statistics*, 30(1), 67-80.

@@ -295,3 +295,6 @@ documentation_build_*.log
 # R test artifacts
 tests/testthat/*.log
 tests/testthat/Rplots.pdf
+
+# Legacy verification results (now in vignette)
+lewbel_verification_results.RData

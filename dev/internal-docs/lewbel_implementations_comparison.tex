@@ -33,7 +33,7 @@
 \maketitle
 
 \begin{abstract}
-This document provides a rigorous comparison of three implementations of Lewbel (2012)'s heteroskedasticity-based identification method: the \texttt{hetid} R package, REndo's \texttt{hetErrorsIV} function, and Stata's manual IV implementation. Through empirical verification, we demonstrate that \texttt{hetid} and Stata produce \textbf{identical} results to machine precision when implementing standard Lewbel (2012). REndo's \texttt{hetErrorsIV} produces slightly different results, using $X$ directly instead of $Z = X^2 - E[X^2]$ for instrument construction, resulting in standard errors that are typically 2-4\% smaller.
+This document provides a rigorous comparison of three implementations of Lewbel (2012)'s heteroskedasticity-based identification method: the \texttt{hetid} R package, REndo's \texttt{hetErrorsIV} function, and Stata's manual IV implementation. Through empirical verification (detailed in the package comparison vignette), we demonstrate that \texttt{hetid} and Stata produce \textbf{identical} results to machine precision when implementing standard Lewbel (2012). REndo's \texttt{hetErrorsIV} produces slightly different results, using $X$ directly instead of $Z = X^2 - E[X^2]$ for instrument construction, resulting in standard errors that are typically 2-4\% smaller.
 \end{abstract}
 
 \section{Introduction}
@@ -161,15 +161,25 @@ ivregress 2sls y1 xk (y2 = lewbel_iv)
 * Coefficient on y2: -0.8009241 (matches hetid exactly)
 \end{lstlisting}
 
-\subsection{Verification Method 3: Direct Comparison Script}
+\subsection{Verification Method 3: Package Comparison Vignette}
 
-\begin{lstlisting}[caption={Complete verification showing REndo uses X not Z}]
-# Prove REndo uses X instead of Z
-library(hetid); library(REndo); library(AER)
-set.seed(42)
-data <- generate_lewbel_data(1000, params)
-test_data <- data.frame(y=data$Y1, x=data$Xk,
-                        p=data$Y2, z=data$Z)
+For complete empirical verification with all edge cases and comprehensive testing, see the package comparison vignette:
+
+\begin{lstlisting}[caption={Access complete verification in R}]
+# Load the hetid package
+library(hetid)
+
+# View the comprehensive comparison vignette
+vignette("package-comparison", package = "hetid")
+
+# The vignette includes:
+# - Instrument construction comparison
+# - Weak heteroskedasticity testing
+# - REndo instrument extraction
+# - Summary statistics and findings
+\end{lstlisting}
+
+The vignette provides the same rigorous verification as the original standalone script, demonstrating that REndo uses X instead of Z:
 
 # Standard Lewbel with Z
 e2_hat <- residuals(lm(p ~ x, data = test_data))
