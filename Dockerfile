@@ -84,39 +84,29 @@ RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
           arch <- Sys.info()[['machine']]; \
           if (arch != 'aarch64' && arch != 'arm64' && requireNamespace('pak', quietly = TRUE)) { \
             tryCatch({ \
-              pak::pkg_install(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat', 'tinytex'), \
+              pak::pkg_install(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat'), \
                              lib = '/usr/local/lib/R/site-library'); \
             }, error = function(e) { \
-              install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat', 'tinytex'), \
+              install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat'), \
                              lib = '/usr/local/lib/R/site-library'); \
             }); \
           } else { \
-            install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat', 'tinytex'), \
+            install.packages(c('remotes', 'devtools', 'knitr', 'rmarkdown', 'testthat'), \
                            lib = '/usr/local/lib/R/site-library'); \
           }"
 
-# Install TinyTeX for LaTeX support (much smaller than texlive)
-# This replaces ~3GB of texlive packages with ~150MB TinyTeX
-# CACHING BEHAVIOR:
-# - TinyTeX installation is cached as a Docker layer (one-time cost: ~20-30 min on ARM64, ~10 min on x86)
-# - Subsequent builds with no changes: 0 seconds (uses cached layer)
-# - GitHub Actions cache via 'cache-from: type=gha' ensures persistence across workflow runs
-# - PDF generation during R CMD check: ~30-60 seconds (not cached, runs each time)
-RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX')" && \
-    /opt/TinyTeX/bin/*/tlmgr path add && \
-    /opt/TinyTeX/bin/*/tlmgr install cm cm-super ec lm tex-gyre inconsolata times fancyhdr natbib caption amsmath amssymb amsfonts mathtools upquote eurosym ucs inputenc fontenc hyperref xcolor framed url latex-fonts && \
-    /opt/TinyTeX/bin/*/tlmgr update --self --all
-
-# Ensure TinyTeX is in PATH for all subsequent operations
-# Dynamically set PATH based on architecture
-RUN TINYTEX_ARCH=$(ls /opt/TinyTeX/bin/) && \
-    echo "export PATH=/opt/TinyTeX/bin/${TINYTEX_ARCH}:\$PATH" >> /etc/profile && \
-    echo "Detected TinyTeX architecture: ${TINYTEX_ARCH}" && \
-    # Verify font installation
-    /opt/TinyTeX/bin/*/kpsewhich cmr10.tfm || (echo "ERROR: Basic Computer Modern fonts not found!" && exit 1)
-
-# Set PATH for both possible architectures to ensure compatibility
-ENV PATH="/opt/TinyTeX/bin/x86_64-linux:/opt/TinyTeX/bin/aarch64-linux:${PATH}"
+# Install TeX Live for LaTeX support
+# This ensures all necessary packages are available for R CMD check --as-cran
+# While larger than TinyTeX, it's more reliable and includes all required fonts
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt \
+    apt-get update && apt-get install -y --no-install-recommends \
+    texlive-latex-base \
+    texlive-latex-recommended \
+    texlive-fonts-recommended \
+    texlive-fonts-extra \
+    texinfo \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy package metadata files first for better layer caching
 COPY DESCRIPTION NAMESPACE ./
@@ -238,9 +228,6 @@ RUN groupadd -r hetid && useradd -r -g hetid -m -s /bin/bash hetid
 # Copy installed R packages from builder
 COPY --from=builder /usr/local/lib/R/site-library/ /usr/local/lib/R/site-library/
 
-# Copy TinyTeX installation from builder
-COPY --from=builder /opt/TinyTeX /opt/TinyTeX
-
 # Copy pandoc from builder (was copied from minimal container)
 COPY --from=builder /usr/local/bin/pandoc /usr/local/bin/pandoc
 
@@ -259,7 +246,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 ENV R_LIBS_USER=/usr/local/lib/R/site-library
 ENV OMP_NUM_THREADS=1
 ENV OPENBLAS_NUM_THREADS=1
-ENV PATH="/opt/TinyTeX/bin/x86_64-linux:/opt/TinyTeX/bin/aarch64-linux:${PATH}"
 
 # Default command
 CMD ["R", "--slave", "-e", "library(hetid); cat('hetid package loaded successfully\\n')"]

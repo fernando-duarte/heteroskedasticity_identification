@@ -196,14 +196,13 @@ jobs:
       run: |
         echo "Testing image for R CMD check: $IMAGE_NAME"
 
-        # TinyTeX is installed in Docker images for PDF manual generation
-        # The installation is cached as a Docker layer, so rebuilds are fast
-        # We now properly handle TinyTeX paths for both architectures
+        # TeX Live is installed in Docker images for PDF manual generation
+        # This ensures reliable PDF generation for R CMD check --as-cran
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
           $IMAGE_NAME \
-          bash -c "R CMD build . && R CMD check --as-cran *.tar.gz || (echo '=== LaTeX Error Details ===' && cat hetid.Rcheck/Rdlatex.log 2>/dev/null | tail -100 && exit 1)"
+          bash -c "R CMD build . && R CMD check --as-cran *.tar.gz"
 
     - name: Test package loading
       env:
