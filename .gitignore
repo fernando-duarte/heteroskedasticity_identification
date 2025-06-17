@@ -298,3 +298,6 @@ tests/testthat/Rplots.pdf
 
 # Legacy verification results (now in vignette)
 lewbel_verification_results.RData
+
+# Development documentation
+CICD-vignette-pdf-best-practices-2025.md

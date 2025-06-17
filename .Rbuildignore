@@ -50,6 +50,7 @@
 ^.*_files$
 ^.*~$
 ^BUILD_DOCUMENTATION\.md$
+^CICD-vignette-pdf-best-practices-2025\.md$
 ^CI_CD_SIMULATION_SUMMARY\.md$
 ^CI_CD_SUCCESS_SUMMARY\.md$
 ^CI_CD_improvement_checklist\.md$
