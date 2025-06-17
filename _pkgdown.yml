@@ -109,3 +109,4 @@ reference:
   - has_stata
   - ensure_stata_packages
   - get_stata_path
+  - hetid_opt
