@@ -106,7 +106,13 @@ RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_pac
     /opt/TinyTeX/bin/*/tlmgr path add
 
 # Ensure TinyTeX is in PATH for all subsequent operations
-ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
+# Dynamically set PATH based on architecture
+RUN TINYTEX_ARCH=$(ls /opt/TinyTeX/bin/) && \
+    echo "export PATH=/opt/TinyTeX/bin/${TINYTEX_ARCH}:\$PATH" >> /etc/profile && \
+    echo "Detected TinyTeX architecture: ${TINYTEX_ARCH}"
+
+# Set PATH for both possible architectures to ensure compatibility
+ENV PATH="/opt/TinyTeX/bin/x86_64-linux:/opt/TinyTeX/bin/aarch64-linux:${PATH}"
 
 # Copy package metadata files first for better layer caching
 COPY DESCRIPTION NAMESPACE ./
@@ -173,8 +179,8 @@ RUN R -e ".libPaths(c('/usr/local/lib/R/site-library', .libPaths())); \
 COPY . .
 
 # Build and install the package
-# Build with --no-build-vignettes to avoid vignette building issues in Docker
-RUN R CMD build . --no-build-vignettes && \
+# We now have TinyTeX installed, so we can build vignettes and PDF manuals
+RUN R CMD build . && \
     R CMD INSTALL *.tar.gz --with-keep.source && \
     # Verify installation
     R -e "library(hetid); packageVersion('hetid')" && \
@@ -249,7 +255,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 ENV R_LIBS_USER=/usr/local/lib/R/site-library
 ENV OMP_NUM_THREADS=1
 ENV OPENBLAS_NUM_THREADS=1
-ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
+ENV PATH="/opt/TinyTeX/bin/x86_64-linux:/opt/TinyTeX/bin/aarch64-linux:${PATH}"
 
 # Default command
 CMD ["R", "--slave", "-e", "library(hetid); cat('hetid package loaded successfully\\n')"]

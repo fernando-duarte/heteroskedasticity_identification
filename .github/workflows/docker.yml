@@ -198,12 +198,12 @@ jobs:
 
         # TinyTeX is installed in Docker images for PDF manual generation
         # The installation is cached as a Docker layer, so rebuilds are fast
-        # Note: We use --no-build-vignettes to avoid potential vignette build issues in CI
+        # We now properly handle TinyTeX paths for both architectures
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
           $IMAGE_NAME \
-          bash -c "R CMD build . --no-build-vignettes && R CMD check --as-cran --no-build-vignettes *.tar.gz"
+          bash -c "R CMD build . && R CMD check --as-cran *.tar.gz"
 
     - name: Test package loading
       env:

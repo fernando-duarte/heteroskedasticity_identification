@@ -200,6 +200,7 @@ reverse_reg <- lm(X1 ~ P, data = test_data)
 u_hat <- residuals(reverse_reg)
 cat("  Step 2: Construct instrument as u_hat * (P - mean(P))\n")
 rendo_iv_manual <- u_hat * (test_data$P - mean(test_data$P))
+test_data$rendo_iv_manual <- rendo_iv_manual  # Add to dataframe for later use
 cat("  Step 3: Instrument mean =", mean(rendo_iv_manual), "\n")
 cat("  Step 4: Instrument std dev =", sd(rendo_iv_manual), "\n")
 
@@ -235,12 +236,16 @@ if (requireNamespace("REndo", quietly = TRUE)) {
 
 # Test overidentification hypothesis
 cat("\nC. Testing overidentification hypothesis:\n")
-# REndo might use {X1, P, generated_IV} as instruments
+# REndo might use X1 and generated_IV as instruments for P
+# Note: P cannot be both endogenous and an instrument
 overid_model <- tryCatch(
   {
-    ivreg(y ~ X1 + P | X1 + P + lewbel_iv, data = test_data)
+    ivreg(y ~ X1 + P | X1 + lewbel_iv + rendo_iv_manual, data = test_data)
   },
-  error = function(e) NULL
+  error = function(e) {
+    cat("   Could not estimate overidentified model: ", e$message, "\n")
+    NULL
+  }
 )
 
 if (!is.null(overid_model)) {
