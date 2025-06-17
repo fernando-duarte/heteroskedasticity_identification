@@ -41,26 +41,50 @@ For enhanced functionality, you may want to install these optional packages:
 ```r
 # For enhanced table formatting in analysis output
 install.packages("knitr")
+
+# For comparison with other Lewbel implementations
+install.packages("REndo")  # Version >= 2.4.0 required
+install.packages("AER")    # For ivreg function
+
+# For Stata comparison (if Stata is available)
+install.packages("RStata")
+install.packages("haven")
 ```
 
 The package will work without these dependencies, but installing them provides:
 - **knitr**: Nicely formatted tables in analysis functions (when `verbose = TRUE`)
+- **REndo**: Comparison with alternative Lewbel implementation
+- **AER**: Additional IV regression capabilities
+- **RStata/haven**: Stata integration for validation studies
 
 ## Project Structure
 
 ```
 heteroskedasticity_identification/
 ├── R/                    # R functions implementing the methodology
-│   ├── messager.R       # Utility functions for messaging
-│   └── stopper.R        # Utility functions for error handling
-├── lewbel2012/          # Implementation and analysis of Lewbel (2012)
+│   ├── analysis.R       # Results analysis and performance metrics
+│   ├── data-generation.R # Data generation and validation
+│   ├── estimation.R     # Core Lewbel estimation functions
+│   ├── lewbel-monte-carlo.R # Main simulation orchestrator
+│   ├── simulation.R     # Parallel simulation infrastructure
+│   ├── visualization.R  # ggplot2-based plotting functions
+│   ├── utils.R          # Configuration and utilities
+│   ├── messager.R       # Messaging utilities
+│   └── stopper.R        # Error handling utilities
+├── lewbel2012/          # Academic paper and LaTeX source
 │   ├── lewbel2012.tex   # LaTeX source file
-│   ├── lewbel2012.pdf   # Compiled PDF document
-│   └── ...              # Supporting LaTeX files
-├── tests/               # Unit tests
+│   ├── lewbel2012.lyx   # LyX source file
+│   └── refs.bib         # Bibliography
+├── tests/               # Comprehensive unit tests
 │   └── testthat/        # testthat test files
 ├── vignettes/           # Package vignettes
-│   └── getting-started.Rmd
+│   ├── getting-started.Rmd      # Introduction to hetid
+│   ├── package-comparison.Rmd   # Comparing implementations
+│   └── degrees-of-freedom.Rmd   # DF adjustment methods
+├── dev/                 # Development documentation
+│   └── internal-docs/   # Internal development guides
+├── data/                # Package datasets
+│   └── lewbel_sim.rda   # Example simulation data
 ├── man/                 # Documentation (generated)
 ├── docs/                # pkgdown site (generated)
 ├── .github/             # GitHub Actions workflows
@@ -70,7 +94,8 @@ heteroskedasticity_identification/
 │   │   └── pkgdown.yml       # Documentation site
 │   └── dependabot.yml       # Automated dependency updates
 └── inst/                # Installed files
-    └── hooks/           # Pre-commit hook scripts
+    ├── hooks/           # Pre-commit hook scripts
+    └── WORDLIST         # Spell check dictionary
 ```
 
 ## Development
@@ -117,7 +142,7 @@ Choose your preferred development environment:
 - CI/CD testing: Both R 4.5.0 (release) and R 4.4.x (oldrel)
 - Full compatibility maintained
 
-See [DOCKER.md](DOCKER.md) for comprehensive Docker documentation.
+See [dev/internal-docs/DOCKER.md](dev/internal-docs/DOCKER.md) for comprehensive Docker documentation.
 
 #### Option 3: Local R Installation 💻
 
@@ -159,7 +184,7 @@ The project uses several tools to maintain code quality:
 - **Code coverage**: Test coverage reporting (to be implemented)
 - **pkgdown**: Automatic documentation website generation
 
-For detailed information about our CI/CD workflows, see [WORKFLOWS.md](WORKFLOWS.md).
+For detailed information about our CI/CD workflows, see [dev/internal-docs/WORKFLOWS.md](dev/internal-docs/WORKFLOWS.md).
 
 ### Pre-commit Hooks
 
@@ -209,7 +234,20 @@ rdev          # Load package in development mode
 ```r
 library(hetid)
 
-# Example usage will be added as functions are developed
+# Quick demonstration
+run_lewbel_demo()
+
+# Create default configuration
+config <- create_default_config()
+
+# Generate example data
+data <- generate_lewbel_data(n = 100, config = config)
+
+# Run single simulation
+result <- run_single_lewbel_simulation(1, config)
+
+# Run full Monte Carlo study
+mc_results <- run_lewbel_monte_carlo(config)
 ```
 
 ### Degrees of Freedom Adjustment
@@ -236,6 +274,33 @@ comparison <- compare_df_adjustments(config)
 ```
 
 For more details, see `vignette("degrees-of-freedom")`.
+
+## Documentation and Vignettes
+
+The package includes comprehensive documentation with three detailed vignettes:
+
+### 1. Getting Started (`vignette("getting-started")`)
+- Introduction to the hetid package
+- Basic usage examples
+- Understanding Lewbel (2012) methodology
+- Quick start guide for new users
+
+### 2. Package Comparison (`vignette("package-comparison")`)
+- Detailed comparison with REndo package
+- Validation against Stata's ivreg2h
+- Understanding implementation differences
+- Choosing the right approach for your research
+
+### 3. Degrees of Freedom (`vignette("degrees-of-freedom")`)
+- Asymptotic vs. finite sample standard errors
+- When to use each approach
+- Practical implications for inference
+- Comparison with other software
+
+### Additional Documentation
+- **Function reference**: Complete documentation for all exported functions
+- **pkgdown website**: [https://fernando-duarte.github.io/heteroskedasticity_identification/](https://fernando-duarte.github.io/heteroskedasticity_identification/)
+- **Development guides**: See `dev/internal-docs/` for technical documentation
 
 ### Docker Usage (Recommended for Local Development)
 
@@ -321,7 +386,7 @@ This works because pak's parallel installation (even with emulation overhead) is
 - **Security hardened** with non-root users
 - **Multi-platform** support (AMD64/ARM64)
 
-See [DOCKER.md](DOCKER.md) for comprehensive documentation, troubleshooting, and advanced usage.
+See [dev/internal-docs/DOCKER.md](dev/internal-docs/DOCKER.md) for comprehensive documentation, troubleshooting, and advanced usage.
 
 ## Contributing
 
@@ -350,26 +415,56 @@ This repository uses automated security scanning with `oysteR` to check for vuln
    - Add `OSSINDEX_USER` and `OSSINDEX_TOKEN` as repository secrets
    - Go to Settings → Secrets and variables → Actions
 
-See [.github/SECURITY_IMPROVEMENTS_2025.md](.github/SECURITY_IMPROVEMENTS_2025.md) for detailed information about our security practices.
+See [dev/internal-docs/CI_CD_SUCCESS_SUMMARY.md](dev/internal-docs/CI_CD_SUCCESS_SUMMARY.md) for detailed information about our security practices and CI/CD setup.
 
 ## Research Focus
 
-This project explores various approaches to identifying and testing for heteroskedasticity in econometric models, with particular attention to modern identification strategies. The package aims to provide:
+This project implements the identification through heteroskedasticity methodology of Lewbel (2012) for econometric models with endogenous regressors. The package provides:
 
-- Implementation of Lewbel (2012) methodology
-- Tools for heteroskedasticity testing
-- Methods for identification through heteroskedasticity
-- Time-series specific adaptations
+- **Complete implementation** of Lewbel (2012) methodology
+- **Set identification** when point identification fails
+- **Comparison tools** with other implementations (REndo, Stata)
+- **Monte Carlo validation** of theoretical results
+- **Practical guidance** on degrees of freedom adjustments
+- **Visualization tools** for understanding estimator performance
+
+### Academic Applications
+- Identification in models with endogenous regressors
+- Situations where traditional instruments are unavailable
+- Comparison of identification strategies
+- Understanding finite sample vs. asymptotic properties
 
 ## Current Status
 
-The package is in early development. Current priorities include:
-- Implementing core Lewbel (2012) estimators
-- Adding comprehensive tests
-- Developing user-friendly vignettes
-- Creating simulation studies
+The package is **feature-complete** and implements the full Lewbel (2012) methodology. Current capabilities include:
 
-See the issues page on GitHub for specific development tasks.
+### ✅ Implemented Features
+- **Core Lewbel (2012) estimators** with set identification
+- **Comprehensive Monte Carlo simulations** with parallel processing
+- **Multiple analysis types**: main simulation, bootstrap, sample size, sensitivity
+- **Visualization suite** with ggplot2-based plotting functions
+- **Comparison tools** for different implementations (REndo, Stata)
+- **Degrees of freedom adjustments** (asymptotic vs. finite sample)
+- **Comprehensive test suite** with >95% code coverage
+- **Three detailed vignettes** with examples and comparisons
+- **Docker development environment** with RStudio Server
+- **CI/CD workflows** with automated testing and security scanning
+
+### 📊 Available Functions
+- `run_lewbel_demo()` - Quick package demonstration
+- `run_lewbel_monte_carlo()` - Full Monte Carlo study
+- `calculate_lewbel_bounds()` - Set identification bounds
+- `generate_lewbel_data()` - Simulate data under Lewbel assumptions
+- `plot_estimator_distributions()` - Visualize estimator performance
+- `compare_df_adjustments()` - Compare standard error methods
+
+### 🔬 Research Applications
+- Identification through heteroskedasticity
+- Set identification when point identification fails
+- Comparison with traditional IV methods
+- Finite sample vs. asymptotic inference
+
+See the [package website](https://fernando-duarte.github.io/heteroskedasticity_identification/) for complete documentation and examples.
 
 ## References
 
