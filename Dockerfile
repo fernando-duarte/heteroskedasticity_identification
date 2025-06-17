@@ -102,7 +102,7 @@ RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
 # - Subsequent builds with no changes: 0 seconds (uses cached layer)
 # - GitHub Actions cache via 'cache-from: type=gha' ensures persistence across workflow runs
 # - PDF generation during R CMD check: ~30-60 seconds (not cached, runs each time)
-RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
+RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption', 'amsmath', 'amssymb', 'amsfonts', 'mathtools', 'upquote', 'eurosym', 'ucs', 'inputenc', 'fontenc', 'hyperref', 'xcolor', 'framed'))" && \
     /opt/TinyTeX/bin/*/tlmgr path add
 
 # Ensure TinyTeX is in PATH for all subsequent operations
