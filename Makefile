@@ -201,7 +201,7 @@ lint: ## Run lintr on package code
 
 format: ## Format R code with styler
 	@echo "Formatting R code..."
-	docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec hetid-dev R -e "styler::style_pkg()"
+	docker-compose -f docker-compose.yml -f docker-compose.dev.yml exec hetid-dev R -e "styler::style_pkg(transformers = styler::tidyverse_style(line_length = 120L))"
 
 # Information targets
 info: ## Show Docker and system information

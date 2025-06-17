@@ -41,10 +41,14 @@ if (length(files) > 0) {
 
     if (is.null(original_content)) next
 
-    # Style the file
+    # Style the file with 120 character line length
     tryCatch(
       {
-        styler::style_file(file, dry = "off")
+        styler::style_file(
+          file,
+          dry = "off",
+          transformers = styler::tidyverse_style(line_length = 120L)
+        )
       },
       error = function(e) {
         cat("Error styling file:", file, "-", e$message, "\n")

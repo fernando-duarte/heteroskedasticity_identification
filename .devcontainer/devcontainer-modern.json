@@ -87,7 +87,7 @@
         // R code formatting
         "[r]": {
           "editor.wordSeparators": "`~!@#%$^&*()-=+[{]}\\|;:'\",<>/?",
-          "editor.rulers": [80],
+          "editor.rulers": [120],
           "editor.tabSize": 2,
           "editor.insertSpaces": true,
           "editor.formatOnSave": false

@@ -149,8 +149,8 @@ if grep -l '[[:space:]]$' DESCRIPTION NAMESPACE 2>/dev/null; then
 fi
 
 # Check for very long lines
-if grep -l '.\{81,\}' R/*.R 2>/dev/null; then
-    print_warning "Lines longer than 80 characters found in R files"
+if grep -l '.\{121,\}' R/*.R 2>/dev/null; then
+    print_warning "Lines longer than 120 characters found in R files"
 fi
 
 print_success "Common issues check completed"

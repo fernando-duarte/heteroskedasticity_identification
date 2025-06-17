@@ -1,0 +1,4 @@
+# styler configuration for hetid package
+# Sets line length to 120 characters to match lintr and pre-commit hooks
+
+transformers: styler::tidyverse_style(line_length = 120L)
