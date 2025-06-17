@@ -89,44 +89,11 @@ This project implements the identification through heteroskedasticity methodolog
 - **Set identification** when point identification fails
 - **Comparison tools** with other implementations (REndo, Stata)
 - **Monte Carlo validation** of theoretical results
-- **Practical guidance** on degrees of freedom adjustments
 - **Visualization tools** for understanding estimator performance
 
-### Academic Applications
-- Identification in models with endogenous regressors
-- Situations where traditional instruments are unavailable
-- Comparison of identification strategies
-- Understanding finite sample vs. asymptotic properties
-
-## Current Status
-
-The package is **feature-complete** and implements the full Lewbel (2012) methodology. Current capabilities include:
-
-### ✅ Implemented Features
-- **Core Lewbel (2012) estimators** with set identification
-- **Comprehensive Monte Carlo simulations** with parallel processing
-- **Multiple analysis types**: main simulation, bootstrap, sample size, sensitivity
-- **Visualization suite** with ggplot2-based plotting functions
-- **Comparison tools** for different implementations (REndo, Stata)
-- **Degrees of freedom adjustments** (asymptotic vs. finite sample)
-- **Comprehensive test suite** with >95% code coverage
-- **Three detailed vignettes** with examples and comparisons
-- **Docker development environment** with RStudio Server
-- **CI/CD workflows** with automated testing and security scanning
-
-### 📊 Available Functions
-- `run_lewbel_demo()` - Quick package demonstration
-- `run_lewbel_monte_carlo()` - Full Monte Carlo study
-- `calculate_lewbel_bounds()` - Set identification bounds
-- `generate_lewbel_data()` - Simulate data under Lewbel assumptions
-- `plot_estimator_distributions()` - Visualize estimator performance
-- `compare_df_adjustments()` - Compare standard error methods
-
-### 🔬 Research Applications
-- Identification through heteroskedasticity
-- Set identification when point identification fails
-- Comparison with traditional IV methods
-- Finite sample vs. asymptotic inference
+### Applications
+- Identification in models with endogenous regressors by heteroskedasticity
+- Useful when traditional instruments are unavailable
 
 See the [package website](https://fernando-duarte.github.io/heteroskedasticity_identification/) for complete documentation and examples.
 
