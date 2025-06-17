@@ -11,7 +11,10 @@ test_that("analyze_main_results handles empty results", {
   # expect_warning() only captures one warning at a time in testthat edition 3,
   # we suppress them here and document their expected nature
   suppressWarnings({
-    analysis_empty <- analyze_main_results(empty_results, config, verbose = FALSE)
+    analysis_empty <- analyze_main_results(
+      empty_results, config,
+      verbose = FALSE
+    )
   })
 
   expect_type(analysis_empty, "list")

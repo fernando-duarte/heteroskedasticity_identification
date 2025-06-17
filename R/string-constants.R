@@ -1,5 +1,5 @@
 #' Internal string constants
-#' @export
+#' @keywords internal
 .hetid_strings <- function() {
   list(
     # Degrees of freedom adjustment methods
@@ -34,7 +34,9 @@
     # Stata integration
     stata = list(
       PACKAGES = c("ranktest", "ivreg2", "ivreg2h"),
-      EXECUTABLES_ALL = c("stata", "stata-mp", "stata-se", "StataMP", "StataSE", "Stata"),
+      EXECUTABLES_ALL = c(
+        "stata", "stata-mp", "stata-se", "StataMP", "StataSE", "Stata"
+      ),
       EXECUTABLES_UNIX = c("stata", "stata-mp", "stata-se"),
       DO_EXTENSION = ".do",
       LOG_EXTENSION = ".log",

@@ -9,3 +9,4 @@
 \description{
 Internal string constants
 }
+\keyword{internal}

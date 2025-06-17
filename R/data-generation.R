@@ -71,7 +71,12 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
 
   # Generate exogenous variables
   # nolint start: object_name_linter.
-  X_mat <- matrix(stats::rnorm(n_obs * n_x, mean = hetid_const("DEFAULT_X_MEAN"), sd = hetid_const("DEFAULT_X_SD")),
+  X_mat <- matrix(
+    stats::rnorm(
+      n_obs * n_x,
+      mean = hetid_const("DEFAULT_X_MEAN"),
+      sd = hetid_const("DEFAULT_X_SD")
+    ),
     nrow = n_obs, ncol = n_x
   )
 
@@ -92,7 +97,11 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
   # Add safeguard for numerical stability
   # Cap the exponent to prevent overflow
   exponent <- params$delta_het * Z_het
-  exponent <- pmin(pmax(exponent, hetid_const("MIN_EXPONENT")), hetid_const("MAX_EXPONENT")) # Cap between min and max exponent
+  # Cap between min and max exponent
+  exponent <- pmin(
+    pmax(exponent, hetid_const("MIN_EXPONENT")),
+    hetid_const("MAX_EXPONENT")
+  )
   V2 <- stats::rnorm(n_obs) * sqrt(exp(exponent))
 
   # Construct structural errors using single-factor model

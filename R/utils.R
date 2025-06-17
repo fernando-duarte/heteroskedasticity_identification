@@ -87,7 +87,7 @@ generate_seed_matrix <- function(base_seed, n_experiments, n_reps_each) {
 #'
 #' @export
 create_default_config <- function(
-    num_simulations = hetid_const("DEFAULT_NUM_SIMULATIONS"), # nolint: object_usage_linter.
+    num_simulations = hetid_const("DEFAULT_NUM_SIMULATIONS"),
     main_sample_size = hetid_const("DEFAULT_MAIN_SAMPLE_SIZE"),
     sample_sizes = hetid_const("DEFAULT_SAMPLE_SIZES"),
     delta_het = 0.8,
