@@ -59,11 +59,11 @@ The package will work without these dependencies, but installing them provides:
 
 ## Development
 
-For comprehensive development setup instructions, code quality tools, and contribution guidelines, see **[DEVELOPMENT.md](DEVELOPMENT.md)**.
+For comprehensive development setup instructions, code quality tools, and contribution guidelines, see **[DEVELOPMENT.md](docs/guides/DEVELOPMENT.md)**.
 
 ## Usage
 
-For comprehensive usage examples, advanced features, and troubleshooting, see **[USAGE.md](USAGE.md)**.
+For comprehensive usage examples, advanced features, and troubleshooting, see **[USAGE.md](docs/guides/USAGE.md)**.
 
 ### Quick Start
 
