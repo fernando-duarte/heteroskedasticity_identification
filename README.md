@@ -81,14 +81,14 @@ run_lewbel_demo()
 
 # Basic workflow
 config <- create_default_config()
-data <- generate_lewbel_data(n = 100, config = config)
+data <- generate_lewbel_data(100, config)
 result <- run_single_lewbel_simulation(1, config)
 ```
 ## Guides
 
-**[Development](docs/guides/DEVELOPMENT.md)**.
-**[Usage](docs/guides/USAGE.md)**.
-**[Troubleshooting](docs/guides/TROUBLESHOOTING.md)**.
+**[Development](dev-guides/DEVELOPMENT.md)**.
+**[Usage](dev-guides/USAGE.md)**.
+**[Troubleshooting](dev-guides/TROUBLESHOOTING.md)**.
 
 ## References
 

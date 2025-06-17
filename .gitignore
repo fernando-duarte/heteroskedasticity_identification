@@ -53,8 +53,8 @@ inst/Meta/
 .Renviron
 .Renviron.local
 
-# pkgdown site (now outputs to pkgdown/ directory)
-pkgdown/
+# pkgdown site outputs (built by CI/CD, not committed)
+docs/
 
 # AI assistant rule files
 .cursorrules
@@ -76,6 +76,7 @@ code_to_do.md
 TODO.txt
 notes.md
 scratch/
+dev-guides/
 
 # Temporary monitoring scripts
 monitor_pr_checks.sh
@@ -294,6 +295,9 @@ documentation_build_*.log
 # R test artifacts
 tests/testthat/*.log
 tests/testthat/Rplots.pdf
+
+# R plotting artifacts
+Rplots.pdf
 
 # Legacy verification results (now in vignette)
 lewbel_verification_results.RData

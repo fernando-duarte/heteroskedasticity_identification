@@ -153,6 +153,7 @@
 ^credentials$
 ^data-raw$
 ^dev$
+^dev-guides$
 ^dev/.*$
 ^diary\.md$
 ^doc$

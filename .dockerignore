@@ -40,6 +40,7 @@ CHANGELOG.md
 vignettes/
 docs/
 pkgdown/
+dev-guides/
 _pkgdown.yml
 man/*.Rd
 

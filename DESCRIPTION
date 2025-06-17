@@ -12,7 +12,8 @@ Description: Implements the identification through heteroskedasticity
     regressors.  Provides tools for estimation and inference when
     traditional instruments are not available.
 License: MIT + file LICENSE
-URL: https://github.com/fernando-duarte/heteroskedasticity_identification
+URL: https://fernando-duarte.github.io/heteroskedasticity_identification/,
+    https://github.com/fernando-duarte/heteroskedasticity_identification
 BugReports:
     https://github.com/fernando-duarte/heteroskedasticity_identification/issues
 Depends:
