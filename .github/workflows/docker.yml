@@ -203,7 +203,7 @@ jobs:
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
           $IMAGE_NAME \
-          bash -c "R CMD build . && R CMD check --as-cran *.tar.gz"
+          bash -c "R CMD build . && R CMD check --as-cran *.tar.gz || (echo '=== LaTeX Error Details ===' && cat hetid.Rcheck/Rdlatex.log 2>/dev/null | tail -100 && exit 1)"
 
     - name: Test package loading
       env:
