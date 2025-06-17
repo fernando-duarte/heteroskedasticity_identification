@@ -20,9 +20,7 @@ Choose your preferred development environment:
    - Package pre-loaded and ready to use
    - All tools and dependencies included
 
-**Features**: RStudio Server, VS Code, R 4.5.0, all dependencies, Git integration, Docker support
-
-> **New**: Modern devcontainer with R 4.5.0 available! Includes both VS Code and RStudio in one environment. See [.devcontainer/README-modern.md](.devcontainer/README-modern.md) for details.
+**Features**: Devcontainer with R 4.5.0 available! Includes both VS Code and RStudio in one environment.
 
 ### Option 2: Local Docker Development 🐳
 
@@ -38,11 +36,8 @@ Choose your preferred development environment:
    ```
 
 **R Versions**:
-- Production images: R 4.5.0 (updated June 2025)
+- Production images: R 4.5.0
 - CI/CD testing: Both R 4.5.0 (release) and R 4.4.x (oldrel)
-- Full compatibility maintained
-
-See [dev/internal-docs/DOCKER.md](dev/internal-docs/DOCKER.md) for comprehensive Docker documentation.
 
 ### Option 3: Local R Installation 💻
 
@@ -69,10 +64,6 @@ See [dev/internal-docs/DOCKER.md](dev/internal-docs/DOCKER.md) for comprehensive
    pre-commit install
    ```
 
-### Additional Tools
-
-- **(Optional) For Cursor AI users**: The repository includes a `.cursorignore` file that prevents the AI from accessing sensitive files and improves performance by excluding large generated files.
-
 ## Code Quality Tools
 
 The project uses several tools to maintain code quality:
@@ -83,8 +74,6 @@ The project uses several tools to maintain code quality:
 - **Automated dependency updates**: Dependabot for GitHub Actions and Docker images
 - **Code coverage**: Test coverage reporting (to be implemented)
 - **pkgdown**: Automatic documentation website generation
-
-For detailed information about our CI/CD workflows, see [dev/internal-docs/WORKFLOWS.md](dev/internal-docs/WORKFLOWS.md).
 
 ## Pre-commit Hooks
 
@@ -108,7 +97,6 @@ The project includes comprehensive ignore files following 2025 best practices:
 
 - **`.gitignore`**: Excludes common R, OS-specific, and IDE files from version control
 - **`.Rbuildignore`**: Excludes development files from the built R package
-- **`.cursorignore`**: Controls which files Cursor AI can access (security & performance)
 - **`.dockerignore`**: Optimizes Docker build context
 
 ## Contributing
@@ -138,11 +126,9 @@ This repository uses automated security scanning with `oysteR` to check for vuln
    - Add `OSSINDEX_USER` and `OSSINDEX_TOKEN` as repository secrets
    - Go to Settings → Secrets and variables → Actions
 
-See [dev/internal-docs/CI_CD_SUCCESS_SUMMARY.md](dev/internal-docs/CI_CD_SUCCESS_SUMMARY.md) for detailed information about our security practices and CI/CD setup.
-
 ## Docker Usage (Recommended for Local Development)
 
-The package includes a complete Docker setup with 2025 best practices for easy development and deployment.
+The package includes a complete Docker setup for easy development and deployment.
 
 ### Quick Start Guide
 
@@ -158,39 +144,7 @@ The package includes a complete Docker setup with 2025 best practices for easy d
    ```bash
    make test
    ```
-
-3. **Execute Monte Carlo Simulations**:
-   ```bash
-   # Quick simulation (100 iterations)
-   make simulation-quick
-
-   # Full simulation (1000 iterations)
-   make simulation
-
-   # Sensitivity analysis
-   make simulation-sensitivity
-   ```
-
-4. **Interactive Development**:
-   ```bash
-   # Open R console in container
-   make dev-r
-
-   # Open bash shell
-   make dev-shell
-
-   # View logs
-   make dev-logs
-   ```
-
-5. **Stop Environment**:
-   ```bash
-   make dev-stop
-   ```
-
-### Alternative Commands
-
-If you prefer direct Docker commands:
+3. **Use Docker commands:**
 
 ```bash
 # Development with RStudio
@@ -223,5 +177,3 @@ This works because pak's parallel installation (even with emulation overhead) is
 - **Automated testing** and quality checks
 - **Security hardened** with non-root users
 - **Multi-platform** support (AMD64/ARM64)
-
-See [dev/internal-docs/DOCKER.md](dev/internal-docs/DOCKER.md) for comprehensive documentation, troubleshooting, and advanced usage.

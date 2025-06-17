@@ -122,8 +122,6 @@ result_finite <- run_single_lewbel_simulation(
 comparison <- compare_df_adjustments(config)
 ```
 
-For more details, see `vignette("degrees-of-freedom")`.
-
 ## Set Identification
 
 When point identification fails, the package provides set identification:
