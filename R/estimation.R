@@ -74,7 +74,7 @@ calculate_lewbel_bounds <- function(data,
     cov_z_w2sq <- stats::cov(d$Z, d$W2^2)
 
     # Check for weak identification
-    if (abs(cov_z_w2sq) < hetid:::hetid_const("WEAK_ID_TOLERANCE")) {
+    if (abs(cov_z_w2sq) < hetid_const("WEAK_ID_TOLERANCE")) {
       return(c(NA, NA))
     }
 
@@ -217,7 +217,7 @@ run_single_lewbel_simulation <- function(sim_id,
         k <- length(coef(ols_model))
         crit_val <- get_critical_value(
           n, k,
-          alpha = hetid:::hetid_const("ALPHA_LEVEL"), df_adjust = df_adjust
+          alpha = hetid_const("ALPHA_LEVEL"), df_adjust = df_adjust
         )
 
         ols_covers <- (params$gamma1 >= ols_est - crit_val * ols_se &&
@@ -254,7 +254,7 @@ run_single_lewbel_simulation <- function(sim_id,
       # Check for invalid instrument
       if (any(is.na(lewbel_iv)) ||
         stats::sd(lewbel_iv, na.rm = TRUE) <
-          hetid:::hetid_const("INSTRUMENT_SD_THRESHOLD")) {
+          hetid_const("INSTRUMENT_SD_THRESHOLD")) {
         tsls_est <- NA_real_
         tsls_se <- NA_real_
         tsls_covers <- NA

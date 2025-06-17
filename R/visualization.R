@@ -18,6 +18,7 @@
 #' print(p1)
 #' }
 #'
+#' @importFrom stats setNames
 #' @export
 plot_estimator_distributions <- function(results_clean, config) {
   # Select and reshape data
