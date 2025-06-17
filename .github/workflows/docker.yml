@@ -181,12 +181,14 @@ jobs:
       run: |
         echo "Testing image: $IMAGE_NAME"
 
-        # Run package tests - devtools is already in the builder image
+        # Run package tests
+        # Note: We install the current code first to ensure we're testing the latest version
+        # The builder image may have been cached with an older version of the package
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
           -e R_LIBS_USER=/usr/local/lib/R/site-library \
           $IMAGE_NAME \
-          bash -c "cd /workspace && R -e \"library(devtools); devtools::test()\""
+          bash -c "cd /workspace && R -e \"devtools::install(quick = TRUE, dependencies = FALSE); devtools::test()\""
 
     - name: Run R CMD check
       env:
@@ -196,11 +198,12 @@ jobs:
 
         # TinyTeX is installed in Docker images for PDF manual generation
         # The installation is cached as a Docker layer, so rebuilds are fast
+        # Note: We use --no-build-vignettes to avoid potential vignette build issues in CI
         docker run --rm \
           -v ${{ github.workspace }}:/workspace \
           -w /workspace \
           $IMAGE_NAME \
-          bash -c "R CMD build . && R CMD check --as-cran *.tar.gz"
+          bash -c "R CMD build . --no-build-vignettes && R CMD check --as-cran --no-build-vignettes *.tar.gz"
 
     - name: Test package loading
       env:

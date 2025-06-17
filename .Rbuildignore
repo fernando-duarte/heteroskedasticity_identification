@@ -144,6 +144,7 @@
 ^bookdown$
 ^build_local_documentation\.R$
 ^check_monitor_status\.sh$
+^cleanup-analysis-report\.md$
 ^code_to_do\.md$
 ^codecov\.yml$
 ^coverage$
@@ -205,6 +206,7 @@
 ^simulate_ci_cd\.sh$
 ^simulation-results$
 ^tags$
+^test_docker_workflow\.sh$
 ^test_workflows\.sh$
 ^tests/testthat/\.cache$
 ^tmux\.md$

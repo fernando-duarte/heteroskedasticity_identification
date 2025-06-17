@@ -46,6 +46,8 @@ Suggests:
     testthat (>= 3.0.0),
     uuid,
     withr
+VignetteBuilder:
+    knitr
 Config/build/vignette-compression: both
 Config/Needs/website: pkgdown
 Config/testthat/edition: 3
