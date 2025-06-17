@@ -11,7 +11,19 @@
 
 ## Overview
 
-The `hetid` package implements the identification through heteroskedasticity method of Lewbel (2012) for time-series models with endogenous regressors. It provides tools for estimation and inference when traditional instruments are not available.
+The `hetid` package implements the identification through heteroskedasticity method of Lewbel (2012) for time-series models with endogenous regressors. It provides tools for estimation and inference:
+
+- **Complete implementation** of Lewbel (2012) methodology
+- **Set identification** when point identification hypotheses are not met
+- **Comparison tools** with other implementations (REndo, Stata)
+- **Monte Carlo validation** of theoretical results
+- **Visualization tools** for understanding estimator performance
+
+### Applications
+- Identification in models with endogenous regressors by heteroskedasticity
+- Useful when traditional instruments are unavailable
+
+See the [package website](https://fernando-duarte.github.io/heteroskedasticity_identification/) for complete documentation and examples.
 
 ## Installation
 
@@ -57,14 +69,6 @@ The package will work without these dependencies, but installing them provides:
 - **AER**: Additional IV regression capabilities
 - **RStata/haven**: Comparison with alternative Stata implementation of Lewbel (2012)
 
-## Development
-
-For comprehensive development setup instructions, code quality tools, and contribution guidelines, see **[DEVELOPMENT.md](docs/guides/DEVELOPMENT.md)**.
-
-## Usage
-
-For comprehensive usage examples, advanced features, and troubleshooting, see **[USAGE.md](docs/guides/USAGE.md)**.
-
 ### Quick Start
 
 ```r
@@ -80,22 +84,11 @@ config <- create_default_config()
 data <- generate_lewbel_data(n = 100, config = config)
 result <- run_single_lewbel_simulation(1, config)
 ```
+## Guides
 
-## Research Focus
-
-This project implements the identification through heteroskedasticity methodology of Lewbel (2012) for econometric models with endogenous regressors. The package provides:
-
-- **Complete implementation** of Lewbel (2012) methodology
-- **Set identification** when point identification fails
-- **Comparison tools** with other implementations (REndo, Stata)
-- **Monte Carlo validation** of theoretical results
-- **Visualization tools** for understanding estimator performance
-
-### Applications
-- Identification in models with endogenous regressors by heteroskedasticity
-- Useful when traditional instruments are unavailable
-
-See the [package website](https://fernando-duarte.github.io/heteroskedasticity_identification/) for complete documentation and examples.
+**[Development](docs/guides/DEVELOPMENT.md)**.
+**[Usage](docs/guides/USAGE.md)**.
+**[Troubleshooting](docs/guides/TROUBLESHOOTING.md)**.
 
 ## References
 
@@ -104,7 +97,3 @@ See the [package website](https://fernando-duarte.github.io/heteroskedasticity_i
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-This package is part of ongoing research in econometric identification strategies.

@@ -218,18 +218,3 @@ print(summary_stats$bias_statistics)
 4. **Consider degrees of freedom**: Choose between asymptotic and finite sample adjustments
 5. **Parallel processing**: Use `future::plan()` for faster Monte Carlo simulations
 6. **Visualization**: Always plot results to understand estimator behavior
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Convergence problems**: Increase sample size or adjust parameters
-2. **Memory issues**: Reduce number of simulations or use parallel processing
-3. **Missing dependencies**: Install suggested packages for full functionality
-
-### Getting Help
-
-- Check the vignettes: `browseVignettes("hetid")`
-- View function documentation: `?function_name`
-- Visit the package website: https://fernando-duarte.github.io/heteroskedasticity_identification/
-- Report issues: https://github.com/fernando-duarte/heteroskedasticity_identification/issues
