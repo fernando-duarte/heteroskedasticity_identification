@@ -102,14 +102,18 @@ RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
 # - Subsequent builds with no changes: 0 seconds (uses cached layer)
 # - GitHub Actions cache via 'cache-from: type=gha' ensures persistence across workflow runs
 # - PDF generation during R CMD check: ~30-60 seconds (not cached, runs each time)
-RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption', 'amsmath', 'amssymb', 'amsfonts', 'mathtools', 'upquote', 'eurosym', 'ucs', 'inputenc', 'fontenc', 'hyperref', 'xcolor', 'framed', 'cm', 'cm-super', 'ec', 'lm', 'url'))" && \
-    /opt/TinyTeX/bin/*/tlmgr path add
+RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX')" && \
+    /opt/TinyTeX/bin/*/tlmgr path add && \
+    /opt/TinyTeX/bin/*/tlmgr install cm cm-super ec lm tex-gyre inconsolata times fancyhdr natbib caption amsmath amssymb amsfonts mathtools upquote eurosym ucs inputenc fontenc hyperref xcolor framed url latex-fonts && \
+    /opt/TinyTeX/bin/*/tlmgr update --self --all
 
 # Ensure TinyTeX is in PATH for all subsequent operations
 # Dynamically set PATH based on architecture
 RUN TINYTEX_ARCH=$(ls /opt/TinyTeX/bin/) && \
     echo "export PATH=/opt/TinyTeX/bin/${TINYTEX_ARCH}:\$PATH" >> /etc/profile && \
-    echo "Detected TinyTeX architecture: ${TINYTEX_ARCH}"
+    echo "Detected TinyTeX architecture: ${TINYTEX_ARCH}" && \
+    # Verify font installation
+    /opt/TinyTeX/bin/*/kpsewhich cmr10.tfm || (echo "ERROR: Basic Computer Modern fonts not found!" && exit 1)
 
 # Set PATH for both possible architectures to ensure compatibility
 ENV PATH="/opt/TinyTeX/bin/x86_64-linux:/opt/TinyTeX/bin/aarch64-linux:${PATH}"
