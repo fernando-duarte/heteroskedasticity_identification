@@ -1,4 +1,5 @@
 url: https://github.com/fernando-duarte/heteroskedasticity_identification
+destination: pkgdown
 
 template:
   bootstrap: 5

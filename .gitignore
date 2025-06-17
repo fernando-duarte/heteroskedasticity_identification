@@ -53,16 +53,7 @@ inst/Meta/
 .Renviron
 .Renviron.local
 
-# pkgdown site (but allow docs/guides/ for our documentation)
-docs/_site/
-docs/reference/
-docs/articles/
-docs/news/
-docs/index.html
-docs/pkgdown.yml
-docs/link/
-docs/bootstrap-toc.*
-docs/docsearch.*
+# pkgdown site (now outputs to pkgdown/ directory)
 pkgdown/
 
 # AI assistant rule files
