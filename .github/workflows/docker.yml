@@ -59,7 +59,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.target == 'production' && 'hetid' || 'hetid-dev' }}
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
           type=ref,event=branch
           type=ref,event=pr
@@ -67,6 +67,8 @@ jobs:
           type=semver,pattern={{major}}.{{minor}}
           type=sha,prefix={{branch}}-,enable={{is_default_branch}}
           type=sha,prefix=sha-,enable=${{ github.event_name == 'pull_request' }}
+        flavor: |
+          suffix=-${{ matrix.target }}
 
     - name: Build Docker image (non-development)
       if: matrix.target != 'development'
@@ -428,12 +430,14 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.REGISTRY }}/${{ github.repository_owner }}/${{ matrix.target == 'production' && 'hetid' || 'hetid-dev' }}
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
         tags: |
           type=ref,event=branch
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
           type=raw,value=latest,enable={{is_default_branch}}
+        flavor: |
+          suffix=${{ matrix.target == 'production' && '' || format('-{0}', matrix.target) }}
 
     - name: Build and push Docker image (non-development)
       if: matrix.target != 'development'
