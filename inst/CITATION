@@ -1,16 +1,41 @@
-citHeader("If you use this package, please cite:")
+citHeader("To cite hetid in publications use:")
+
+bibentry(
+  bibtype = "Manual",
+  title = "hetid: Identification Through Heteroskedasticity",
+  author = person("Fernando", "Duarte"),
+  year = "2025",
+  note = "R package version 0.1.0",
+  url = "https://github.com/fernando-duarte/heteroskedasticity_identification",
+  textVersion = paste(
+    "Duarte, Fernando (2025). hetid: Identification Through Heteroskedasticity.",
+    "R package version 0.1.0.",
+    "https://github.com/fernando-duarte/heteroskedasticity_identification"
+  )
+)
+
+citFooter("We have invested a lot of time and effort in creating hetid,",
+          "please cite it when using it for data analysis.",
+          "See also 'citation(\"hetid\")' for citing R packages.")
+
+# Reference to the original Lewbel paper
+citHeader("\nIf you use the Lewbel (2012) method, please also cite:")
 
 bibentry(
   bibtype = "Article",
-  entry    = "Article",
-  title    = "articleTitle",
-  author   = "author1, author2, author3",
-  journal  = "journalName",
-  year     = "publicationYear",
-  volume   = "volume",
-  number   = "number",
-  pages    = "pages",
-  url      = "linkToPublication",
-  textVersion = paste("author1, author2, author3 (publicationYear) articleTitle, *journalName*; volumeNumber, [linkToPublication](linkToPublication)"
+  title = "Using Heteroscedasticity to Identify and Estimate Mismeasured and Endogenous Regressor Models",
+  author = person("Arthur", "Lewbel"),
+  journal = "Journal of Business & Economic Statistics",
+  year = "2012",
+  volume = "30",
+  number = "1",
+  pages = "67--80",
+  doi = "10.1080/07350015.2012.643126",
+  url = "https://doi.org/10.1080/07350015.2012.643126",
+  textVersion = paste(
+    "Lewbel, Arthur (2012).",
+    "Using Heteroscedasticity to Identify and Estimate Mismeasured and Endogenous Regressor Models.",
+    "Journal of Business & Economic Statistics, 30(1), 67-80.",
+    "https://doi.org/10.1080/07350015.2012.643126"
   )
 )
