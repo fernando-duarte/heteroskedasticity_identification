@@ -350,7 +350,7 @@ jobs:
         severity: 'CRITICAL,HIGH'
 
     - name: Upload Trivy scan results
-      uses: github/codeql-action/upload-sarif@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
+      uses: github/codeql-action/upload-sarif@ce28f5bb42b7a9f2c824e633a3f6ee835bab6858 # v3.29.0
       if: always()
       with:
         sarif_file: 'trivy-results.sarif'
@@ -377,7 +377,7 @@ jobs:
         skip-dirs: '.git,node_modules,renv'
 
     - name: Upload Dockerfile scan results
-      uses: github/codeql-action/upload-sarif@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
+      uses: github/codeql-action/upload-sarif@ce28f5bb42b7a9f2c824e633a3f6ee835bab6858 # v3.29.0
       if: always()
       with:
         sarif_file: 'dockerfile-trivy-results.sarif'
@@ -393,7 +393,7 @@ jobs:
         severity: 'CRITICAL,HIGH,MEDIUM'
 
     - name: Upload workflow scan results
-      uses: github/codeql-action/upload-sarif@e2b3eafc8d227b0241d48be5f425d47c2d750a13 # v3.26.10
+      uses: github/codeql-action/upload-sarif@ce28f5bb42b7a9f2c824e633a3f6ee835bab6858 # v3.29.0
       if: always()
       with:
         sarif_file: 'workflow-trivy-results.sarif'
