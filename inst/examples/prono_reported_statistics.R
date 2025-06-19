@@ -1,0 +1,75 @@
+# Summary of statistics actually reported by Prono (2014)
+
+cat("=== STATISTICS REPORTED BY PRONO (2014) ===\n\n")
+
+cat("DATA DESCRIPTION:\n")
+cat("- Period: July 5, 1963 to December 31, 2004\n")
+cat("- Frequency: Weekly returns\n")
+cat("- Number of observations: 2,166\n")
+cat("- Data sources:\n")
+cat("  * CRSP value-weighted market return\n")
+cat("  * 25 Fama-French Size-B/M portfolios\n")
+cat("  * 30 Fama-French Industry portfolios\n")
+cat("  * 1-month Treasury bill rate\n\n")
+
+cat("SUMMARY STATISTICS REPORTED:\n")
+cat("1. Market excess return:\n")
+cat("   - Average weekly excess return: 0.097%\n")
+cat("   - Standard deviation: NOT REPORTED\n")
+cat("   - Other moments: NOT REPORTED\n\n")
+
+cat("2. Individual portfolios:\n")
+cat("   - Means: NOT REPORTED\n")
+cat("   - Standard deviations: NOT REPORTED\n")
+cat("   - Correlations: NOT REPORTED\n\n")
+
+cat("3. Fama-French factors (SMB, HML):\n")
+cat("   - Summary statistics: NOT REPORTED\n\n")
+
+cat("4. Risk-free rate:\n")
+cat("   - Average: NOT REPORTED\n")
+cat("   - Variation: NOT REPORTED\n\n")
+
+cat("WHAT PRONO DOES REPORT:\n")
+cat("- Monte Carlo simulation results (Table II)\n")
+cat("- Empirical estimation results (Tables VI-VII)\n")
+cat("- Focus on bias reduction, not data description\n\n")
+
+cat("=== ACTUAL DOWNLOADED DATA ===\n")
+cat("NONE - We attempted to download but frenchdata package not installed\n\n")
+
+cat("=== SIMULATED DATA MATCHING PRONO ===\n")
+cat("We created simulated data with:\n")
+cat("- Mean market excess return: 0.097% (matches Prono)\n")
+cat("- SD market returns: ~2% (typical for weekly equity)\n")
+cat("- GARCH effects present\n")
+cat("- Proper scale for asset pricing\n\n")
+
+cat("=== WHAT WE WOULD GET FROM FAMA-FRENCH ===\n")
+cat("If we successfully downloaded the data:\n\n")
+
+cat("1. Fama-French 3 Factors (weekly, 1963-2004):\n")
+cat("   - Mkt-RF: mean ~0.10-0.15%, SD ~2-2.5%\n")
+cat("   - SMB: mean ~0.03%, SD ~1.4%\n")
+cat("   - HML: mean ~0.09%, SD ~1.5%\n")
+cat("   - RF: mean ~0.096% (5% annual)\n\n")
+
+cat("2. 25 Size-B/M Portfolios (weekly):\n")
+cat("   Example corners:\n")
+cat("   - Small-Low: mean ~0.15%, SD ~4.5%\n")
+cat("   - Small-High: mean ~0.23%, SD ~3.7%\n")
+cat("   - Big-Low: mean ~0.10%, SD ~3.0%\n")
+cat("   - Big-High: mean ~0.18%, SD ~2.2%\n\n")
+
+cat("3. 30 Industry Portfolios (weekly):\n")
+cat("   Examples:\n")
+cat("   - Tech: mean ~0.15%, SD ~3.5%\n")
+cat("   - Utilities: mean ~0.10%, SD ~1.8%\n")
+cat("   - Average: mean ~0.12%, SD ~2.5%\n\n")
+
+cat("=== CONCLUSION ===\n")
+cat("Prono (2014) reports minimal summary statistics:\n")
+cat("- Only reports average market excess return (0.097%)\n")
+cat("- Does not report standard deviations\n")
+cat("- Does not report portfolio-level statistics\n")
+cat("- Focus is on methodology, not data description\n")

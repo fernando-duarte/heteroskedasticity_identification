@@ -60,17 +60,17 @@ result <- run_single_prono_simulation(config, return_details = TRUE)
 # Compare estimates
 cat("Estimation Results:\n")
 cat(sprintf("True gamma1:    %.4f\n", result$gamma1_true))
-cat(sprintf("OLS estimate:   %.4f (bias: %+.4f)\n", 
+cat(sprintf("OLS estimate:   %.4f (bias: %+.4f)\n",
             result$gamma1_ols, result$bias_ols))
-cat(sprintf("Prono estimate: %.4f (bias: %+.4f)\n", 
+cat(sprintf("Prono estimate: %.4f (bias: %+.4f)\n",
             result$gamma1_iv, result$bias_iv))
-cat(sprintf("Bias reduction: %.1f%%\n", 
+cat(sprintf("Bias reduction: %.1f%%\n",
             100 * (1 - abs(result$bias_iv)/abs(result$bias_ols))))
 
 ## ----monte-carlo, cache=TRUE--------------------------------------------------
 # Run 500 simulations
 mc_results <- run_prono_monte_carlo(
-  config, 
+  config,
   n_sims = 500,
   parallel = FALSE,
   progress = FALSE
@@ -81,7 +81,7 @@ summary_stats <- data.frame(
   Method = c("OLS", "Prono IV"),
   Mean_Bias = c(mean(mc_results$bias_ols), mean(mc_results$bias_iv)),
   SD_Bias = c(sd(mc_results$bias_ols), sd(mc_results$bias_iv)),
-  RMSE = c(sqrt(mean(mc_results$bias_ols^2)), 
+  RMSE = c(sqrt(mean(mc_results$bias_ols^2)),
            sqrt(mean(mc_results$bias_iv^2)))
 )
 
@@ -149,14 +149,14 @@ for (i in seq_along(alpha_values)) {
   config_temp <- config
   config_temp$garch_params$alpha <- alpha_values[i]
   config_temp$garch_params$beta <- 0.9 - alpha_values[i]  # Keep sum < 1
-  
+
   mc_temp <- run_prono_monte_carlo(
-    config_temp, 
+    config_temp,
     n_sims = 200,
     parallel = FALSE,
     progress = FALSE
   )
-  
+
   results_list[[i]] <- data.frame(
     alpha = alpha_values[i],
     mean_bias_ols = mean(mc_temp$bias_ols),
@@ -176,7 +176,7 @@ plot(sensitivity_results$alpha, abs(sensitivity_results$mean_bias_iv),
      main = "Bias vs GARCH Parameter")
 lines(sensitivity_results$alpha, abs(sensitivity_results$mean_bias_ols),
       type = "b", col = "red", pch = 17)
-legend("topright", c("Prono IV", "OLS"), 
+legend("topright", c("Prono IV", "OLS"),
        col = c("blue", "red"), pch = c(19, 17), lty = 1)
 
 plot(sensitivity_results$alpha, sensitivity_results$mean_f_stat,
@@ -194,14 +194,14 @@ n_results <- list()
 for (i in seq_along(n_values)) {
   config_n <- config
   config_n$n <- n_values[i]
-  
+
   mc_n <- run_prono_monte_carlo(
-    config_n, 
+    config_n,
     n_sims = 200,
     parallel = FALSE,
     progress = FALSE
   )
-  
+
   n_results[[i]] <- data.frame(
     n = n_values[i],
     bias_ols = mean(mc_n$bias_ols),
@@ -228,4 +228,3 @@ ggplot(n_sensitivity, aes(x = n)) +
 
 ## ----eval=FALSE---------------------------------------------------------------
 # install.packages("rugarch")
-

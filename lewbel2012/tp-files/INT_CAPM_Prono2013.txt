@@ -1,0 +1,74 @@
+clear all
+set rmsg on
+
+
+program define data
+/*input file-path to the data*/
+use " ", clear
+/*identifier for which excess return is being referenced*/
+loc i = 
+rename r`i' Y1
+rename rm Y2
+end
+
+
+program define bound
+loc k = 1
+loc t = tau
+tempname CRSS E2 R1 SQ
+reg Y1
+predict `R1', residuals
+reg Y2
+predict `E2', residuals
+gen `CRSS' = (`R1')*(`E2')
+gen `SQ' = (`E2')^2
+corr `SQ' l`k'.`SQ', c
+scalar g22`k' = r(cov_12)
+corr `CRSS' `SQ', c
+scalar g1220 = r(cov_12)
+corr `CRSS' l`k'.`SQ', c
+scalar g122`k' = r(cov_12)
+summ `CRSS', detail
+scalar v12 = r(Var)
+summ `SQ', detail
+scalar v22 = r(Var)
+tempname a b c r1 r2
+scalar `a' = 1 - ((`t')^2)
+scalar `b' = -2*(((g122`k')/(g22`k')) - ((`t')^2)*(g1220/v22))
+scalar `c' = (((g122`k')^2)/((g22`k')^2)) - ((`t')^2)*(v12/v22)
+scalar `r1' = (-`b'-sqrt(((`b')^2)-4*(`a')*(`c')))/(2*(`a'))
+scalar `r2' = (-`b'+sqrt(((`b')^2)-4*(`a')*(`c')))/(2*(`a'))
+if `r1' < `r2' {
+scalar lower_beta = `r1'
+scalar upper_beta = `r2'
+}
+else {
+scalar lower_beta = `r2'
+scalar upper_beta = `r1'
+}
+tempname b1 b2 coeff y
+gen `y' = Y1 - (lower_beta)*Y2
+reg `y'
+mat `coeff' = e(b)
+scalar `b1' = el(`coeff',1,1)
+replace `y' = Y1 - (upper_beta)*Y2
+reg `y'
+mat `coeff' = e(b)
+scalar `b2' = el(`coeff',1,1)
+if `b1' < `b2' {
+scalar lower_alpha = `b1'
+scalar upper_alpha = `b2'
+}
+else {
+scalar lower_alpha = `b2'
+scalar upper_alpha = `b1'
+}
+end
+
+/*specifies the value of tau used*/
+loc t = 
+scalar tau = `t'
+qui data
+qui bound
+scalar list lower_alpha upper_alpha
+scalar list lower_beta upper_beta

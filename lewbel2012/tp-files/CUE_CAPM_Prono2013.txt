@@ -1,0 +1,466 @@
+clear all
+set rmsg on
+
+
+program define CR
+loc i = port
+tempname a22 b22 prim sec
+arch rm, arch(1) garch(1)
+predict Em, residuals
+predict h22, variance
+mat `sec' = e(b)
+scalar delta = el(`sec',1,1)
+scalar `a22' = el(`sec',1,2)
+scalar `b22' = el(`sec',1,3)
+scalar c3 = sqrt(el(`sec',1,4))
+scalar p22 = `a22' + `b22'
+gen CF = Em/h22
+reg r`i' rm CF
+mat `prim' = e(b)
+scalar beta1 = el(`prim',1,3)
+scalar beta2 = el(`prim',1,1)
+gen E`i' = r`i' - (beta1) - (beta2)*rm
+end
+
+
+program define COV
+loc i = port
+tempname coeff c23 s12
+gen E`i'Em = E`i'*Em
+arima E`i'Em, ar(1) ma(1)
+mat `coeff' = e(b)
+scalar `s12' = el(`coeff',1,1)
+scalar p12 = el(`coeff',1,2)
+scalar `c23' = `s12'*(1 - p12)
+scalar c2 = `c23'/c3
+end
+
+
+program define vals
+loc i = port
+/*identifier for determining starting values; in nearly all cases, start = 1*/
+scalar start = 1
+qui CR
+qui COV
+if p12 < 0 | p12 > 1 | p22 > 1 {
+scalar start = 1
+}
+if start == 1 {
+tempname Em2 v12 v22
+/*specifies naive starting values for phi12 and phi22; p12 = 0.70 and p22 = 0.80 or p12 = 0.80 and p22 = 0.90 tend to produce highly comparable results*/
+scalar p12 = 0.70
+scalar p22 = 0.80
+gen `Em2' = (Em)^2
+summ `Em2', meanonly
+scalar `v22' = r(mean)
+scalar c3 = sqrt(`v22'*(1-p22))
+summ E`i'Em, meanonly
+scalar `v12' = r(mean)
+scalar c2 = (`v12'*(1 - p12))/c3
+}
+drop Em h22 CF E`i' E`i'Em
+rename r`i' Y1
+rename rm Y2
+end
+
+
+program define mom
+loc l = lags
+mat theta = c
+scalar beta1 = el(theta,1,1)
+scalar beta2 = el(theta,1,2)
+scalar delta = el(theta,1,3)
+scalar c2 = el(theta,1,4)
+scalar c3 = el(theta,1,5)
+scalar p12 = el(theta,1,6)
+scalar p22 = el(theta,1,7)
+
+scalar v2 = ((c2)*(c3))/(1 - p12)
+scalar v3 = ((c3)^2)/(1 - p22)
+
+gen double E1 = Y1 - (beta1) - (beta2)*Y2
+compress E1
+gen double E2 = Y2 - (delta)
+compress E2
+
+gen double g1 = E1
+compress g1
+gen double g2 = E2
+compress g2
+gen double g3 = (E1)*(E2) - v2
+compress g3
+gen double g4 = ((E2)^2) - v3
+compress g4
+
+forv i = 1(1)`l' {
+gen double cov22_`i' = (((E1)*(E2)) - v2)*(((l`i'.E1)*(l`i'.E2)) - v2)
+compress cov22_`i'
+gen double cov23_`i' = (((E1)*(E2)) - v2)*(((l`i'.E2)^2) - v3)
+compress cov23_`i'
+gen double cov32_`i' = (((E2)^2) - v3)*(((l`i'.E1)*(l`i'.E2)) - v2)
+compress cov32_`i'
+gen double cov33_`i' = (((E2)^2) - v3)*(((l`i'.E2)^2) - v3)
+compress cov33_`i'
+}
+
+forv i = 2(1)`l' {
+loc j = `i' + 3
+loc k = `i' - 1
+gen double g`j' = cov22_`i' - (p12)*cov22_`k'
+compress g`j'
+}
+forv i = 2(1)`l' {
+loc j = `i' + `l' + 2
+loc k = `i' - 1
+gen double g`j' = cov23_`i' - (p12)*cov23_`k'
+compress g`j'
+}
+forv i = 2(1)`l' {
+loc j = `i' + 2*(`l') + 1
+loc k = `i' - 1
+gen double g`j' = cov32_`i' - (p22)*cov32_`k'
+compress g`j'
+}
+forvalues i = 2(1)`l' {
+loc j = `i' + 3*(`l')
+loc k = `i' - 1
+gen double g`j' = cov33_`i' - (p22)*cov33_`k'
+compress g`j'
+}
+
+forv i = 1(1)`l' {
+drop cov22_`i' cov23_`i' cov32_`i' cov33_`i'
+}
+end
+
+
+program define formg
+mom
+loc l = lags
+loc t = count
+loc u = `t' - 1
+forv i = 1(1)`t' {
+summ g`i' if DATE > `l', meanonly
+scalar meang`i' = r(mean)
+drop g`i'
+}
+drop E1 E2
+loc x
+forv i = 1(1)`u' {
+loc x `"`x' meang`i'\"'
+}
+loc x `"`x' meang`t'"'
+mat g = (`x')
+end
+
+
+program define formgd
+scalar dh = 1e-6
+loc t = 7
+loc u = `t' - 1
+mat e = I(`t')
+forv i = 1(1)`t' {
+mat e`i' = e[`i'..`i',1...]
+}
+mat c0 = c
+loc i = 1
+while `i'<=`t' {
+mat c = c0 + e`i'*dh 
+formg
+mat gplus`i' = g
+mat c = c0 - e`i'*dh
+formg
+mat gminus`i' = g
+mat gd`i' = ((gplus`i' - gminus`i')/(2*dh))
+loc i = `i'+1
+}
+loc x
+forv i = 1(1)`u' {
+loc x `"`x' gd`i',"'
+}
+loc x `"`x' gd`t'"'
+mat gd = (`x')
+mat c = c0
+scalar dh = 0
+mat c0 = 0
+forv i = 1(1)`t' {
+mat drop  e`i'
+}
+mat drop e
+end
+
+
+program define formgwgd
+scalar dh = 1e-6
+loc t = 7
+loc u = `t' - 1
+mat e = I(`t')
+forv i = 1(1)`t' {
+mat e`i' = e[`i'..`i',1...]
+}
+mat c0 = c
+loc i = 1
+while `i'<=`t' {
+mat c = c0 + e`i'*dh 
+formg
+optw
+mat gwgplus`i' = g'*w*g
+mat c = c0 - e`i'*dh
+formg
+optw
+mat gwgminus`i' = g'*w*g
+mat gwgd`i' = ((gwgplus`i' - gwgminus`i')/(2*dh))
+loc i = `i'+1
+}
+loc x
+forv i = 1(1)`u' {
+loc x `"`x' gwgd`i',"'
+}
+loc x `"`x' gwgd`t'"'
+mat direc = (`x')
+mat c = c0
+scalar dh = 0
+mat c0 = 0
+forv i = 1(1)`t' {
+mat drop  e`i'
+}
+mat drop e
+end
+
+
+program define optstp
+scalar stp = 0.01
+mat coeff0 = c
+scalar fcn0 = obj
+scalar try = stp
+mat c = coeff - try*direc
+formg
+optw
+mat matobj1 = g'*w*g
+scalar fcn1 = trace(matobj1)
+if fcn1>=fcn0 {
+half
+}
+else {
+scalar chang = fcn0 - fcn1
+while chang >= 0 {
+scalar fcn0 = fcn1
+scalar stp = try
+scalar try = try*2.0
+mat c = coeff - try*direc
+formg
+optw
+mat matobj1 = g'*w*g
+scalar fcn1 = trace(matobj1)
+scalar chang = fcn0 - fcn1
+}
+mat c = coeff0
+mat coeff0 = 0
+scalar fcn0 = 0
+scalar try = 0
+scalar fcn1 = 0
+scalar chang = 0
+}
+end
+
+
+program define half
+loc iters = 0
+while fcn1>fcn0 & `iters'< 10 {
+scalar try = try*0.5
+mat c = coeff - try*direc
+formg
+optw
+mat matobj1 = g'*w*g
+scalar fcn1 = trace(matobj1)
+loc iters = `iters' + 1
+}
+if fcn1>=fcn0 {
+scalar stp = 0
+}
+else {
+scalar stp = try
+}
+mat c = coeff0
+scalar try = 0
+scalar fcn0 = 0
+scalar fcn1 = 0
+end
+
+
+program define formw1
+loc T = _N - lags
+loc t = count
+loc u = u
+loc x
+forv j = 1(1)`t' {
+loc x`"`x' g`j'"'
+}
+forv k = 1(1)`t' {
+mat veca r`k' = g`k' `x', noc
+}
+loc y
+forv l = 1(1)`u' {
+loc y `"`y' r`l'\"'
+}
+loc y `"`y' r`t'"'
+mat C = (`y')*(1/`T')
+mat w0 = inv(C)
+mat w = (1/2)*(w0+w0')
+forv i = 1(1)`t' {
+mat drop r`i'
+drop g`i'
+}
+end
+
+
+program define formw2
+loc T = _N - lags
+loc t = count
+loc u = u
+loc v = v
+loc x
+forv i = 1(1)`t' {
+loc x`"`x' g`i'"'
+}
+forv i = 1(1)`t' {
+mat veca r`i' = g`i' `x', noc
+}
+loc y
+forv i = 1(1)`u' {
+loc y `"`y' r`i'\"'
+}
+loc y `"`y' r`t'"'
+mat S = (`y')*(1/`T')
+forv i = 1(1)`t' {
+gen gg`i' = 0
+}
+loc k = `v' + 1
+forv i = 1(1)`v' {
+scalar w`i' = 1 - (`i'/(`k'))
+loc z
+forv j = 1(1)`t' {
+replace gg`j' = g`j'[_n-`i']
+loc z`"`z' gg`j'"'
+}
+forv l = 1(1)`t' {
+mat veca r`l' = g`l' `z', noc
+}
+loc a
+forv m = 1(1)`u' {
+loc a `"`a' r`m'\"'
+}
+loc a `"`a' r`t'"'
+mat N = (`a')*(1/`T')
+mat O`i' = w`i'*(N + N')
+mat S = S + O`i'
+}
+mat w = inv(S)
+forv i = 1(1)`t' {
+mat drop r`i'
+drop g`i' gg`i'
+}
+end
+
+
+program define optw
+mom
+scalar u = count - 1
+scalar v = 1
+if v==0 {
+formw1
+}
+if v>0 {
+formw2
+}
+scalar drop u v
+drop E1 E2
+end
+
+
+program define step1
+/*input file path to data*/
+use " ", clear
+/*identifier for which excess return is being referenced*/
+scalar port = 
+vals
+/*number of lags to use in estimation*/
+scalar lags = 12
+scalar obs = _N - lags
+scalar count = 4*(lags)
+loc x
+loc x `"`x' beta1, beta2, delta,"'
+forv i = 2(1)3 {
+loc x `"`x' c`i',"'
+}
+loc x `"`x' p12, p22"'
+mat coeff = (`x')
+scalar para = colsof(coeff)
+scalar obj = 1000
+scalar tol = 1e-7
+scalar maxit = 1000
+scalar noconv = maxit
+scalar delob = 1
+
+loc iter = 1
+while delob>tol & `iter'<= noconv {
+scalar oldobj = obj
+scalar stp = 0
+mat c = coeff
+formgwgd
+formg
+optw
+mat matobj = g'*w*g
+scalar obj = trace(matobj)
+optstp
+mat coeff = coeff - direc*stp
+mat c = coeff
+formg
+optw
+mat matobj = g'*w*g
+scalar obj = trace(matobj)
+scalar delob = abs(obj - oldobj)
+loc iter = `iter' + 1
+}
+end
+
+
+program define sig
+loc T = _N - lags
+loc t = 7
+qui formgd
+mat var = inv(gd'*w*gd)
+forv i = 1(1)`t' {
+scalar stderror`i' = sqrt((1/`T')*el(var,`i',`i'))
+}
+
+qui formg
+mat jstat = (`T')*(g'*w*g)
+scalar Jstat = trace(jstat)
+scalar df = count - para
+scalar prob = chi2tail(df,Jstat)
+
+scalar beta1 = el(theta,1,1)
+scalar beta2 = el(theta,1,2)
+scalar delta = el(theta,1,3)
+scalar c2 = el(theta,1,4)
+scalar c3 = el(theta,1,5)
+scalar p12 = el(theta,1,6)
+scalar p22 = el(theta,1,7)
+di "beta1 = " beta1 " stderror = " stderror1  " low = " beta1-(invnorm(0.975))*stderror1 " up = " beta1+(invnorm(0.975))*stderror1
+di "beta2 = " beta2 " stderror = " stderror2  " low = " beta2-(invnorm(0.975))*stderror2 " up = " beta2+(invnorm(0.975))*stderror2
+di "delta = " delta " stderror = " stderror3 " low = " delta-(invnorm(0.975))*stderror3 " up = " delta+(invnorm(0.975))*stderror3
+di "c2 = " c2 " stderror = " stderror4 " low = " c2-(invnorm(0.975))*stderror4 " up = " c2+(invnorm(0.975))*stderror4
+di "c3 = " c3 " stderror = " stderror5 " low = " c3-(invnorm(0.975))*stderror5 " up = " c3+(invnorm(0.975))*stderror5
+di "p12 = " p12 " stderror = " stderror6 " low = " p12-(invnorm(0.975))*stderror6 " up = " p12+(invnorm(0.975))*stderror6
+di "p22 = " p22 " stderror = " stderror7 " low = " p22-(invnorm(0.975))*stderror7 " up = " p22+(invnorm(0.975))*stderror7
+scalar list Jstat prob
+end
+
+
+program define optimize
+qui step1
+sig
+end
+
+optimize

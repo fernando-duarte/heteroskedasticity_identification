@@ -135,13 +135,13 @@ result <- run_single_prono_simulation(config, return_details = TRUE)
 # Compare estimates
 cat("Estimation Results:\n")
 cat(sprintf("True beta:      %.4f\n", result$gamma1_true))
-cat(sprintf("OLS estimate:   %.4f (bias: %+.4f)\n", 
+cat(sprintf("OLS estimate:   %.4f (bias: %+.4f)\n",
             result$gamma1_ols, result$bias_ols))
-cat(sprintf("Prono estimate: %.4f (bias: %+.4f)\n", 
+cat(sprintf("Prono estimate: %.4f (bias: %+.4f)\n",
             result$gamma1_iv, result$bias_iv))
-cat(sprintf("Bias reduction: %.1f%%\n", 
+cat(sprintf("Bias reduction: %.1f%%\n",
             100 * (1 - abs(result$bias_iv)/abs(result$bias_ols))))
-cat(sprintf("\nData check - Y2 mean: %.3f%% (target: 0.097%%)\n", 
+cat(sprintf("\nData check - Y2 mean: %.3f%% (target: 0.097%%)\n",
             mean(result$data$Y2)))
 ```
 
@@ -152,7 +152,7 @@ To assess the method's performance, let's run a Monte Carlo simulation:
 ```{r monte-carlo, cache=TRUE}
 # Run 500 simulations
 mc_results <- run_prono_monte_carlo(
-  config, 
+  config,
   n_sims = 500,
   parallel = FALSE,
   progress = FALSE
@@ -163,7 +163,7 @@ summary_stats <- data.frame(
   Method = c("OLS", "Prono IV"),
   Mean_Bias = c(mean(mc_results$bias_ols), mean(mc_results$bias_iv)),
   SD_Bias = c(sd(mc_results$bias_ols), sd(mc_results$bias_iv)),
-  RMSE = c(sqrt(mean(mc_results$bias_ols^2)), 
+  RMSE = c(sqrt(mean(mc_results$bias_ols^2)),
            sqrt(mean(mc_results$bias_iv^2)))
 )
 
@@ -246,14 +246,14 @@ for (i in seq_along(alpha_values)) {
   config_temp <- config
   config_temp$garch_params$alpha <- alpha_values[i]
   config_temp$garch_params$beta <- 0.9 - alpha_values[i]  # Keep sum < 1
-  
+
   mc_temp <- run_prono_monte_carlo(
-    config_temp, 
+    config_temp,
     n_sims = 200,
     parallel = FALSE,
     progress = FALSE
   )
-  
+
   results_list[[i]] <- data.frame(
     alpha = alpha_values[i],
     mean_bias_ols = mean(mc_temp$bias_ols),
@@ -273,7 +273,7 @@ plot(sensitivity_results$alpha, abs(sensitivity_results$mean_bias_iv),
      main = "Bias vs GARCH Parameter")
 lines(sensitivity_results$alpha, abs(sensitivity_results$mean_bias_ols),
       type = "b", col = "red", pch = 17)
-legend("topright", c("Prono IV", "OLS"), 
+legend("topright", c("Prono IV", "OLS"),
        col = c("blue", "red"), pch = c(19, 17), lty = 1)
 
 plot(sensitivity_results$alpha, sensitivity_results$mean_f_stat,
@@ -294,14 +294,14 @@ n_results <- list()
 for (i in seq_along(n_values)) {
   config_n <- config
   config_n$n <- n_values[i]
-  
+
   mc_n <- run_prono_monte_carlo(
-    config_n, 
+    config_n,
     n_sims = 200,
     parallel = FALSE,
     progress = FALSE
   )
-  
+
   n_results[[i]] <- data.frame(
     n = n_values[i],
     bias_ols = mean(mc_n$bias_ols),
@@ -397,17 +397,17 @@ prono_params <- list(
   beta1_0 = 1,    # Intercept in first equation
   beta2 = 1,      # Coefficient on Y2
   delta = 1,      # Intercept in second equation
-  
+
   # GARCH parameters from Table I, Case 1
   garch_params = list(
     omega = 0.1,
     alpha = 0.1,   # Paper uses α₁₁ = α₁₂ = 0.10
     beta = 0.7     # Paper uses β₁₂,₁₀ = β₂₂,₂₀ = 0.70
   ),
-  
+
   # Sample size (paper uses 1000 after dropping 200)
   n = 1000,
-  
+
   # Other parameters
   sigma1 = 1,
   seed = 42
@@ -415,19 +415,19 @@ prono_params <- list(
 
 # Function to run Prono replication with specified correlation
 run_prono_replication <- function(rho, n_sims = 1000) {
-  
+
   results <- vector("list", n_sims)
-  
+
   # Progress bar for long simulation
   pb <- txtProgressBar(min = 0, max = n_sims, style = 3)
-  
+
   for (i in 1:n_sims) {
     # Create config for this simulation
     config <- create_prono_config(
       n = prono_params$n,
       k = 1,  # At least one X variable needed
       beta1 = c(prono_params$beta1_0, 0),  # Intercept + 0 for X
-      beta2 = c(prono_params$delta, 0),     # Intercept + 0 for X  
+      beta2 = c(prono_params$delta, 0),     # Intercept + 0 for X
       gamma1 = prono_params$beta2,    # This is β₂ in paper
       garch_params = prono_params$garch_params,
       sigma1 = prono_params$sigma1,
@@ -435,7 +435,7 @@ run_prono_replication <- function(rho, n_sims = 1000) {
       seed = prono_params$seed + i,
       verbose = FALSE
     )
-    
+
     # Run single simulation
     tryCatch({
       sim_result <- run_single_prono_simulation(config)
@@ -449,24 +449,24 @@ run_prono_replication <- function(rho, n_sims = 1000) {
     }, error = function(e) {
       results[[i]] <- NULL
     })
-    
+
     setTxtProgressBar(pb, i)
   }
   close(pb)
-  
+
   # Combine results
   results_df <- do.call(rbind, Filter(Negate(is.null), results))
-  
+
   # Calculate summary statistics matching paper's Table II
   summary_stats <- data.frame(
     Method = c("OLS", "Prono CUE"),
     Mean_Bias = c(mean(results_df$ols_bias), mean(results_df$prono_bias)),
     Median_Bias = c(median(results_df$ols_bias), median(results_df$prono_bias)),
     SD = c(sd(results_df$ols_beta2), sd(results_df$prono_beta2)),
-    RMSE = c(sqrt(mean(results_df$ols_bias^2)), 
+    RMSE = c(sqrt(mean(results_df$ols_bias^2)),
              sqrt(mean(results_df$prono_bias^2)))
   )
-  
+
   list(results = results_df, summary = summary_stats)
 }
 
@@ -547,7 +547,7 @@ p_fstats <- ggplot(f_stats_data, aes(x = F_stat, fill = Correlation)) +
        x = "F-statistic",
        y = "Count") +
   theme_minimal() +
-  scale_fill_manual(values = c("Low (ρ = 0.20)" = "#3498DB", 
+  scale_fill_manual(values = c("Low (ρ = 0.20)" = "#3498DB",
                                "High (ρ = 0.40)" = "#E74C3C"))
 
 print(p_fstats)
@@ -599,17 +599,17 @@ ff3_factors <- download_french_data("Fama/French 3 Factors")
 # Download 25 Size-B/M portfolios
 ff25_portfolios <- download_french_data("25 Portfolios Formed on Size and Book-to-Market")
 
-# Download 30 Industry portfolios  
+# Download 30 Industry portfolios
 ff30_industries <- download_french_data("30 Industry Portfolios")
 
 # Alternative using FFdownload package
 library(FFdownload)
 tempf <- tempfile(fileext = ".RData")
-inputlist <- c("F-F_Research_Data_Factors", 
+inputlist <- c("F-F_Research_Data_Factors",
                "25_Portfolios_5x5",
                "30_Industry_Portfolios")
-FFdownload(output_file = tempf, 
-           inputlist = inputlist, 
+FFdownload(output_file = tempf,
+           inputlist = inputlist,
            exclude_daily = FALSE)  # We want weekly data
 ```
 
@@ -669,19 +669,19 @@ sp500 <- tq_get("^GSPC",
 
 # Assume we have weekly portfolio returns and factors
 prepare_prono_data <- function(portfolio_returns, market_factor, rf_rate) {
-  
+
   # Merge all data by date
   data <- portfolio_returns %>%
     left_join(market_factor, by = "date") %>%
     left_join(rf_rate, by = "date")
-  
+
   # Calculate excess returns
   data <- data %>%
     mutate(
       portfolio_excess = portfolio_return - rf,
       market_excess = mkt_return - rf
     )
-  
+
   # Structure for Prono's model: Y1 = portfolio excess return, Y2 = market excess return
   prono_data <- data %>%
     select(
@@ -690,7 +690,7 @@ prepare_prono_data <- function(portfolio_returns, market_factor, rf_rate) {
       Y2 = market_excess
     ) %>%
     na.omit()
-  
+
   return(prono_data)
 }
 ```
@@ -702,13 +702,13 @@ prepare_prono_data <- function(portfolio_returns, market_factor, rf_rate) {
 run_prono_asset_pricing <- function(data, window_size = 260) {
   # window_size: number of weeks for estimation (260 = 5 years)
   # Assumes data contains Y1 and Y2 as percent returns
-  
+
   results <- list()
-  
+
   # Rolling window estimation
   for (i in window_size:nrow(data)) {
     window_data <- data[(i - window_size + 1):i, ]
-    
+
     # Create Prono configuration for percent returns
     config <- create_prono_config(
       n = nrow(window_data),
@@ -718,19 +718,19 @@ run_prono_asset_pricing <- function(data, window_size = 260) {
       gamma1 = 1,  # Initial guess for beta
       verbose = FALSE
     )
-    
+
     # Generate data in Prono format
     prono_df <- data.frame(
       Y1 = window_data$Y1,
       Y2 = window_data$Y2,
       time = 1:nrow(window_data)
     )
-    
+
     # Estimate using Prono method
     tryCatch({
       # First get residuals for GARCH estimation
       e2 <- residuals(lm(Y2 ~ 1, data = prono_df))
-      
+
       # Fit GARCH if rugarch available
       if (requireNamespace("rugarch", quietly = TRUE)) {
         spec <- rugarch::ugarchspec(
@@ -738,12 +738,12 @@ run_prono_asset_pricing <- function(data, window_size = 260) {
           mean.model = list(armaOrder = c(0, 0), include.mean = FALSE)
         )
         garch_fit <- rugarch::ugarchfit(spec = spec, data = e2)
-        
+
         # Continue with Prono estimation...
       }
     }, error = function(e) NULL)
   }
-  
+
   return(results)
 }
 ```

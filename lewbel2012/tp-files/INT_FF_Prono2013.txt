@@ -1,0 +1,96 @@
+clear all
+set rmsg on
+
+
+program define data
+/*input file-path to the data*/
+use " ", clear
+/*identifier for which excess return is being referenced*/
+loc i = 
+rename r`i' Y1
+rename rm Y2
+end
+
+
+program define bound
+loc k = 1
+loc t = tau
+tempname CRSS E2 R1 SQ
+reg Y1 smb hml
+predict `R1', residuals
+reg Y2 smb hml
+predict `E2', residuals
+gen `CRSS' = (`R1')*(`E2')
+gen `SQ' = (`E2')^2
+corr `SQ' l`k'.`SQ', c
+scalar g22`k' = r(cov_12)
+corr `CRSS' `SQ', c
+scalar g1220 = r(cov_12)
+corr `CRSS' l`k'.`SQ', c
+scalar g122`k' = r(cov_12)
+summ `CRSS', detail
+scalar v12 = r(Var)
+summ `SQ', detail
+scalar v22 = r(Var)
+tempname a b c r1 r2
+scalar `a' = 1 - ((`t')^2)
+scalar `b' = -2*(((g122`k')/(g22`k')) - ((`t')^2)*(g1220/v22))
+scalar `c' = (((g122`k')^2)/((g22`k')^2)) - ((`t')^2)*(v12/v22)
+scalar `r1' = (-`b'-sqrt(((`b')^2)-4*(`a')*(`c')))/(2*(`a'))
+scalar `r2' = (-`b'+sqrt(((`b')^2)-4*(`a')*(`c')))/(2*(`a'))
+if `r1' < `r2' {
+scalar lower_mkt = `r1'
+scalar upper_mkt = `r2'
+}
+else {
+scalar lower_mkt = `r2'
+scalar upper_mkt = `r1'
+}
+tempname a1 a2 b1 b2 b3 b4 coeff y
+gen `y' = Y1 - (lower_mkt)*Y2
+reg `y' smb hml
+mat `coeff' = e(b)
+scalar `b1' = el(`coeff',1,1)
+scalar `b2' = el(`coeff',1,2)
+scalar `a1' = el(`coeff',1,3)
+replace `y' = Y1 - (upper_mkt)*Y2
+reg `y' smb hml
+mat `coeff' = e(b)
+scalar `b3' = el(`coeff',1,1)
+scalar `b4' = el(`coeff',1,2)
+scalar `a2' = el(`coeff',1,3)
+if `b1' < `b3' {
+scalar lower_smb = `b1'
+scalar upper_smb = `b3'
+}
+else {
+scalar lower_smb = `b3'
+scalar upper_smb = `b1'
+}
+if `b2' < `b4' {
+scalar lower_hml = `b2'
+scalar upper_hml = `b4'
+}
+else {
+scalar lower_hml = `b4'
+scalar upper_hml = `b2'
+}
+if `a1' < `a2' {
+scalar lower_alpha = `a1'
+scalar upper_alpha = `a2'
+}
+else {
+scalar lower_alpha = `a2'
+scalar upper_alpha = `a1'
+}
+end
+
+/*specifies the value of tau used*/
+loc t = 
+scalar tau = `t'
+qui data
+qui bound
+scalar list lower_alpha upper_alpha
+scalar list lower_mkt upper_mkt
+scalar list lower_smb upper_smb
+scalar list lower_hml upper_hml
