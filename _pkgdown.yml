@@ -10,6 +10,8 @@ home:
   description: >
     Implements the identification through heteroskedasticity method
     of Lewbel (2012) for time-series models with endogenous regressors.
+  sidebar:
+    poster: "inst/hex/hex.png"
 
 authors:
   Fernando Duarte:
