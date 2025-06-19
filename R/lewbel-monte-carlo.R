@@ -253,3 +253,166 @@ run_lewbel_demo <- function(num_simulations = 100, verbose = TRUE) {
     verbose = verbose
   )
 }
+
+#' Run Rigobon (2003) Identification Demo
+#'
+#' Demonstrates Rigobon's regime-based heteroskedasticity identification
+#' method with example data and analysis.
+#'
+#' @param n_obs Integer. Sample size (default: 1000).
+#' @param n_regimes Integer. Number of regimes (default: 2).
+#' @param verbose Logical. Whether to print detailed output (default: TRUE).
+#'
+#' @return A list containing:
+#'   \itemize{
+#'     \item data: Generated data
+#'     \item params: True parameters used
+#'     \item results: Estimation results
+#'     \item comparison: Comparison of OLS vs Rigobon estimates
+#'   }
+#'
+#' @examples
+#' \dontrun{
+#' # Basic two-regime demo
+#' demo <- run_rigobon_demo()
+#'
+#' # Three-regime example with larger sample
+#' demo_3reg <- run_rigobon_demo(n_obs = 2000, n_regimes = 3)
+#'
+#' # Silent demo
+#' demo_quiet <- run_rigobon_demo(verbose = FALSE)
+#' }
+#'
+#' @export
+run_rigobon_demo <- function(n_obs = 1000, n_regimes = 2, verbose = TRUE) {
+
+  if (verbose) {
+    cat("\n========================================\n")
+    cat("RIGOBON (2003) IDENTIFICATION DEMO\n")
+    cat("========================================\n\n")
+    cat("Demonstrating identification through regime-based heteroskedasticity\n")
+    cat(sprintf("Sample size: %d, Number of regimes: %d\n\n", n_obs, n_regimes))
+  }
+
+  # Set up parameters based on number of regimes
+  if (n_regimes == 2) {
+    regime_probs <- c(0.4, 0.6)
+    sigma2_regimes <- c(1.0, 2.5)  # Variance 2.5x higher in regime 2
+    regime_labels <- c("Low Volatility", "High Volatility")
+  } else if (n_regimes == 3) {
+    regime_probs <- c(0.3, 0.4, 0.3)
+    sigma2_regimes <- c(0.5, 1.0, 2.0)  # Increasing variance across regimes
+    regime_labels <- c("Low Vol", "Medium Vol", "High Vol")
+  } else {
+    # General case
+    regime_probs <- rep(1 / n_regimes, n_regimes)
+    sigma2_regimes <- seq(0.5, 2.5, length.out = n_regimes)
+    regime_labels <- paste("Regime", seq_len(n_regimes))
+  }
+
+  # True parameters
+  params <- list(
+    beta1_0 = 0.5,
+    beta1_1 = 1.5,
+    gamma1 = -0.8,  # True endogenous parameter
+    beta2_0 = 1.0,
+    beta2_1 = -1.0,
+    alpha1 = -0.5,
+    alpha2 = 1.0,
+    regime_probs = regime_probs,
+    sigma2_regimes = sigma2_regimes
+  )
+
+  if (verbose) {
+    cat("True Parameters:\n")
+    cat(sprintf("  gamma1 (endogenous parameter): %.2f\n", params$gamma1))
+    cat("\nRegime Structure:\n")
+    for (i in seq_len(n_regimes)) {
+      cat(sprintf("  %s: %.1f%% of obs, variance multiplier = %.2f\n",
+                  regime_labels[i],
+                  100 * regime_probs[i],
+                  sigma2_regimes[i]))
+    }
+    cat("\n")
+  }
+
+  # Generate data
+  set.seed(42)  # For reproducibility
+  data <- generate_rigobon_data(n_obs, params)
+
+  # Run estimation
+  results <- run_rigobon_estimation(data, return_diagnostics = TRUE)
+
+  if (verbose) {
+    cat("Estimation Results:\n")
+    cat("==================\n\n")
+
+    # OLS results
+    cat("OLS (biased):\n")
+    cat(sprintf("  Estimate: %.4f (true: %.4f)\n",
+                results$ols$estimates["gamma1"], params$gamma1))
+    cat(sprintf("  Std Error: %.4f\n", results$ols$se["gamma1"]))
+    cat(sprintf("  Bias: %.4f\n\n",
+                results$ols$estimates["gamma1"] - params$gamma1))
+
+    # Rigobon 2SLS results
+    cat("Rigobon 2SLS:\n")
+    cat(sprintf("  Estimate: %.4f (true: %.4f)\n",
+                results$tsls$estimates["gamma1"], params$gamma1))
+    cat(sprintf("  Std Error: %.4f\n", results$tsls$se["gamma1"]))
+    cat(sprintf("  Bias: %.4f\n\n",
+                results$tsls$estimates["gamma1"] - params$gamma1))
+
+    # First-stage strength
+    cat("First-Stage F-statistics:\n")
+    for (i in seq_len(n_regimes)) {
+      cat(sprintf("  %s: F = %.2f\n",
+                  regime_labels[i],
+                  results$first_stage_F[i]))
+    }
+
+    # Heteroskedasticity test
+    cat(sprintf("\nHeteroskedasticity Test:\n"))
+    cat(sprintf("  F-stat: %.2f, p-value: %.4f\n",
+                results$heteroskedasticity_test$F_stat,
+                results$heteroskedasticity_test$p_value))
+    cat(sprintf("  %s\n", results$heteroskedasticity_test$interpretation))
+
+        # Efficiency comparison
+    if (!is.na(results$ols$se["gamma1"]) && !is.na(results$tsls$se["gamma1"])) {
+      efficiency_gain <- (results$ols$se["gamma1"] / results$tsls$se["gamma1"])^2
+      cat(sprintf("\nRelative efficiency (OLS/Rigobon variance): %.2f\n",
+                  efficiency_gain))
+
+      if (efficiency_gain < 1) {
+        cat("  (Rigobon estimator is more efficient than OLS)\n")
+      }
+    } else {
+      cat("\nRelative efficiency: Cannot compute (NA values)\n")
+    }
+  }
+
+  # Create comparison data frame
+  comparison <- data.frame(
+    Method = c("OLS", "Rigobon 2SLS"),
+    Estimate = c(results$ols$estimates["gamma1"],
+                 results$tsls$estimates["gamma1"]),
+    StdError = c(results$ols$se["gamma1"],
+                 results$tsls$se["gamma1"]),
+    Bias = c(results$ols$estimates["gamma1"] - params$gamma1,
+             results$tsls$estimates["gamma1"] - params$gamma1),
+    RMSE = c(sqrt((results$ols$estimates["gamma1"] - params$gamma1)^2 +
+                   results$ols$se["gamma1"]^2),
+             sqrt((results$tsls$estimates["gamma1"] - params$gamma1)^2 +
+                   results$tsls$se["gamma1"]^2))
+  )
+
+  # Return results
+  invisible(list(
+    data = data,
+    params = params,
+    results = results,
+    comparison = comparison,
+    regime_labels = regime_labels
+  ))
+}

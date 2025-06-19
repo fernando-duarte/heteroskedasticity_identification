@@ -11,9 +11,10 @@
 
 ## Overview
 
-The `hetid` package implements the identification through heteroskedasticity method of Lewbel (2012) for time-series models with endogenous regressors. It provides tools for estimation and inference:
+The `hetid` package implements identification through heteroskedasticity methods for models with endogenous regressors. It provides tools for estimation and inference using:
 
-- **Complete implementation** of Lewbel (2012) methodology
+- **Lewbel (2012)**: Identification using continuous heteroskedasticity drivers
+- **Rigobon (2003)**: Identification using discrete regime indicators
 - **Set identification** when point identification hypotheses are not met
 - **Comparison tools** with other implementations (REndo, Stata)
 - **Monte Carlo validation** of theoretical results
@@ -84,15 +85,20 @@ config <- create_default_config()
 data <- generate_lewbel_data(100, config)
 result <- run_single_lewbel_simulation(1, config)
 ```
+
+The package also implements **Rigobon (2003)** regime-based identification. See the [Rigobon Guide](dev-guides/RIGOBON.md) for detailed usage.
+
 ## Guides
 
 **[Development](dev-guides/DEVELOPMENT.md)**.
 **[Usage](dev-guides/USAGE.md)**.
 **[Troubleshooting](dev-guides/TROUBLESHOOTING.md)**.
+**[Rigobon Method](dev-guides/RIGOBON.md)**.
 
 ## References
 
 - Lewbel, A. (2012). Using heteroscedasticity to identify and estimate mismeasured and endogenous regressor models. *Journal of Business & Economic Statistics*, 30(1), 67-80.
+- Rigobon, R. (2003). Identification through heteroskedasticity. *The Review of Economics and Statistics*, 85(4), 777-792.
 
 ## License
 

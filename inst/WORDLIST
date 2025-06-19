@@ -21,9 +21,12 @@ autoupdate
 availableCores
 bbrowser
 bc
+bartlett
 behaviour
 biocViews
+Bloomberg
 browseURL
+Breusch
 BugReports
 build'
 buildkit
@@ -57,6 +60,7 @@ conditionMessage
 cov
 Cov
 covr
+cv
 cran
 CRAN
 CRAN's
@@ -96,7 +100,9 @@ ec
 econometric
 eddelbuettel
 edu
+EMBI
 endog
+eq
 endogeneity
 endogenous
 engel
@@ -113,12 +119,14 @@ fallbacks
 fernando
 Fernando
 fileext
+FirstStageF
 fmwww
 fontface
 foodshare
 FP
 fstatistic
 furrr
+fs
 gc
 GCP
 GDAL
@@ -177,6 +185,8 @@ isTRUE
 ivreg
 ivregress
 jq
+JPMorgan
+JPMorgan's
 json
 jsonlite
 kable
@@ -238,7 +248,13 @@ nchar
 ncol
 nComparing
 nCorrelation
+nDemo
+nEstimation
 neq
+nExample
+nFirst
+nHeteroskedasticity
+nInstrument
 neurogenomics
 nExported
 nFinite
@@ -253,7 +269,10 @@ NONINFRINGEMENT
 nOr
 NOTEs
 nOutput
+nOverall
 nPlease
+nRegime
+nRelative
 nResults
 nrow
 nRunning
@@ -265,7 +284,9 @@ nStarting
 nTest
 nTesting
 nTo
+nTrue
 num
+nWARNING
 nWeak
 nWith
 nYou
@@ -310,6 +331,7 @@ pre-commit
 prebuild
 precommit
 prev
+probs
 PROJ
 PRs
 purrr
@@ -330,9 +352,11 @@ readLines
 README
 rect
 refactoring
+Refinitiv
 regexec
 regmatches
 regressors
+RelativeBias
 rendo
 REndo
 REndo's
@@ -344,6 +368,10 @@ resaveRdaFiles
 resid
 reusability
 Rhistory
+rigobon
+Rigobon
+RIGOBON
+Rigobon's
 rlang
 rmarkdown
 rmd
@@ -364,7 +392,9 @@ RtmpgejkIS
 runif
 rvest
 rworkflows
+Salomon
 sandboxed
+sapply
 sargan
 Sargan
 SARIF
@@ -385,6 +415,7 @@ SHA
 sls
 SLS
 SLSA
+SMPBASE
 Sonatype's
 sprintf
 ssc
@@ -395,6 +426,7 @@ Stata
 Stata's
 StataMP
 StataSE
+StdError
 stderr
 steelblue
 stockwatson
@@ -439,6 +471,7 @@ trailingOnly
 Trivy
 tryCatch
 tsls
+TrueValue
 TypeScript
 ubuntu
 uk

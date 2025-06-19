@@ -31,6 +31,8 @@ navbar:
       menu:
       - text: Getting Started
         href: articles/getting-started.html
+      - text: Rigobon (2003) Method
+        href: articles/rigobon-method.html
       - text: Comparing Lewbel (2012) Implementations
         href: articles/package-comparison.html
     github:
@@ -70,6 +72,25 @@ reference:
   - run_sensitivity_analysis
   - run_bootstrap_demonstration
   - create_default_config
+
+- title: "Rigobon (2003) Method"
+  desc: "Functions for regime-based heteroskedasticity identification"
+  contents:
+  - generate_rigobon_data
+  - run_rigobon_analysis
+  - run_rigobon_estimation
+  - run_rigobon_demo
+  - validate_rigobon_assumptions
+  - compare_rigobon_methods
+
+- title: "Prono (2014) Method"
+  desc: "Functions for GARCH-based heteroskedasticity identification"
+  contents:
+  - generate_prono_data
+  - run_single_prono_simulation
+  - run_prono_monte_carlo
+  - run_prono_demo
+  - create_prono_config
 
 - title: "Analysis"
   desc: "Functions for analyzing simulation results"

@@ -434,3 +434,210 @@ run_single_lewbel_simulation <- function(sim_id,
     }
   )
 }
+
+#' Run Rigobon (2003) Regime-Based Estimation
+#'
+#' Implements Rigobon's heteroskedasticity-based identification using discrete
+#' regime indicators. This is a wrapper around the Lewbel estimation framework
+#' that automatically constructs instruments from regime dummies.
+#'
+#' @param data Data.frame. Must contain Y1, Y2, X variables, and regime indicator.
+#' @param endog_var Character. Name of endogenous variable (default: "Y2").
+#' @param exog_vars Character vector. Names of exogenous variables (default: "Xk").
+#' @param regime_var Character. Name of regime indicator variable (default: "regime").
+#' @param df_adjust Character. Degrees of freedom adjustment: "asymptotic" or "finite" (default: "asymptotic").
+#' @param return_diagnostics Logical. Whether to return additional diagnostic information (default: FALSE).
+#'
+#' @return If return_diagnostics = FALSE: A list with:
+#'   \itemize{
+#'     \item ols: OLS estimates and standard errors
+#'     \item tsls: 2SLS estimates and standard errors using Rigobon instruments
+#'     \item first_stage_F: Vector of F-statistics for each instrument
+#'   }
+#'   If return_diagnostics = TRUE: Additionally returns:
+#'   \itemize{
+#'     \item instruments: Matrix of generated instruments
+#'     \item regime_props: Proportion of observations in each regime
+#'     \item heteroskedasticity_test: Test for regime-based heteroskedasticity
+#'   }
+#'
+#' @details
+#' The function:
+#' 1. Creates centered dummy variables for each regime
+#' 2. Estimates first-stage residuals
+#' 3. Constructs instruments as (centered regime dummy) × (first-stage residual)
+#' 4. Performs 2SLS estimation using all regime-based instruments
+#'
+#' This implements the procedure described in Rigobon (2003) for identification
+#' through heteroskedasticity across discrete regimes.
+#'
+#' @examples
+#' \dontrun{
+#' # Generate Rigobon-style data
+#' params <- list(
+#'   beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
+#'   beta2_0 = 1.0, beta2_1 = -1.0,
+#'   alpha1 = -0.5, alpha2 = 1.0,
+#'   regime_probs = c(0.4, 0.6),
+#'   sigma2_regimes = c(1.0, 2.5)
+#' )
+#' data <- generate_rigobon_data(1000, params)
+#'
+#' # Run Rigobon estimation
+#' results <- run_rigobon_estimation(data)
+#' print(results$tsls$estimates)
+#'
+#' # With diagnostics
+#' results_diag <- run_rigobon_estimation(data, return_diagnostics = TRUE)
+#' print(results_diag$heteroskedasticity_test)
+#' }
+#'
+#' @export
+run_rigobon_estimation <- function(data,
+                                   endog_var = "Y2",
+                                   exog_vars = "Xk",
+                                   regime_var = "regime",
+                                   df_adjust = "asymptotic",
+                                   return_diagnostics = FALSE) {
+
+  # Validate inputs
+  required_vars <- c("Y1", endog_var, exog_vars, regime_var)
+  if (!all(required_vars %in% names(data))) {
+    missing <- setdiff(required_vars, names(data))
+    stop(paste("Missing required variables:", paste(missing, collapse = ", ")))
+  }
+
+  # Get unique regimes
+  regimes <- sort(unique(data[[regime_var]]))
+  n_regimes <- length(regimes)
+
+  if (n_regimes < 2) {
+    stop("Need at least 2 regimes for Rigobon identification")
+  }
+
+  # Calculate regime proportions
+  regime_props <- table(data[[regime_var]]) / nrow(data)
+
+  # Step 1: First-stage regression to get residuals
+  y2_formula <- stats::as.formula(paste(
+    endog_var, "~", paste(exog_vars, collapse = " + ")
+  ))
+  first_stage <- stats::lm(y2_formula, data = data)
+  e2_hat <- stats::residuals(first_stage)
+
+  # Step 2: Create centered regime dummies and instruments
+  Z_names <- paste0("Z_regime_", regimes)
+  IV_names <- paste0("IV_regime_", regimes)
+
+  # Create regime dummies if not already in data
+  for (s in regimes) {
+    # Check if Z variable already exists (from generate_rigobon_data)
+    z_name <- paste0("Z", which(regimes == s))
+    if (z_name %in% names(data)) {
+      # Use existing centered dummy
+      data[[Z_names[which(regimes == s)]]] <- data[[z_name]]
+    } else {
+      # Create and center dummy
+      dummy <- as.numeric(data[[regime_var]] == s)
+      data[[Z_names[which(regimes == s)]]] <- dummy - mean(dummy)
+    }
+
+    # Create instrument: Z_s × e2_hat
+    data[[IV_names[which(regimes == s)]]] <- data[[Z_names[which(regimes == s)]]] * e2_hat
+  }
+
+  # Step 3: OLS estimation for comparison
+  y1_formula <- stats::as.formula(paste(
+    "Y1 ~", endog_var, "+", paste(exog_vars, collapse = " + ")
+  ))
+  ols_model <- stats::lm(y1_formula, data = data)
+
+  ols_est <- stats::coef(ols_model)[endog_var]
+  all_se_ols <- extract_se_lm(ols_model, df_adjust = df_adjust)
+  ols_se <- all_se_ols[endog_var]
+
+  # Step 4: 2SLS estimation with all regime instruments
+  iv_formula <- stats::as.formula(paste(
+    "Y1 ~", endog_var, "+", paste(exog_vars, collapse = " + "),
+    "|", paste(exog_vars, collapse = " + "), "+",
+    paste(IV_names, collapse = " + ")
+  ))
+
+  tsls_model <- tryCatch({
+    if (requireNamespace("ivreg", quietly = TRUE)) {
+      ivreg::ivreg(iv_formula, data = data)
+    } else if (requireNamespace("AER", quietly = TRUE)) {
+      AER::ivreg(iv_formula, data = data)
+    } else {
+      stop("Neither ivreg nor AER package is available for IV regression")
+    }
+  }, error = function(e) {
+    stop(paste("IV regression failed:", e$message))
+  })
+
+  tsls_est <- stats::coef(tsls_model)[endog_var]
+  all_se_tsls <- extract_se_ivreg(tsls_model, df_adjust = df_adjust)
+  tsls_se <- all_se_tsls[endog_var]
+
+  # Step 5: First-stage F-statistics for each instrument
+  first_stage_F <- numeric(n_regimes)
+  for (i in seq_len(n_regimes)) {
+    fs_formula <- stats::as.formula(paste(
+      endog_var, "~", paste(exog_vars, collapse = " + "), "+", IV_names[i]
+    ))
+    fs_model <- stats::lm(fs_formula, data = data)
+    first_stage_F[i] <- summary(fs_model)$fstatistic[1]
+  }
+  names(first_stage_F) <- paste0("F_regime_", regimes)
+
+  # Prepare basic results
+  # Create named vectors with "gamma1" for consistency
+  ols_results <- setNames(ols_est, "gamma1")
+  ols_se_results <- setNames(ols_se, "gamma1")
+  tsls_results <- setNames(tsls_est, "gamma1")
+  tsls_se_results <- setNames(tsls_se, "gamma1")
+
+  results <- list(
+    ols = list(
+      estimates = ols_results,
+      se = ols_se_results,
+      model = ols_model
+    ),
+    tsls = list(
+      estimates = tsls_results,
+      se = tsls_se_results,
+      model = tsls_model
+    ),
+    first_stage_F = first_stage_F
+  )
+
+  # Add diagnostics if requested
+  if (return_diagnostics) {
+    # Extract instrument matrix
+    instruments <- as.matrix(data[, IV_names, drop = FALSE])
+
+    # Test for heteroskedasticity across regimes
+    # Breusch-Pagan type test: regress e2^2 on regime dummies
+    data$e2_sq <- e2_hat^2
+    het_formula <- stats::as.formula(paste(
+      "e2_sq ~", paste(Z_names[-1], collapse = " + ")  # Exclude one for collinearity
+    ))
+    het_test <- stats::lm(het_formula, data = data)
+    het_f_stat <- summary(het_test)$fstatistic
+    het_p_value <- 1 - stats::pf(het_f_stat[1], het_f_stat[2], het_f_stat[3])
+
+    results$instruments <- instruments
+    results$regime_props <- regime_props
+    results$heteroskedasticity_test <- list(
+      F_stat = het_f_stat[1],
+      p_value = het_p_value,
+      interpretation = ifelse(
+        het_p_value < 0.05,
+        "Significant heteroskedasticity across regimes (good for identification)",
+        "No significant heteroskedasticity across regimes (weak identification)"
+      )
+    )
+  }
+
+  results
+}

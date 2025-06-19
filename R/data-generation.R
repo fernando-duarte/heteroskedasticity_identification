@@ -241,3 +241,164 @@ verify_lewbel_assumptions <- function(data = NULL, config = NULL,
 
   invisible(results)
 }
+
+#' Generate Data for Rigobon (2003) Regime-Based Model
+#'
+#' Creates a dataset based on the triangular model with regime-specific
+#' heteroskedasticity following Rigobon (2003). This is a special case of
+#' Lewbel's method where heteroskedasticity drivers are discrete regime indicators.
+#'
+#' @param n_obs Integer. Sample size.
+#' @param params List. Parameters for the data generating process containing:
+#'   \itemize{
+#'     \item beta1_0, beta1_1: Parameters for first equation
+#'     \item beta2_0, beta2_1: Parameters for second equation
+#'     \item gamma1: Endogenous parameter (key parameter of interest)
+#'     \item alpha1, alpha2: Factor loadings for common factor U
+#'     \item regime_probs: Vector of regime probabilities (must sum to 1)
+#'     \item sigma2_regimes: Vector of variance multipliers for each regime
+#'       (length must match regime_probs)
+#'   }
+#' @param n_x Integer. Number of exogenous X variables to generate (default: 1).
+#'
+#' @return A data.frame with columns Y1, Y2, epsilon1, epsilon2, regime, and:
+#'   \itemize{
+#'     \item If n_x = 1: Xk, plus Z1, Z2, ... (one centered dummy per regime)
+#'     \item If n_x > 1: X1, X2, ..., plus Z1, Z2, ... (one centered dummy per regime)
+#'   }
+#'
+#' @details
+#' The triangular model is:
+#' \deqn{Y_1 = \beta_{1,0} + \beta_{1,1}X + \gamma_1 Y_2 + \epsilon_1}
+#' \deqn{Y_2 = \beta_{2,0} + \beta_{2,1}X + \epsilon_2}
+#'
+#' The error structure follows Rigobon's regime heteroskedasticity:
+#' \deqn{\epsilon_1 = \alpha_1 U + V_1}
+#' \deqn{\epsilon_2 = \alpha_2 U + V_2}
+#'
+#' where V_2 has variance that depends on the regime:
+#' \deqn{Var(V_2|regime = s) = \sigma^2_{2,s}}
+#'
+#' @examples
+#' \dontrun{
+#' # Two-regime example (e.g., pre/post policy change)
+#' params <- list(
+#'   beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
+#'   beta2_0 = 1.0, beta2_1 = -1.0,
+#'   alpha1 = -0.5, alpha2 = 1.0,
+#'   regime_probs = c(0.4, 0.6),  # 40% in regime 1, 60% in regime 2
+#'   sigma2_regimes = c(1.0, 2.5)  # Variance is 2.5x higher in regime 2
+#' )
+#' data <- generate_rigobon_data(1000, params)
+#'
+#' # Three-regime example
+#' params_3reg <- list(
+#'   beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
+#'   beta2_0 = 1.0, beta2_1 = -1.0,
+#'   alpha1 = -0.5, alpha2 = 1.0,
+#'   regime_probs = c(0.3, 0.4, 0.3),
+#'   sigma2_regimes = c(0.5, 1.0, 2.0)
+#' )
+#' data_3reg <- generate_rigobon_data(1000, params_3reg)
+#' }
+#'
+#' @export
+generate_rigobon_data <- function(n_obs, params, n_x = 1) {
+  # Validate regime parameters
+  if (!("regime_probs" %in% names(params)) || !("sigma2_regimes" %in% names(params))) {
+    stop("params must contain 'regime_probs' and 'sigma2_regimes'")
+  }
+
+  n_regimes <- length(params$regime_probs)
+  if (length(params$sigma2_regimes) != n_regimes) {
+    stop("Length of sigma2_regimes must match length of regime_probs")
+  }
+
+  if (abs(sum(params$regime_probs) - 1) > 1e-10) {
+    stop("regime_probs must sum to 1")
+  }
+
+  # Validate parameters for multiple X
+  if (n_x > 1) {
+    if (length(params$beta1_1) != n_x || length(params$beta2_1) != n_x) {
+      stop("For n_x > 1, beta1_1 and beta2_1 must be vectors of length n_x")
+    }
+  } else {
+    # Ensure scalar parameters are treated as length-1 vectors
+    if (length(params$beta1_1) == 1) {
+      params$beta1_1 <- as.numeric(params$beta1_1)
+    }
+    if (length(params$beta2_1) == 1) {
+      params$beta2_1 <- as.numeric(params$beta2_1)
+    }
+  }
+
+  # Generate regime assignments
+  regime <- sample(seq_len(n_regimes), n_obs, replace = TRUE, prob = params$regime_probs)
+
+  # Generate exogenous variables
+  # nolint start: object_name_linter.
+  X_mat <- matrix(
+    stats::rnorm(
+      n_obs * n_x,
+      mean = hetid_const("DEFAULT_X_MEAN"),
+      sd = hetid_const("DEFAULT_X_SD")
+    ),
+    nrow = n_obs, ncol = n_x
+  )
+
+  # Create regime dummy variables and center them
+  Z_mat <- matrix(0, nrow = n_obs, ncol = n_regimes)
+  for (s in seq_len(n_regimes)) {
+    # Create dummy
+    Z_mat[, s] <- as.numeric(regime == s)
+    # Center it: Z_s = D_s - p_s
+    Z_mat[, s] <- Z_mat[, s] - mean(Z_mat[, s])
+  }
+
+  # Generate mutually independent error components
+  U <- stats::rnorm(n_obs)
+  V1 <- stats::rnorm(n_obs)
+
+  # Generate V2 with regime-specific variance
+  V2 <- numeric(n_obs)
+  for (s in seq_len(n_regimes)) {
+    regime_mask <- regime == s
+    n_regime <- sum(regime_mask)
+    if (n_regime > 0) {
+      V2[regime_mask] <- stats::rnorm(n_regime) * sqrt(params$sigma2_regimes[s])
+    }
+  }
+
+  # Construct structural errors using single-factor model
+  epsilon1 <- params$alpha1 * U + V1
+  epsilon2 <- params$alpha2 * U + V2
+
+  # Generate endogenous variables using all X variables
+  Y2 <- params$beta2_0 + as.vector(X_mat %*% params$beta2_1) + epsilon2
+  Y1 <- params$beta1_0 + as.vector(X_mat %*% params$beta1_1) +
+    params$gamma1 * Y2 + epsilon1
+
+  # Create output data frame
+  result_df <- data.frame(
+    Y1 = Y1, Y2 = Y2, epsilon1 = epsilon1, epsilon2 = epsilon2,
+    regime = regime
+  )
+
+  # Add X variables with appropriate names
+  if (n_x == 1) {
+    result_df$Xk <- X_mat[, 1]
+  } else {
+    for (j in 1:n_x) {
+      result_df[[paste0("X", j)]] <- X_mat[, j]
+    }
+  }
+
+  # Add centered regime dummies as Z variables
+  for (s in seq_len(n_regimes)) {
+    result_df[[paste0("Z", s)]] <- Z_mat[, s]
+  }
+  # nolint end
+
+  result_df
+}
