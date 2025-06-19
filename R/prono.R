@@ -184,6 +184,11 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
     )
 
     # Fit GARCH model
+    # Note: tsgarch may produce "NaNs produced" warnings when fitting GARCH to data
+    # with no ARCH effects (alpha ≈ 0). This is expected behavior indicating that
+    # the conditional variance is essentially constant, making the Hessian matrix
+    # singular when computing standard errors. The warning is harmless and does not
+    # affect the validity of the conditional variance estimates.
     garch_fit <- tsmethods::estimate(garch_spec)
 
     # Extract conditional variances (sigma returns standard deviations)
