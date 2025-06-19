@@ -1,0 +1,275 @@
+---
+title: "GMM Estimation for Lewbel (2012) Heteroskedasticity-Based Identification"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GMM Estimation for Lewbel (2012) Heteroskedasticity-Based Identification}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(hetid)
+library(gmm)
+```
+
+## Introduction
+
+This vignette demonstrates how to use the GMM (Generalized Method of Moments) implementation for Lewbel's (2012) heteroskedasticity-based identification method. The GMM approach offers several advantages over traditional 2SLS:
+
+- **Efficiency**: GMM provides optimal weighting of moment conditions
+- **Flexibility**: Supports both triangular and simultaneous equation systems
+- **Robustness**: Multiple variance-covariance matrix specifications available
+
+## Basic Usage
+
+### Triangular System
+
+The triangular system is the most common case:
+
+$$Y_1 = X'\beta_1 + \gamma_1 Y_2 + \epsilon_1$$
+$$Y_2 = X'\beta_2 + \epsilon_2$$
+
+```{r triangular-example}
+# Generate example data
+set.seed(123)
+n <- 1000
+params <- list(
+  beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
+  beta2_0 = 1.0, beta2_1 = -1.0,
+  alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
+)
+
+data <- generate_lewbel_data(n, params)
+
+# Estimate using GMM
+gmm_result <- lewbel_gmm(data, system = "triangular")
+summary(gmm_result)
+```
+
+### Simultaneous System
+
+For systems with bidirectional causality:
+
+$$Y_1 = X'\beta_1 + \gamma_1 Y_2 + \epsilon_1$$
+$$Y_2 = X'\beta_2 + \gamma_2 Y_1 + \epsilon_2$$
+
+Note: Requires $\gamma_1 \gamma_2 \neq 1$ for identification.
+
+```{r simultaneous-example}
+# Generate data with multiple X variables
+n_sim <- 1000
+data_sim <- data.frame(
+  X1 = rnorm(n_sim),
+  X2 = rnorm(n_sim),
+  X3 = rnorm(n_sim)
+)
+
+# Create endogenous variables
+gamma1_true <- -0.6
+gamma2_true <- 0.3
+beta1 <- c(0.5, 1.0, -0.5, 0.8)
+beta2 <- c(1.0, -0.5, 1.2, -0.3)
+
+# Generate with heteroskedasticity
+u1 <- rnorm(n_sim) * exp(0.5 * data_sim$X1)
+u2 <- rnorm(n_sim) * exp(-0.5 * data_sim$X1)
+
+# Solve system
+X_mat <- as.matrix(cbind(1, data_sim[, c("X1", "X2", "X3")]))
+Gamma <- matrix(c(0, gamma1_true, gamma2_true, 0), 2, 2)
+Beta <- cbind(beta1, beta2)
+U <- cbind(u1, u2)
+
+I_minus_Gamma_inv <- solve(diag(2) - Gamma)
+Y <- (X_mat %*% Beta + U) %*% t(I_minus_Gamma_inv)
+
+data_sim$Y1 <- Y[, 1]
+data_sim$Y2 <- Y[, 2]
+
+# Estimate
+gmm_sim <- lewbel_gmm(
+  data_sim,
+  system = "simultaneous",
+  y1_var = "Y1",
+  y2_var = "Y2",
+  x_vars = c("X1", "X2", "X3")
+)
+
+print(gmm_sim)
+```
+
+## GMM Types
+
+Three types of GMM estimators are available:
+
+### Two-Step GMM (Default)
+
+Fast and reliable for most applications:
+
+```{r twostep}
+gmm_twostep <- lewbel_gmm(data, gmm_type = "twostep")
+```
+
+### Iterative GMM
+
+May improve finite sample properties:
+
+```{r iterative}
+gmm_iter <- lewbel_gmm(data, gmm_type = "iterative")
+```
+
+### Continuous Updating Estimator (CUE)
+
+Theoretically optimal but computationally intensive:
+
+```{r cue}
+gmm_cue <- lewbel_gmm(data, gmm_type = "cue")
+```
+
+## Custom Heteroskedasticity Drivers
+
+By default, centered X variables are used as heteroskedasticity drivers (Z). You can specify custom Z variables:
+
+```{r custom-z}
+# Add custom Z variables
+data$Z1 <- data$Xk^2
+data$Z2 <- abs(data$Xk)
+
+# Estimate with custom Z
+gmm_custom <- lewbel_gmm(
+  data,
+  z_vars = c("Z1", "Z2")
+)
+
+coef(gmm_custom)["gamma1"]
+```
+
+## Variance-Covariance Options
+
+### HAC (Default)
+
+Heteroskedasticity and Autocorrelation Consistent:
+
+```{r hac}
+gmm_hac <- lewbel_gmm(data, vcov = "HAC")
+```
+
+### IID
+
+Assumes independent and identically distributed errors:
+
+```{r iid}
+gmm_iid <- lewbel_gmm(data, vcov = "iid")
+```
+
+### Clustered
+
+For grouped data:
+
+```{r cluster, eval=FALSE}
+# Add cluster variable
+data$cluster <- rep(1:10, each = n/10)
+
+gmm_cluster <- lewbel_gmm(
+  data,
+  vcov = "cluster",
+  cluster_var = "cluster"
+)
+```
+
+## Comparing GMM with 2SLS
+
+The package provides a convenience function to compare GMM and 2SLS estimates:
+
+```{r compare}
+comparison <- compare_gmm_2sls(data)
+print(comparison)
+```
+
+## Diagnostics
+
+### J-Test for Overidentifying Restrictions
+
+The J-test checks the validity of moment conditions:
+
+```{r j-test}
+j_test <- gmm_result$test
+cat("J-statistic:", j_test$test[1], "\n")
+cat("p-value:", j_test$test[2], "\n")
+cat("Degrees of freedom:", j_test$df, "\n")
+```
+
+### First-Stage Strength
+
+Check instrument relevance:
+
+```{r first-stage}
+# Manually construct Lewbel instruments
+e2_hat <- residuals(lm(Y2 ~ Xk, data = data))
+z_centered <- scale(data$Xk, center = TRUE, scale = FALSE)
+lewbel_iv <- z_centered * e2_hat
+
+# First-stage regression
+first_stage <- lm(Y2 ~ Xk + lewbel_iv, data = data)
+f_stat <- summary(first_stage)$fstatistic[1]
+cat("First-stage F-statistic:", round(f_stat, 2), "\n")
+```
+
+## Bootstrap Inference
+
+For small samples, bootstrap inference may be preferred:
+
+```{r bootstrap}
+library(boot)
+
+# Bootstrap function
+boot_gmm <- function(data, indices) {
+  d <- data[indices, ]
+  gmm_boot <- lewbel_gmm(d, system = "triangular")
+  return(coef(gmm_boot)["gamma1"])
+}
+
+# Run bootstrap
+set.seed(123)
+boot_results <- boot(data, boot_gmm, R = 100)
+
+# Confidence interval
+boot_ci <- boot.ci(boot_results, type = "perc")
+print(boot_ci)
+```
+
+## Recommendations
+
+1. **Choice of GMM Type**:
+   - Use two-step GMM for most applications
+   - Consider iterative GMM for small samples
+   - Use CUE when optimal efficiency is crucial
+
+2. **Heteroskedasticity Drivers**:
+   - Default (centered X) works well in most cases
+   - Custom Z variables can improve efficiency if theory suggests specific drivers
+
+3. **Variance-Covariance Matrix**:
+   - Use HAC (default) for time series or when autocorrelation is suspected
+   - Use IID only when errors are truly independent
+   - Use clustered for grouped data
+
+4. **Sample Size**:
+   - GMM performs well with n > 500
+   - Consider bootstrap for n < 500
+   - Check first-stage F-statistic for weak instruments
+
+5. **Model Selection**:
+   - Use triangular system unless bidirectional causality is theoretically justified
+   - For simultaneous systems, ensure identification condition holds
+
+## References
+
+Lewbel, A. (2012). Using heteroscedasticity to identify and estimate mismeasured and endogenous regressor models. Journal of Business & Economic Statistics, 30(1), 67-80.

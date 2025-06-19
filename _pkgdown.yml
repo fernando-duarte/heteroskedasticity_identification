@@ -31,8 +31,12 @@ navbar:
       menu:
       - text: Getting Started
         href: articles/getting-started.html
+      - text: GMM Estimation with Lewbel (2012)
+        href: articles/lewbel-gmm.html
       - text: Rigobon (2003) Method
         href: articles/rigobon-method.html
+      - text: Prono (2014) Method
+        href: articles/prono-method.html
       - text: Comparing Lewbel (2012) Implementations
         href: articles/package-comparison.html
     github:
@@ -60,6 +64,21 @@ reference:
   contents:
   - calculate_lewbel_bounds
   - run_single_lewbel_simulation
+
+- title: "GMM (Generalized Method of Moments)"
+  desc: "GMM estimation for heteroskedasticity-based identification methods"
+  contents:
+  - lewbel_gmm
+  - lewbel_triangular_moments
+  - lewbel_simultaneous_moments
+  - rigobon_gmm
+  - rigobon_triangular_moments
+  - rigobon_simultaneous_moments
+  - prono_gmm
+  - prono_triangular_moments
+  - compare_gmm_2sls
+  - print.lewbel_gmm
+  - summary.lewbel_gmm
 
 - title: "Monte Carlo Simulations"
   desc: "Functions for running Monte Carlo experiments"

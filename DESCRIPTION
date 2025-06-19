@@ -24,6 +24,8 @@ Imports:
     furrr,
     future,
     ggplot2,
+    gmm,
+    parallel,
     purrr,
     rlang,
     stats,
@@ -46,6 +48,8 @@ Suggests:
     RStata,
     rugarch,
     testthat (>= 3.0.0),
+    tsgarch,
+    tsmarch,
     uuid,
     withr
 VignetteBuilder:
