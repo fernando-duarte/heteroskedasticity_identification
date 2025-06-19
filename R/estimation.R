@@ -30,6 +30,8 @@
 #'       (if requested)
 #'   }
 #'
+#' @template references-lewbel
+#'
 #' @examples
 #' \dontrun{
 #' params <- list(
@@ -146,6 +148,10 @@ calculate_lewbel_bounds <- function(data,
 #'     \item models: A list with ols_model, first_stage_model, tsls_model
 #'     \item data: The generated data
 #'   }
+#'
+#' @template references-lewbel
+#'
+#' @seealso \code{\link{calculate_lewbel_bounds}} for set identification
 #'
 #' @examples
 #' \dontrun{
@@ -465,11 +471,15 @@ run_single_lewbel_simulation <- function(sim_id,
 #' The function:
 #' 1. Creates centered dummy variables for each regime
 #' 2. Estimates first-stage residuals
-#' 3. Constructs instruments as (centered regime dummy) × (first-stage residual)
+#' 3. Constructs instruments as (centered regime dummy) * (first-stage residual)
 #' 4. Performs 2SLS estimation using all regime-based instruments
 #'
 #' This implements the procedure described in Rigobon (2003) for identification
 #' through heteroskedasticity across discrete regimes.
+#'
+#' @template references-rigobon
+#'
+#' @seealso \code{\link{generate_rigobon_data}} for generating regime-based data
 #'
 #' @examples
 #' \dontrun{
@@ -542,7 +552,7 @@ run_rigobon_estimation <- function(data,
       data[[z_names[which(regimes == s)]]] <- dummy - mean(dummy)
     }
 
-    # Create instrument: Z_s × e2_hat
+    # Create instrument: Z_s * e2_hat
     data[[iv_names[which(regimes == s)]]] <- data[[z_names[which(regimes == s)]]] * e2_hat
   }
 

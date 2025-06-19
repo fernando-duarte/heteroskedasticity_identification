@@ -60,6 +60,10 @@
 #' results <- run_rigobon_analysis(data = my_data, regime_var = "period")
 #' }
 #'
+#' @template references-rigobon
+#'
+#' @seealso \code{\link{generate_rigobon_data}}, \code{\link{run_rigobon_estimation}}, \code{\link{validate_rigobon_assumptions}}
+#'
 #' @export
 run_rigobon_analysis <- function(n_obs = 1000,
                                  params = NULL,
@@ -143,7 +147,7 @@ run_rigobon_analysis <- function(n_obs = 1000,
   # Step 4: Prepare diagnostics summary
   diagnostics <- list(
     heteroskedasticity_test = estimation_results$heteroskedasticity_test,
-    first_stage_F = estimation_results$first_stage_F,
+    first_stage_F = estimation_results$first_stage_f_stats,
     regime_proportions = estimation_results$regime_props,
     n_regimes = length(estimation_results$regime_props)
   )
@@ -156,7 +160,7 @@ run_rigobon_analysis <- function(n_obs = 1000,
     print(estimates_df, row.names = FALSE)
 
     cat("\nFirst-Stage F-Statistics:\n")
-    print(estimation_results$first_stage_F)
+    print(estimation_results$first_stage_f_stats)
 
     cat("\nHeteroskedasticity Test:\n")
     cat(sprintf("  F-statistic: %.2f\n", diagnostics$heteroskedasticity_test$F_stat))
@@ -169,7 +173,7 @@ run_rigobon_analysis <- function(n_obs = 1000,
     print(regime_table)
 
     # Instrument strength assessment
-    avg_f <- mean(estimation_results$first_stage_F)
+    avg_f <- mean(estimation_results$first_stage_f_stats)
     if (avg_f < 10) {
       cat("\nWARNING: Average first-stage F =", round(avg_f, 2),
           "< 10 (weak instruments)\n")
@@ -238,6 +242,8 @@ run_rigobon_analysis <- function(n_obs = 1000,
 #' # Validate assumptions
 #' validation <- validate_rigobon_assumptions(data)
 #' }
+#'
+#' @template references-rigobon
 #'
 #' @export
 validate_rigobon_assumptions <- function(data,
@@ -403,6 +409,10 @@ validate_rigobon_assumptions <- function(data,
 #' comparison <- compare_rigobon_methods(data, true_gamma1 = params$gamma1)
 #' }
 #'
+#' @template references-rigobon
+#'
+#' @seealso \code{\link{run_rigobon_estimation}}, \code{\link{run_single_lewbel_simulation}}
+#'
 #' @export
 compare_rigobon_methods <- function(data,
                                     true_gamma1 = NULL,
@@ -427,7 +437,7 @@ compare_rigobon_methods <- function(data,
     results$Rigobon <- list(
       estimate = as.numeric(rigobon_results$tsls$estimates["gamma1"]),
       se = as.numeric(rigobon_results$tsls$se["gamma1"]),
-      first_stage_F = mean(rigobon_results$first_stage_F),
+      first_stage_F = mean(rigobon_results$first_stage_f_stats),
       method_info = sprintf("Rigobon 2SLS (%d regimes)",
                             length(rigobon_results$regime_props))
     )

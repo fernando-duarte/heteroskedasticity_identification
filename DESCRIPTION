@@ -29,7 +29,9 @@ Imports:
     purrr,
     rlang,
     stats,
-    tidyr
+    tidyr,
+    tsmethods,
+    xts
 Suggests:
     AER,
     covr,
@@ -46,7 +48,6 @@ Suggests:
     REndo (>= 2.4.0),
     rmarkdown,
     RStata,
-    rugarch,
     testthat (>= 3.0.0),
     tsgarch,
     tsmarch,

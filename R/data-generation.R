@@ -33,6 +33,11 @@
 #'   - If n_x = 1: Xk, Z
 #'   - If n_x > 1: X1, X2, ..., Z1, Z2, ... (one Z per X)
 #'
+#' @template references-lewbel
+#'
+#' @seealso \code{\link{verify_lewbel_assumptions}} for testing the assumptions,
+#'   \code{\link{run_single_lewbel_simulation}} for using this data in simulations
+#'
 #' @examples
 #' \dontrun{
 #' # Single X variable (backward compatible)
@@ -168,6 +173,10 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
 #'
 #' @return Invisibly returns a list with verification results and data.
 #'
+#' @template references-lewbel
+#'
+#' @seealso \code{\link{generate_lewbel_data}} for generating data that meets assumptions
+#'
 #' @examples
 #' \dontrun{
 #' config <- create_default_config()
@@ -278,6 +287,10 @@ verify_lewbel_assumptions <- function(data = NULL, config = NULL,
 #'
 #' where V_2 has variance that depends on the regime:
 #' \deqn{Var(V_2|regime = s) = \sigma^2_{2,s}}
+#'
+#' @template references-rigobon
+#'
+#' @seealso \code{\link{generate_lewbel_data}} for continuous heteroskedasticity drivers
 #'
 #' @examples
 #' \dontrun{

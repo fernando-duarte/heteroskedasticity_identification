@@ -3,7 +3,7 @@
 cat("=== CHECKING REQUIRED PACKAGES ===\n\n")
 
 required_packages <- list(
-  rugarch = "GARCH modeling (essential for Prono method)",
+  tsgarch = "GARCH modeling (essential for Prono method)",
   ivreg = "Instrumental variables regression",
   AER = "Alternative IV package",
   gmm = "Generalized Method of Moments",
@@ -39,10 +39,10 @@ if (length(missing) > 0) {
 
 # Check if we can at least run basic Prono without all packages
 cat("\n\n=== MINIMAL REQUIREMENTS CHECK ===\n")
-if ("rugarch" %in% installed) {
+if ("tsgarch" %in% installed) {
   cat("✓ Can run basic Prono method with univariate GARCH\n")
 } else {
-  cat("✗ Cannot run Prono method without rugarch package\n")
+  cat("✗ Cannot run Prono method without tsgarch package\n")
 }
 
 if ("gmm" %in% installed) {
@@ -63,13 +63,13 @@ cat("Based on installed packages, you can run:\n\n")
 
 cat("1. Basic summary statistics (always available)\n")
 
-if ("rugarch" %in% installed && (("ivreg" %in% installed) || ("AER" %in% installed))) {
+if ("tsgarch" %in% installed && (("ivreg" %in% installed) || ("AER" %in% installed))) {
   cat("2. Prono IV with univariate GARCH ✓\n")
 } else {
   cat("2. Prono IV with univariate GARCH ✗\n")
 }
 
-if ("rugarch" %in% installed && "gmm" %in% installed) {
+if ("tsgarch" %in% installed && "gmm" %in% installed) {
   cat("3. Prono GMM estimation ✓\n")
 } else {
   cat("3. Prono GMM estimation ✗\n")

@@ -85,7 +85,7 @@ install.packages("RStata")
 install.packages("haven")
 
 # For Prono GARCH-based identification
-install.packages("rugarch")
+install.packages("tsgarch")
 ```
 
 The package will work without these optional dependencies, but installing them provides:
@@ -93,7 +93,7 @@ The package will work without these optional dependencies, but installing them p
 - **REndo**: Comparison with alternative R implementation of Lewbel (2012)
 - **AER**: Additional IV regression capabilities
 - **RStata/haven**: Comparison with alternative Stata implementation of Lewbel (2012)
-- **rugarch**: GARCH modeling for Prono (2014) time-series identification
+- **tsgarch**: GARCH modeling for Prono (2014) time-series identification
 
 ### Quick Start
 

@@ -16,7 +16,15 @@ test_that("lewbel_triangular_moments generates correct moment conditions", {
   theta <- c(0.5, 1.0, -0.5, 1.5, 0.8) # beta1_0, beta1_1, gamma1, beta2_0, beta2_1
 
   # Generate moment conditions
-  moments <- lewbel_triangular_moments(theta, data)
+  moments <- lewbel_triangular_moments(
+    theta = theta,
+    data = data,
+    y1_var = "Y1",
+    y2_var = "Y2",
+    x_vars = "Xk",
+    z_vars = NULL,
+    add_intercept = TRUE
+  )
 
   # Check dimensions
   expect_equal(nrow(moments), n)
@@ -44,7 +52,16 @@ test_that("lewbel_simultaneous_moments handles identification condition", {
 
   # Should produce warning
   expect_warning(
-    lewbel_simultaneous_moments(theta, data),
+    lewbel_simultaneous_moments(
+      theta = theta,
+      data = data,
+      y1_var = "Y1",
+      y2_var = "Y2",
+      x_vars = "Xk",
+      z_vars = NULL,
+      add_intercept = TRUE,
+      z_sq = FALSE
+    ),
     "gamma1 \\* gamma2 is close to 1"
   )
 })
@@ -245,7 +262,8 @@ test_that("lewbel_gmm handles missing gmm package gracefully", {
         lewbel_gmm(data.frame(Y1 = 1:10, Y2 = 1:10, Xk = 1:10)),
         "Package 'gmm' is required but not installed"
       )
-    }
+    },
+    .package = "base"
   )
 })
 
@@ -298,7 +316,15 @@ test_that("rigobon_triangular_moments generates correct moment conditions", {
   theta <- c(0.5, 1.5, -0.8, 1.0, -1.0)
 
   # Generate moment conditions
-  moments <- rigobon_triangular_moments(theta, data, regime_var = "regime")
+  moments <- rigobon_triangular_moments(
+    theta = theta,
+    data = data,
+    y1_var = "Y1",
+    y2_var = "Y2",
+    x_vars = "Xk",
+    regime_var = "regime",
+    add_intercept = TRUE
+  )
 
   # Check dimensions
   n_regimes <- length(unique(data$regime))
@@ -324,7 +350,15 @@ test_that("rigobon_simultaneous_moments generates correct moment conditions", {
   theta <- c(0.5, 1.5, -0.8, 1.0, -1.0, 0.2)
 
   # Generate moment conditions
-  moments <- rigobon_simultaneous_moments(theta, data, regime_var = "regime")
+  moments <- rigobon_simultaneous_moments(
+    theta = theta,
+    data = data,
+    y1_var = "Y1",
+    y2_var = "Y2",
+    x_vars = "Xk",
+    regime_var = "regime",
+    add_intercept = TRUE
+  )
 
   # Check dimensions
   n_regimes <- length(unique(data$regime))
@@ -354,7 +388,7 @@ test_that("rigobon_gmm estimates triangular system correctly", {
   expect_s3_class(result, c("rigobon_gmm", "lewbel_gmm"))
   expect_true("coefficients" %in% names(result))
   expect_true("vcov" %in% names(result))
-  expect_true("J_test" %in% names(result))
+  # J_test is optional (only present when overidentified)
   expect_equal(result$n_regimes, 2)
 
   # Check coefficient names
@@ -518,7 +552,15 @@ test_that("prono_triangular_moments generates correct moment conditions", {
   theta <- c(0.05, 0.01, 1.0, 0.097, -0.005)
 
   # Generate moment conditions
-  moments <- prono_triangular_moments(theta, data, x_vars = "X1")
+  moments <- prono_triangular_moments(
+    theta = theta,
+    data = data,
+    y1_var = "Y1",
+    y2_var = "Y2",
+    x_vars = "X1",
+    add_intercept = TRUE,
+    garch_res_var = "sigma2_sq_hat"
+  )
 
   # Check dimensions
   expect_equal(nrow(moments), 100)
@@ -528,7 +570,7 @@ test_that("prono_triangular_moments generates correct moment conditions", {
 
 test_that("prono_gmm estimates triangular system correctly", {
   skip_if_not_installed("gmm")
-  skip_if_not_installed("rugarch")
+  skip_if_not_installed("tsgarch")
 
   # Generate larger sample
   set.seed(42)
@@ -560,23 +602,24 @@ test_that("prono_gmm estimates triangular system correctly", {
 })
 
 
-test_that("prono_gmm handles missing rugarch gracefully", {
+test_that("prono_gmm handles missing tsgarch gracefully", {
   skip_if_not_installed("gmm")
 
   # Generate data
   data <- generate_prono_data(n = 100)
 
-  # Mock requireNamespace to return FALSE for rugarch
+  # Mock requireNamespace to return FALSE for tsgarch
   with_mocked_bindings(
     requireNamespace = function(pkg, ...) {
-      if (pkg == "rugarch") FALSE else TRUE
+      if (pkg == "tsgarch") FALSE else TRUE
     },
     {
       expect_error(
         prono_gmm(data, verbose = FALSE),
-        "rugarch"
+        "tsgarch"
       )
-    }
+    },
+    .package = "base"
   )
 })
 

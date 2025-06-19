@@ -47,3 +47,11 @@ comparison <- compare_rigobon_methods(data, true_gamma1 = params$gamma1)
 }
 
 }
+\references{
+Rigobon, R. (2003). Identification Through Heteroskedasticity.
+Review of Economics and Statistics, 85(4), 777-792.
+\doi{10.1162/003465303772815727}
+}
+\seealso{
+\code{\link{run_rigobon_estimation}}, \code{\link{run_single_lewbel_simulation}}
+}

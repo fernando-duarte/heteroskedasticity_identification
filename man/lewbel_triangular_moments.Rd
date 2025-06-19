@@ -49,6 +49,11 @@ The moment conditions are:
 }
 where Z = g(X) is a mean-zero transformation of X.
 }
+\references{
+Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
+Mismeasured and Endogenous Regressor Models. Journal of Business &
+Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
+}
 \seealso{
 \code{\link{lewbel_gmm}} for the main GMM estimation function.
 \code{\link{lewbel_simultaneous_moments}} for simultaneous system moments.

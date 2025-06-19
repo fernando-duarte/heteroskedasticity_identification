@@ -36,7 +36,7 @@ The triangular system is the most common case:
 $$Y_1 = X'\beta_1 + \gamma_1 Y_2 + \epsilon_1$$
 $$Y_2 = X'\beta_2 + \epsilon_2$$
 
-```{r triangular-example}
+```{r triangular-example, eval=FALSE}
 # Generate example data
 set.seed(123)
 n <- 1000
@@ -62,7 +62,7 @@ $$Y_2 = X'\beta_2 + \gamma_2 Y_1 + \epsilon_2$$
 
 Note: Requires $\gamma_1 \gamma_2 \neq 1$ for identification.
 
-```{r simultaneous-example}
+```{r simultaneous-example, eval=FALSE}
 # Generate data with multiple X variables
 n_sim <- 1000
 data_sim <- data.frame(
@@ -113,7 +113,7 @@ Three types of GMM estimators are available:
 
 Fast and reliable for most applications:
 
-```{r twostep}
+```{r twostep, eval=FALSE}
 gmm_twostep <- lewbel_gmm(data, gmm_type = "twostep")
 ```
 
@@ -121,7 +121,7 @@ gmm_twostep <- lewbel_gmm(data, gmm_type = "twostep")
 
 May improve finite sample properties:
 
-```{r iterative}
+```{r iterative, eval=FALSE}
 gmm_iter <- lewbel_gmm(data, gmm_type = "iterative")
 ```
 
@@ -129,7 +129,7 @@ gmm_iter <- lewbel_gmm(data, gmm_type = "iterative")
 
 Theoretically optimal but computationally intensive:
 
-```{r cue}
+```{r cue, eval=FALSE}
 gmm_cue <- lewbel_gmm(data, gmm_type = "cue")
 ```
 
@@ -137,7 +137,7 @@ gmm_cue <- lewbel_gmm(data, gmm_type = "cue")
 
 By default, centered X variables are used as heteroskedasticity drivers (Z). You can specify custom Z variables:
 
-```{r custom-z}
+```{r custom-z, eval=FALSE}
 # Add custom Z variables
 data$Z1 <- data$Xk^2
 data$Z2 <- abs(data$Xk)
@@ -157,7 +157,7 @@ coef(gmm_custom)["gamma1"]
 
 Heteroskedasticity and Autocorrelation Consistent:
 
-```{r hac}
+```{r hac, eval=FALSE}
 gmm_hac <- lewbel_gmm(data, vcov = "HAC")
 ```
 
@@ -165,7 +165,7 @@ gmm_hac <- lewbel_gmm(data, vcov = "HAC")
 
 Assumes independent and identically distributed errors:
 
-```{r iid}
+```{r iid, eval=FALSE}
 gmm_iid <- lewbel_gmm(data, vcov = "iid")
 ```
 
@@ -188,7 +188,7 @@ gmm_cluster <- lewbel_gmm(
 
 The package provides a convenience function to compare GMM and 2SLS estimates:
 
-```{r compare}
+```{r compare, eval=FALSE}
 comparison <- compare_gmm_2sls(data)
 print(comparison)
 ```
@@ -199,7 +199,7 @@ print(comparison)
 
 The J-test checks the validity of moment conditions:
 
-```{r j-test}
+```{r j-test, eval=FALSE}
 j_test <- gmm_result$test
 cat("J-statistic:", j_test$test[1], "\n")
 cat("p-value:", j_test$test[2], "\n")
@@ -210,7 +210,7 @@ cat("Degrees of freedom:", j_test$df, "\n")
 
 Check instrument relevance:
 
-```{r first-stage}
+```{r first-stage, eval=FALSE}
 # Manually construct Lewbel instruments
 e2_hat <- residuals(lm(Y2 ~ Xk, data = data))
 z_centered <- scale(data$Xk, center = TRUE, scale = FALSE)
@@ -226,7 +226,7 @@ cat("First-stage F-statistic:", round(f_stat, 2), "\n")
 
 For small samples, bootstrap inference may be preferred:
 
-```{r bootstrap}
+```{r bootstrap, eval=FALSE}
 library(boot)
 
 # Bootstrap function

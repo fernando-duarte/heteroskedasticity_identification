@@ -16,6 +16,8 @@ lewbel_gmm(
   initial_values = NULL,
   vcov = c("HAC", "iid", "cluster"),
   cluster_var = NULL,
+  compute_se = TRUE,
+  verbose = FALSE,
   ...
 )
 }
@@ -41,6 +43,10 @@ lewbel_gmm(
 \item{vcov}{Character. Type of variance-covariance matrix: "HAC", "iid", or "cluster" (default: "HAC").}
 
 \item{cluster_var}{Character. Variable name for clustering if vcov = "cluster" (default: NULL).}
+
+\item{compute_se}{Logical. Whether to compute standard errors (default: TRUE). Passed to gmm call.}
+
+\item{verbose}{Logical. Whether to print messages (default: FALSE).}
 
 \item{...}{Additional arguments passed to gmm().}
 }
@@ -82,6 +88,11 @@ cat("2SLS estimate:", tsls_result$tsls_gamma1, "\n")
 cat("GMM estimate:", coef(gmm_tri)["gamma1"], "\n")
 }
 
+}
+\references{
+Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
+Mismeasured and Endogenous Regressor Models. Journal of Business &
+Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
 }
 \seealso{
 \code{\link{lewbel_triangular_moments}}, \code{\link{lewbel_simultaneous_moments}} for moment condition functions.

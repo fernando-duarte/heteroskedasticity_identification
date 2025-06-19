@@ -30,7 +30,7 @@ Data frame with simulation results
 Run Prono Monte Carlo simulation
 }
 \examples{
-\donttest{
+\dontrun{
 # Time-consuming Monte Carlo simulation
 # For actual research, use n_sims = 1000+
 config <- create_prono_config(n = 500)

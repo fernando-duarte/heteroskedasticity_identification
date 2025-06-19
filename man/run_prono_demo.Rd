@@ -18,7 +18,7 @@ Results from single simulation (invisibly)
 Run Prono demonstration
 }
 \examples{
-\donttest{
+\dontrun{
 # Quick demonstration with reduced sample size
 run_prono_demo(n = 200, print_results = TRUE)
 }

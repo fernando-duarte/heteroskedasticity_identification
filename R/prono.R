@@ -165,23 +165,29 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
   garch_fit <- NULL
 
   tryCatch({
-    # Check if rugarch is available
-    if (!requireNamespace("rugarch", quietly = TRUE)) {
-      stop("Package 'rugarch' is required for GARCH modeling. Please install it.")
+    # Check if tsgarch is available
+    if (!requireNamespace("tsgarch", quietly = TRUE)) {
+      stop("Package 'tsgarch' is required for GARCH modeling. Please install it.")
     }
 
-    # Specify GARCH(1,1) model
-    garch_spec <- rugarch::ugarchspec(
-      variance.model = list(model = "sGARCH", garchOrder = c(1, 1)),
-      mean.model = list(armaOrder = c(0, 0), include.mean = FALSE),
-      distribution.model = "norm"
+    # Convert to xts object as required by tsgarch
+    dates <- as.Date("2000-01-01") + seq_along(e2_hat) - 1
+    e2_xts <- xts::xts(e2_hat, order.by = dates)
+
+    # Specify GARCH(1,1) model using tsgarch
+    garch_spec <- tsgarch::garch_modelspec(
+      y = e2_xts,
+      model = "garch",
+      order = c(1, 1),
+      constant = TRUE,
+      distribution = "norm"
     )
 
     # Fit GARCH model
-    garch_fit <- rugarch::ugarchfit(spec = garch_spec, data = e2_hat)
+    garch_fit <- tsmethods::estimate(garch_spec)
 
-    # Extract fitted conditional variances
-    sigma2_sq_hat <- as.numeric(rugarch::sigma(garch_fit))^2
+    # Extract conditional variances (sigma returns standard deviations)
+    sigma2_sq_hat <- as.numeric(sigma(garch_fit))^2
 
   }, error = function(e) {
     warning("GARCH fitting failed, using squared residuals as proxy: ", e$message)
@@ -298,7 +304,7 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
 #' \code{\link{create_prono_config}} for configuration setup
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Time-consuming Monte Carlo simulation
 #' # For actual research, use n_sims = 1000+
 #' config <- create_prono_config(n = 500)
@@ -454,7 +460,7 @@ create_prono_config <- function(n = 500, k = 1, ...) {
 #' \code{\link{run_prono_monte_carlo}} for full Monte Carlo analysis
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Quick demonstration with reduced sample size
 #' run_prono_demo(n = 200, print_results = TRUE)
 #' }
@@ -488,9 +494,9 @@ run_prono_demo <- function(n = 500, print_results = TRUE) {
     if (!is.null(results$garch_fit)) {
       cat("\nGARCH(1,1) parameters:\n")
       garch_coef <- coef(results$garch_fit)
-      cat(sprintf("  omega: %.4f\n", garch_coef["omega"]))
-      cat(sprintf("  alpha: %.4f\n", garch_coef["alpha1"]))
-      cat(sprintf("  beta:  %.4f\n", garch_coef["beta1"]))
+      cat(sprintf("  omega: %.4f\n", garch_coef[names(garch_coef) == "omega"]))
+      cat(sprintf("  alpha: %.4f\n", garch_coef[names(garch_coef) == "alpha1"]))
+      cat(sprintf("  beta:  %.4f\n", garch_coef[names(garch_coef) == "beta1"]))
     }
   }
 

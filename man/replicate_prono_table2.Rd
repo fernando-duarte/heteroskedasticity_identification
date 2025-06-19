@@ -30,7 +30,7 @@ List with results data frame and summary statistics matching Prono's Table II
 Run Monte Carlo simulation matching Prono's exact specification
 }
 \examples{
-\donttest{
+\dontrun{
 # Replication of Prono Table II (time-consuming)
 # Uses 1000 simulations to match paper results
 results <- replicate_prono_table2(n_sim = 1000, n_obs = 500)

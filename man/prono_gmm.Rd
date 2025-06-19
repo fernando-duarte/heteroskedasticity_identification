@@ -6,65 +6,64 @@
 \usage{
 prono_gmm(
   data,
-  gmm_type = "twoStep",
-  vcov_type = "HAC",
-  endog_var = "Y2",
-  exog_vars = NULL,
-  fit_garch = TRUE,
+  system = "triangular",
+  y1_var = "Y1",
+  y2_var = "Y2",
+  x_vars = NULL,
   garch_order = c(1, 1),
-  df_adjust = "asymptotic",
-  verbose = TRUE
+  fit_garch = TRUE,
+  add_intercept = TRUE,
+  gmm_type = "twoStep",
+  vcov = "HAC",
+  initial_values = NULL,
+  compute_se = TRUE,
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{
-\item{data}{Data frame containing the variables.}
+\item{data}{Data frame containing all variables.}
 
-\item{gmm_type}{Character. Type of GMM: "twoStep", "iterative", or "cue".}
+\item{system}{Character. Either "triangular" (default).}
 
-\item{vcov_type}{Character. Type of variance-covariance matrix.}
+\item{y1_var}{Character. Name of the first dependent variable (default: "Y1").}
 
-\item{endog_var}{Character. Name of endogenous variable.}
+\item{y2_var}{Character. Name of the second dependent variable (default: "Y2").}
 
-\item{exog_vars}{Character vector. Names of exogenous variables.}
+\item{x_vars}{Character vector. Names of exogenous variables.}
 
-\item{fit_garch}{Logical. Whether to fit GARCH model (TRUE) or use pre-fitted values.}
+\item{garch_order}{GARCH(p,q) order (default: c(1,1)).}
 
-\item{garch_order}{Numeric vector. GARCH(p,q) order, default c(1,1).}
+\item{fit_garch}{Logical. Whether to fit GARCH model (default: TRUE).}
 
-\item{df_adjust}{Character. Degrees of freedom adjustment.}
+\item{add_intercept}{Logical. Whether to add an intercept (default: TRUE).}
 
-\item{verbose}{Logical. Whether to print progress and diagnostics.}
+\item{gmm_type}{Character. GMM type: "onestep", "twoStep" (default), "iterative", or "cue".}
+
+\item{vcov}{Character. Variance-covariance matrix type: "iid", "HAC" (default), or "cluster".}
+
+\item{initial_values}{Numeric vector. Initial parameter values (optional).}
+
+\item{compute_se}{Logical. Whether to compute standard errors (default: TRUE).}
+
+\item{verbose}{Logical. Print progress messages (default: TRUE).}
+
+\item{...}{Additional arguments passed to gmm::gmm.}
 }
 \value{
-An object of class "prono_gmm" (inheriting from "lewbel_gmm").
+An object of class "prono_gmm" containing GMM estimation results.
 }
 \description{
-Implements GMM estimation for Prono's heteroskedasticity-based
-identification using GARCH conditional variances.
+Implementation of GMM estimation for Prono's (2014) heteroskedasticity-based
+identification strategy using GARCH models.
 }
-\examples{
-\dontrun{
-# Generate Prono-style data
-config <- create_prono_config(n = 500)
-data <- generate_prono_data(
-  n = config$n,
-  beta1 = config$beta1,
-  beta2 = config$beta2,
-  gamma1 = config$gamma1,
-  garch_params = config$garch_params
-)
-
-# GMM estimation
-gmm_result <- prono_gmm(data)
-summary(gmm_result)
-}
-
+\references{
+Prono, T. (2014). The Role of Conditional Heteroskedasticity in Identifying
+and Estimating Linear Triangular Systems, with Applications to Asset Pricing
+Models That Include a Mismeasured Factor. Journal of Applied Econometrics,
+29(5), 800-824. \doi{10.1002/jae.2387}
 }
 \seealso{
-\code{\link{prono_triangular_moments}} for moment condition functions.
-\code{\link{lewbel_gmm}} for Lewbel's heteroskedasticity-based identification.
-\code{\link{rigobon_gmm}} for regime-based heteroskedasticity identification.
-\code{\link{generate_prono_data}} for generating data with GARCH heteroskedasticity.
-\code{\link{run_single_prono_simulation}} for simulation implementation.
-\code{\link{create_prono_config}} for default configuration.
+\code{\link{prono_triangular_moments}} for moment conditions.
+\code{\link{run_single_prono_simulation}} for 2SLS estimation.
 }

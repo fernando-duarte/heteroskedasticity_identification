@@ -39,3 +39,11 @@ demo_quiet <- run_rigobon_demo(verbose = FALSE)
 }
 
 }
+\references{
+Rigobon, R. (2003). Identification Through Heteroskedasticity.
+Review of Economics and Statistics, 85(4), 777-792.
+\doi{10.1162/003465303772815727}
+}
+\seealso{
+\code{\link{generate_rigobon_data}}, \code{\link{run_rigobon_estimation}}
+}

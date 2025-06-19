@@ -66,3 +66,12 @@ data_multi <- generate_lewbel_data(1000, params_multi, n_x = 2)
 }
 
 }
+\references{
+Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
+Mismeasured and Endogenous Regressor Models. Journal of Business &
+Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
+}
+\seealso{
+\code{\link{verify_lewbel_assumptions}} for testing the assumptions,
+\code{\link{run_single_lewbel_simulation}} for using this data in simulations
+}

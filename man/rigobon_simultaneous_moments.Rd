@@ -11,7 +11,7 @@ rigobon_simultaneous_moments(
   y2_var,
   x_vars,
   regime_var,
-  add_intercept
+  add_intercept = TRUE
 )
 }
 \arguments{
@@ -27,16 +27,16 @@ rigobon_simultaneous_moments(
 
 \item{regime_var}{Character. Name of the regime indicator variable.}
 
-\item{add_intercept}{Logical. Whether to include a constant term.}
+\item{add_intercept}{Logical. Whether to add an intercept.}
 }
 \value{
-Matrix of moment conditions (n × g).
+Matrix of moment conditions.
 }
 \description{
-Creates the moment function for GMM estimation of a simultaneous equation
-system using Rigobon's regime-based heteroskedasticity identification.
+Creates the moment function for GMM estimation of a simultaneous equations
+system using Rigobon's regime-based identification.
 }
-\seealso{
-\code{\link{rigobon_gmm}} for the main GMM estimation function.
-\code{\link{rigobon_triangular_moments}} for triangular system moments.
+\references{
+Rigobon, R. (2003). Identification through heteroskedasticity.
+Review of Economics and Statistics, 85(4), 777-792.
 }

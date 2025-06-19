@@ -53,7 +53,7 @@ fit_diagonal_garch_prono <- function(data,
   if (!has_tsmarch || !has_tsgarch) {
     if (verbose) {
       cat("Advanced GARCH packages (tsmarch/tsgarch) not available.\n")
-      cat("Falling back to rugarch-based implementation...\n")
+      cat("Falling back to tsgarch-based implementation...\n")
     }
     return(fit_dcc_garch_fallback(returns, garch_order, verbose))
   }
@@ -91,7 +91,7 @@ fit_diagonal_garch_prono <- function(data,
     # Step 3: Fit the model
     mv_fit <- tryCatch({
       # Using a simpler fit for faster execution in tests, eval.se = TRUE is very slow
-      rugarch::dccfit(spec = mv_spec, data = returns, solver = "nlminb", fit.control = list(eval.se = FALSE))
+      tsmethods::estimate(mv_spec, y = returns)
     }, error = function(e) {
       if (verbose) messager("DCC-GARCH fitting failed: ", e$message, ". Check data and model specification.")
     })
@@ -154,28 +154,44 @@ fit_diagonal_garch_prono <- function(data,
 #' @keywords internal
 fit_dcc_garch_fallback <- function(returns, garch_order = c(1, 1), verbose = TRUE) {
 
-  if (!requireNamespace("rugarch", quietly = TRUE)) {
-    utils::install.packages("rugarch")
+  if (!requireNamespace("tsgarch", quietly = TRUE)) {
+    stop("Package 'tsgarch' is required for GARCH modeling. Please install it.")
   }
 
-  # Use rugarch for robustness
-  uspec <- rugarch::ugarchspec(
-    variance.model = list(model = "sGARCH", garchOrder = garch_order),
-    mean.model = list(armaOrder = c(0, 0), include.mean = TRUE),
-    distribution.model = "norm"
+  # Convert to xts as required by tsgarch
+  dates <- as.Date("2000-01-01") + seq_len(nrow(returns)) - 1
+  returns_xts1 <- xts::xts(returns[, 1], order.by = dates)
+  returns_xts2 <- xts::xts(returns[, 2], order.by = dates)
+
+  # Use tsgarch for robustness
+  # Fit univariate GARCH to each series
+  spec1 <- tsgarch::garch_modelspec(
+    y = returns_xts1,
+    model = "garch",
+    order = garch_order,
+    constant = TRUE,
+    distribution = "norm"
   )
 
-  # Fit univariate GARCH to each series
-  fit1 <- rugarch::ugarchfit(uspec, returns[, 1])
-  fit2 <- rugarch::ugarchfit(uspec, returns[, 2])
+  spec2 <- tsgarch::garch_modelspec(
+    y = returns_xts2,
+    model = "garch",
+    order = garch_order,
+    constant = TRUE,
+    distribution = "norm"
+  )
+
+  # Fit the models
+  fit1 <- tsmethods::estimate(spec1)
+  fit2 <- tsmethods::estimate(spec2)
 
   # Extract conditional variances
-  sigma1_sq <- as.numeric(rugarch::sigma(fit1))^2
-  sigma2_sq <- as.numeric(rugarch::sigma(fit2))^2
+  sigma1_sq <- as.numeric(sigma(fit1))^2
+  sigma2_sq <- as.numeric(sigma(fit2))^2
 
-  # Extract residuals
-  e1 <- as.numeric(rugarch::residuals(fit1))
-  e2 <- as.numeric(rugarch::residuals(fit2))
+  # Extract residuals (standardized residuals from tsgarch)
+  e1 <- as.numeric(residuals(fit1, standardize = TRUE))
+  e2 <- as.numeric(residuals(fit2, standardize = TRUE))
 
   # Estimate time-varying correlation using exponential smoothing
   # This approximates the diagonal GARCH covariance dynamics
@@ -253,7 +269,7 @@ estimate_dynamic_correlation <- function(z1, z2, lambda = 0.94) {
 #' \code{\link{prono_gmm}} for GMM estimation
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Time-consuming example with diagonal GARCH
 #' data <- generate_prono_data(n = 500)
 #' result <- prono_diagonal_garch(data, method = "2sls")
@@ -340,7 +356,7 @@ prono_diagonal_garch <- function(data,
 #' \code{\link{create_prono_config}} for configuration
 #'
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' # Replication of Prono Table II (time-consuming)
 #' # Uses 1000 simulations to match paper results
 #' results <- replicate_prono_table2(n_sim = 1000, n_obs = 500)

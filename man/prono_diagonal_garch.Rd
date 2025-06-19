@@ -27,7 +27,7 @@ List with estimation results
 Complete Prono estimation using proper diagonal GARCH specification
 }
 \examples{
-\donttest{
+\dontrun{
 # Time-consuming example with diagonal GARCH
 data <- generate_prono_data(n = 500)
 result <- prono_diagonal_garch(data, method = "2sls")

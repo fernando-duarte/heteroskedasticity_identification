@@ -25,4 +25,6 @@
 #' where \eqn{V_2 \sim N(0, \exp(1.2 \cdot Z))} with \eqn{Z = X2^2 - E[X2^2]}.
 #'
 #' @source Simulated data using generate_lewbel_data() function
+#'
+#' @template references-lewbel
 "lewbel_sim"

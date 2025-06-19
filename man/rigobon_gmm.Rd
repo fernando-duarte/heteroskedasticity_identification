@@ -7,63 +7,51 @@
 rigobon_gmm(
   data,
   system = "triangular",
-  gmm_type = "twoStep",
-  vcov_type = "HAC",
-  endog_var = "Y2",
-  exog_vars = "Xk",
+  y1_var = "Y1",
+  y2_var = "Y2",
+  x_vars = "Xk",
   regime_var = "regime",
-  df_adjust = "asymptotic",
-  verbose = TRUE
+  add_intercept = TRUE,
+  gmm_type = "twoStep",
+  vcov = "HAC",
+  initial_values = NULL,
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{
-\item{data}{Data frame containing the variables.}
+\item{data}{Data frame containing all variables.}
 
-\item{system}{Character. Either "triangular" or "simultaneous".}
+\item{system}{Character. Either "triangular" (default) or "simultaneous".}
 
-\item{gmm_type}{Character. Type of GMM: "twoStep", "iterative", or "cue".}
+\item{y1_var}{Character. Name of the first dependent variable.}
 
-\item{vcov_type}{Character. Type of variance-covariance matrix.}
+\item{y2_var}{Character. Name of the second dependent variable.}
 
-\item{endog_var}{Character. Name of endogenous variable.}
+\item{x_vars}{Character vector. Names of exogenous variables.}
 
-\item{exog_vars}{Character vector. Names of exogenous variables.}
+\item{regime_var}{Character. Name of the regime indicator variable.}
 
-\item{regime_var}{Character. Name of regime indicator variable.}
+\item{add_intercept}{Logical. Whether to add an intercept.}
 
-\item{df_adjust}{Character. Degrees of freedom adjustment.}
+\item{gmm_type}{Character. GMM type.}
 
-\item{verbose}{Logical. Whether to print progress and diagnostics.}
+\item{vcov}{Character. Variance-covariance matrix type.}
+
+\item{initial_values}{Numeric vector. Initial parameter values.}
+
+\item{verbose}{Logical. Print progress messages.}
+
+\item{...}{Additional arguments passed to gmm::gmm.}
 }
 \value{
-An object of class "rigobon_gmm" (inheriting from "lewbel_gmm").
+An object of class "rigobon_gmm" containing GMM estimation results.
 }
 \description{
-Implements GMM estimation for Rigobon's heteroskedasticity-based
-identification using discrete regime indicators.
+Implementation of GMM estimation for Rigobon's (2003) heteroskedasticity-based
+identification strategy using regime changes.
 }
-\examples{
-\dontrun{
-# Generate Rigobon-style data
-params <- list(
-  beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-  beta2_0 = 1.0, beta2_1 = -1.0,
-  alpha1 = -0.5, alpha2 = 1.0,
-  regime_probs = c(0.4, 0.6),
-  sigma2_regimes = c(1.0, 2.5)
-)
-data <- generate_rigobon_data(1000, params)
-
-# GMM estimation
-gmm_result <- rigobon_gmm(data)
-summary(gmm_result)
-}
-
-}
-\seealso{
-\code{\link{rigobon_triangular_moments}}, \code{\link{rigobon_simultaneous_moments}} for moment condition functions.
-\code{\link{lewbel_gmm}} for Lewbel's continuous heteroskedasticity identification.
-\code{\link{prono_gmm}} for GARCH-based heteroskedasticity identification.
-\code{\link{generate_rigobon_data}} for generating data with regime-based heteroskedasticity.
-\code{\link{run_rigobon_estimation}} for 2SLS implementation.
+\references{
+Rigobon, R. (2003). Identification through heteroskedasticity.
+Review of Economics and Statistics, 85(4), 777-792.
 }

@@ -65,6 +65,10 @@
 #' )
 #' }
 #'
+#' @template references-lewbel
+#'
+#' @seealso \code{\link{run_single_lewbel_simulation}}, \code{\link{calculate_lewbel_bounds}}
+#'
 #' @export
 run_lewbel_monte_carlo <- function(config = NULL,
                                    run_verification = TRUE,
@@ -231,6 +235,10 @@ run_lewbel_monte_carlo <- function(config = NULL,
 #' demo_results <- run_lewbel_demo(100, verbose = FALSE)
 #' }
 #'
+#' @template references-lewbel
+#'
+#' @seealso \code{\link{run_lewbel_monte_carlo}}
+#'
 #' @export
 run_lewbel_demo <- function(num_simulations = 100, verbose = TRUE) {
   demo_config <- create_default_config(
@@ -282,6 +290,10 @@ run_lewbel_demo <- function(num_simulations = 100, verbose = TRUE) {
 #' # Silent demo
 #' demo_quiet <- run_rigobon_demo(verbose = FALSE)
 #' }
+#'
+#' @template references-rigobon
+#'
+#' @seealso \code{\link{generate_rigobon_data}}, \code{\link{run_rigobon_estimation}}
 #'
 #' @export
 run_rigobon_demo <- function(n_obs = 1000, n_regimes = 2, verbose = TRUE) {

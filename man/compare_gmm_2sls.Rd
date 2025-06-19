@@ -2,22 +2,87 @@
 % Please edit documentation in R/lewbel-gmm.R
 \name{compare_gmm_2sls}
 \alias{compare_gmm_2sls}
-\title{Compare GMM and 2SLS Estimates}
+\title{Compare GMM and 2SLS Estimates for Lewbel Model}
 \usage{
-compare_gmm_2sls(data, verbose = TRUE, ...)
+compare_gmm_2sls(
+  data,
+  y1_var = "Y1",
+  y2_var = "Y2",
+  x_vars = "Xk",
+  add_intercept = TRUE,
+  true_gamma1 = NA_real_,
+  gmm_args = list(),
+  tsls_sim_config = list(),
+  verbose = TRUE
+)
 }
 \arguments{
-\item{data}{Data frame containing all variables.}
+\item{data}{Data frame containing all variables. Must contain "Y1", "Y2", and "Xk"
+(or variables specified by y1_var, y2_var, x_vars).}
+
+\item{y1_var}{Character. Name of the first dependent variable (default: "Y1").}
+
+\item{y2_var}{Character. Name of the second dependent variable/endogenous regressor (default: "Y2").}
+
+\item{x_vars}{Character vector. Names of exogenous variables (default: "Xk").
+For 2SLS via run_single_lewbel_simulation, it assumes a single "Xk" if
+default simulation parameters are used. For GMM, can be multiple.
+This function will try to match behavior. If multiple x_vars are given,
+the 2SLS part might be less comparable if its underlying DGP assumes one X.}
+
+\item{add_intercept}{Logical. Whether to add an intercept for GMM (default: TRUE).
+2SLS via run_single_lewbel_simulation typically includes an intercept.}
+
+\item{true_gamma1}{Numeric. Optional true value of gamma1 for bias calculation.}
+
+\item{gmm_args}{List. Additional arguments passed to \code{\link{lewbel_gmm}}.}
+
+\item{tsls_sim_config}{List. Parameters to override in the default config for
+\code{\link{run_single_lewbel_simulation}}.
+The \code{sample_size} will be set to \code{nrow(data)}.
+\code{lewbel_x_vars} in this config should match \code{x_vars} here.}
 
 \item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
-
-\item{...}{Additional arguments passed to lewbel_gmm and run_single_lewbel_simulation.}
 }
 \value{
 A data frame comparing estimates, standard errors, and test statistics.
 }
 \description{
-Compares GMM estimates with traditional 2SLS (Lewbel) estimates.
+Compares GMM estimates with traditional 2SLS (Lewbel) estimates for the triangular system.
+}
+\examples{
+\dontrun{
+# Generate data
+params_dgp <- list(
+  beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
+  beta2_0 = 1.0, beta2_1 = -1.0,
+  alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
+)
+data_comp <- generate_lewbel_data(1000, params_dgp) # Generates Y1, Y2, Xk, Z
+
+# Compare (assuming Xk is the exogenous variable for both)
+comparison <- compare_gmm_2sls(data_comp, true_gamma1 = params_dgp$gamma1)
+print(comparison)
+
+# Example with multiple X for GMM, 2SLS might be less direct comparison
+params_multi <- list(
+  beta1_0 = 0.5, beta1_1 = c(1.5, 0.2), gamma1 = -0.8,
+  beta2_0 = 1.0, beta2_1 = c(-1.0, 0.3),
+  alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
+)
+data_multi_x <- generate_lewbel_data(1000, params_multi, n_x = 2) # Y1,Y2,X1,X2,Z1,Z2
+comparison_multi <- compare_gmm_2sls(data_multi_x,
+                                     x_vars = c("X1", "X2"),
+                                     true_gamma1 = params_multi$gamma1,
+                                     tsls_sim_config = list(
+                                        lewbel_x_vars = c("X1","X2") # Hypothetical
+                                        # Note: run_single_lewbel_simulation's internal
+                                        # DGP might not easily map to this if it assumes 1 Xk.
+                                        # This part is more illustrative for GMM side.
+                                        )
+                                    )
+print(comparison_multi)
+}
 }
 \seealso{
 \code{\link{lewbel_gmm}} for GMM estimation.

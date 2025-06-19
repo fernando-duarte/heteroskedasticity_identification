@@ -40,6 +40,20 @@ url = {https://onlinelibrary.wiley.com/doi/abs/10.1002/jae.2340},
 eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/jae.2340},
 year = {2014}
 }
+
+@article{klein2010estimating,
+title = {Estimating a class of triangular simultaneous equations models without exclusion restrictions},
+journal = {Journal of Econometrics},
+volume = {154},
+number = {2},
+pages = {154-164},
+year = {2010},
+issn = {0304-4076},
+doi = {https://doi.org/10.1016/j.jeconom.2009.05.005},
+url = {https://www.sciencedirect.com/science/article/pii/S0304407609001675},
+author = {Roger Klein and Francis Vella}
+}
+
 \end{filecontents}
 
 \documentclass{article}
@@ -50,7 +64,7 @@ year = {2014}
 \usepackage{amssymb}
 \usepackage{geometry}
 \geometry{verbose}
-\usepackage[backend=biber, style=authoryear]{biblatex}
+\usepackage[backend=biber, style=authoryear, citestyle=authoryear]{biblatex}
 \addbibresource{refs.bib}
 
 \usepackage{enumitem}
@@ -79,6 +93,7 @@ year = {2014}
 
 \title{Heteroskedasticity-Based Identification}
 \author{}
+\date{}
 \maketitle
 
 \section{Preliminaries and Notation}
@@ -118,11 +133,11 @@ with the triangular case obtained by setting $\gamma_{2}=0$.
 \begin{remark} The algebra follows directly from solving the two-equation
 system for the reduced form and collecting the error terms. \end{remark}
 
-\section{Core Assumptions for Point Identification}
+\section{Core Assumptions for Lewbel-Style Identification}
 
 The method relies on the following key assumptions:
 
-\begin{enumerate}[label=(A\arabic*)]
+\begin{enumerate}[label=(LW\arabic*), ref=(LW\arabic*)]
 \item \label{enu:exogeneity}\textbf{Strict exogeneity.} $\E[\varepsilon_{j}\mid X]=0$
 for $j=1,2$. \emph{Time-series note:} in Section \ref{sec:timeseries}
 we weaken this to a martingale-difference assumption.
@@ -274,6 +289,102 @@ corresponding to the interval for $\gamma_{1}$.
 
 This set-identification cannot be used in the simultaneous system.
 
+\section{Semiparametric Control Function Approach}
+
+An alternative to the IV/GMM framework for the triangular system is the semiparametric control function approach of \textcite{klein2010estimating}. This method addresses endogeneity by directly augmenting the structural equation with a non-constant control term.
+
+\subsection{The Model and General Control Function}
+
+The starting point is a general statistical decomposition of the first structural error via a linear projection onto the second error, conditional on the exogenous variables:
+\[
+\varepsilon_1 = A(X)\varepsilon_2 + \eta_1, \qquad \text{where} \quad \E[\eta_1 | X, \varepsilon_2] = 0.
+\]
+This decomposition holds by defining $A(X)$ as the coefficient from a conditional linear projection, given by:
+\[
+A(X) \coloneqq \frac{\cov(\varepsilon_1, \varepsilon_2 \mid X)}{\var(\varepsilon_2 \mid X)}.
+\]
+Substituting this into the primary structural equation yields the augmented regression model:
+\begin{equation}
+Y_1 = X\T\beta_1 + \gamma_1 Y_2 + A(X)\varepsilon_2 + \eta_1. \label{eq:cf_model}
+\end{equation}
+Identification hinges on giving the generally intractable function $A(X)$ an estimable structure.
+
+\subsection{Assumptions for Identification}
+The key assumptions which provide this structure are:
+\begin{enumerate}[label=(KV\arabic*), ref=(KV\arabic*)]
+    \item \label{enu:kv_exogeneity} \textbf{Exogeneity.} $\E[\varepsilon_j | X] = 0$ for $j=1,2$.
+    \item \label{enu:kv_corr} \textbf{Constant Conditional Correlation.} The correlation between the structural errors is constant conditional on $X$: $\corr(\varepsilon_1, \varepsilon_2 | X) = \rho_0$.
+    \item \label{enu:kv_het} \textbf{Heteroskedasticity and Variation.} The conditional variances are non-constant functions of $X$, denoted $\var(\varepsilon_j|X) = S_j^2(X)$. Crucially, the ratio of the conditional standard deviations, $S_1(X)/S_2(X)$, is not a constant.
+\end{enumerate}
+
+\subsection{Identification via Control Function}
+The K\&V assumptions transform the inestimable general form of $A(X)$ into a specific, identifiable structure. The derivation proceeds as follows:
+\begin{align*}
+A(X) &= \frac{\cov(\varepsilon_1, \varepsilon_2 \mid X)}{\var(\varepsilon_2 \mid X)} &&\text{(General Definition)} \\
+&= \frac{\corr(\varepsilon_1, \varepsilon_2 \mid X) S_1(X) S_2(X)}{S_2^2(X)} &&\text{(Definition of Correlation)} \\
+&= \frac{\rho_0 S_1(X) S_2(X)}{S_2^2(X)} &&\text{(Using Assumption \ref{enu:kv_corr})} \\
+&= \rho_0 \frac{S_1(X)}{S_2(X)} &&\text{(Identified Form)}
+\end{align*}
+While the original form is inestimable due to the unknown conditional covariance function, this final form depends only on the parameter $\rho_0$ and the conditional standard deviation functions, which can be estimated nonparametrically. Assumption \ref{enu:kv_het} is crucial as it ensures this ratio is not constant. If the ratio were a constant, say~$c$, the model would collapse into a simple linear form \(Y_1 = X\T\tilde{\beta}_1 + Y_2\tilde{\gamma}_1 + \eta_1\), where an estimator could only identify the two composite parameters $\tilde{\beta}_1$ and $\tilde{\gamma}_1$, leaving the three structural parameters $(\beta_1, \gamma_1, \rho_0)$ unidentified from the two equations:
+\begin{align*}
+\hat{\tilde{\beta}}_1 &= \beta_1 - \rho_0 c \beta_2 \\
+\hat{\tilde{\gamma}}_1 &= \gamma_1 + \rho_0 c
+\end{align*}
+
+\subsection{Estimation Strategy}
+With the identified control function, the estimable regression model is:
+\[
+Y_1 = X\T\beta_1 + \gamma_1 Y_2 + \rho_0 \frac{S_1(X)}{S_2(X)}\varepsilon_2 + \eta_1.
+\]
+The parameters $(\beta_1, \gamma_1, \rho_0)$ and the unknown variance functions are estimated jointly via a multi-step Semiparametric Least Squares (SLS) procedure.
+\begin{enumerate}
+    \itemsep2pt
+    \item \textbf{First-step residual.} Estimate the second structural equation $Y_2 = X\T\beta_2 + \varepsilon_2$ by OLS to obtain consistent residuals $\hat{\varepsilon}_2$.
+    \item \textbf{Second-error variance.} Estimate the conditional variance function $S_2^2(X) = \var(\varepsilon_2|X)$ by nonparametrically regressing the squared residuals $\hat{\varepsilon}_2^2$ on $X$, for instance using kernel regression. This yields the estimator $\hat{S}_2(X)$.
+    \item \textbf{Main equation SLS.} The primary parameters $(\beta_1, \gamma_1, \rho_0)$ are estimated by minimizing the sum of squared residuals of the main equation. This is a nested procedure where for each candidate parameter vector $(\beta_{1,k}, \gamma_{1,k}, \rho_{0,k})$:
+    \begin{enumerate}[label=(\alph*)]
+        \itemsep1pt
+        \item The structural error $\hat{\varepsilon}_{1,k} = Y_1 - X\T\beta_{1,k} - Y_2\gamma_{1,k}$ is computed.
+        \item The variance function $\hat{S}_{1,k}(X)$ is estimated by nonparametrically regressing $\hat{\varepsilon}_{1,k}^2$ on $X$.
+        \item The objective function $\sum_{i=1}^N \left( Y_{1i} - X_i\T\beta_{1,k} - Y_{2i}\gamma_{1,k} - \rho_{0,k}\frac{\hat{S}_{1,k}(X_i)}{\hat{S}_2(X_i)}\hat{\varepsilon}_{2i} \right)^2$ is evaluated.
+    \end{enumerate}
+    The final parameter estimates are those which minimize this objective function.
+\end{enumerate}
+
+\subsection{Fully Parametric Estimation}
+The most direct simplification replaces the unknown variance functions $S_j(X)$ with specific parametric forms, converting the semiparametric problem into a standard parametric one. A common specification that ensures positivity is the exponential model:
+\[
+S_j^2(X) = \var(\varepsilon_j|X) = \exp(X\T\delta_j), \quad \text{for } j=1,2.
+\]
+The full parameter vector for the triangular system is now finite-dimensional: $\theta \coloneqq (\beta_1\T, \gamma_1, \beta_2\T, \rho_0, \delta_1\T, \delta_2\T)\T$. Estimation can proceed via Maximum Likelihood or GMM.
+
+\paragraph{Maximum Likelihood Estimation (MLE).}
+This approach requires a full distributional assumption for the structural errors. Assuming $(\varepsilon_1, \varepsilon_2)$ are conditionally bivariate normal given $X$, the distribution is:
+\[
+\begin{pmatrix} \varepsilon_1 \\ \varepsilon_2 \end{pmatrix} \mid X \sim \mathcal{N} \left( \begin{pmatrix} 0 \\ 0 \end{pmatrix}, \Sigma(X; \theta) \right),
+\]
+where the conditional covariance matrix $\Sigma(X; \theta)$ is a function of the parameters:
+\[
+\Sigma(X; \theta) = \begin{pmatrix}
+\exp(X\T\delta_1) & \rho_0 \exp(\frac{1}{2}X\T(\delta_1+\delta_2)) \\
+\rho_0 \exp(\frac{1}{2}X\T(\delta_1+\delta_2)) & \exp(X\T\delta_2)
+\end{pmatrix}.
+\]
+The structural errors are functions of the mean parameters: $\varepsilon_1(\theta) = Y_1 - X\T\beta_1 - Y_2\gamma_1$ and $\varepsilon_2(\theta) = Y_2 - X\T\beta_2$. The MLE estimator $\hat{\theta}_{\text{MLE}}$ is the value of $\theta$ that maximizes the log-likelihood function, $\mathcal{L}(\theta) = \sum_{i=1}^N \log f(\varepsilon_{1i}(\theta), \varepsilon_{2i}(\theta) \mid X_i; \theta)$, where $f(\cdot)$ is the bivariate normal PDF.
+
+\paragraph{Generalized Method of Moments (GMM).}
+GMM provides a more robust alternative that does not require a full distributional assumption. A set of moment conditions sufficient to identify $\theta$ is given by $\E[Q(\theta)]=0$, where:
+\[
+Q(\theta) \coloneqq \begin{pmatrix}
+X \cdot \varepsilon_1(\theta) \\
+X \cdot \varepsilon_2(\theta) \\
+X \cdot \left(\varepsilon_1(\theta)^2 - \exp(X\T\delta_1)\right) \\
+X \cdot \left(\varepsilon_2(\theta)^2 - \exp(X\T\delta_2)\right) \\
+X \cdot \left(\varepsilon_1(\theta)\varepsilon_2(\theta) - \rho_0 \exp(\frac{1}{2}X\T(\delta_1+\delta_2))\right)
+\end{pmatrix}.
+\]
+The first two sets of moments identify the mean parameters ($\beta_1, \gamma_1, \beta_2$). The next two sets use the assumed variance structure to identify the variance parameters ($\delta_1, \delta_2$), and the final set identifies the correlation parameter $\rho_0$. The GMM estimator $\hat{\theta}_{\text{GMM}}$ minimizes the standard quadratic form $\bar{Q}(\theta)\T W \bar{Q}(\theta)$ for a given weighting matrix $W$.
+
 \section{Two Time-Series Examples}
 
 The core idea can be adapted to other contexts by properly defining
@@ -313,40 +424,69 @@ as instruments for $Y_{2t}$ in the first structural equation. Use
 HAC-robust standard errors.
 \end{enumerate}
 
-\subsection{Regime heteroskedasticity \textcite{rigobon2003}}
-
-\paragraph{Model.}
-
-The model is a simultaneous system where the error variances differ
-across observable, discrete regimes (e.g., pre- and post-policy change,
-or high- vs. low-volatility periods). The system is:
+\subsection{Regime Heteroskedasticity \textcite{rigobon2003}}
+\label{sec:rigobon_application}
+\paragraph{Model Framework.}
+The core idea of \textcite{rigobon2003} is that identification can be achieved if the error variances differ across observable, discrete regimes, $s \in \{1, \dots, S\}$ (e.g., pre- and post-policy change, or high- vs. low-volatility periods). The structural parameters of the model are assumed to be constant across these regimes. The structural equations are:
 \begin{align*}
 Y_{1} & =X\T\beta_{1}+\gamma_{1}Y_{2}+\varepsilon_{1}\\
-Y_{2} & =X\T\beta_{2}+\varepsilon_{2}
+Y_{2} & =X\T\beta_{2}+\gamma_{2}Y_{1}+\varepsilon_{2}
 \end{align*}
-The key assumption is that for at least one error term $\varepsilon_{j}$,
-its variance changes across regimes $s$, while the covariance between
-the errors remains constant:
-\begin{align*}
-\var(\varepsilon_{j}\mid s) & \neq\var(\varepsilon_{j}\mid s')\quad\text{for }s\neq s'\\
-\cov(\varepsilon_{1},\varepsilon_{2}\mid s) & =\text{constant for all }s.
-\end{align*}
+The key assumption is that the variance-covariance matrix of the structural errors, $\Sigma_{\varepsilon}$, is different in at least two regimes. Let $\Sigma_{\varepsilon, s}$ denote this matrix in regime $s$.
+\[
+\Sigma_{\varepsilon, s} \coloneqq \begin{pmatrix} \sigma_{1,s}^2 & \sigma_{12,s} \\ \sigma_{12,s} & \sigma_{2,s}^2 \end{pmatrix}, \qquad \text{with } \Sigma_{\varepsilon, s} \neq \Sigma_{\varepsilon, s'} \text{ for some } s \neq s'.
+\]
+This regime-based heteroskedasticity can be exploited using either the Lewbel or Klein-Vella identification strategy, depending on further assumptions about the error structure.
 
+\subsubsection{Lewbel-Style IV Procedure}
+\paragraph{Assumptions.}
+This approach applies to the simultaneous system. It relies on the core Lewbel assumptions, specialized to the regime context. The key identifying restrictions are:
+\begin{enumerate}
+    \itemsep1pt
+    \item \textbf{Covariance Restriction:} The structural error \emph{covariance} is constant across regimes: $\sigma_{12,s} = \sigma_{12}$ for all $s$.
+    \item \textbf{Instrument Relevance:} At least one structural error \emph{variance} is not constant across regimes: $\sigma_{j,s}^2 \neq \sigma_{j,s'}^2$ for some $j, s, s'$.
+\end{enumerate}
+Let $D_s$ be a dummy variable for regime $s$. The instrument vector $Z$ is formed by the set of centered dummies, $Z \coloneqq [D_1 - p_1, \dots, D_{S-1}-p_{S-1}]\T$, where $p_s$ is the population proportion in regime $s$. Under these conditions, the Lewbel assumptions \ref{enu:error_covariance} and \ref{enu:het} hold. Specifically, $\cov(Z, \varepsilon_1\varepsilon_2) = 0$ because both $Z$ and $\varepsilon_1\varepsilon_2$ are functions of the regime, but $\varepsilon_1\varepsilon_2$ has a constant mean across regimes while $Z$ does not.
 
 \paragraph{Procedure.}
-
-The regime indicators are used to generate the instrument.
+The regime indicators are used to generate the instrument. For the triangular case ($\gamma_2 = 0$):
 \begin{enumerate}
 \itemsep2pt
-\item Estimate the second equation by OLS to get residuals $\hat{\varepsilon}_{2}$.
-\item Create a set of dummy variables $\{D_{1},\dots,D_{S}\}$ for the regimes.
-\item The heteroskedasticity drivers are these dummies: set $Z$ to be the
-vector of centered dummies, $Z_{s}\coloneqq D_{s}-p_{s}$, where $p_{s}$
-is the sample proportion of observations in regime $s$.
-\item Construct the generated instrument(s): $IV_{s}\coloneqq Z_{s}\hat{\varepsilon}_{2}$.
-\item Proceed with 2SLS, using $[X,IV_{1},\dots,IV_{S}]$ as instruments
-for $Y_{2}$ in the main equation.
+\item \textbf{Generate residuals.} Regress $Y_{2}$ on $X$ by OLS to get residuals $\hat{\varepsilon}_{2}$.
+\item \textbf{Construct instruments.} The heteroskedasticity drivers are the centered dummy variables, $Z_{s}\coloneqq D_{s}-\bar{D}_{s}$. The generated instruments are $IV_{s}\coloneqq Z_{s}\hat{\varepsilon}_{2}$.
+\item \textbf{Proceed with 2SLS,} using $[X,IV_{1},\dots,IV_{S-1}]$ as instruments for $Y_{2}$.
 \end{enumerate}
+
+\subsubsection{Klein \& Vella-Style Control Function Procedure}
+\paragraph{Assumptions.}
+This approach applies to the triangular system ($\gamma_2=0$). It relies on the core K\&V assumptions, specialized to the regime context.
+\begin{enumerate}
+    \itemsep1pt
+    \item \textbf{Constant Conditional Correlation:} The structural error \emph{correlation} is constant across regimes: $\corr(\varepsilon_1, \varepsilon_2 \mid s) = \rho_0$ for all $s$.
+    \item \textbf{Heteroskedasticity and Variation:} The structural error \emph{variances} are not constant across regimes. Crucially for identification, the ratio of the standard deviations, $\sigma_{1,s}/\sigma_{2,s}$, must not be constant for all $s$.
+\end{enumerate}
+
+\paragraph{Procedure.}
+The regime indicators are used to construct a piecewise control function. The simplest case is where the conditional variances are constant within each regime, i.e., $\var(\varepsilon_j \mid s) = \sigma_{js}^2$.
+\begin{enumerate}
+    \itemsep2pt
+    \item \textbf{Estimate second-equation residuals.} Regress $Y_2$ on $X$ to get residuals $\hat{\varepsilon}_2$.
+    \item \textbf{Estimate regime-specific variances.} For each regime $s$, compute the sample variance of the residuals, $\hat{\sigma}_{2s}^2 = \frac{1}{N_s}\sum_{i \in s} \hat{\varepsilon}_{2i}^2$. For any candidate $(\beta_{1k}, \gamma_{1k})$, compute $\hat{\varepsilon}_{1k}$ and its regime-specific variances $\hat{\sigma}_{1ks}^2$.
+    \item \textbf{Estimate via nonlinear least squares (NLS).} The main equation is specified with an interacted control function:
+    \[
+    Y_1 = X\T\beta_1 + \gamma_1 Y_2 + \rho_0 \sum_{s=1}^S D_s \left( \frac{\sigma_{1s}}{\sigma_{2s}} \hat{\varepsilon}_2 \right) + \eta_1
+    \]
+    The parameters $(\beta_1, \gamma_1, \rho_0)$ and the variance ratios $(\sigma_{1s}/\sigma_{2s})$ for $s=1,\dots,S$ are estimated jointly via NLS.
+\end{enumerate}
+
+\subsubsection{Comparison of Approaches}
+The Lewbel and K\&V approaches use the same observable phenomenon—a shift in the error variance structure across regimes—but rely on different, non-nested assumptions to achieve identification.
+\begin{itemize}
+\item \textbf{Core Assumption:} Lewbel requires the \emph{covariance} of the structural errors to be constant across regimes. K\&V requires the \emph{correlation} to be constant. If both variances change across regimes, these two assumptions are mutually exclusive.
+\item \textbf{Applicability:} The Lewbel approach is more general as it applies to simultaneous systems. The K\&V control function approach, as formulated, is restricted to triangular systems.
+\item \textbf{Estimation:} Lewbel's method leads to a standard linear IV (2SLS) procedure. K\&V's method requires a more complex nonlinear least squares estimation to handle the variance ratios and correlation parameter.
+\end{itemize}
+The choice between the two depends on which assumption about the stability of the error structure—constant covariance or constant correlation—is more plausible in a given economic application.
 
 \section{Time-Series Variant with Log-Linear Conditional Variances}
 
@@ -364,7 +504,7 @@ log-linear function of the exogenous variables $X_{t}$:
 \[
 \log\sigma_{jt}^{2}\coloneqq X_{t}\T\delta_{j},\quad\text{where}\quad\varepsilon_{jt}\mid\mathcal{F}_{t-1}\sim(0,\sigma_{jt}^{2})\quad\text{for }j=1,2.
 \]
-and $\mathcal{F}_{t-1}$ denotes time $(t+1)$-information. Since
+and $\mathcal{F}_{t-1}$ denotes time $(t-1)$-information. Since
 $(\delta_{1},\delta_{2})$ are assumed non-zero, $X_{t}$ is correlated
 with $\varepsilon_{jt}^{2}$, satisfying the instrument relevance
 condition \ref{enu:het}. The heteroskedasticity driver is defined
@@ -399,7 +539,7 @@ is $Z_{t}\coloneqq X_{t}-\E[X_{t}]$, estimated in-sample as $X_{t}-\bar{X}$.
 \end{itemize}
 Therefore, the sample average of $Q_{t}(\theta)$ is a computable
 criterion function for any candidate parameter values. As in Section \ref{subsec:sys}, $Z_t$
-must have at least 2 entries (including perhaps a constant, if Corollary \ref{cor:const_Z} applies)
+must have at least 2 entries (including perhaps a constant, if Corollary \ref{cor:const_Z} applies).
 
 \section{Other Notes}
 \begin{itemize}
@@ -414,7 +554,7 @@ test the validity of the moment conditions.
 \item \textbf{Endogeneity of $Y_{2}$.} The endogeneity of $Y_{2}$ can
 be tested using a difference-in-Hansen test (C-statistic) or a Hausman-style
 test comparing the OLS and 2SLS estimates of $\gamma_{1}$.
-\item \textbf{heteroskedasticity of $\varepsilon_{2}$.} The crucial assumption
+\item \textbf{Heteroskedasticity of $\varepsilon_{2}$.} The crucial assumption
 \ref{enu:het} can be checked with a Breusch--Pagan or White test
 for heteroskedasticity, by regressing the squared residuals $\hat{\varepsilon}_{2}^{2}$
 on the proposed driver(s) $Z$. A significant relationship provides

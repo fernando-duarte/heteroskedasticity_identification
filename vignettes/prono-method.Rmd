@@ -337,13 +337,13 @@ ggplot(n_sensitivity, aes(x = n)) +
 
 ### 1. GARCH Package Requirement
 
-For full functionality, install the `rugarch` package:
+For full functionality, install the `tsgarch` package:
 
 ```{r eval=FALSE}
-install.packages("rugarch")
+install.packages("tsgarch")
 ```
 
-Without `rugarch`, the method falls back to using squared residuals as a proxy for conditional variance, which is less efficient.
+Without `tsgarch`, the method falls back to using squared residuals as a proxy for conditional variance, which is less efficient.
 
 ### 2. When to Use This Method
 
@@ -739,13 +739,16 @@ run_prono_asset_pricing <- function(data, window_size = 260) {
       # First get residuals for GARCH estimation
       e2 <- residuals(lm(Y2 ~ 1, data = prono_df))
 
-      # Fit GARCH if rugarch available
-      if (requireNamespace("rugarch", quietly = TRUE)) {
-        spec <- rugarch::ugarchspec(
-          variance.model = list(model = "sGARCH", garchOrder = c(1, 1)),
-          mean.model = list(armaOrder = c(0, 0), include.mean = FALSE)
+      # Fit GARCH if tsgarch available
+      if (requireNamespace("tsgarch", quietly = TRUE)) {
+        spec <- tsgarch::garch_modelspec(
+          y = e2,
+          model = "garch",
+          order = c(1, 1),
+          constant = TRUE,
+          distribution = "norm"
         )
-        garch_fit <- rugarch::ugarchfit(spec = spec, data = e2)
+        garch_fit <- tsgarch::estimate(spec)
 
         # Continue with Prono estimation...
       }
