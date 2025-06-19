@@ -59,6 +59,8 @@ docs/
 # AI assistant rule files
 .cursorrules
 .augmentrules
+.claude
+CLAUDE.md
 
 # translation temp files
 po/*~
@@ -96,24 +98,7 @@ setup_env.sh
 *#*.lyx#
 *.lyx
 
-# LaTeX auxiliary files
-*.aux
-*.log
-*.synctex.gz
-*.bbl
-*.blg
-*.fdb_latexmk
-*.fls
-*.out
-*.toc
-*.bcf
-*.run.xml
 
-# Generated PDF output (but keep reference papers)
-lewbel2012/lewbel2012.pdf
-
-# Generated bibliography files (from filecontents)
-lewbel2012/*.bib
 
 # Temporary R/editor files
 *~
@@ -304,3 +289,22 @@ lewbel_verification_results.RData
 
 # Development documentation
 CICD-vignette-pdf-best-practices-2025.md
+
+# LaTeX auxiliary files
+*.aux
+*.log
+*.synctex.gz
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.toc
+*.bcf
+*.run.xml
+
+# PDF files in lewbel2012 directory (research papers)
+lewbel2012/*.pdf
+
+# Generated bibliography files (from filecontents)
+lewbel2012/*.bib

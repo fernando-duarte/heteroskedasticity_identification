@@ -44,6 +44,7 @@ Suggests:
     REndo (>= 2.4.0),
     rmarkdown,
     RStata,
+    rugarch,
     testthat (>= 3.0.0),
     uuid,
     withr

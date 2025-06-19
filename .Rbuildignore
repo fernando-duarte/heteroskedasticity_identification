@@ -103,6 +103,7 @@
 ^\.\.Rcheck$
 ^\.augmentrules$
 ^\.circleci$
+^\.claude$
 ^\.coverage$
 ^\.cursorignore$
 ^\.cursorrules$
@@ -176,7 +177,7 @@
 ^inst/scripts$
 ^journal\.md$
 ^lewbel2012$
-^lewbel2012/lewbel_2012_paper\.pdf$
+^lewbel2012/.*\.pdf$
 ^lewbel_implementations_comparison\.tex$
 ^lewbel_methods_summary\.tex$
 ^local-todo\.md$

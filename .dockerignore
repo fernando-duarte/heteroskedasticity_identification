@@ -207,6 +207,10 @@ local-todo.md
 .cursorrules
 .cursorignore
 
+### Claude AI ###
+.claude
+CLAUDE.md
+
 ### Additional ignores ###
 .dockerignore
 *.pid

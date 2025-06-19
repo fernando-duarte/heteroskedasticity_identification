@@ -69,6 +69,10 @@ DS013
 # HEALTHCHECK is implemented where needed
 DS026
 
+# Claude AI working directory
+.claude
+CLAUDE.md
+
 #=============================================================================
 # GITHUB ACTIONS - Workflow configurations
 #=============================================================================

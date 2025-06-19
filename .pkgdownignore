@@ -15,6 +15,7 @@ STATA*.md
 CI_CD*.md
 PR_*.md
 CLAUDE.md
+.claude
 error.md
 tmux.md
 validate_hetid.md
@@ -22,6 +23,7 @@ documentation-patterns.md
 refactor_magic_variables_prompt.md
 long_files.md
 lewbel*.tex
+lewbel2012/*.pdf
 
 # Include only intended documentation
 !README.md
