@@ -307,12 +307,11 @@ mc_summary <- data.frame(
 cat("Monte Carlo Results (", n_mc, "replications):\n")
 print(mc_summary, digits = 4)
 
-# Plot distributions
-library(tidyr)
-mc_long <- mc_df %>%
-  select(ols_est, rigobon_est) %>%
-  pivot_longer(everything(), names_to = "Method", values_to = "Estimate") %>%
-  mutate(Method = ifelse(Method == "ols_est", "OLS", "Rigobon"))
+# Reshape for plotting
+mc_long <- mc_df |>
+  select(ols_est, rigobon_est) |>
+  pivot_longer(everything(), names_to = "Method", values_to = "Estimate") |>
+  mutate(Method = factor(Method, levels = c("ols_est", "rigobon_est"), labels = c("OLS", "Rigobon")))
 
 ggplot(mc_long, aes(x = Estimate, fill = Method)) +
   geom_density(alpha = 0.7) +
@@ -732,8 +731,8 @@ cat("α estimates - Mean:", round(mean(alpha_estimates), 3),
 cat("β estimates - Mean:", round(mean(beta_estimates), 3),
     "SD:", round(sd(beta_estimates), 3), "\n")
 cat("\nCoefficient of variation:\n")
-cat("α:", round(sd(alpha_estimates)/mean(alpha_estimates), 3), "\n")
-cat("β:", round(sd(beta_estimates)/mean(beta_estimates), 3), "\n")
+cat("α:", round(sd(alpha_estimates) / mean(alpha_estimates), 3), "\n")
+cat("β:", round(sd(beta_estimates) / mean(beta_estimates), 3), "\n")
 ```
 
 ### Key Findings and Interpretation
@@ -795,3 +794,12 @@ The `hetid` package provides a complete implementation with:
 For theoretical details, see:
 - Rigobon, R. (2003). "Identification Through Heteroskedasticity." *The Review of Economics and Statistics*, 85(4), 777-792.
 - Lewbel, A. (2012). "Using Heteroscedasticity to Identify and Estimate Mismeasured and Endogenous Regressor Models." *Journal of Business & Economic Statistics*, 30(1), 67-80.
+
+# Example showing potential coefficient of variation for estimates if run in MC
+# This is a conceptual calculation
+# Example data: alpha_estimates <- rnorm(100, mean = 0.6, sd = 0.1) # from MC
+# beta_estimates <- rnorm(100, mean = 0.2, sd = 0.05)
+# if (exists("alpha_estimates") && exists("beta_estimates")) {
+# cat("CV for alpha estimates: ", round(sd(alpha_estimates) / mean(alpha_estimates), 3), "\n")
+# cat("CV for beta estimates: ", round(sd(beta_estimates) / mean(beta_estimates), 3), "\n")
+# }

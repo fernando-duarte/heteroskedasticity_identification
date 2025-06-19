@@ -12,8 +12,26 @@ run_prono_demo(n = 500, print_results = TRUE)
 \item{print_results}{Whether to print results}
 }
 \value{
-Results from single simulation
+Results from single simulation (invisibly)
 }
 \description{
 Run Prono demonstration
+}
+\examples{
+\donttest{
+# Quick demonstration with reduced sample size
+run_prono_demo(n = 200, print_results = TRUE)
+}
+
+}
+\references{
+Prono, T. (2014). The Role of Conditional Heteroskedasticity in Identifying
+and Estimating Linear Triangular Systems, with Applications to Asset Pricing
+Models That Include a Mismeasured Factor. Journal of Applied Econometrics,
+29(5), 800-824. \doi{10.1002/jae.2387}
+}
+\seealso{
+\code{\link{run_single_prono_simulation}} for the underlying simulation
+\code{\link{create_prono_config}} for configuration
+\code{\link{run_prono_monte_carlo}} for full Monte Carlo analysis
 }

@@ -29,3 +29,22 @@ Data frame with simulation results
 \description{
 Run Prono Monte Carlo simulation
 }
+\examples{
+\donttest{
+# Time-consuming Monte Carlo simulation
+# For actual research, use n_sims = 1000+
+config <- create_prono_config(n = 500)
+mc_results <- run_prono_monte_carlo(config, n_sims = 100)
+}
+
+}
+\references{
+Prono, T. (2014). The Role of Conditional Heteroskedasticity in Identifying
+and Estimating Linear Triangular Systems, with Applications to Asset Pricing
+Models That Include a Mismeasured Factor. Journal of Applied Econometrics,
+29(5), 800-824. \doi{10.1002/jae.2387}
+}
+\seealso{
+\code{\link{run_single_prono_simulation}} for single simulation
+\code{\link{create_prono_config}} for configuration setup
+}

@@ -65,10 +65,10 @@ Data characteristics:
 
 ## Validation Summary
 
-✅ **Bias reduction**: Nearly identical (~92%)  
-✅ **RMSE improvement**: Nearly identical (~68%)  
-✅ **Coverage rates**: Both achieve nominal 95% level  
-✅ **First-stage strength**: F-statistics > 10 (strong identification)  
+✅ **Bias reduction**: Nearly identical (~92%)
+✅ **RMSE improvement**: Nearly identical (~68%)
+✅ **Coverage rates**: Both achieve nominal 95% level
+✅ **First-stage strength**: F-statistics > 10 (strong identification)
 
 ## Minor Differences Explained
 

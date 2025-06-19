@@ -29,6 +29,18 @@
 #' @param seed Random seed
 #'
 #' @return Data frame with generated variables (Y1 and Y2 are in percent)
+#'
+#' @references
+#' Prono, T. (2014). The Role of Conditional Heteroskedasticity in Identifying
+#' and Estimating Linear Triangular Systems, with Applications to Asset Pricing
+#' Models That Include a Mismeasured Factor. Journal of Applied Econometrics,
+#' 29(5), 800-824. \doi{10.1002/jae.2387}
+#'
+#' @seealso
+#' \code{\link{run_single_prono_simulation}} for running a single simulation
+#' \code{\link{create_prono_config}} for default configuration
+#' \code{\link{run_prono_monte_carlo}} for Monte Carlo analysis
+#'
 #' @export
 generate_prono_data <- function(n = 500,
                                beta1 = c(0.05, 0.01),
@@ -99,7 +111,20 @@ generate_prono_data <- function(n = 500,
 #' @param config Configuration list with simulation parameters
 #' @param return_details If TRUE, return detailed results
 #'
-#' @return List with estimation results
+#' @return List with estimation results including gamma1_true, gamma1_ols, gamma1_iv,
+#' standard errors, biases, F-statistic, and optionally full model objects
+#'
+#' @references
+#' Prono, T. (2014). The Role of Conditional Heteroskedasticity in Identifying
+#' and Estimating Linear Triangular Systems, with Applications to Asset Pricing
+#' Models That Include a Mismeasured Factor. Journal of Applied Econometrics,
+#' 29(5), 800-824. \doi{10.1002/jae.2387}
+#'
+#' @seealso
+#' \code{\link{generate_prono_data}} for data generation
+#' \code{\link{run_prono_monte_carlo}} for Monte Carlo analysis
+#' \code{\link{prono_gmm}} for GMM estimation
+#'
 #' @export
 run_single_prono_simulation <- function(config, return_details = FALSE) {
 
@@ -261,6 +286,26 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
 #' @param progress Whether to show progress bar
 #'
 #' @return Data frame with simulation results
+#'
+#' @references
+#' Prono, T. (2014). The Role of Conditional Heteroskedasticity in Identifying
+#' and Estimating Linear Triangular Systems, with Applications to Asset Pricing
+#' Models That Include a Mismeasured Factor. Journal of Applied Econometrics,
+#' 29(5), 800-824. \doi{10.1002/jae.2387}
+#'
+#' @seealso
+#' \code{\link{run_single_prono_simulation}} for single simulation
+#' \code{\link{create_prono_config}} for configuration setup
+#'
+#' @examples
+#' \donttest{
+#' # Time-consuming Monte Carlo simulation
+#' # For actual research, use n_sims = 1000+
+#' config <- create_prono_config(n = 500)
+#' mc_results <- run_prono_monte_carlo(config, n_sims = 100)
+#' }
+#'
+#' @importFrom utils txtProgressBar setTxtProgressBar
 #' @export
 run_prono_monte_carlo <- function(config,
                                  n_sims = 1000,
@@ -395,7 +440,25 @@ create_prono_config <- function(n = 500, k = 1, ...) {
 #' @param n Sample size
 #' @param print_results Whether to print results
 #'
-#' @return Results from single simulation
+#' @return Results from single simulation (invisibly)
+#'
+#' @references
+#' Prono, T. (2014). The Role of Conditional Heteroskedasticity in Identifying
+#' and Estimating Linear Triangular Systems, with Applications to Asset Pricing
+#' Models That Include a Mismeasured Factor. Journal of Applied Econometrics,
+#' 29(5), 800-824. \doi{10.1002/jae.2387}
+#'
+#' @seealso
+#' \code{\link{run_single_prono_simulation}} for the underlying simulation
+#' \code{\link{create_prono_config}} for configuration
+#' \code{\link{run_prono_monte_carlo}} for full Monte Carlo analysis
+#'
+#' @examples
+#' \donttest{
+#' # Quick demonstration with reduced sample size
+#' run_prono_demo(n = 200, print_results = TRUE)
+#' }
+#'
 #' @export
 run_prono_demo <- function(n = 500, print_results = TRUE) {
 
@@ -410,11 +473,11 @@ run_prono_demo <- function(n = 500, print_results = TRUE) {
   results <- run_single_prono_simulation(config, return_details = TRUE)
 
   if (print_results) {
-    cat("Model: Y1 = X'β1 + γ1*Y2 + ε1\n")
-    cat("       Y2 = X'β2 + ε2\n")
-    cat("where ε2 follows GARCH(1,1)\n\n")
+    cat("Model: Y1 = X'beta1 + gamma1*Y2 + epsilon1\n")
+    cat("       Y2 = X'beta2 + epsilon2\n")
+    cat("where epsilon2 follows GARCH(1,1)\n\n")
 
-    cat(sprintf("True γ1: %.3f\n", results$gamma1_true))
+    cat(sprintf("True gamma1: %.3f\n", results$gamma1_true))
     cat(sprintf("OLS estimate: %.3f (bias: %.3f)\n",
                 results$gamma1_ols, results$bias_ols))
     cat(sprintf("Prono IV estimate: %.3f (bias: %.3f)\n",

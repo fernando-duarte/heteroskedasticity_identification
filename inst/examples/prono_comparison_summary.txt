@@ -2,8 +2,8 @@
 PRONO (2014) PUBLISHED RESULTS vs OUR REPLICATION SUMMARY
 ==============================================================
 
-Since the rugarch package is not currently installed, here is a 
-comprehensive summary of the comparison between Prono's published 
+Since the rugarch package is not currently installed, here is a
+comprehensive summary of the comparison between Prono's published
 results and what our replication achieves with independent data.
 
 PRONO'S PUBLISHED RESULTS (Table II, Journal of Applied Econometrics)
@@ -103,8 +103,8 @@ First-stage F-stat:  15.3
 CONCLUSION
 ==========
 
-Our package successfully implements Prono's (2014) GARCH-based 
-heteroskedasticity identification method. Using independently 
+Our package successfully implements Prono's (2014) GARCH-based
+heteroskedasticity identification method. Using independently
 generated data, we achieve:
 
 - Comparable bias reduction (>90%)

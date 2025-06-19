@@ -7,10 +7,11 @@
 lewbel_triangular_moments(
   theta,
   data,
-  y1_var = "Y1",
-  y2_var = "Y2",
-  x_vars = "Xk",
-  z_vars = NULL
+  y1_var,
+  y2_var,
+  x_vars,
+  z_vars,
+  add_intercept
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ lewbel_triangular_moments(
 \item{x_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 
 \item{z_vars}{Character vector. Names of heteroskedasticity drivers (default: NULL, uses centered X).}
+
+\item{add_intercept}{Logical. Whether to add an intercept to the exogenous variables.}
 }
 \value{
 Matrix of moment conditions (n x q).
@@ -40,9 +43,9 @@ For the triangular system:
 
 The moment conditions are:
 \itemize{
-\item E\link{X * epsilon_1} = 0
-\item E\link{X * epsilon_2} = 0
-\item E\link{Z * epsilon_1 * epsilon_2} = 0
+\item \eqn{E[X \times \epsilon_1] = 0}
+\item \eqn{E[X \times \epsilon_2] = 0}
+\item \eqn{E[Z \times \epsilon_1 \times \epsilon_2] = 0}
 }
 where Z = g(X) is a mean-zero transformation of X.
 }

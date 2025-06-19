@@ -79,19 +79,19 @@ cat(sprintf("- Min: %.3f%%, Max: %.3f%%\n", min(market_excess), max(market_exces
 squared_returns <- (market_excess - mean(market_excess))^2
 acf_sq <- acf(squared_returns, lag.max = 10, plot = FALSE)
 cat(sprintf("- ACF of squared returns at lag 1: %.3f\n", acf_sq$acf[2]))
-cat(sprintf("- Evidence of GARCH effects: %s\n\n", 
+cat(sprintf("- Evidence of GARCH effects: %s\n\n",
             ifelse(acf_sq$acf[2] > 0.1, "YES", "WEAK")))
 
 # Summary comparison
 cat("=== SUMMARY COMPARISON ===\n\n")
 
 comparison <- data.frame(
-  Statistic = c("Number of observations", 
+  Statistic = c("Number of observations",
                 "Mean weekly excess return (%)",
                 "Data frequency",
                 "Start date",
                 "End date"),
-  Prono_Paper = c("2,166", 
+  Prono_Paper = c("2,166",
                   "0.097",
                   "Weekly",
                   "July 5, 1963",
@@ -104,7 +104,7 @@ comparison <- data.frame(
   Status = c("EXACT MATCH",
              ifelse(abs(mean(market_excess) - 0.097) < 0.005, "CLOSE MATCH", "NEEDS ADJUSTMENT"),
              "MATCH",
-             "MATCH", 
+             "MATCH",
              "MATCH")
 )
 
@@ -138,5 +138,5 @@ cat("- 1980s: ~8% annually (0.154% weekly)\n")
 cat("- 1990s: ~5% annually (0.096% weekly)\n")
 cat("- 2000-2004: ~2% annually (0.038% weekly)\n")
 avg_rf <- (4 + 6 + 8 + 5 + 2) / 5
-cat(sprintf("\nRough average: %.1f%% annually (%.3f%% weekly)\n", 
+cat(sprintf("\nRough average: %.1f%% annually (%.3f%% weekly)\n",
             avg_rf, avg_rf / 52))

@@ -301,4 +301,3 @@ result <- run_single_lewbel_simulation(
 cat("\nResult to match R's ivreg (finite sample):\n")
 cat("  Coefficient:", round(result$tsls_gamma1, 6), "\n")
 cat("  SE:", round(result$tsls_se, 6), "\n")
-

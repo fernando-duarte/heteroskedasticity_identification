@@ -50,9 +50,9 @@ analysis_data <- na.omit(analysis_data)
 
 # Display summary statistics
 cat("Summary Statistics:\n")
-cat("Y1 (Portfolio excess return): Mean =", sprintf("%.3f%%", mean(analysis_data$Y1)), 
+cat("Y1 (Portfolio excess return): Mean =", sprintf("%.3f%%", mean(analysis_data$Y1)),
     "SD =", sprintf("%.3f%%", sd(analysis_data$Y1)), "\n")
-cat("Y2 (Market excess return): Mean =", sprintf("%.3f%%", mean(analysis_data$Y2)), 
+cat("Y2 (Market excess return): Mean =", sprintf("%.3f%%", mean(analysis_data$Y2)),
     "SD =", sprintf("%.3f%%", sd(analysis_data$Y2)), "\n\n")
 
 # Test 1: OLS (biased)
@@ -76,14 +76,14 @@ tryCatch({
     data = analysis_data,
     return_details = TRUE
   )
-  
+
   cat("Coefficient on Y2:", sprintf("%.4f", prono_result$gamma1_iv), "\n")
   cat("Standard error:", sprintf("%.4f", prono_result$se_iv), "\n")
   cat("t-statistic:", sprintf("%.2f", prono_result$gamma1_iv / prono_result$se_iv), "\n")
   cat("First-stage F-stat:", sprintf("%.2f", prono_result$f_stat), "\n")
-  cat("Bias reduction:", sprintf("%.1f%%", 
+  cat("Bias reduction:", sprintf("%.1f%%",
       100 * (1 - abs(prono_result$bias_iv) / abs(prono_result$bias_ols))), "\n\n")
-  
+
 }, error = function(e) {
   cat("Error:", e$message, "\n\n")
 })
@@ -95,15 +95,15 @@ cat("============================\n")
 tryCatch({
   # First fit GARCH to get conditional variance
   y2_resid <- lm(Y2 ~ X1 + X2, data = analysis_data)$residuals
-  
+
   garch_spec <- rugarch::ugarchspec(
     variance.model = list(model = "sGARCH", garchOrder = c(1, 1)),
     mean.model = list(armaOrder = c(0, 0), include.mean = FALSE)
   )
-  
+
   garch_fit <- rugarch::ugarchfit(garch_spec, y2_resid)
   analysis_data$sigma2_sq_hat <- as.numeric(rugarch::sigma(garch_fit))^2
-  
+
   # Run GMM
   gmm_result <- prono_gmm(
     analysis_data,
@@ -111,19 +111,19 @@ tryCatch({
     fit_garch = FALSE,
     verbose = FALSE
   )
-  
+
   gmm_coef <- coef(gmm_result)["gamma1"]
   gmm_se <- sqrt(vcov(gmm_result)["gamma1", "gamma1"])
-  
+
   cat("GMM coefficient on Y2:", sprintf("%.4f", gmm_coef), "\n")
   cat("GMM standard error:", sprintf("%.4f", gmm_se), "\n")
   cat("GMM t-statistic:", sprintf("%.2f", gmm_coef/gmm_se), "\n")
-  
+
   if (!is.null(gmm_result$J_test)) {
     cat("J-test statistic:", sprintf("%.2f", gmm_result$J_test$J_stat), "\n")
     cat("J-test p-value:", sprintf("%.4f", gmm_result$J_test$p_value), "\n")
   }
-  
+
 }, error = function(e) {
   cat("Error in GMM:", e$message, "\n\n")
 })
@@ -132,17 +132,17 @@ tryCatch({
 cat("\n=== SUMMARY COMPARISON ===\n")
 cat("Method              Coefficient    Std Error    t-stat\n")
 cat("-------------------------------------------------------\n")
-cat(sprintf("OLS                 %8.4f      %8.4f    %6.2f\n", 
+cat(sprintf("OLS                 %8.4f      %8.4f    %6.2f\n",
     ols_coef, ols_se, ols_coef/ols_se))
 
 if (exists("prono_result")) {
-  cat(sprintf("Prono IV            %8.4f      %8.4f    %6.2f\n", 
-      prono_result$gamma1_iv, prono_result$se_iv, 
+  cat(sprintf("Prono IV            %8.4f      %8.4f    %6.2f\n",
+      prono_result$gamma1_iv, prono_result$se_iv,
       prono_result$gamma1_iv / prono_result$se_iv))
 }
 
 if (exists("gmm_coef")) {
-  cat(sprintf("Prono GMM           %8.4f      %8.4f    %6.2f\n", 
+  cat(sprintf("Prono GMM           %8.4f      %8.4f    %6.2f\n",
       gmm_coef, gmm_se, gmm_coef/gmm_se))
 }
 

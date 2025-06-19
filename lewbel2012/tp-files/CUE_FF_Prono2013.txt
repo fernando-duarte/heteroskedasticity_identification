@@ -186,7 +186,7 @@ mat e`i' = e[`i'..`i',1...]
 mat c0 = c
 loc i = 1
 while `i'<=`t' {
-mat c = c0 + e`i'*dh 
+mat c = c0 + e`i'*dh
 formg
 mat gplus`i' = g
 mat c = c0 - e`i'*dh
@@ -222,7 +222,7 @@ mat e`i' = e[`i'..`i',1...]
 mat c0 = c
 loc i = 1
 while `i'<=`t' {
-mat c = c0 + e`i'*dh 
+mat c = c0 + e`i'*dh
 formg
 optw
 mat gwgplus`i' = g'*w*g
@@ -403,7 +403,7 @@ program define step1
 /*input file path to data*/
 use " ", clear
 /*identifier for which excess return is being referenced*/
-scalar p = 
+scalar p =
 vals
 /*number of lags to use in estimation*/
 scalar lags = 12

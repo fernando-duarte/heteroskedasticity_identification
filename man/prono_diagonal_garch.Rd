@@ -26,3 +26,22 @@ List with estimation results
 \description{
 Complete Prono estimation using proper diagonal GARCH specification
 }
+\examples{
+\donttest{
+# Time-consuming example with diagonal GARCH
+data <- generate_prono_data(n = 500)
+result <- prono_diagonal_garch(data, method = "2sls")
+}
+
+}
+\references{
+Prono, T. (2014). The Role of Conditional Heteroskedasticity in Identifying
+and Estimating Linear Triangular Systems, with Applications to Asset Pricing
+Models That Include a Mismeasured Factor. Journal of Applied Econometrics,
+29(5), 800-824. \doi{10.1002/jae.2387}
+}
+\seealso{
+\code{\link{fit_diagonal_garch_prono}} for GARCH fitting
+\code{\link{run_single_prono_simulation}} for 2SLS estimation
+\code{\link{prono_gmm}} for GMM estimation
+}

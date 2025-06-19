@@ -11,6 +11,7 @@ lewbel_gmm(
   y2_var = "Y2",
   x_vars = "Xk",
   z_vars = NULL,
+  add_intercept = TRUE,
   gmm_type = c("twoStep", "iterative", "cue"),
   initial_values = NULL,
   vcov = c("HAC", "iid", "cluster"),
@@ -30,6 +31,8 @@ lewbel_gmm(
 \item{x_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 
 \item{z_vars}{Character vector. Names of heteroskedasticity drivers (default: NULL).}
+
+\item{add_intercept}{Logical. Whether to add an intercept to the exogenous variables (default: TRUE).}
 
 \item{gmm_type}{Character. GMM type: "twoStep", "iterative", or "cue" (default: "twoStep").}
 

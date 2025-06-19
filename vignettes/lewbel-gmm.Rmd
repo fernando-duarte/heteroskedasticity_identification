@@ -82,16 +82,16 @@ u1 <- rnorm(n_sim) * exp(0.5 * data_sim$X1)
 u2 <- rnorm(n_sim) * exp(-0.5 * data_sim$X1)
 
 # Solve system
-X_mat <- as.matrix(cbind(1, data_sim[, c("X1", "X2", "X3")]))
-Gamma <- matrix(c(0, gamma1_true, gamma2_true, 0), 2, 2)
-Beta <- cbind(beta1, beta2)
-U <- cbind(u1, u2)
+x_mat <- as.matrix(cbind(1, data_sim[, c("X1", "X2", "X3")]))
+gamma_mat <- matrix(c(0, gamma1_true, gamma2_true, 0), 2, 2)
+beta_mat <- cbind(beta1, beta2)
+u_mat <- cbind(u1, u2)
 
-I_minus_Gamma_inv <- solve(diag(2) - Gamma)
-Y <- (X_mat %*% Beta + U) %*% t(I_minus_Gamma_inv)
+i_minus_gamma_inv <- solve(diag(2) - gamma_mat)
+y_constructed <- (x_mat %*% beta_mat + u_mat) %*% t(i_minus_gamma_inv)
 
-data_sim$Y1 <- Y[, 1]
-data_sim$Y2 <- Y[, 2]
+data_sim$Y1 <- y_constructed[, 1]
+data_sim$Y2 <- y_constructed[, 2]
 
 # Estimate
 gmm_sim <- lewbel_gmm(
@@ -175,7 +175,7 @@ For grouped data:
 
 ```{r cluster, eval=FALSE}
 # Add cluster variable
-data$cluster <- rep(1:10, each = n/10)
+data$cluster <- rep(1:10, each = n_obs / 10)
 
 gmm_cluster <- lewbel_gmm(
   data,
@@ -230,15 +230,20 @@ For small samples, bootstrap inference may be preferred:
 library(boot)
 
 # Bootstrap function
-boot_gmm <- function(data, indices) {
-  d <- data[indices, ]
-  gmm_boot <- lewbel_gmm(d, system = "triangular")
-  return(coef(gmm_boot)["gamma1"])
+bootstrap_function <- function(data, indices) {
+  gmm_boot <- lewbel_gmm(data = data[indices, ],
+                         y1_var = "Y1", y2_var = "Y2",
+                         x_vars = c("X1", "X2", "X3"),
+                         model_type = "simultaneous",
+                         add_intercept = TRUE,
+                         compute_se = FALSE,
+                         verbose = FALSE) # Suppress messages within bootstrap
+  coef(gmm_boot)["gamma1"]
 }
 
-# Run bootstrap
+# Run bootstrap (reduce B for speed in example)
 set.seed(123)
-boot_results <- boot(data, boot_gmm, R = 100)
+boot_results <- boot(data, bootstrap_function, R = 100)
 
 # Confidence interval
 boot_ci <- boot.ci(boot_results, type = "perc")

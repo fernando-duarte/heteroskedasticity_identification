@@ -52,53 +52,53 @@ pb <- txtProgressBar(min = 0, max = n_portfolios, style = 3)
 
 for (i in 1:n_portfolios) {
   # Generate portfolio returns with GARCH errors (matching Prono's model)
-  
+
   # Initialize GARCH process
   eps2 <- numeric(n_weeks)
   sigma2_sq <- numeric(n_weeks)
   sigma2_sq[1] <- 0.0004  # Initial variance
-  
+
   # GARCH(1,1) parameters
   omega <- 0.00001
   alpha <- 0.1
   beta <- 0.85
-  
+
   # Generate GARCH errors for market
   for (t in 2:n_weeks) {
-    sigma2_sq[t] <- omega + alpha * eps2[t-1]^2 + beta * sigma2_sq[t-1]
+    sigma2_sq[t] <- omega + alpha * eps2[t-1] ^ 2 + beta * sigma2_sq[t-1]
     eps2[t] <- sqrt(sigma2_sq[t]) * rnorm(1)
   }
-  
+
   # Portfolio errors correlated with market errors
   rho <- 0.3  # Endogeneity
   eps1 <- rho * eps2 + sqrt(1 - rho^2) * rnorm(n_weeks) * 0.01
-  
+
   # Generate portfolio returns
   portfolio_excess <- true_alphas[i] + true_betas[i] * market_excess + eps1
-  
+
   # OLS estimation
   ols_fit <- lm(portfolio_excess ~ market_excess)
   beta_ols <- coef(ols_fit)[2]
   alpha_ols <- coef(ols_fit)[1]
-  
+
   # Prono estimation (simplified)
   tryCatch({
     # Get market residuals
     e2 <- residuals(lm(market_excess ~ 1))
-    
+
     # Use conditional heteroskedasticity as instrument
-    Z <- sigma2_sq - mean(sigma2_sq)  # True conditional variance (in practice, estimated)
-    instrument <- Z * e2
-    
+    z_instrument <- sigma2_sq - mean(sigma2_sq)  # True conditional variance (in practice, estimated)
+    instrument <- z_instrument * e2
+
     # 2SLS
     first_stage <- lm(market_excess ~ instrument)
     market_fitted <- fitted(first_stage)
     f_stat <- summary(first_stage)$fstatistic[1]
-    
+
     second_stage <- lm(portfolio_excess ~ market_fitted)
     beta_prono <- coef(second_stage)[2]
     alpha_prono <- coef(second_stage)[1]
-    
+
     # Store results
     portfolio_results <- rbind(portfolio_results, data.frame(
       portfolio = i,
@@ -110,9 +110,9 @@ for (i in 1:n_portfolios) {
       alpha_prono = alpha_prono,
       f_stat = f_stat
     ))
-    
+
   }, error = function(e) NULL)
-  
+
   setTxtProgressBar(pb, i)
 }
 close(pb)
@@ -132,14 +132,14 @@ rmse_prono <- sqrt(mean((portfolio_results$beta_prono - portfolio_results$true_b
 cat("\nBeta Estimation Performance:\n")
 cat(sprintf("OLS:   Bias = %.4f, RMSE = %.4f\n", bias_ols, rmse_ols))
 cat(sprintf("Prono: Bias = %.4f, RMSE = %.4f\n", bias_prono, rmse_prono))
-cat(sprintf("Bias reduction: %.1f%%\n", 100 * (1 - abs(bias_prono)/abs(bias_ols))))
+cat(sprintf("Bias reduction: %.1f%%\n", 100 * (1 - abs(bias_prono) / abs(bias_ols))))
 
 # First-stage strength
 cat("\nFirst-stage F-statistics:\n")
-cat(sprintf("Mean: %.1f, Median: %.1f\n", 
-            mean(portfolio_results$f_stat), 
+cat(sprintf("Mean: %.1f, Median: %.1f\n",
+            mean(portfolio_results$f_stat),
             median(portfolio_results$f_stat)))
-cat(sprintf("Proportion with F > 10: %.1f%%\n", 
+cat(sprintf("Proportion with F > 10: %.1f%%\n",
             100 * mean(portfolio_results$f_stat > 10)))
 
 # ========================================================================
@@ -159,17 +159,17 @@ cat("\nCross-sectional regression results:\n")
 cat("(Testing if average returns are explained by betas)\n\n")
 
 cat("OLS betas:\n")
-cat(sprintf("  Intercept: %.5f (SE: %.5f)\n", 
-            coef(cs_ols)[1], summary(cs_ols)$coefficients[1,2]))
-cat(sprintf("  Slope: %.5f (SE: %.5f)\n", 
-            coef(cs_ols)[2], summary(cs_ols)$coefficients[2,2]))
+cat(sprintf("  Intercept: %.5f (SE: %.5f)\n",
+            coef(cs_ols)[1], summary(cs_ols)$coefficients[1, 2]))
+cat(sprintf("  Slope: %.5f (SE: %.5f)\n",
+            coef(cs_ols)[2], summary(cs_ols)$coefficients[2, 2]))
 cat(sprintf("  R-squared: %.3f\n", summary(cs_ols)$r.squared))
 
 cat("\nProno betas:\n")
-cat(sprintf("  Intercept: %.5f (SE: %.5f)\n", 
-            coef(cs_prono)[1], summary(cs_prono)$coefficients[1,2]))
-cat(sprintf("  Slope: %.5f (SE: %.5f)\n", 
-            coef(cs_prono)[2], summary(cs_prono)$coefficients[2,2]))
+cat(sprintf("  Intercept: %.5f (SE: %.5f)\n",
+            coef(cs_prono)[1], summary(cs_prono)$coefficients[1, 2]))
+cat(sprintf("  Slope: %.5f (SE: %.5f)\n",
+            coef(cs_prono)[2], summary(cs_prono)$coefficients[2, 2]))
 cat(sprintf("  R-squared: %.3f\n", summary(cs_prono)$r.squared))
 
 cat(sprintf("\nTrue market risk premium: %.5f\n", mean(market_excess)))

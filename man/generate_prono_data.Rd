@@ -55,4 +55,14 @@ Generate time series data for Prono's triangular model
 
 Generates data matching Prono (2014) asset pricing application with
 returns in percent (like the original paper).
+
+Prono, T. (2014). The Role of Conditional Heteroskedasticity in Identifying
+and Estimating Linear Triangular Systems, with Applications to Asset Pricing
+Models That Include a Mismeasured Factor. Journal of Applied Econometrics,
+29(5), 800-824. \doi{10.1002/jae.2387}
+}
+\seealso{
+\code{\link{run_single_prono_simulation}} for running a single simulation
+\code{\link{create_prono_config}} for default configuration
+\code{\link{run_prono_monte_carlo}} for Monte Carlo analysis
 }

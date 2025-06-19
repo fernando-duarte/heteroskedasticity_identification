@@ -38,7 +38,7 @@ cat("4. Generating data at percentage scale:\n")
 # For asset returns in percent, we need much smaller parameters
 percent_scale_params <- list(
   beta1 = c(0.01, 0.005),  # Small intercept and slope
-  beta2 = c(0.097, -0.001), # Mean of 0.097% with small X effect  
+  beta2 = c(0.097, -0.001), # Mean of 0.097% with small X effect
   gamma1 = 1,               # Beta coefficient (unitless)
   garch_params = list(
     omega = 0.01,    # Variance parameters for percent returns
@@ -64,7 +64,7 @@ percent_data <- generate_prono_data(
 
 cat(sprintf("   Y2 mean: %.3f%%\n", mean(percent_data$Y2)))
 cat(sprintf("   Y2 SD: %.3f%%\n", sd(percent_data$Y2)))
-cat(sprintf("   Range: [%.1f%%, %.1f%%]\n\n", 
+cat(sprintf("   Range: [%.1f%%, %.1f%%]\n\n",
             min(percent_data$Y2), max(percent_data$Y2)))
 
 # 5. Check if this matches Prono better
@@ -72,7 +72,7 @@ cat("5. Match assessment:\n")
 cat(sprintf("   Target mean: 0.097%%\n"))
 cat(sprintf("   Our mean: %.3f%%\n", mean(percent_data$Y2)))
 cat(sprintf("   Difference: %.3f%%\n", mean(percent_data$Y2) - 0.097))
-cat(sprintf("   Match quality: %s\n\n", 
+cat(sprintf("   Match quality: %s\n\n",
             ifelse(abs(mean(percent_data$Y2) - 0.097) < 0.01, "EXCELLENT", "NEEDS TUNING")))
 
 # 6. What about volatility clustering?
@@ -103,7 +103,7 @@ prono_config <- create_prono_config(
   n = 500,
   k = 1,
   beta1 = c(0.05, 0.01),      # Portfolio excess return params
-  beta2 = c(0.097, -0.005),   # Market excess return params  
+  beta2 = c(0.097, -0.005),   # Market excess return params
   gamma1 = 1,                 # True beta
   garch_params = list(omega = 0.05, alpha = 0.1, beta = 0.85),
   sigma1 = 1,                 # Portfolio idiosyncratic vol
@@ -116,8 +116,23 @@ result <- run_single_prono_simulation(prono_config, return_details = TRUE)
 
 cat("\nEstimation with percent-scale data:\n")
 cat(sprintf("True gamma (beta): %.3f\n", result$gamma1_true))
-cat(sprintf("OLS estimate: %.3f (bias: %.3f)\n", 
+cat(sprintf("OLS estimate: %.3f (bias: %.3f)\n",
             result$gamma1_ols, result$bias_ols))
-cat(sprintf("Prono IV estimate: %.3f (bias: %.3f)\n", 
+cat(sprintf("Prono IV estimate: %.3f (bias: %.3f)\n",
             result$gamma1_iv, result$bias_iv))
 cat(sprintf("First-stage F-stat: %.1f\n", result$f_stat))
+
+# Autocorrelation of squared residuals (ARCH effects)
+acf_result <- acf(residuals(garch_fit_y2_weekly)^2, plot = FALSE, lag.max = 5)
+cat("  Autocorrelation of Squared Residuals (Market Factor - Weekly Scale):\n")
+for (i in seq_along(acf_result$acf[-1])) {
+  cat(sprintf("   Lag %d: %.3f\n", i, acf_result$acf[i + 1]))
+}
+
+# --- FX Data Example (Not directly from Prono, but for broader applicability) ---
+# Autocorrelation of squared residuals
+acf_result <- acf(fx_data$Log_Return^2, plot = FALSE, lag.max = 5)
+cat("  Autocorrelation of Squared Log Returns (FX Data):\n")
+for (i in seq_along(acf_result$acf[-1])) {
+  cat(sprintf("   Lag %d: %.3f\n", i, acf_result$acf[i + 1]))
+}

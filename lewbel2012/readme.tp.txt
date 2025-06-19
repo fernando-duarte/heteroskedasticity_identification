@@ -4,7 +4,7 @@ Pricing Models that Include a Mismeasured Factor", Journal of Applied
 Econometrics, Vol. 29, No. 5, 2014, pp. 800-824.
 
 The data file contains 2,166 weekly return observations (in percentage
-terms) recorded over the period 07/05/1963--12/31/2004. 
+terms) recorded over the period 07/05/1963--12/31/2004.
 
 The variables in this data file include:
 
@@ -41,5 +41,3 @@ generated before the programs can be executed. The file names are:
 
 All five files are ASCII files in DOS format. They are zipped in the
 file tp-files.zip. Unix/Linux users should use "unzip -a".
-
-

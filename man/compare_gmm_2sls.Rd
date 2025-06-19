@@ -4,10 +4,12 @@
 \alias{compare_gmm_2sls}
 \title{Compare GMM and 2SLS Estimates}
 \usage{
-compare_gmm_2sls(data, ...)
+compare_gmm_2sls(data, verbose = TRUE, ...)
 }
 \arguments{
 \item{data}{Data frame containing all variables.}
+
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 
 \item{...}{Additional arguments passed to lewbel_gmm and run_single_lewbel_simulation.}
 }

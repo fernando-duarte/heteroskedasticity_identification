@@ -28,15 +28,21 @@ cat("Downloading Fama-French data...\n")
 ff3_factors <- download_french_data("Fama/French 3 Factors")
 
 # Extract weekly data
-ff3_weekly <- ff3_factors$subsets$weekly$data
+if (requireNamespace("frenchdata", quietly = TRUE)) {
+  ff3_weekly <- ff3_factors$subsets$weekly$data |>
+    mutate(date = as.Date(row.names(.))) |>
+    rename(Mkt_RF = `Mkt-RF`, RF_rate = RF) |>
+    select(date, Mkt_RF, SMB, HML, RF_rate)
+}
 
-# Convert to proper data frame with dates
-ff3_weekly <- ff3_weekly %>%
-  mutate(date = as.Date(row.names(.))) %>%
-  as_tibble()
+# Combine all data (aligning by date)
+prono_data <- ff3_weekly |>
+  filter(date >= start_date & date <= end_date) |>
+  mutate_if(is.character, as.numeric) # Ensure numeric types
 
-cat("Downloaded", nrow(ff3_weekly), "weekly observations\n")
-cat("Date range:", format(min(ff3_weekly$date)), "to", format(max(ff3_weekly$date)), "\n\n")
+cat("Filtered data: ", nrow(prono_data), "observations\n")
+cat("Prono reports: 2,166 observations\n")
+cat("Difference: ", nrow(prono_data) - 2166, "\n\n")
 
 # ========================================================================
 # STEP 2: FILTER TO PRONO'S TIME PERIOD
@@ -48,13 +54,12 @@ end_date <- as.Date("2004-12-31")
 
 cat("Filtering to Prono's period: July 5, 1963 to December 31, 2004\n")
 
-prono_data <- ff3_weekly %>%
-  filter(date >= start_date & date <= end_date) %>%
-  arrange(date)
+# Display structure and summary
+cat("\n--- Prono Data Structure ---\n")
+str(prono_data)
 
-cat("Filtered data: ", nrow(prono_data), "observations\n")
-cat("Prono reports: 2,166 observations\n")
-cat("Difference: ", nrow(prono_data) - 2166, "\n\n")
+cat("\n--- Prono Data Summary ---\n")
+summary(prono_data)
 
 # ========================================================================
 # STEP 3: COMPUTE SUMMARY STATISTICS
@@ -62,50 +67,53 @@ cat("Difference: ", nrow(prono_data) - 2166, "\n\n")
 
 cat("=== SUMMARY STATISTICS ===\n\n")
 
-# Market excess return (already excess returns in FF data)
-market_stats <- prono_data %>%
+# Market Factor (Mkt-RF) Summary
+cat("\n--- Market Factor (Mkt-RF) ---\n")
+market_stats <- prono_data |>
   summarise(
-    mean_weekly = mean(`Mkt-RF`, na.rm = TRUE),
-    sd_weekly = sd(`Mkt-RF`, na.rm = TRUE),
-    min_weekly = min(`Mkt-RF`, na.rm = TRUE),
-    max_weekly = max(`Mkt-RF`, na.rm = TRUE),
-    n_obs = n()
+    Mean = mean(Mkt_RF, na.rm = TRUE),
+    SD = sd(Mkt_RF, na.rm = TRUE),
+    Min = min(Mkt_RF, na.rm = TRUE),
+    Max = max(Mkt_RF, na.rm = TRUE),
+    N_Obs = n()
   )
 
 cat("Market Excess Return (Mkt-RF) Statistics:\n")
-cat(sprintf("Mean (weekly):     %.3f%% (Prono reports: 0.097%%)\n", market_stats$mean_weekly))
-cat(sprintf("Std Dev (weekly):  %.3f%%\n", market_stats$sd_weekly))
-cat(sprintf("Min (weekly):      %.3f%%\n", market_stats$min_weekly))
-cat(sprintf("Max (weekly):      %.3f%%\n", market_stats$max_weekly))
-cat(sprintf("Observations:      %d\n\n", market_stats$n_obs))
+cat(sprintf("Mean (weekly):     %.3f%% (Prono reports: 0.097%%)\n", market_stats$Mean))
+cat(sprintf("Std Dev (weekly):  %.3f%%\n", market_stats$SD))
+cat(sprintf("Min (weekly):      %.3f%%\n", market_stats$Min))
+cat(sprintf("Max (weekly):      %.3f%%\n", market_stats$Max))
+cat(sprintf("Observations:      %d\n\n", market_stats$N_Obs))
 
-# Risk-free rate statistics
-rf_stats <- prono_data %>%
+# Risk-Free Rate (RF) Summary
+cat("\n--- Risk-Free Rate (RF) ---\n")
+rf_stats <- prono_data |>
   summarise(
-    mean_weekly = mean(RF, na.rm = TRUE),
-    sd_weekly = sd(RF, na.rm = TRUE),
-    min_weekly = min(RF, na.rm = TRUE),
-    max_weekly = max(RF, na.rm = TRUE)
+    Mean = mean(RF_rate, na.rm = TRUE),
+    SD = sd(RF_rate, na.rm = TRUE),
+    Min = min(RF_rate, na.rm = TRUE),
+    Max = max(RF_rate, na.rm = TRUE)
   )
 
 cat("Risk-Free Rate (RF) Statistics:\n")
-cat(sprintf("Mean (weekly):     %.3f%%\n", rf_stats$mean_weekly))
-cat(sprintf("Std Dev (weekly):  %.3f%%\n", rf_stats$sd_weekly))
-cat(sprintf("Min (weekly):      %.3f%%\n", rf_stats$min_weekly))
-cat(sprintf("Max (weekly):      %.3f%%\n\n", rf_stats$max_weekly))
+cat(sprintf("Mean (weekly):     %.3f%%\n", rf_stats$Mean))
+cat(sprintf("Std Dev (weekly):  %.3f%%\n", rf_stats$SD))
+cat(sprintf("Min (weekly):      %.3f%%\n", rf_stats$Min))
+cat(sprintf("Max (weekly):      %.3f%%\n\n", rf_stats$Max))
 
-# SMB and HML statistics
-factor_stats <- prono_data %>%
+# SMB and HML Factors Summary
+cat("\n--- SMB and HML Factors ---\n")
+factor_stats <- prono_data |>
   summarise(
-    mean_smb = mean(SMB, na.rm = TRUE),
-    sd_smb = sd(SMB, na.rm = TRUE),
-    mean_hml = mean(HML, na.rm = TRUE),
-    sd_hml = sd(HML, na.rm = TRUE)
+    Mean_SMB = mean(SMB, na.rm = TRUE),
+    SD_SMB = sd(SMB, na.rm = TRUE),
+    Mean_HML = mean(HML, na.rm = TRUE),
+    SD_HML = sd(HML, na.rm = TRUE)
   )
 
 cat("Other Factor Statistics:\n")
-cat(sprintf("SMB Mean: %.3f%%, SD: %.3f%%\n", factor_stats$mean_smb, factor_stats$sd_smb))
-cat(sprintf("HML Mean: %.3f%%, SD: %.3f%%\n\n", factor_stats$mean_hml, factor_stats$sd_hml))
+cat(sprintf("SMB Mean: %.3f%%, SD: %.3f%%\n", factor_stats$Mean_SMB, factor_stats$SD_SMB))
+cat(sprintf("HML Mean: %.3f%%, SD: %.3f%%\n\n", factor_stats$Mean_HML, factor_stats$SD_HML))
 
 # ========================================================================
 # STEP 4: ANNUALIZED STATISTICS
@@ -119,16 +127,16 @@ cat("=== ANNUALIZED STATISTICS ===\n\n")
 annualized_stats <- data.frame(
   Factor = c("Market Excess", "SMB", "HML", "Risk-Free"),
   Annual_Mean = c(
-    market_stats$mean_weekly * 52,
-    factor_stats$mean_smb * 52,
-    factor_stats$mean_hml * 52,
-    rf_stats$mean_weekly * 52
+    market_stats$Mean * 52,
+    factor_stats$Mean_SMB * 52,
+    factor_stats$Mean_HML * 52,
+    rf_stats$Mean * 52
   ),
   Annual_SD = c(
-    market_stats$sd_weekly * sqrt(52),
-    factor_stats$sd_smb * sqrt(52),
-    factor_stats$sd_hml * sqrt(52),
-    rf_stats$sd_weekly * sqrt(52)
+    market_stats$SD * sqrt(52),
+    factor_stats$SD_SMB * sqrt(52),
+    factor_stats$SD_HML * sqrt(52),
+    rf_stats$SD * sqrt(52)
   ),
   Sharpe_Ratio = NA
 )
@@ -145,7 +153,7 @@ print(annualized_stats, digits = 2)
 cat("\n=== COMPARISON WITH PRONO (2014) ===\n\n")
 
 cat("Key Findings:\n")
-cat("1. Our market excess return mean (", sprintf("%.3f%%", market_stats$mean_weekly), 
+cat("1. Our market excess return mean (", sprintf("%.3f%%", market_stats$Mean),
     ") is very close to Prono's reported 0.097%\n")
 cat("2. The slight difference may be due to:\n")
 cat("   - Different data versions (Kenneth French updates data)\n")
@@ -159,28 +167,26 @@ cat("   - CRSP vs Fama-French market return construction\n\n")
 cat("Downloading portfolio data for additional validation...\n")
 
 tryCatch({
-  # Download 25 Size-B/M portfolios
-  ff25 <- download_french_data("25 Portfolios Formed on Size and Book-to-Market")
-  ff25_weekly <- ff25$subsets$weekly$data %>%
-    mutate(date = as.Date(row.names(.))) %>%
-    filter(date >= start_date & date <= end_date)
-  
-  cat("\n25 Size-B/M Portfolios:\n")
-  cat("Number of portfolios:", ncol(ff25_weekly) - 1, "\n")
-  cat("Weekly observations:", nrow(ff25_weekly), "\n")
-  
-  # Check a sample portfolio
-  sample_port <- ff25_weekly %>%
-    select(date, `SMALL LoBM`) %>%
-    summarise(
-      mean_return = mean(`SMALL LoBM`, na.rm = TRUE),
-      sd_return = sd(`SMALL LoBM`, na.rm = TRUE)
-    )
-  
-  cat("\nSample Portfolio (Small-Low B/M):\n")
-  cat(sprintf("Mean weekly return: %.3f%%\n", sample_port$mean_return))
-  cat(sprintf("Std Dev: %.3f%%\n", sample_port$sd_return))
-  
+  # Download 25 Size-B/M Portfolios (Weekly)
+  ff25 <- frenchdata::download_french_data("25 Portfolios Formed on Size and Book-to-Market (Weekly)")
+  if (!is.null(ff25$subsets$weekly$data)) {
+    ff25_weekly <- ff25$subsets$weekly$data |>
+      mutate(date = as.Date(row.names(.))) |>
+      filter(date >= start_date & date <= end_date) |>
+      mutate_if(is.character, as.numeric)
+
+    # Sample portfolio: Small LoBM
+    sample_port <- ff25_weekly |>
+      select(date, `SMALL LoBM`) |>
+      rename(Portfolio_LoBM = `SMALL LoBM`)
+
+    cat("\n--- Sample Portfolio (SMALL LoBM) ---\n")
+    cat(sprintf("Mean weekly return: %.3f%%\n", sample_port$Portfolio_LoBM))
+    cat(sprintf("Std Dev: %.3f%%\n", sd(sample_port$Portfolio_LoBM, na.rm = TRUE)))
+
+  } else {
+    cat("Error downloading portfolio data.\n")
+  }
 }, error = function(e) {
   cat("Error downloading portfolio data:", e$message, "\n")
 })
@@ -193,7 +199,7 @@ cat("\n=== AUTOCORRELATION ANALYSIS ===\n")
 cat("(Relevant for GARCH modeling)\n\n")
 
 # Check for autocorrelation in squared returns (GARCH effects)
-market_returns <- prono_data$`Mkt-RF`
+market_returns <- prono_data$Mkt_RF
 squared_returns <- market_returns^2
 
 # Compute autocorrelations
@@ -229,15 +235,15 @@ decades <- list(
 
 decade_stats <- map_df(names(decades), function(decade) {
   period <- decades[[decade]]
-  subset_data <- prono_data %>%
+  subset_data <- prono_data |>
     filter(date >= as.Date(period[1]) & date <= as.Date(period[2]))
-  
+
   data.frame(
     Decade = decade,
     N_Obs = nrow(subset_data),
-    Mean_Mkt_Excess = mean(subset_data$`Mkt-RF`, na.rm = TRUE),
-    SD_Mkt = sd(subset_data$`Mkt-RF`, na.rm = TRUE),
-    Mean_RF = mean(subset_data$RF, na.rm = TRUE)
+    Mean_Mkt_Excess = mean(subset_data$Mkt_RF, na.rm = TRUE),
+    SD_Mkt = sd(subset_data$Mkt_RF, na.rm = TRUE),
+    Mean_RF = mean(subset_data$RF_rate, na.rm = TRUE)
   )
 })
 
@@ -252,22 +258,28 @@ validation_results <- list(
   market_stats = market_stats,
   comparison = data.frame(
     Statistic = c("Mean Market Excess Return (weekly)", "Number of Observations"),
-    Our_Value = c(market_stats$mean_weekly, market_stats$n_obs),
+    Our_Value = c(market_stats$Mean, market_stats$N_Obs),
     Prono_Value = c(0.097, 2166)
   ),
   annualized = annualized_stats,
   decade_analysis = decade_stats
 )
 
-# Optional: save to file
-# saveRDS(validation_results, "prono_data_validation_results.rds")
-
 cat("\n=== VALIDATION COMPLETE ===\n")
 cat("\nConclusion: Our data closely matches Prono's reported statistics.\n")
-cat("The mean market excess return of", sprintf("%.3f%%", market_stats$mean_weekly), 
+cat("The mean market excess return of", sprintf("%.3f%%", market_stats$Mean),
     "is very close to Prono's 0.097%.\n")
 cat("This validates that publicly available Fama-French data can be used\n")
-cat("for replication studies of Prono (2014).\n")
+cat("to replicate key aspects of Prono (2014) data characteristics.\n")
+cat("Final checks and summary statistics generated.\n")
+
+# Store results (optional)
+# validation_results <- list(
+#   market_summary = market_stats,
+#   rf_summary = rf_stats,
+#   factor_summary = factor_stats,
+#   # ... add other relevant summaries ...
+# )
 
 # ========================================================================
 # STEP 10: GMM IMPLEMENTATION CHECK
@@ -303,3 +315,5 @@ for (pkg in gmm_packages) {
     cat("-", pkg, "(not installed)\n")
   }
 }
+
+cat("\n--- Data Validation Complete ---\n")

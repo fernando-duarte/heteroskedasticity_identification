@@ -526,8 +526,8 @@ run_rigobon_estimation <- function(data,
   e2_hat <- stats::residuals(first_stage)
 
   # Step 2: Create centered regime dummies and instruments
-  Z_names <- paste0("Z_regime_", regimes)
-  IV_names <- paste0("IV_regime_", regimes)
+  z_names <- paste0("Z_regime_", regimes)
+  iv_names <- paste0("IV_regime_", regimes)
 
   # Create regime dummies if not already in data
   for (s in regimes) {
@@ -535,15 +535,15 @@ run_rigobon_estimation <- function(data,
     z_name <- paste0("Z", which(regimes == s))
     if (z_name %in% names(data)) {
       # Use existing centered dummy
-      data[[Z_names[which(regimes == s)]]] <- data[[z_name]]
+      data[[z_names[which(regimes == s)]]] <- data[[z_name]]
     } else {
       # Create and center dummy
       dummy <- as.numeric(data[[regime_var]] == s)
-      data[[Z_names[which(regimes == s)]]] <- dummy - mean(dummy)
+      data[[z_names[which(regimes == s)]]] <- dummy - mean(dummy)
     }
 
     # Create instrument: Z_s × e2_hat
-    data[[IV_names[which(regimes == s)]]] <- data[[Z_names[which(regimes == s)]]] * e2_hat
+    data[[iv_names[which(regimes == s)]]] <- data[[z_names[which(regimes == s)]]] * e2_hat
   }
 
   # Step 3: OLS estimation for comparison
@@ -560,7 +560,7 @@ run_rigobon_estimation <- function(data,
   iv_formula <- stats::as.formula(paste(
     "Y1 ~", endog_var, "+", paste(exog_vars, collapse = " + "),
     "|", paste(exog_vars, collapse = " + "), "+",
-    paste(IV_names, collapse = " + ")
+    paste(iv_names, collapse = " + ")
   ))
 
   tsls_model <- tryCatch({
@@ -580,15 +580,15 @@ run_rigobon_estimation <- function(data,
   tsls_se <- all_se_tsls[endog_var]
 
   # Step 5: First-stage F-statistics for each instrument
-  first_stage_F <- numeric(n_regimes)
+  first_stage_f_stats <- numeric(n_regimes)
   for (i in seq_len(n_regimes)) {
     fs_formula <- stats::as.formula(paste(
-      endog_var, "~", paste(exog_vars, collapse = " + "), "+", IV_names[i]
+      endog_var, "~", paste(exog_vars, collapse = " + "), "+", iv_names[i]
     ))
     fs_model <- stats::lm(fs_formula, data = data)
-    first_stage_F[i] <- summary(fs_model)$fstatistic[1]
+    first_stage_f_stats[i] <- summary(fs_model)$fstatistic[1]
   }
-  names(first_stage_F) <- paste0("F_regime_", regimes)
+  names(first_stage_f_stats) <- paste0("F_regime_", regimes)
 
   # Prepare basic results
   # Create named vectors with "gamma1" for consistency
@@ -608,19 +608,19 @@ run_rigobon_estimation <- function(data,
       se = tsls_se_results,
       model = tsls_model
     ),
-    first_stage_F = first_stage_F
+    first_stage_f_stats = first_stage_f_stats
   )
 
   # Add diagnostics if requested
   if (return_diagnostics) {
     # Extract instrument matrix
-    instruments <- as.matrix(data[, IV_names, drop = FALSE])
+    instruments <- as.matrix(data[, iv_names, drop = FALSE])
 
     # Test for heteroskedasticity across regimes
     # Breusch-Pagan type test: regress e2^2 on regime dummies
     data$e2_sq <- e2_hat^2
     het_formula <- stats::as.formula(paste(
-      "e2_sq ~", paste(Z_names[-1], collapse = " + ")  # Exclude one for collinearity
+      "e2_sq ~", paste(z_names[-1], collapse = " + ")  # Exclude one for collinearity
     ))
     het_test <- stats::lm(het_formula, data = data)
     het_f_stat <- summary(het_test)$fstatistic

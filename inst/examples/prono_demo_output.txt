@@ -5,34 +5,34 @@ This file shows what the output would look like if all required packages were in
 === TESTING PRONO IMPLEMENTATION ON ACTUAL DATA ===
 
 Loading Prono's data...
-Data loaded. Sample size: 2166 
-Date range: 1963-07-05 to 2004-12-31 
+Data loaded. Sample size: 2166
+Date range: 1963-07-05 to 2004-12-31
 
 Summary Statistics:
-Y1 (Portfolio excess return): Mean = 0.232% SD = 2.035% 
-Y2 (Market excess return): Mean = -0.022% SD = 2.074% 
+Y1 (Portfolio excess return): Mean = 0.232% SD = 2.035%
+Y2 (Market excess return): Mean = -0.022% SD = 2.074%
 
 TEST 1: OLS ESTIMATION
 =====================
-Coefficient on Y2: 0.7234 
-Standard error: 0.0198 
-t-statistic: 36.54 
+Coefficient on Y2: 0.7234
+Standard error: 0.0198
+t-statistic: 36.54
 
 TEST 2: PRONO METHOD WITH UNIVARIATE GARCH
 ==========================================
 Fitting GARCH(1,1) model...
 GARCH coefficients:
   omega: 0.0483
-  alpha1: 0.1052  
+  alpha1: 0.1052
   beta1: 0.8734
 Constructing Prono instruments...
 Running 2SLS with GARCH-based instruments...
 
-Coefficient on Y2: 0.8912 
-Standard error: 0.0587 
-t-statistic: 15.18 
-First-stage F-stat: 12.45 
-Bias reduction: 68.2% 
+Coefficient on Y2: 0.8912
+Standard error: 0.0587
+t-statistic: 15.18
+First-stage F-stat: 12.45
+Bias reduction: 68.2%
 
 TEST 3: PRONO GMM ESTIMATION
 ============================

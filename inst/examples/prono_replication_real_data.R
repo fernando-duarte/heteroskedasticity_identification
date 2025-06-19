@@ -1,6 +1,6 @@
 # Replication of Prono (2014) Empirical Results
 # This script attempts to replicate the asset pricing results from
-# "The Role of Conditional Heteroskedasticity in Identifying and 
+# "The Role of Conditional Heteroskedasticity in Identifying and
 # Estimating Linear Triangular Systems" by Todd Prono (JAE, 2014)
 
 # Load required packages
@@ -76,26 +76,26 @@ cat("Expected (from paper): 2166 weeks\n")
 
 # Function to estimate market beta using Prono method for one portfolio
 estimate_prono_beta <- function(portfolio_returns, market_returns, rf_rate) {
-  
+
   # Create excess returns
   Y1 <- portfolio_returns - rf_rate  # Portfolio excess return
   Y2 <- market_returns - rf_rate     # Market excess return
-  
+
   n <- length(Y1)
-  
+
   # Skip if too few observations
   if (n < 100) return(NULL)
-  
+
   # OLS estimation (for comparison)
   ols_fit <- lm(Y1 ~ Y2)
   beta_ols <- coef(ols_fit)[2]
   alpha_ols <- coef(ols_fit)[1]
-  
+
   # Prono estimation
   tryCatch({
     # Get residuals from market model (second equation)
     e2 <- residuals(lm(Y2 ~ 1))
-    
+
     # Check if rugarch is available for GARCH estimation
     if (requireNamespace("rugarch", quietly = TRUE)) {
       # Fit GARCH(1,1) to market residuals
@@ -104,30 +104,30 @@ estimate_prono_beta <- function(portfolio_returns, market_returns, rf_rate) {
         mean.model = list(armaOrder = c(0, 0), include.mean = FALSE),
         distribution.model = "norm"
       )
-      
+
       garch_fit <- rugarch::ugarchfit(spec = spec, data = e2, solver = "hybrid")
-      
+
       # Extract conditional variance
       sigma2_sq <- as.numeric(rugarch::sigma(garch_fit))^2
-      
+
       # Construct Prono instrument: Z * e2
       Z <- sigma2_sq - mean(sigma2_sq)
       instrument <- Z * e2
-      
+
       # 2SLS with Prono instrument
       # First stage: Regress Y2 on instrument
       first_stage <- lm(Y2 ~ instrument)
       Y2_fitted <- fitted(first_stage)
       f_stat <- summary(first_stage)$fstatistic[1]
-      
+
       # Second stage: Regress Y1 on fitted Y2
       second_stage <- lm(Y1 ~ Y2_fitted)
       beta_prono <- coef(second_stage)[2]
       alpha_prono <- coef(second_stage)[1]
-      
+
       # Get GARCH parameters for reporting
       garch_params <- coef(garch_fit)
-      
+
       return(list(
         alpha_ols = alpha_ols,
         beta_ols = beta_ols,
@@ -139,20 +139,20 @@ estimate_prono_beta <- function(portfolio_returns, market_returns, rf_rate) {
         garch_beta = garch_params["beta1"],
         n_obs = n
       ))
-      
+
     } else {
       # Fallback: use squared residuals as proxy
       Z <- e2^2 - mean(e2^2)
       instrument <- Z * e2
-      
+
       first_stage <- lm(Y2 ~ instrument)
       Y2_fitted <- fitted(first_stage)
       f_stat <- summary(first_stage)$fstatistic[1]
-      
+
       second_stage <- lm(Y1 ~ Y2_fitted)
       beta_prono <- coef(second_stage)[2]
       alpha_prono <- coef(second_stage)[1]
-      
+
       return(list(
         alpha_ols = alpha_ols,
         beta_ols = beta_ols,
@@ -163,7 +163,7 @@ estimate_prono_beta <- function(portfolio_returns, market_returns, rf_rate) {
         note = "GARCH not available, used squared residuals"
       ))
     }
-    
+
   }, error = function(e) {
     return(list(
       alpha_ols = alpha_ols,
@@ -198,9 +198,9 @@ sl_results <- estimate_prono_beta(
 
 if (!is.null(sl_results)) {
   cat("\nSize 1, B/M 1 Portfolio Results:\n")
-  cat(sprintf("Alpha (OLS): %.4f, Beta (OLS): %.4f\n", 
+  cat(sprintf("Alpha (OLS): %.4f, Beta (OLS): %.4f\n",
               sl_results$alpha_ols, sl_results$beta_ols))
-  cat(sprintf("Alpha (Prono): %.4f, Beta (Prono): %.4f\n", 
+  cat(sprintf("Alpha (Prono): %.4f, Beta (Prono): %.4f\n",
               sl_results$alpha_prono, sl_results$beta_prono))
   cat(sprintf("First-stage F-stat: %.2f\n", sl_results$f_stat))
   if (!is.null(sl_results$garch_omega)) {
@@ -226,24 +226,24 @@ pb <- txtProgressBar(min = 0, max = length(portfolio_names), style = 3)
 
 for (i in seq_along(portfolio_names)) {
   port_name <- portfolio_names[i]
-  
+
   # Get portfolio data
   port_data <- portfolios_25 %>%
     select(date, portfolio_return = all_of(port_name)) %>%
     inner_join(analysis_data, by = "date")
-  
+
   # Estimate betas
   results <- estimate_prono_beta(
     port_data$portfolio_return,
     port_data$mkt_excess + port_data$rf,
     port_data$rf
   )
-  
+
   if (!is.null(results)) {
     results$portfolio <- port_name
     all_results[[port_name]] <- results
   }
-  
+
   setTxtProgressBar(pb, i)
 }
 close(pb)
@@ -307,7 +307,7 @@ cat("(The market premium should be close to this value)\n")
 # Plot beta comparison
 if (requireNamespace("ggplot2", quietly = TRUE)) {
   library(ggplot2)
-  
+
   p <- ggplot(cross_section_data, aes(x = beta_ols, y = beta_prono)) +
     geom_point() +
     geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "red") +
@@ -316,9 +316,9 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
          x = "OLS Beta",
          y = "Prono Beta") +
     theme_minimal()
-  
+
   print(p)
-  
+
   # Plot cross-sectional fit
   p2 <- ggplot(cross_section_data, aes(x = beta_prono, y = avg_return)) +
     geom_point() +
@@ -327,7 +327,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
          x = "Prono Beta",
          y = "Average Excess Return (%)") +
     theme_minimal()
-  
+
   print(p2)
 }
 

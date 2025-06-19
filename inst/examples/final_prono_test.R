@@ -22,7 +22,7 @@ cat(sprintf("   Y1 std dev: %.3f%%\n", sd(prono_data$Y1)))
 # Check GARCH effects
 resid2 <- prono_data$eps2
 acf_sq <- acf(resid2^2, lag.max = 5, plot = FALSE)
-cat(sprintf("\n   Squared residual ACF(1): %.3f (GARCH present if > 0.1)\n", 
+cat(sprintf("\n   Squared residual ACF(1): %.3f (GARCH present if > 0.1)\n",
             acf_sq$acf[2]))
 
 # 2. Quick replication of key results
@@ -42,7 +42,7 @@ cat(sprintf("\n   ρ = 0.20 (Low endogeneity):\n"))
 cat(sprintf("   OLS bias: %.3f (Prono: 0.196)\n", mean(mc_low$bias_ols)))
 cat(sprintf("   IV bias: %.3f (Prono CUE: 0.011)\n", mean(mc_low$bias_iv)))
 
-# High endogeneity case  
+# High endogeneity case
 config_high <- create_prono_config(
   n = 1000,
   gamma1 = 1.0,
@@ -60,27 +60,29 @@ cat(sprintf("   IV bias: %.3f (Prono CUE: 0.020)\n", mean(mc_high$bias_iv)))
 cat("\n3. Summary Statistics Comparison:\n")
 
 summary_table <- data.frame(
-  Statistic = c("Weekly market excess return", 
-                "Number of observations",
-                "OLS bias (ρ=0.2)",
-                "OLS bias (ρ=0.4)",
-                "Bias reduction (ρ=0.2)",
-                "Bias reduction (ρ=0.4)"),
-  Our_Implementation = c(
-    sprintf("%.3f%%", mean(prono_data$Y2)),
-    "2166",
-    sprintf("%.3f", mean(mc_low$bias_ols)),
-    sprintf("%.3f", mean(mc_high$bias_ols)),
-    sprintf("%.0f%%", 100 * (1 - abs(mean(mc_low$bias_iv))/abs(mean(mc_low$bias_ols)))),
-    sprintf("%.0f%%", 100 * (1 - abs(mean(mc_high$bias_iv))/abs(mean(mc_high$bias_ols))))
+  Comparison = c(
+    "Mean Bias (OLS)",
+    "Mean Bias (Prono IV)",
+    "Bias Reduction",
+    "RMSE (OLS)",
+    "RMSE (Prono IV)",
+    "Mean F-statistic"
   ),
-  Prono_2014 = c(
-    "0.097%",
-    "2166", 
-    "0.196",
-    "0.375",
-    "~95% (CUE)",
-    "~95% (CUE)"
+  Low_Correlation_rho02 = c(
+    sprintf("%.3f", mean(mc_low$bias_ols)),
+    sprintf("%.3f", mean(mc_low$bias_iv)),
+    sprintf("%.0f%%", 100 * (1 - abs(mean(mc_low$bias_iv)) / abs(mean(mc_low$bias_ols)))),
+    sprintf("%.3f", sqrt(mean(mc_low$bias_ols^2))),
+    sprintf("%.3f", sqrt(mean(mc_low$bias_iv^2))),
+    sprintf("%.1f", mean(mc_low$f_stat, na.rm = TRUE))
+  ),
+  High_Correlation_rho04 = c(
+    sprintf("%.3f", mean(mc_high$bias_ols)),
+    sprintf("%.3f", mean(mc_high$bias_iv)),
+    sprintf("%.0f%%", 100 * (1 - abs(mean(mc_high$bias_iv)) / abs(mean(mc_high$bias_ols)))),
+    sprintf("%.3f", sqrt(mean(mc_high$bias_ols^2))),
+    sprintf("%.3f", sqrt(mean(mc_high$bias_iv^2))),
+    sprintf("%.1f", mean(mc_high$f_stat, na.rm = TRUE))
   )
 )
 
@@ -88,7 +90,7 @@ print(summary_table, row.names = FALSE)
 
 cat("\n=== CONCLUSION ===\n")
 cat("✓ Basic summary statistics match very closely\n")
-cat("✓ OLS bias matches Prono's results reasonably well\n") 
+cat("✓ OLS bias matches Prono's results reasonably well\n")
 cat("✓ Our 2SLS provides modest bias reduction (10-20%)\n")
 cat("✓ Prono's GMM/CUE achieves much larger reduction (~95%)\n")
 cat("\nThe hetid package correctly implements Prono's method\n")

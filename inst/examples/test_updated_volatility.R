@@ -65,9 +65,12 @@ config <- create_prono_config(
 mc_results <- run_prono_monte_carlo(config, n_sims = 50, progress = FALSE)
 
 cat(sprintf("OLS bias: %.3f (Prono: 0.375)\n", mean(mc_results$bias_ols)))
-cat(sprintf("IV bias: %.3f (Prono CUE: 0.020)\n", mean(mc_results$bias_iv)))
-cat(sprintf("Bias reduction: %.1f%%\n", 
-            100 * (1 - abs(mean(mc_results$bias_iv))/abs(mean(mc_results$bias_ols)))))
+cat(sprintf("Prono IV: Mean Bias = %.4f, RMSE = %.4f\n",
+            mean(mc_results$bias_iv), sqrt(mean(mc_results$bias_iv^2))))
+cat(sprintf("Bias Reduction: %.1f%%\n",
+            100 * (1 - abs(mean(mc_results$bias_iv)) / abs(mean(mc_results$bias_ols)))))
+
+cat("\n--- First-Stage F-statistic ---\n")
 
 cat("\n✓ We now match both mean (0.097%) and volatility (~2%)\n")
 cat("✓ This matches typical weekly equity returns\n")

@@ -60,7 +60,7 @@ str(data[, c("Y1", "Y2", "X1", "sigma2_sq")])
 cat("\n2. Visualizing time-varying volatility...\n")
 
 # Create time series plots
-data$time <- 1:nrow(data)
+data$time <- seq_len(nrow(data))
 
 # Plot returns and conditional volatility
 p1 <- ggplot(data, aes(x = time)) +

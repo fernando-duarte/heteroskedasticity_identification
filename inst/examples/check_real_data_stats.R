@@ -16,7 +16,7 @@ cat("- Market excess return mean: 0.097% weekly\n")
 cat("- Uses 25 Size-B/M portfolios and 30 Industry portfolios\n\n")
 
 # Since we can't actually download the data in this environment,
-# let's check what typical Fama-French data looks like based on 
+# let's check what typical Fama-French data looks like based on
 # historical statistics
 
 cat("1. EXPECTED FAMA-FRENCH MARKET FACTOR STATISTICS:\n")
@@ -44,7 +44,7 @@ cat(sprintf("   Expected weekly vol: %.3f%%\n", market_vol_weekly * 100))
 cat(sprintf("   Prono reports: 0.097%% mean\n\n"))
 
 # Simulate market returns
-market_excess <- rnorm(n_weeks, 
+market_excess <- rnorm(n_weeks,
                       mean = 0.097,  # Match Prono's reported mean
                       sd = market_vol_weekly * 100)
 
@@ -102,8 +102,8 @@ cat("   - This equals ~5% annual excess return\n")
 cat("   - Assessment: REASONABLE for 1963-2004 period\n")
 
 cat("\n2. Number of observations (2,166):\n")
-weeks_calculated <- as.numeric(difftime(as.Date("2004-12-31"), 
-                                       as.Date("1963-07-05"), 
+weeks_calculated <- as.numeric(difftime(as.Date("2004-12-31"),
+                                       as.Date("1963-07-05"),
                                        units = "weeks"))
 cat(sprintf("   - Calculated weeks: %.0f\n", weeks_calculated))
 cat("   - Prono reports: 2,166\n")

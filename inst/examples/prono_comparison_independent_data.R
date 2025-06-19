@@ -75,11 +75,11 @@ for (i in 1:n_sim) {
   # Generate fresh data each time
   sim_config <- config
   sim_config$seed <- 1000 + i
-  
+
   tryCatch({
     # Run single simulation
     sim_result <- run_single_prono_simulation(sim_config)
-    
+
     # Store results
     results <- rbind(results, data.frame(
       sim = i,
@@ -95,7 +95,7 @@ for (i in 1:n_sim) {
   }, error = function(e) {
     # Skip failed simulations
   })
-  
+
   setTxtProgressBar(pb, i)
 }
 close(pb)
@@ -123,10 +123,10 @@ cat("================================\n\n")
 comparison <- data.frame(
   Metric = c("Mean Bias", "RMSE", "Mean SE", "Coverage Rate"),
   Prono_OLS = c(-0.277, 0.281, 0.042, 0.14),
-  Our_OLS = round(c(our_results$Mean_Bias[1], our_results$RMSE[1], 
+  Our_OLS = round(c(our_results$Mean_Bias[1], our_results$RMSE[1],
                     our_results$Mean_SE[1], our_results$Coverage_Rate[1]), 3),
   Prono_IV = c(-0.023, 0.090, 0.091, 0.94),
-  Our_IV = round(c(our_results$Mean_Bias[2], our_results$RMSE[2], 
+  Our_IV = round(c(our_results$Mean_Bias[2], our_results$RMSE[2],
                    our_results$Mean_SE[2], our_results$Coverage_Rate[2]), 3)
 )
 
@@ -154,8 +154,8 @@ cat(sprintf("  Ours:  %.1f%%\n", our_rmse_reduction))
 
 # Coverage improvement
 cat(sprintf("\nCoverage rate improvement:\n"))
-cat(sprintf("  Prono: %.0f%% → %.0f%%\n", prono_table2$Coverage_Rate[1]*100, prono_table2$Coverage_Rate[2]*100))
-cat(sprintf("  Ours:  %.0f%% → %.0f%%\n", our_results$Coverage_Rate[1]*100, our_results$Coverage_Rate[2]*100))
+cat(sprintf("  Prono: %.0f%% → %.0f%%\n", prono_table2$Coverage_Rate[1] * 100, prono_table2$Coverage_Rate[2] * 100))
+cat(sprintf("  Ours:  %.0f%% → %.0f%%\n", our_results$Coverage_Rate[1] * 100, our_results$Coverage_Rate[2] * 100))
 
 # First-stage strength
 cat(sprintf("\nFirst-stage F-statistic:\n"))
@@ -191,7 +191,7 @@ cat("Estimating market beta for a small-value portfolio:\n\n")
 example_data <- generate_prono_data(
   n = 1000,  # Larger sample for stability
   beta1 = c(0.1, 0.02),      # Small-value characteristics
-  beta2 = c(0.0, -0.005),    
+  beta2 = c(0.0, -0.005),
   gamma1 = 1.2,              # True beta = 1.2
   garch_params = config$garch_params,
   sigma1 = 2.0,              # Higher idiosyncratic risk
@@ -208,17 +208,17 @@ example_result$data <- example_data
 
 # Results
 cat("True beta: 1.200\n")
-cat(sprintf("OLS estimate: %.3f (bias: %.3f)\n", 
+cat(sprintf("OLS estimate: %.3f (bias: %.3f)\n",
     example_result$gamma1_ols, example_result$bias_ols))
-cat(sprintf("Prono IV estimate: %.3f (bias: %.3f)\n", 
+cat(sprintf("Prono IV estimate: %.3f (bias: %.3f)\n",
     example_result$gamma1_iv, example_result$bias_iv))
 cat(sprintf("First-stage F-stat: %.1f\n\n", example_result$f_stat))
 
 # Summary statistics of generated data
 cat("Data characteristics:\n")
-cat(sprintf("  Portfolio return: mean = %.3f%%, SD = %.3f%%\n", 
+cat(sprintf("  Portfolio return: mean = %.3f%%, SD = %.3f%%\n",
     mean(example_data$Y1), sd(example_data$Y1)))
-cat(sprintf("  Market return: mean = %.3f%%, SD = %.3f%%\n", 
+cat(sprintf("  Market return: mean = %.3f%%, SD = %.3f%%\n",
     mean(example_data$Y2), sd(example_data$Y2)))
 
 # Test for GARCH

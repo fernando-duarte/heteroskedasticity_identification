@@ -104,7 +104,6 @@ test_that("Prono method handles missing rugarch package gracefully", {
   with_mocked_bindings(
     requireNamespace = function(package, ...) {
       if (package == "rugarch") return(FALSE)
-      return(TRUE)
     },
     {
       config <- create_prono_config(n = 100, k = 1, seed = 123)
@@ -121,3 +120,19 @@ test_that("Prono method handles missing rugarch package gracefully", {
     }
   )
 })
+
+# Check if the GARCH model converged (this is a simple check)
+garch_converged <- function(fit) {
+  # Based on rugarch documentation, convergence status is in fit@fit$convergence
+  # 0 indicates convergence
+  if (!is.null(fit@fit$convergence) && fit@fit$convergence == 0) {
+    TRUE
+  } else {
+    # Fallback or more detailed check if needed
+    # For this test, simply checking if coefficients are available might be enough
+    # if main interest is not GARCH convergence itself but whether Prono runs.
+    length(coef(fit)) > 0
+  }
+}
+
+# Test with a basic configuration

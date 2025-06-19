@@ -79,22 +79,24 @@ cat("\n\n4. NUMERICAL COMPARISON TABLE\n")
 cat("=============================\n\n")
 
 comparison_table <- data.frame(
-  Metric = c("Mean Bias", "RMSE", "Mean SE", "Coverage", "Bias Reduction", "RMSE Reduction"),
-  Prono = c(
-    sprintf("%.3f → %.3f", prono_results$Mean_Bias[1], prono_results$Mean_Bias[2]),
-    sprintf("%.3f → %.3f", prono_results$RMSE[1], prono_results$RMSE[2]),
-    sprintf("%.3f → %.3f", prono_results$Mean_SE[1], prono_results$Mean_SE[2]),
-    sprintf("%.0f%% → %.0f%%", prono_results$Coverage[1]*100, prono_results$Coverage[2]*100),
-    sprintf("%.1f%%", prono_improvement),
-    sprintf("%.1f%%", (1 - prono_results$RMSE[2]/prono_results$RMSE[1])*100)
+  Metric = c("Mean Bias", "RMSE", "Mean SE", "Coverage", "Bias Reduction", "RMSE Reduction", "Avg F-stat"),
+  Prono_Paper = c(
+    sprintf("%.3f", prono_results$Mean_Bias[prono_results$Method == "2SLS-Het"]),
+    sprintf("%.3f", prono_results$RMSE[prono_results$Method == "2SLS-Het"]),
+    sprintf("%.3f", prono_results$Mean_SE[prono_results$Method == "2SLS-Het"]),
+    sprintf("%.0f%% → %.0f%%", prono_results$Coverage[1] * 100, prono_results$Coverage[2] * 100),
+    "91.7%", # Directly from paper for 2SLS-Het
+    sprintf("%.1f%%", (1 - prono_results$RMSE[2] / prono_results$RMSE[1]) * 100),
+    NA
   ),
   Our_Replication = c(
-    sprintf("%.3f → %.3f", our_results$Mean_Bias[1], our_results$Mean_Bias[2]),
-    sprintf("%.3f → %.3f", our_results$RMSE[1], our_results$RMSE[2]),
-    sprintf("%.3f → %.3f", our_results$Mean_SE[1], our_results$Mean_SE[2]),
-    sprintf("%.0f%% → %.0f%%", our_results$Coverage[1]*100, our_results$Coverage[2]*100),
-    sprintf("%.1f%%", our_improvement),
-    sprintf("%.1f%%", (1 - our_results$RMSE[2]/our_results$RMSE[1])*100)
+    sprintf("%.3f", our_results$Mean_Bias[our_results$Method == "Prono IV"]),
+    sprintf("%.3f", our_results$RMSE[our_results$Method == "Prono IV"]),
+    sprintf("%.3f", our_results$Mean_SE[our_results$Method == "Prono IV"]),
+    sprintf("%.0f%% → %.0f%%", our_results$Coverage_Rate[1] * 100, our_results$Coverage_Rate[2] * 100),
+    sprintf("%.1f%%", (1 - abs(our_results$Mean_Bias[2]) / abs(our_results$Mean_Bias[1])) * 100),
+    sprintf("%.1f%%", (1 - our_results$RMSE[2] / our_results$RMSE[1]) * 100),
+    sprintf("%.1f", our_results$Mean_F_stat[2])
   )
 )
 
@@ -113,7 +115,7 @@ cat("✓ Our implementation successfully replicates Prono's methodology\n")
 if (requireNamespace("ggplot2", quietly = TRUE)) {
   cat("\n\nTo create publication-quality plots, run:\n")
   cat("source('inst/examples/create_prono_plots.R')\n")
-  
+
   # Save plot creation code
   plot_code <- '# Create publication-quality plots for Prono comparison
 library(ggplot2)
@@ -166,9 +168,9 @@ p2 <- ggplot(combined, aes(x = Source, y = RMSE, fill = Method_Type)) +
 # Plot 3: Coverage rate
 p3 <- ggplot(combined, aes(x = Source, y = Coverage, fill = Method_Type)) +
   geom_bar(stat = "identity", position = "dodge", width = 0.7) +
-  geom_hline(yintercept = 0.95, linetype = "dashed", color = "blue", 
+  geom_hline(yintercept = 0.95, linetype = "dashed", color = "blue",
              size = 1, alpha = 0.7) +
-  annotate("text", x = 1.5, y = 0.97, label = "Nominal 95%", 
+  annotate("text", x = 1.5, y = 0.97, label = "Nominal 95%",
            color = "blue", size = 3) +
   labs(title = "Coverage Rate Comparison",
        y = "Coverage Rate",
@@ -183,11 +185,11 @@ p3 <- ggplot(combined, aes(x = Source, y = Coverage, fill = Method_Type)) +
 grid.arrange(p1, p2, p3, ncol = 3)
 
 # Save combined plot
-ggsave("prono_comparison_plots.pdf", 
+ggsave("prono_comparison_plots.pdf",
        arrangeGrob(p1, p2, p3, ncol = 3),
        width = 12, height = 4)
 '
-  
+
   writeLines(plot_code, "inst/examples/create_prono_plots.R")
   cat("Plot creation code saved to: inst/examples/create_prono_plots.R\n")
 }

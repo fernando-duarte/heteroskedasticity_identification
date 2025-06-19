@@ -7,11 +7,11 @@
 rigobon_triangular_moments(
   theta,
   data,
-  y1_var = "Y1",
-  y2_var = "Y2",
-  x_vars = "Xk",
-  regime_var = "regime",
-  include_const = TRUE
+  y1_var,
+  y2_var,
+  x_vars,
+  regime_var,
+  add_intercept
 )
 }
 \arguments{
@@ -27,7 +27,7 @@ rigobon_triangular_moments(
 
 \item{regime_var}{Character. Name of the regime indicator variable.}
 
-\item{include_const}{Logical. Whether to include a constant term.}
+\item{add_intercept}{Logical. Whether to include a constant term.}
 }
 \value{
 Matrix of moment conditions (n × g).

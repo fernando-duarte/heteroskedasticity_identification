@@ -21,7 +21,7 @@ cat("  - SD: 2.0-2.5% weekly (~16% annual)\n")
 cat("  - Prono's 0.097% = 5.04% annual (REASONABLE)\n\n")
 
 # 2. RISK-FREE RATE
-cat("2. RISK-FREE RATE (RF)\n") 
+cat("2. RISK-FREE RATE (RF)\n")
 cat(paste(rep("=", 50), collapse=""), "\n")
 cat("Expected for 1963-2004 period:\n")
 cat("  - 1960s: ~4% annual (0.077% weekly)\n")
@@ -76,7 +76,7 @@ portfolio_grid$Expected_Vol <- with(portfolio_grid, {
 })
 
 # Show corner portfolios
-corners <- portfolio_grid[portfolio_grid$Size %in% c("Small", "Big") & 
+corners <- portfolio_grid[portfolio_grid$Size %in% c("Small", "Big") &
                          portfolio_grid$BM %in% c("Low", "High"), ]
 print(corners[, c("Size", "BM", "Expected_Return", "Expected_Vol")])
 
@@ -111,16 +111,16 @@ cat("7. SUMMARY COMPARISON\n")
 cat("="*50, "\n\n")
 
 summary_table <- data.frame(
-  Data_Series = c("Market Excess (Mkt-RF)", 
+  Data_Series = c("Market Excess (Mkt-RF)",
                   "Risk-Free Rate (RF)",
-                  "Size Factor (SMB)", 
+                  "Size Factor (SMB)",
                   "Value Factor (HML)",
                   "Typical Portfolio",
                   "Number of Observations"),
   Prono_Reports = c("0.097% mean",
                     "Not specified",
                     "Not specified",
-                    "Not specified", 
+                    "Not specified",
                     "Not specified",
                     "2,166"),
   Expected_Mean = c("0.10-0.15%",

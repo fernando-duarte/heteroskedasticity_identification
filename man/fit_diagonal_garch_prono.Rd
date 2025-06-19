@@ -41,4 +41,13 @@ Fit Bivariate Diagonal GARCH Model (Prono Specification)
 
 Fits a bivariate diagonal GARCH model to portfolio and market returns
 following Prono's exact specification.
+
+Prono, T. (2014). The Role of Conditional Heteroskedasticity in Identifying
+and Estimating Linear Triangular Systems, with Applications to Asset Pricing
+Models That Include a Mismeasured Factor. Journal of Applied Econometrics,
+29(5), 800-824. \doi{10.1002/jae.2387}
+}
+\seealso{
+\code{\link{prono_diagonal_garch}} for complete estimation
+\code{\link{fit_dcc_garch_fallback}} for fallback implementation
 }

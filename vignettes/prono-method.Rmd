@@ -140,7 +140,7 @@ cat(sprintf("OLS estimate:   %.4f (bias: %+.4f)\n",
 cat(sprintf("Prono estimate: %.4f (bias: %+.4f)\n",
             result$gamma1_iv, result$bias_iv))
 cat(sprintf("Bias reduction: %.1f%%\n",
-            100 * (1 - abs(result$bias_iv)/abs(result$bias_ols))))
+            100 * (1 - abs(result$bias_iv) / abs(result$bias_ols))))
 cat(sprintf("\nData check - Y2 mean: %.3f%% (target: 0.097%%)\n",
             mean(result$data$Y2)))
 ```
@@ -149,7 +149,10 @@ cat(sprintf("\nData check - Y2 mean: %.3f%% (target: 0.097%%)\n",
 
 To assess the method's performance, let's run a Monte Carlo simulation:
 
-```{r monte-carlo, cache=TRUE}
+<!-- Note: The following code chunks use eval=FALSE to avoid CRAN check timeouts.
+     Users can run this code locally to replicate the results. -->
+
+```{r monte-carlo, eval=FALSE}
 # Run 500 simulations
 mc_results <- run_prono_monte_carlo(
   config,
@@ -172,7 +175,7 @@ print(summary_stats, digits = 4)
 
 ### Visualizing Monte Carlo Results
 
-```{r plot-mc-results}
+```{r plot-mc-results, eval=FALSE}
 # Prepare data for plotting
 plot_data <- data.frame(
   Method = rep(c("OLS", "Prono IV"), each = nrow(mc_results)),
@@ -210,7 +213,7 @@ print(p2)
 
 An important diagnostic is the first-stage F-statistic:
 
-```{r f-stats}
+```{r f-stats, eval=FALSE}
 # Analyze first-stage F-statistics
 f_summary <- data.frame(
   Mean_F = mean(mc_results$f_stat),
@@ -237,7 +240,10 @@ ggplot(mc_results, aes(x = f_stat)) +
 
 Let's examine how the GARCH parameters affect identification strength:
 
-```{r sensitivity-garch, cache=TRUE}
+<!-- The following sensitivity analyses are computationally intensive.
+     Run these locally to explore parameter sensitivity. -->
+
+```{r sensitivity-garch, eval=FALSE}
 # Test different GARCH parameters
 alpha_values <- c(0.05, 0.1, 0.2, 0.3)
 results_list <- list()
@@ -286,7 +292,7 @@ abline(h = 10, lty = 2, col = "red")
 
 ### Effect of Sample Size
 
-```{r sensitivity-n, cache=TRUE}
+```{r sensitivity-n, eval=FALSE}
 # Test different sample sizes
 n_values <- c(100, 200, 500, 1000)
 n_results <- list()
@@ -390,7 +396,10 @@ Prono (2014) uses the following simulation design:
 
 ### Replication Exercise
 
-```{r prono-replication, cache=TRUE}
+<!-- This replication code matches Prono's Monte Carlo design but is computationally intensive.
+     Run locally with n_sims = 1000 to fully replicate Table II results. -->
+
+```{r prono-replication, eval=FALSE}
 # Set up parameters matching Prono (2014) Table I, Case 1
 prono_params <- list(
   # True structural parameters
@@ -502,7 +511,7 @@ cat("This may be due to using simplified GARCH vs. full diagonal specification.\
 
 ### Visualizing the Replication Results
 
-```{r replication-plots}
+```{r replication-plots, eval=FALSE}
 # Combine results for plotting
 plot_data <- rbind(
   data.frame(
@@ -584,8 +593,8 @@ All data except CRSP can be freely downloaded using R packages.
 ```{r data-packages, eval=FALSE}
 # Install required packages if not already installed
 packages <- c("frenchdata", "fredr", "tidyquant", "FFdownload")
-new_packages <- packages[!(packages %in% installed.packages()[,"Package"])]
-if(length(new_packages)) install.packages(new_packages)
+new_packages <- packages[!(packages %in% installed.packages()[, "Package"])]
+if (length(new_packages)) install.packages(new_packages)
 ```
 
 ### Downloading Fama-French Data
@@ -671,27 +680,26 @@ sp500 <- tq_get("^GSPC",
 prepare_prono_data <- function(portfolio_returns, market_factor, rf_rate) {
 
   # Merge all data by date
-  data <- portfolio_returns %>%
-    left_join(market_factor, by = "date") %>%
+  data <- portfolio_returns |>
+    left_join(market_factor, by = "date") |>
     left_join(rf_rate, by = "date")
 
   # Calculate excess returns
-  data <- data %>%
+  data <- data |>
     mutate(
-      portfolio_excess = portfolio_return - rf,
-      market_excess = mkt_return - rf
+      Y1 = portfolio_return - RF, # Portfolio excess return
+      Y2 = market_factor - RF    # Market excess return (the factor)
     )
 
   # Structure for Prono's model: Y1 = portfolio excess return, Y2 = market excess return
-  prono_data <- data %>%
-    select(
-      date,
-      Y1 = portfolio_excess,
-      Y2 = market_excess
-    ) %>%
-    na.omit()
-
-  return(prono_data)
+  prono_data <- data |>
+    select(Y1, Y2, X = market_factor) |>
+    mutate(
+      Y1 = as.numeric(Y1),
+      Y2 = as.numeric(Y2),
+      X = as.numeric(X) # Ensure X is also numeric for GARCH model
+    )
+  prono_data
 }
 ```
 

@@ -71,9 +71,9 @@ analysis_data <- na.omit(analysis_data)
 n_obs <- nrow(analysis_data)
 
 cat("Prepared data:\n")
-cat("  Y1 (Portfolio excess): Mean =", sprintf("%.3f%%", mean(analysis_data$Y1)), 
+cat("  Y1 (Portfolio excess): Mean =", sprintf("%.3f%%", mean(analysis_data$Y1)),
     "SD =", sprintf("%.3f%%", sd(analysis_data$Y1)), "\n")
-cat("  Y2 (Market excess): Mean =", sprintf("%.3f%%", mean(analysis_data$Y2)), 
+cat("  Y2 (Market excess): Mean =", sprintf("%.3f%%", mean(analysis_data$Y2)),
     "SD =", sprintf("%.3f%%", sd(analysis_data$Y2)), "\n")
 cat("  Number of observations:", n_obs, "\n\n")
 
@@ -121,13 +121,13 @@ tryCatch({
     garch_order = c(1, 1),
     verbose = TRUE
   )
-  
+
   cat("\nProno IV with Diagonal GARCH:\n")
   cat("  Coefficient:", sprintf("%.4f", prono_diag$gamma1_iv), "\n")
   cat("  Std Error:", sprintf("%.4f", prono_diag$se_iv), "\n")
   cat("  t-statistic:", sprintf("%.4f", prono_diag$gamma1_iv / prono_diag$se_iv), "\n")
   cat("  First-stage F-stat:", sprintf("%.2f", prono_diag$f_stat), "\n")
-  
+
 }, error = function(e) {
   cat("Error with diagonal GARCH:", e$message, "\n")
   cat("This may require installing tsmarch package\n")
@@ -146,7 +146,7 @@ if (requireNamespace("rugarch", quietly = TRUE)) {
   )
   garch_fit <- rugarch::ugarchfit(garch_spec, analysis_data$Y2)
   analysis_data$sigma2_sq_hat <- as.numeric(rugarch::sigma(garch_fit))^2
-  
+
   # GMM estimation
   gmm_result <- prono_gmm(
     analysis_data,
@@ -154,10 +154,10 @@ if (requireNamespace("rugarch", quietly = TRUE)) {
     fit_garch = FALSE,
     verbose = FALSE
   )
-  
+
   cat("GMM Two-Step Results:\n")
   print(summary(gmm_result))
-  
+
   # Try CUE
   cue_result <- prono_gmm(
     analysis_data,
@@ -165,7 +165,7 @@ if (requireNamespace("rugarch", quietly = TRUE)) {
     fit_garch = FALSE,
     verbose = FALSE
   )
-  
+
   cat("\nGMM CUE Results:\n")
   print(summary(cue_result))
 }
@@ -175,7 +175,7 @@ cat("\n\nPART 7: SUMMARY COMPARISON\n")
 cat("==========================\n\n")
 
 results_table <- data.frame(
-  Method = c("OLS", "Standard IV", "Prono IV (Univariate)", "Prono IV (Diagonal)", 
+  Method = c("OLS", "Standard IV", "Prono IV (Univariate)", "Prono IV (Diagonal)",
              "GMM Two-Step", "GMM CUE"),
   Coefficient = c(
     coef(ols_fit)["Y2"],

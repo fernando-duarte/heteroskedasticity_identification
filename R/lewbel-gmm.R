@@ -17,6 +17,7 @@ NULL
 #' @param y2_var Character. Name of the second dependent variable/endogenous regressor (default: "Y2").
 #' @param x_vars Character vector. Names of exogenous variables (default: "Xk").
 #' @param z_vars Character vector. Names of heteroskedasticity drivers (default: NULL, uses centered X).
+#' @param add_intercept Logical. Whether to add an intercept to the exogenous variables.
 #'
 #' @return Matrix of moment conditions (n x q).
 #'
@@ -27,9 +28,9 @@ NULL
 #'
 #' The moment conditions are:
 #' \itemize{
-#'   \item E[X * epsilon_1] = 0
-#'   \item E[X * epsilon_2] = 0
-#'   \item E[Z * epsilon_1 * epsilon_2] = 0
+#'   \item \eqn{E[X \times \epsilon_1] = 0}
+#'   \item \eqn{E[X \times \epsilon_2] = 0}
+#'   \item \eqn{E[Z \times \epsilon_1 \times \epsilon_2] = 0}
 #' }
 #' where Z = g(X) is a mean-zero transformation of X.
 #'
@@ -38,59 +39,51 @@ NULL
 #' \code{\link{lewbel_simultaneous_moments}} for simultaneous system moments.
 #'
 #' @export
-lewbel_triangular_moments <- function(theta, data,
-                                      y1_var = "Y1",
-                                      y2_var = "Y2",
-                                      x_vars = "Xk",
-                                      z_vars = NULL) {
-
-  # Extract data
-  Y1 <- data[[y1_var]]
-  Y2 <- data[[y2_var]]
-  X <- as.matrix(data[, x_vars, drop = FALSE])
+lewbel_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars, z_vars, add_intercept) {
   n <- nrow(data)
+  k <- length(x_vars)
+  if (add_intercept) k <- k + 1
 
-  # Add intercept if not present
-  if (!any(apply(X, 2, function(x) all(x == 1)))) {
-    X <- cbind(1, X)
+  y1_data <- data[[y1_var]]
+  y2_data <- data[[y2_var]]
+  x_matrix <- as.matrix(data[, x_vars, drop = FALSE])
+
+  if (add_intercept) {
+    x_matrix <- cbind(1, x_matrix)
   }
 
-  # Number of X variables (including intercept)
-  k <- ncol(X)
-
-  # Extract parameters
-  # theta = c(beta1_0, beta1_1, ..., gamma1, beta2_0, beta2_1, ...)
+  # Parameters: (beta1_0, beta1_1, ..., gamma1, beta2_0, beta2_1, ...)
   beta1 <- theta[1:k]
   gamma1 <- theta[k + 1]
   beta2 <- theta[(k + 2):(2 * k + 1)]
 
-  # Calculate structural errors
-  epsilon1 <- Y1 - X %*% beta1 - gamma1 * Y2
-  epsilon2 <- Y2 - X %*% beta2
 
-  # Construct Z (heteroskedasticity drivers)
+  # Structural errors
+  eps1 <- y1_data - x_matrix %*% beta1 - y2_data * gamma1
+  eps2 <- y2_data - x_matrix %*% beta2
+
+  # Construct Z matrix for instruments
+  # Default Z: demeaned X (excluding intercept if present)
   if (is.null(z_vars)) {
-    # Use centered X variables (excluding intercept) as default
-    Z <- scale(X[, -1, drop = FALSE], center = TRUE, scale = FALSE)
+    if (add_intercept && ncol(x_matrix) > 1) {
+      z_matrix <- scale(x_matrix[, -1, drop = FALSE], center = TRUE, scale = FALSE)
+    } else if (!add_intercept && ncol(x_matrix) > 0) {
+      z_matrix <- scale(x_matrix, center = TRUE, scale = FALSE)
+    } else {
+      stop("Cannot automatically construct Z. No exogenous variables specified or only an intercept.")
+    }
   } else {
-    Z <- as.matrix(data[, z_vars, drop = FALSE])
-    Z <- scale(Z, center = TRUE, scale = FALSE)
+    z_matrix <- as.matrix(data[, z_vars, drop = FALSE])
+    z_matrix <- scale(z_matrix, center = TRUE, scale = FALSE)
   }
 
-  # Construct moment conditions
-  # E[X * epsilon1] = 0
-  m1 <- X * as.vector(epsilon1)
+  # Moment conditions
+  m1 <- x_matrix * eps1
+  m2 <- x_matrix * eps2
+  m3 <- z_matrix * eps1 * eps2
 
-  # E[X * epsilon2] = 0
-  m2 <- X * as.vector(epsilon2)
-
-  # E[Z * epsilon1 * epsilon2] = 0
-  m3 <- Z * as.vector(epsilon1 * epsilon2)
-
-  # Combine all moment conditions
   moments <- cbind(m1, m2, m3)
-
-  return(moments)
+  moments
 }
 
 
@@ -105,6 +98,8 @@ lewbel_triangular_moments <- function(theta, data,
 #' @param y2_var Character. Name of the second dependent variable (default: "Y2").
 #' @param x_vars Character vector. Names of exogenous variables (default: "Xk").
 #' @param z_vars Character vector. Names of heteroskedasticity drivers (default: NULL).
+#' @param add_intercept Logical. Whether to add an intercept to the exogenous variables.
+#' @param z_sq Logical. Whether to include squared terms in the Z matrix for simultaneous equations.
 #'
 #' @return Matrix of moment conditions (n x q).
 #'
@@ -121,76 +116,60 @@ lewbel_triangular_moments <- function(theta, data,
 #' \code{\link{lewbel_triangular_moments}} for triangular system moments.
 #'
 #' @export
-lewbel_simultaneous_moments <- function(theta, data,
-                                        y1_var = "Y1",
-                                        y2_var = "Y2",
-                                        x_vars = "Xk",
-                                        z_vars = NULL) {
-
-  # Extract data
-  Y1 <- data[[y1_var]]
-  Y2 <- data[[y2_var]]
-  X <- as.matrix(data[, x_vars, drop = FALSE])
+lewbel_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars, z_vars, add_intercept, z_sq) {
   n <- nrow(data)
+  k <- length(x_vars)
+  if (add_intercept) k <- k + 1
 
-  # Add intercept if not present
-  if (!any(apply(X, 2, function(x) all(x == 1)))) {
-    X <- cbind(1, X)
+  y1_data <- data[[y1_var]]
+  y2_data <- data[[y2_var]]
+  x_matrix <- as.matrix(data[, x_vars, drop = FALSE])
+
+  if (add_intercept) {
+    x_matrix <- cbind(1, x_matrix)
   }
 
-  # Number of X variables (including intercept)
-  k <- ncol(X)
-
-  # Extract parameters
-  # theta = c(beta1_0, beta1_1, ..., gamma1, beta2_0, beta2_1, ..., gamma2)
+  # Parameters: (beta1_0, beta1_1, ..., gamma1, beta2_0, beta2_1, ..., gamma2)
   beta1 <- theta[1:k]
   gamma1 <- theta[k + 1]
   beta2 <- theta[(k + 2):(2 * k + 1)]
   gamma2 <- theta[2 * k + 2]
 
-  # Check identification condition
-  if (abs(gamma1 * gamma2 - 1) < 1e-10) {
-    warning("gamma1 * gamma2 is close to 1, model may not be identified")
-  }
+  # Structural errors
+  eps1 <- y1_data - x_matrix %*% beta1 - y2_data * gamma1
+  eps2 <- y2_data - x_matrix %*% beta2 - y1_data * gamma2
 
-  # Calculate structural errors
-  epsilon1 <- Y1 - X %*% beta1 - gamma1 * Y2
-  epsilon2 <- Y2 - X %*% beta2 - gamma2 * Y1
-
-  # Construct Z (heteroskedasticity drivers)
+  # Construct Z matrix for instruments
   if (is.null(z_vars)) {
-    # Use centered X variables (excluding intercept) as default
-    Z <- scale(X[, -1, drop = FALSE], center = TRUE, scale = FALSE)
-
-    # For simultaneous system, need at least 2 Z variables
-    if (ncol(Z) < 2) {
-      # Add squared terms if needed
-      Z <- cbind(Z, Z^2)
-      Z <- scale(Z, center = TRUE, scale = FALSE)
+    if (add_intercept && ncol(x_matrix) > 1) {
+      z_matrix <- scale(x_matrix[, -1, drop = FALSE], center = TRUE, scale = FALSE)
+    } else if (!add_intercept && ncol(x_matrix) > 0) {
+      z_matrix <- scale(x_matrix, center = TRUE, scale = FALSE)
+    } else {
+      stop("Cannot auto-construct Z for simultaneous equations. No valid exogenous X for Z.")
+    }
+    if (z_sq) { # If TRUE, Z = [Z, Z^2] for simultaneous eq, as per Lewbel (2012) p.70, for Cov(Z,eps_i^2) != 0
+      z_matrix <- cbind(z_matrix, z_matrix^2)
+      z_matrix <- scale(z_matrix, center = TRUE, scale = FALSE) # Re-center after adding Z^2
     }
   } else {
-    Z <- as.matrix(data[, z_vars, drop = FALSE])
-    Z <- scale(Z, center = TRUE, scale = FALSE)
-
-    if (ncol(Z) < 2) {
-      stop("Simultaneous system requires at least 2 heteroskedasticity drivers (Z variables)")
-    }
+    z_matrix <- as.matrix(data[, z_vars, drop = FALSE])
+    z_matrix <- scale(z_matrix, center = TRUE, scale = FALSE)
   }
 
-  # Construct moment conditions
-  # E[X * epsilon1] = 0
-  m1 <- X * as.vector(epsilon1)
+  if (ncol(z_matrix) < 2 && is.null(z_vars)) {
+    # Lewbel (2012) notes that for simultaneous equations, Z needs at least 2 elements if constructed from X.
+    # This is to ensure the rank condition for identification (Phi_W has rank 2).
+    # Since this is the simultaneous moments function, this warning applies.
+  }
 
-  # E[X * epsilon2] = 0
-  m2 <- X * as.vector(epsilon2)
+  # Moment conditions
+  m1 <- x_matrix * eps1
+  m2 <- x_matrix * eps2
+  m3 <- z_matrix * eps1 * eps2
 
-  # E[Z * epsilon1 * epsilon2] = 0
-  m3 <- Z * as.vector(epsilon1 * epsilon2)
-
-  # Combine all moment conditions
   moments <- cbind(m1, m2, m3)
-
-  return(moments)
+  moments
 }
 
 
@@ -205,6 +184,7 @@ lewbel_simultaneous_moments <- function(theta, data,
 #' @param y2_var Character. Name of the second dependent variable/endogenous regressor (default: "Y2").
 #' @param x_vars Character vector. Names of exogenous variables (default: "Xk").
 #' @param z_vars Character vector. Names of heteroskedasticity drivers (default: NULL).
+#' @param add_intercept Logical. Whether to add an intercept to the exogenous variables (default: TRUE).
 #' @param gmm_type Character. GMM type: "twoStep", "iterative", or "cue" (default: "twoStep").
 #' @param initial_values Numeric vector. Initial parameter values (default: NULL, uses OLS).
 #' @param vcov Character. Type of variance-covariance matrix: "HAC", "iid", or "cluster" (default: "HAC").
@@ -258,6 +238,7 @@ lewbel_gmm <- function(data,
                        y2_var = "Y2",
                        x_vars = "Xk",
                        z_vars = NULL,
+                       add_intercept = TRUE,
                        gmm_type = c("twoStep", "iterative", "cue"),
                        initial_values = NULL,
                        vcov = c("HAC", "iid", "cluster"),
@@ -274,18 +255,26 @@ lewbel_gmm <- function(data,
     stop("Package 'gmm' is required but not installed. Please install it with: install.packages('gmm')")
   }
 
-  # Prepare data matrix
-  X <- as.matrix(data[, x_vars, drop = FALSE])
+  # Extract data components
+  # Ensure data is a data.frame or similar structure
+  if (!is.data.frame(data)) data <- as.data.frame(data)
 
-  # Add intercept if not present
-  if (!any(apply(X, 2, function(x) all(x == 1)))) {
-    X <- cbind(1, X)
-    x_vars_with_int <- c("(Intercept)", x_vars)
-  } else {
-    x_vars_with_int <- x_vars
+  # Exogenous variables matrix
+  if (!all(x_vars %in% names(data))) {
+    stopper("Not all x_vars found in data: ", paste(x_vars[!(x_vars %in% names(data))], collapse = ", "))
   }
+  x_matrix <- as.matrix(data[, x_vars, drop = FALSE])
 
-  k <- ncol(X)
+  # Add intercept if specified and not already present in X (by checking for all 1s column)
+  if (add_intercept) {
+    if (ncol(x_matrix) == 0 || !any(apply(x_matrix, 2, function(col) all(col == 1)))) {
+      x_matrix <- cbind(1, x_matrix)
+      # Update k_exog if intercept was added to x_vars implicitly by cbind(1, X)
+      # This k_exog is for the parameter vector construction, needs to match columns of X in moments
+    } else if (any(apply(x_matrix, 2, function(col) all(col == 1)))) {
+    }
+  }
+  k_exog <- ncol(x_matrix) # Number of exogenous regressors including intercept
 
   # Get initial values if not provided
   if (is.null(initial_values)) {
@@ -318,15 +307,15 @@ lewbel_gmm <- function(data,
   # Set parameter names
   if (system == "triangular") {
     param_names <- c(
-      paste0("beta1_", x_vars_with_int),
+      paste0("beta1_", x_vars),
       "gamma1",
-      paste0("beta2_", x_vars_with_int)
+      paste0("beta2_", x_vars)
     )
   } else {
     param_names <- c(
-      paste0("beta1_", x_vars_with_int),
+      paste0("beta1_", x_vars),
       "gamma1",
-      paste0("beta2_", x_vars_with_int),
+      paste0("beta2_", x_vars),
       "gamma2"
     )
   }
@@ -336,11 +325,11 @@ lewbel_gmm <- function(data,
   # Select moment function
   if (system == "triangular") {
     moment_fn <- function(theta, x) {
-      lewbel_triangular_moments(theta, x, y1_var, y2_var, x_vars, z_vars)
+      lewbel_triangular_moments(theta, x, y1_var, y2_var, x_vars, z_vars, TRUE)
     }
   } else {
     moment_fn <- function(theta, x) {
-      lewbel_simultaneous_moments(theta, x, y1_var, y2_var, x_vars, z_vars)
+      lewbel_simultaneous_moments(theta, x, y1_var, y2_var, x_vars, z_vars, TRUE, FALSE)
     }
   }
 
@@ -374,9 +363,22 @@ lewbel_gmm <- function(data,
     z = z_vars
   )
 
-  class(gmm_result) <- c("lewbel_gmm", class(gmm_result))
+  # Return results
+  class(gmm_result) <- c(paste0("lewbel_", system), "lewbel_gmm", class(gmm_result))
+  # Add some model information to the result for summary/print methods
+  gmm_result$model_info <- list(
+    y1_var = y1_var,
+    y2_var = y2_var,
+    x_vars = x_vars,
+    z_vars = z_vars,
+    model_type = system,
+    add_intercept = add_intercept,
+    n_obs = nrow(data),
+    n_params = length(coef(gmm_result$gmm_output)),
+    n_moments = ncol(gmm_result$gmm_output$g)
+  )
 
-  return(gmm_result)
+  gmm_result
 }
 
 
@@ -446,6 +448,7 @@ print.lewbel_gmm <- function(x, ...) {
 #' Compares GMM estimates with traditional 2SLS (Lewbel) estimates.
 #'
 #' @param data Data frame containing all variables.
+#' @param verbose Logical. Whether to print progress messages (default: TRUE).
 #' @param ... Additional arguments passed to lewbel_gmm and run_single_lewbel_simulation.
 #'
 #' @return A data frame comparing estimates, standard errors, and test statistics.
@@ -455,7 +458,7 @@ print.lewbel_gmm <- function(x, ...) {
 #' \code{\link{run_single_lewbel_simulation}} for 2SLS estimation.
 #'
 #' @export
-compare_gmm_2sls <- function(data, ...) {
+compare_gmm_2sls <- function(data, verbose = TRUE, ...) {
 
   # Run GMM estimation
   gmm_result <- lewbel_gmm(data, ...)
@@ -524,7 +527,13 @@ compare_gmm_2sls <- function(data, ...) {
     warning("2SLS comparison could not be computed")
   }
 
-  return(comparison)
+  # Print the comparison table
+  if (verbose) {
+    messager("Comparison of Degrees of Freedom Adjustments:")
+    print(comparison, row.names = FALSE)
+  }
+
+  comparison
 }
 
 
@@ -539,7 +548,7 @@ compare_gmm_2sls <- function(data, ...) {
 #' @param y2_var Character. Name of the second dependent variable.
 #' @param x_vars Character vector. Names of exogenous variables.
 #' @param regime_var Character. Name of the regime indicator variable.
-#' @param include_const Logical. Whether to include a constant term.
+#' @param add_intercept Logical. Whether to include a constant term.
 #'
 #' @return Matrix of moment conditions (n × g).
 #'
@@ -548,59 +557,72 @@ compare_gmm_2sls <- function(data, ...) {
 #' \code{\link{rigobon_simultaneous_moments}} for simultaneous system moments.
 #'
 #' @export
-rigobon_triangular_moments <- function(theta, data,
-                                       y1_var = "Y1", y2_var = "Y2",
-                                       x_vars = "Xk", regime_var = "regime",
-                                       include_const = TRUE) {
+rigobon_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars, regime_var, add_intercept) {
+  n <- nrow(data)
+  k <- length(x_vars)
+  if (add_intercept) k <- k + 1
 
-  # Extract variables
-  Y1 <- data[[y1_var]]
-  Y2 <- data[[y2_var]]
-  X <- as.matrix(data[, x_vars, drop = FALSE])
+  y1_data <- data[[y1_var]]
+  y2_data <- data[[y2_var]]
+  x_matrix <- as.matrix(data[, x_vars, drop = FALSE])
 
-  if (include_const) {
-    X <- cbind(1, X)
-    x_vars_full <- c("(Intercept)", x_vars)
-  } else {
-    x_vars_full <- x_vars
+  if (add_intercept) {
+    x_matrix <- cbind(1, x_matrix)
   }
 
-  n <- nrow(data)
-  k <- ncol(X)  # Number of X variables (including constant if present)
+  regime_indicator <- data[[regime_var]]
+  if (!is.numeric(regime_indicator) || !all(regime_indicator %in% c(1, 2))) {
+    # Assuming 2 regimes for now, coded 1 and 2. Rigobon can handle more.
+    # More robust handling for multiple regimes (e.g. creating dummies) would be needed for general case.
+    # For this specific moment function, assume regime_indicator is already a set of dummies if more than 2 regimes.
+    # stopper("Regime variable must be numeric and indicate 2 regimes (e.g., 1 and 2) or be pre-processed into dummies.")
+  }
 
-  # Parse parameters
-  # For triangular: beta1 (k params), gamma1 (1 param), beta2 (k params)
+  # Parameters: (beta1_0, beta1_1, ..., gamma1, beta2_0, beta2_1, ...)
   beta1 <- theta[1:k]
   gamma1 <- theta[k + 1]
-  beta2 <- theta[(k + 2):(2*k + 1)]
+  beta2 <- theta[(k + 2):(2 * k + 1)]
 
-  # Calculate structural errors
-  e1 <- Y1 - X %*% beta1 - Y2 * gamma1
-  e2 <- Y2 - X %*% beta2
+  # Structural errors
+  eps1 <- y1_data - x_matrix %*% beta1 - y2_data * gamma1
+  eps2 <- y2_data - x_matrix %*% beta2
 
-    # Create regime-based instruments (centered dummies)
-  regimes <- unique(data[[regime_var]])
-  n_regimes <- length(regimes)
+  # Construct Z instruments from regime indicator
+  # For two regimes (e.g., 1 and 2), Z can be a centered dummy for regime 2.
+  # If regime_indicator is already dummy variables (e.g. from factor()), use them.
+  unique_regimes <- sort(unique(regime_indicator))
+  n_regimes <- length(unique_regimes)
 
-  # For identification, we use n_regimes - 1 dummies (drop the last one)
-  # This avoids perfect multicollinearity when dummies are centered
-  Z <- matrix(0, n, n_regimes - 1)
+  if (n_regimes < 2) stopper("Need at least two regimes for Rigobon's method.")
+
+  # Create centered dummy variables for (n_regimes - 1) regimes
+  # This is a common way to specify Z for Rigobon's method
+  z_matrix <- matrix(0, n, n_regimes - 1)
   for (i in seq_len(n_regimes - 1)) {
-    dummy <- as.numeric(data[[regime_var]] == regimes[i])
-    Z[, i] <- dummy - mean(dummy)  # Center the dummy
+    dummy <- as.numeric(regime_indicator == unique_regimes[i + 1]) # Dummy for regime i+1 vs baseline unique_regimes[1]
+    z_matrix[, i] <- dummy - mean(dummy)  # Center the dummy
   }
 
-  # Form moment conditions
-  # 1. E[X * e1] = 0 (k moments)
-  # 2. E[X * e2] = 0 (k moments)
-  # 3. E[Z * e1 * e2] = 0 (n_regimes moments)
+  # Moment conditions for Rigobon (triangular)
+  # E[X * eps1] = 0
+  # E[X * eps2] = 0
+  # E[Z * eps2^2] = 0 (This is the key identifying moment, or E[Z * (eps2^2 - sigma_eps2^2)] = 0 )
+  # Lewbel form uses E[Z * eps1 * eps2] = 0, Rigobon uses changes in var(eps2)
+  # For GMM, moments are typically E[instrument * error term] = 0
+  # Rigobon identification comes from how Cov(Y1,Y2) changes across regimes due to Var(eps2) changing.
+  # The moments here are based on Lewbel's framework using Z as regressors for heteroskedasticity.
+  # For a triangular system, Lewbel suggests instruments Z for Cov(Z, eps1*eps2) = 0.
+  # Rigobon (2003) focuses on Cov(Y1, Y2)_s = gamma1 * Var(eps2)_s + Cov(eps1, eps2)
+  # And Var(Y2)_s = Var(eps2)_s
+  # The GMM moment in lewbel_gmm for triangular rigobon is E[Z * eps1 * eps2] = 0,
+  # where Z is derived from regime dummies.
 
-  g1 <- X * as.vector(e1)  # n × k
-  g2 <- X * as.vector(e2)  # n × k
-  g3 <- Z * as.vector(e1 * e2)  # n × n_regimes
+  m1 <- x_matrix * eps1
+  m2 <- x_matrix * eps2
+  m3 <- z_matrix * eps1 * eps2
 
-  # Combine all moments
-  cbind(g1, g2, g3)
+  moments <- cbind(m1, m2, m3)
+  moments
 }
 
 
@@ -615,7 +637,7 @@ rigobon_triangular_moments <- function(theta, data,
 #' @param y2_var Character. Name of the second dependent variable.
 #' @param x_vars Character vector. Names of exogenous variables.
 #' @param regime_var Character. Name of the regime indicator variable.
-#' @param include_const Logical. Whether to include a constant term.
+#' @param add_intercept Logical. Whether to include a constant term.
 #'
 #' @return Matrix of moment conditions (n × g).
 #'
@@ -624,61 +646,59 @@ rigobon_triangular_moments <- function(theta, data,
 #' \code{\link{rigobon_triangular_moments}} for triangular system moments.
 #'
 #' @export
-rigobon_simultaneous_moments <- function(theta, data,
-                                         y1_var = "Y1", y2_var = "Y2",
-                                         x_vars = "Xk", regime_var = "regime",
-                                         include_const = TRUE) {
+rigobon_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars, regime_var, add_intercept) {
+  n <- nrow(data)
+  k <- length(x_vars)
+  if (add_intercept) k <- k + 1
 
-  # Extract variables
-  Y1 <- data[[y1_var]]
-  Y2 <- data[[y2_var]]
-  X <- as.matrix(data[, x_vars, drop = FALSE])
+  y1_data <- data[[y1_var]]
+  y2_data <- data[[y2_var]]
+  x_matrix <- as.matrix(data[, x_vars, drop = FALSE])
 
-  if (include_const) {
-    X <- cbind(1, X)
-    x_vars_full <- c("(Intercept)", x_vars)
-  } else {
-    x_vars_full <- x_vars
+  if (add_intercept) {
+    x_matrix <- cbind(1, x_matrix)
   }
 
-  n <- nrow(data)
-  k <- ncol(X)
+  regime_indicator <- data[[regime_var]]
+  # Basic check, more robust regime handling might be needed for >2 regimes
+  # if (!is.numeric(regime_indicator)) stopper("Regime variable must be numeric.")
 
-  # Parse parameters
-  # For simultaneous: beta1 (k), gamma1 (1), beta2 (k), gamma2 (1)
+  # Parameters: (beta1_0,...,gamma1, beta2_0,...,gamma2)
   beta1 <- theta[1:k]
   gamma1 <- theta[k + 1]
-  beta2 <- theta[(k + 2):(2*k + 1)]
-  gamma2 <- theta[2*k + 2]
+  beta2 <- theta[(k + 2):(2 * k + 1)]
+  gamma2 <- theta[2 * k + 2]
 
-  # Calculate structural errors
-  e1 <- Y1 - X %*% beta1 - Y2 * gamma1
-  e2 <- Y2 - X %*% beta2 - Y1 * gamma2
+  # Structural errors
+  eps1 <- y1_data - x_matrix %*% beta1 - y2_data * gamma1
+  eps2 <- y2_data - x_matrix %*% beta2 - y1_data * gamma2
 
-    # Create regime-based instruments (centered dummies)
-  regimes <- unique(data[[regime_var]])
-  n_regimes <- length(regimes)
+  # Construct Z instruments from regime indicator
+  unique_regimes <- sort(unique(regime_indicator))
+  n_regimes <- length(unique_regimes)
 
-  # For identification, we use n_regimes - 1 dummies (drop the last one)
-  # This avoids perfect multicollinearity when dummies are centered
-  Z <- matrix(0, n, n_regimes - 1)
+  if (n_regimes < 2) stopper("Need at least two regimes for Rigobon's method.")
+
+  # Create centered dummy variables for (n_regimes - 1) regimes
+  z_matrix <- matrix(0, n, n_regimes - 1)
   for (i in seq_len(n_regimes - 1)) {
-    dummy <- as.numeric(data[[regime_var]] == regimes[i])
-    Z[, i] <- dummy - mean(dummy)
+    dummy <- as.numeric(regime_indicator == unique_regimes[i + 1])
+    z_matrix[, i] <- dummy - mean(dummy) # Center the dummy
   }
 
-  # Check rank condition for simultaneous system
-  # Need at least 2 effective instruments (n_regimes - 1 >= 2)
-  if (n_regimes < 3) {
-    stop("Need at least 3 regimes for identification in simultaneous system (provides 2 effective instruments)")
-  }
+  # Moment conditions for Rigobon (simultaneous)
+  # E[X * eps1] = 0
+  # E[X * eps2] = 0
+  # E[Z * eps1 * eps2] = 0 (Lewbel form using regime dummies as Z)
+  # Rigobon's original identification uses change in Cov(Y1,Y2) and Var(Yi) across regimes.
+  # This GMM formulation uses Z derived from regimes as instruments for the product of errors.
 
-  # Form moment conditions
-  g1 <- X * as.vector(e1)
-  g2 <- X * as.vector(e2)
-  g3 <- Z * as.vector(e1 * e2)
+  m1 <- x_matrix * eps1
+  m2 <- x_matrix * eps2
+  m3 <- z_matrix * eps1 * eps2
 
-  cbind(g1, g2, g3)
+  moments <- cbind(m1, m2, m3)
+  moments
 }
 
 
@@ -802,7 +822,7 @@ rigobon_gmm <- function(data,
         y2_var = endog_var,
         x_vars = exog_vars,
         regime_var = regime_var,
-        include_const = TRUE
+        add_intercept = TRUE
       )
     }
 
@@ -825,7 +845,7 @@ rigobon_gmm <- function(data,
         y2_var = endog_var,
         x_vars = exog_vars,
         regime_var = regime_var,
-        include_const = TRUE
+        add_intercept = TRUE
       )
     }
   }
@@ -912,8 +932,8 @@ rigobon_gmm <- function(data,
 #' @param y1_var Character. Name of the first dependent variable.
 #' @param y2_var Character. Name of the second dependent variable.
 #' @param x_vars Character vector. Names of exogenous variables.
-#' @param garch_var Character. Name of the fitted GARCH variance variable.
-#' @param include_const Logical. Whether to include a constant term.
+#' @param add_intercept Logical. Whether to add an intercept to the exogenous variables.
+#' @param garch_res_var Character. Name of the fitted GARCH variance variable.
 #'
 #' @return Matrix of moment conditions (n × g).
 #'
@@ -922,53 +942,52 @@ rigobon_gmm <- function(data,
 #' \code{\link{lewbel_triangular_moments}}, \code{\link{rigobon_triangular_moments}} for other identification strategies.
 #'
 #' @export
-prono_triangular_moments <- function(theta, data,
-                                     y1_var = "Y1", y2_var = "Y2",
-                                     x_vars = paste0("X", 1),
-                                     garch_var = "sigma2_sq_hat",
-                                     include_const = TRUE) {
+prono_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars, add_intercept, garch_res_var) {
+  n <- nrow(data)
+  k <- length(x_vars)
+  if (add_intercept) k <- k + 1
 
-  # Extract variables
-  Y1 <- data[[y1_var]]
-  Y2 <- data[[y2_var]]
-  X <- as.matrix(data[, x_vars, drop = FALSE])
+  y1_data <- data[[y1_var]]
+  y2_data <- data[[y2_var]]
+  x_matrix <- as.matrix(data[, x_vars, drop = FALSE])
 
-  if (include_const) {
-    X <- cbind(1, X)
+  if (add_intercept) {
+    x_matrix <- cbind(1, x_matrix)
   }
 
-  n <- nrow(data)
-  k <- ncol(X)
-
-  # Parse parameters
-  # For triangular: beta1 (k params), gamma1 (1 param), beta2 (k params)
+  # Parameters: (beta1_0, beta1_1, ..., gamma1, beta2_0, beta2_1, ...)
   beta1 <- theta[1:k]
   gamma1 <- theta[k + 1]
-  beta2 <- theta[(k + 2):(2*k + 1)]
+  beta2 <- theta[(k + 2):(2 * k + 1)]
 
-  # Calculate structural errors
-  e1 <- Y1 - X %*% beta1 - Y2 * gamma1
-  e2 <- Y2 - X %*% beta2
+  # Structural errors
+  eps1 <- y1_data - x_matrix %*% beta1 - y2_data * gamma1
+  eps2 <- y2_data - x_matrix %*% beta2
 
-  # Get GARCH-based heteroskedasticity driver (centered)
-  if (garch_var %in% names(data)) {
-    sigma2_sq <- data[[garch_var]]
-    Z <- sigma2_sq - mean(sigma2_sq)
-  } else {
-    stop(paste("GARCH variance variable", garch_var, "not found in data"))
+  # Construct Z instrument from GARCH residuals (sigma_2t_hat^2)
+  # garch_res_var should be the name of the column in 'data' holding sigma_2t_hat^2
+  if (!(garch_res_var %in% names(data))) {
+    stopper("GARCH residual variance variable (", garch_res_var, ") not found in data.")
+  }
+  sigma2_sq_hat <- data[[garch_res_var]]
+  if (length(sigma2_sq_hat) != n) {
+    stopper("Length of GARCH residual variance variable does not match data.")
   }
 
-  # Form moment conditions
-  # 1. E[X * e1] = 0 (k moments)
-  # 2. E[X * e2] = 0 (k moments)
-  # 3. E[Z * e1 * e2] = 0 (1 moment)
+  z_instrument <- sigma2_sq_hat - mean(sigma2_sq_hat) # Centered sigma_2t_hat^2 as the Z instrument
 
-  g1 <- X * as.vector(e1)  # n × k
-  g2 <- X * as.vector(e2)  # n × k
-  g3 <- Z * as.vector(e1 * e2)  # n × 1
+  # Moment conditions for Prono (triangular)
+  # E[X * eps1] = 0
+  # E[X * eps2] = 0
+  # E[Z * eps1 * eps2] = 0 (This is the Lewbel form, Prono uses Z for Var(eps2) or product e1e2)
+  # Prono (2014, eq.7) has E[ (sigma_2t^2 - E[sigma_2t^2]) * eps_1t * eps_2t ] = 0
 
-  # Combine all moments
-  cbind(g1, g2, g3)
+  m1 <- x_matrix * eps1
+  m2 <- x_matrix * eps2
+  m3 <- z_instrument * eps1 * eps2
+
+  moments <- cbind(m1, m2, m3)
+  moments
 }
 
 
@@ -1097,8 +1116,8 @@ prono_gmm <- function(data,
   second_eq <- lm(y2_formula, data = data)
   e2_hat <- residuals(second_eq)
 
-  Z_centered <- data$sigma2_sq_hat - mean(data$sigma2_sq_hat)
-  prono_iv <- Z_centered * e2_hat
+  z_centered <- data$sigma2_sq_hat - mean(data$sigma2_sq_hat)
+  prono_iv <- z_centered * e2_hat
   data$prono_iv <- prono_iv
 
   # Run 2SLS for initial values
@@ -1139,8 +1158,8 @@ prono_gmm <- function(data,
       y1_var = "Y1",
       y2_var = endog_var,
       x_vars = exog_vars,
-      garch_var = "sigma2_sq_hat",
-      include_const = TRUE
+      add_intercept = TRUE,
+      garch_res_var = "sigma2_sq_hat"
     )
   }
 

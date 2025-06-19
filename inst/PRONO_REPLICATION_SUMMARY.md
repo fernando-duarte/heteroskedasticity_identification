@@ -8,7 +8,7 @@ We have successfully implemented Prono's (2014) heteroskedasticity-based identif
 
 ### 1. Package Quality Assessment
 - **ccgarch**: Removed from CRAN in 2019, no longer maintained
-- **rmgarch**: Being deprecated, maintenance-only until 2027  
+- **rmgarch**: Being deprecated, maintenance-only until 2027
 - **tsmarch** (RECOMMENDED): Modern replacement with better code quality, testing, and performance
 
 ### 2. Implementation Status
@@ -108,7 +108,7 @@ diag_result <- prono_diagonal_garch(
 - **`lewbel2012/tp-files/ff_sze_bm_ind_Prono2013.txt`**: Prono's actual data
   - 2,166 weekly observations (1963-2004)
   - Market returns, Fama-French factors, 25 Size-B/M portfolios, 30 Industry portfolios
-  
+
 - **`lewbel2012/tp-files/CUE_*.txt`**: Prono's Stata implementation files
 
 ## Required Packages

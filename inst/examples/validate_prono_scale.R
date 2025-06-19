@@ -11,7 +11,7 @@ data <- generate_prono_data(n = 2166)  # Prono's sample size
 
 cat(sprintf("   Y2 mean: %.3f%% (target: 0.097%%)\n", mean(data$Y2)))
 cat(sprintf("   Y2 SD: %.3f%%\n", sd(data$Y2)))
-cat(sprintf("   Match: %s\n\n", 
+cat(sprintf("   Match: %s\n\n",
             ifelse(abs(mean(data$Y2) - 0.097) < 0.05, "EXCELLENT", "NEEDS WORK")))
 
 # 2. Test configuration
@@ -46,17 +46,17 @@ prono_config <- create_prono_config(
 
 mc_results <- run_prono_monte_carlo(prono_config, n_sims = 50, progress = FALSE)
 
-cat(sprintf("   Mean Y2 across sims: %.3f%%\n", 
+cat(sprintf("   Mean Y2 across sims: %.3f%%\n",
             mean(sapply(1:50, function(i) {
               set.seed(i)
               d <- generate_prono_data(n = 1000, gamma1 = 1.0, rho = 0.4)
               mean(d$Y2)
             }))))
 
-cat(sprintf("   OLS bias: %.3f (Prono reports ~0.375 for ρ=0.4)\n", 
+cat(sprintf("   OLS bias: %.3f (Prono reports ~0.375 for ρ=0.4)\n",
             mean(mc_results$bias_ols)))
 cat(sprintf("   IV bias: %.3f\n", mean(mc_results$bias_iv)))
-cat(sprintf("   Bias reduction: %.1f%%\n", 
+cat(sprintf("   Bias reduction: %.1f%%\n",
             100 * (1 - abs(mean(mc_results$bias_iv))/abs(mean(mc_results$bias_ols)))))
 
 # 5. Summary

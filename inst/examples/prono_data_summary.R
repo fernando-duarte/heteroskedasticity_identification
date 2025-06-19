@@ -7,7 +7,7 @@ cat("- Average weekly excess market return: 0.097%\n\n")
 
 cat("WHAT THE ACTUAL DATA SHOWS:\n")
 cat("- Market return (rm): mean = 0.097%\n")
-cat("- Risk-free rate (RF): mean = 0.119%\n") 
+cat("- Risk-free rate (RF): mean = 0.119%\n")
 cat("- Market EXCESS return (rm - RF): mean = -0.022%\n\n")
 
 cat("THE DISCREPANCY:\n")

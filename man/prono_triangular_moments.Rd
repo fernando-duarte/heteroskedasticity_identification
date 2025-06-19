@@ -7,11 +7,11 @@
 prono_triangular_moments(
   theta,
   data,
-  y1_var = "Y1",
-  y2_var = "Y2",
-  x_vars = paste0("X", 1),
-  garch_var = "sigma2_sq_hat",
-  include_const = TRUE
+  y1_var,
+  y2_var,
+  x_vars,
+  add_intercept,
+  garch_res_var
 )
 }
 \arguments{
@@ -25,9 +25,9 @@ prono_triangular_moments(
 
 \item{x_vars}{Character vector. Names of exogenous variables.}
 
-\item{garch_var}{Character. Name of the fitted GARCH variance variable.}
+\item{add_intercept}{Logical. Whether to add an intercept to the exogenous variables.}
 
-\item{include_const}{Logical. Whether to include a constant term.}
+\item{garch_res_var}{Character. Name of the fitted GARCH variance variable.}
 }
 \value{
 Matrix of moment conditions (n × g).

@@ -27,7 +27,7 @@ for (pkg in names(required_packages)) {
 if (length(missing) > 0) {
   cat("\n\nTo install missing packages, run:\n")
   cat("install.packages(c(", paste0('"', missing, '"', collapse = ", "), "))\n")
-  
+
   # Special note for tsmarch/tsgarch
   if ("tsmarch" %in% missing || "tsgarch" %in% missing) {
     cat("\nNote: tsmarch and tsgarch are the modern replacements for rmgarch.\n")

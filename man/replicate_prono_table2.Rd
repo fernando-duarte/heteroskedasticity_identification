@@ -24,8 +24,26 @@ replicate_prono_table2(
 \item{verbose}{Print progress}
 }
 \value{
-Data frame with simulation results
+List with results data frame and summary statistics matching Prono's Table II
 }
 \description{
 Run Monte Carlo simulation matching Prono's exact specification
+}
+\examples{
+\donttest{
+# Replication of Prono Table II (time-consuming)
+# Uses 1000 simulations to match paper results
+results <- replicate_prono_table2(n_sim = 1000, n_obs = 500)
+}
+
+}
+\references{
+Prono, T. (2014). The Role of Conditional Heteroskedasticity in Identifying
+and Estimating Linear Triangular Systems, with Applications to Asset Pricing
+Models That Include a Mismeasured Factor. Journal of Applied Econometrics,
+29(5), 800-824. \doi{10.1002/jae.2387}
+}
+\seealso{
+\code{\link{run_prono_monte_carlo}} for standard Monte Carlo
+\code{\link{create_prono_config}} for configuration
 }

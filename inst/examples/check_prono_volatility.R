@@ -50,7 +50,7 @@ cat("\n4. Historical comparison:\n")
 cat("   Prono's sample period: July 1963 - Dec 2004\n")
 cat("   Historical weekly market volatility in this period: ~2%\n")
 cat(sprintf("   Our simulated volatility: %.3f%%\n", mean(market_sds)))
-cat(sprintf("   Match quality: %s\n", 
+cat(sprintf("   Match quality: %s\n",
             ifelse(abs(mean(market_sds) - 2.0) < 0.5, "GOOD", "NEEDS ADJUSTMENT")))
 
 # Test with different sample sizes
@@ -65,11 +65,15 @@ for (n in sample_sizes) {
 cat("\n6. GARCH volatility clustering check:\n")
 data <- generate_prono_data(n = 1000, seed = 42)
 
-# Calculate rolling 20-week volatility
-window <- 20
-rolling_vol <- numeric(length(data$Y2) - window + 1)
-for (i in 1:(length(data$Y2) - window + 1)) {
-  rolling_vol[i] <- sd(data$Y2[i:(i+window-1)])
+# Calculate rolling window volatility
+window <- 22 # Approximately one month of trading days
+if (nrow(data) >= window) {
+  rolling_vol <- numeric(nrow(data) - window + 1)
+  for (i in 1:(nrow(data) - window + 1)) {
+    rolling_vol[i] <- sd(data$Y2[i:(i + window - 1)])
+  }
+  # Scale to annualized percentage
+  rolling_vol_ann <- rolling_vol * sqrt(252) * 100
 }
 
 cat(sprintf("   Rolling %d-week volatility:\n", window))

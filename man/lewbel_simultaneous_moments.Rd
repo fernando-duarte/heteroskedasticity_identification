@@ -7,10 +7,12 @@
 lewbel_simultaneous_moments(
   theta,
   data,
-  y1_var = "Y1",
-  y2_var = "Y2",
-  x_vars = "Xk",
-  z_vars = NULL
+  y1_var,
+  y2_var,
+  x_vars,
+  z_vars,
+  add_intercept,
+  z_sq
 )
 }
 \arguments{
@@ -25,6 +27,10 @@ lewbel_simultaneous_moments(
 \item{x_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 
 \item{z_vars}{Character vector. Names of heteroskedasticity drivers (default: NULL).}
+
+\item{add_intercept}{Logical. Whether to add an intercept to the exogenous variables.}
+
+\item{z_sq}{Logical. Whether to include squared terms in the Z matrix for simultaneous equations.}
 }
 \value{
 Matrix of moment conditions (n x q).

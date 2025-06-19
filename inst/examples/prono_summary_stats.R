@@ -10,7 +10,7 @@ cat("- Number of observations: 2,166 weekly returns\n")
 cat("- Average weekly excess market return: 0.097%\n")
 cat("- Data sources:\n")
 cat("  * CRSP value-weighted market return\n")
-cat("  * 25 Fama-French Size-B/M portfolios\n") 
+cat("  * 25 Fama-French Size-B/M portfolios\n")
 cat("  * 30 Fama-French Industry portfolios\n")
 cat("  * 1-month Treasury bill rate\n\n")
 
@@ -121,7 +121,7 @@ mc_results <- run_prono_monte_carlo(config, n_sims = 100, progress = FALSE)
 cat("\nResults with ρ = 0.40:\n")
 cat(sprintf("OLS bias: %.3f\n", mean(mc_results$bias_ols)))
 cat(sprintf("Prono (2SLS) bias: %.3f\n", mean(mc_results$bias_iv)))
-cat(sprintf("Bias reduction: %.1f%%\n", 
+cat(sprintf("Bias reduction: %.1f%%\n",
             100 * (1 - abs(mean(mc_results$bias_iv))/abs(mean(mc_results$bias_ols)))))
 
 cat("\nConclusion: Even without GMM, the Prono method in hetid provides\n")

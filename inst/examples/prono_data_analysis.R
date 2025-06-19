@@ -32,11 +32,11 @@ cat("Date range:", format(min(prono_data$DATE)), "to", format(max(prono_data$DAT
 cat("Number of observations:", nrow(prono_data), "\n\n")
 
 cat("Key statistics:\n")
-cat("- Market return (rm): Mean =", sprintf("%.3f%%", mean(prono_data$rm)), 
+cat("- Market return (rm): Mean =", sprintf("%.3f%%", mean(prono_data$rm)),
     "SD =", sprintf("%.3f%%", sd(prono_data$rm)), "\n")
-cat("- Risk-free rate (RF): Mean =", sprintf("%.3f%%", mean(prono_data$RF)), 
+cat("- Risk-free rate (RF): Mean =", sprintf("%.3f%%", mean(prono_data$RF)),
     "SD =", sprintf("%.3f%%", sd(prono_data$RF)), "\n")
-cat("- Market excess (rm-RF): Mean =", sprintf("%.3f%%", mean(prono_data$mkt_rf)), 
+cat("- Market excess (rm-RF): Mean =", sprintf("%.3f%%", mean(prono_data$mkt_rf)),
     "SD =", sprintf("%.3f%%", sd(prono_data$mkt_rf)), "\n\n")
 
 cat("CRITICAL FINDING:\n")
@@ -85,9 +85,9 @@ mean_excess <- colMeans(portfolio_excess)
 sd_excess <- apply(portfolio_excess, 2, sd)
 
 cat("25 Size-B/M Portfolio Excess Returns:\n")
-cat("- Mean range: [", sprintf("%.3f%%", min(mean_excess)), ", ", 
+cat("- Mean range: [", sprintf("%.3f%%", min(mean_excess)), ", ",
     sprintf("%.3f%%", max(mean_excess)), "]\n", sep = "")
-cat("- SD range: [", sprintf("%.3f%%", min(sd_excess)), ", ", 
+cat("- SD range: [", sprintf("%.3f%%", min(sd_excess)), ", ",
     sprintf("%.3f%%", max(sd_excess)), "]\n\n", sep = "")
 
 # Show corner portfolios
@@ -100,7 +100,7 @@ corners <- list(
 
 cat("Corner portfolios:\n")
 for (name in names(corners)) {
-  cat(sprintf("- %s: Mean = %.3f%%, SD = %.3f%%\n", 
+  cat(sprintf("- %s: Mean = %.3f%%, SD = %.3f%%\n",
               name, mean(corners[[name]]), sd(corners[[name]])))
 }
 
@@ -144,6 +144,6 @@ cat("install.packages(c('tsmarch', 'tsgarch'))  # For diagonal GARCH\n\n")
 
 cat("With these packages, you can:\n")
 cat("1. Run our package on Prono's actual data ✓\n")
-cat("2. Run our package on fresh Fama-French data ✓\n") 
+cat("2. Run our package on fresh Fama-French data ✓\n")
 cat("3. Use GMM estimation (already available) ✓\n")
 cat("4. Implement diagonal GARCH exactly as Prono ✓\n")
