@@ -368,14 +368,14 @@ n_obs <- 1200
 time_periods <- 4  # Quarterly data
 
 # Create regime based on time
-regime_time <- rep(1:time_periods, each = n_obs/time_periods)
+regime_time <- rep(1:time_periods, each = n_obs / time_periods)
 
 # Different volatility in each quarter (e.g., seasonal patterns)
 params_time <- list(
   beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
   beta2_0 = 1.0, beta2_1 = -1.0,
   alpha1 = -0.5, alpha2 = 1.0,
-  regime_probs = rep(1/time_periods, time_periods),
+  regime_probs = rep(1 / time_periods, time_periods),
   sigma2_regimes = c(0.8, 1.0, 1.5, 1.2)  # Different volatility by quarter
 )
 
@@ -452,7 +452,7 @@ brady_params <- list(
   alpha2 = 1.0,
 
   # Crisis regimes with variance increases matching Table 1 of Rigobon
-  regime_probs = c(0.85, 0.15),  # 85% tranquil, 15% crisis
+  regime_probs = c(0.85, 0.15),
   sigma2_regimes = c(1.0, 15.0)  # 15x variance increase (average from paper)
 )
 
@@ -504,18 +504,18 @@ brady_data$vol_mexico <- rollapply(
 )
 
 # Plot similar to Figure 3 in Rigobon
-vol_data <- brady_data %>%
-  select(date, vol_argentina, vol_mexico, is_crisis) %>%
+vol_data <- brady_data |>
+  select(date, vol_argentina, vol_mexico, is_crisis) |>
   tidyr::pivot_longer(cols = c(vol_argentina, vol_mexico),
                names_to = "country",
-               values_to = "volatility") %>%
+               values_to = "volatility") |>
   filter(!is.na(volatility))
 
 ggplot(vol_data, aes(x = date, y = sqrt(volatility) * 100)) +
   geom_line(aes(color = country)) +
-  geom_rect(data = brady_data %>%
-              filter(is_crisis) %>%
-              group_by(grp = cumsum(c(1, diff(date) > 1))) %>%
+  geom_rect(data = brady_data |>
+              filter(is_crisis) |>
+              group_by(grp = cumsum(c(1, diff(date) > 1))) |>
               summarise(xmin = min(date), xmax = max(date)),
             aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
             alpha = 0.2, fill = "red", inherit.aes = FALSE) +
@@ -531,8 +531,8 @@ ggplot(vol_data, aes(x = date, y = sqrt(volatility) * 100)) +
   theme_minimal()
 
 # Show variance increase during crisis
-variance_by_regime <- brady_data %>%
-  group_by(crisis_regime) %>%
+variance_by_regime <- brady_data |>
+  group_by(crisis_regime) |>
   summarise(
     var_argentina = var(ret_argentina, na.rm = TRUE),
     var_mexico = var(ret_mexico, na.rm = TRUE),
@@ -541,11 +541,11 @@ variance_by_regime <- brady_data %>%
   )
 
 cat("\nVariance-Covariance by Regime (×10,000):\n")
-print(variance_by_regime %>%
+print(variance_by_regime |>
   mutate(across(c(var_argentina, var_mexico, cov_bonds), ~ . * 10000)))
 
 # Calculate variance ratios
-var_ratios <- variance_by_regime %>%
+var_ratios <- variance_by_regime |>
   summarise(
     argentina_ratio = var_argentina[crisis_regime == 2] / var_argentina[crisis_regime == 1],
     mexico_ratio = var_mexico[crisis_regime == 2] / var_mexico[crisis_regime == 1],
@@ -615,13 +615,10 @@ results_table <- data.frame(
 print(results_table, digits = 3)
 
 # Test rank condition (Rigobon's "covariance of weighted difference")
-cov_matrices <- rigobon_results$covariance_matrices
-rank_test <- (cov_matrices$tranquil[1,1] * cov_matrices$crisis[1,2] -
-              cov_matrices$crisis[1,1] * cov_matrices$tranquil[1,2])
-
+# Note: covariance_matrices not available in current implementation
+# This would test the rank condition for identification
 cat("\n=== RANK CONDITION TEST ===\n")
-cat("Covariance of weighted difference:", format(rank_test, scientific = FALSE), "\n")
-cat("Rank condition satisfied:", abs(rank_test) > 1e-10, "\n")
+cat("Note: Detailed covariance matrix test not available in current implementation\n")
 
 # First-stage F-statistics
 cat("\n=== INSTRUMENT STRENGTH ===\n")
@@ -702,37 +699,53 @@ for (crisis_name in names(brady_extended_list)) {
     return_diagnostics = TRUE
   )
 
-  crisis_results[[crisis_name]] <- data.frame(
-    Crisis = crisis_name,
-    alpha_hat = 1 / results$tsls$estimates["gamma1"],
-    beta_hat = results$tsls$estimates["gamma1"],
-    F_stat = mean(results$first_stage_F),
-    variance_ratio = results$covariance_matrices$crisis[1,1] /
-                    results$covariance_matrices$tranquil[1,1]
-  )
+  # Extract estimates with error handling
+  if (!is.null(results$tsls$estimates["gamma1"]) &&
+      !is.na(results$tsls$estimates["gamma1"]) &&
+      results$tsls$estimates["gamma1"] != 0) {
+
+    crisis_results[[crisis_name]] <- data.frame(
+      Crisis = crisis_name,
+      alpha_hat = 1 / results$tsls$estimates["gamma1"],
+      beta_hat = results$tsls$estimates["gamma1"],
+      F_stat = if (!is.null(results$first_stage_F)) mean(results$first_stage_F) else NA,
+      variance_ratio = NA  # covariance_matrices not available in current implementation
+    )
+  }
 }
 
 # Combine results
-combined_results <- do.call(rbind, crisis_results)
-rownames(combined_results) <- NULL
+if (length(crisis_results) > 0) {
+  combined_results <- do.call(rbind, crisis_results)
+  rownames(combined_results) <- NULL
 
-cat("\n=== ESTIMATES ACROSS DIFFERENT CRISES ===\n")
-cat("(Replicating the stability of estimates across subsamples)\n\n")
-print(combined_results, digits = 3)
+  cat("\n=== ESTIMATES ACROSS DIFFERENT CRISES ===\n")
+  cat("(Replicating the stability of estimates across subsamples)\n\n")
+  print(combined_results, digits = 3)
+} else {
+  cat("\nNo valid results to display\n")
+  combined_results <- data.frame()
+}
 
 # Test parameter stability (Hausman-type test)
 # H0: Parameters are stable across crises
-alpha_estimates <- combined_results$alpha_hat
-beta_estimates <- combined_results$beta_hat
+if (nrow(combined_results) > 0) {
+  alpha_estimates <- combined_results$alpha_hat
+  beta_estimates <- combined_results$beta_hat
 
-cat("\n=== PARAMETER STABILITY TESTS ===\n")
-cat("α estimates - Mean:", round(mean(alpha_estimates), 3),
-    "SD:", round(sd(alpha_estimates), 3), "\n")
-cat("β estimates - Mean:", round(mean(beta_estimates), 3),
-    "SD:", round(sd(beta_estimates), 3), "\n")
-cat("\nCoefficient of variation:\n")
-cat("α:", round(sd(alpha_estimates) / mean(alpha_estimates), 3), "\n")
-cat("β:", round(sd(beta_estimates) / mean(beta_estimates), 3), "\n")
+  cat("\n=== PARAMETER STABILITY TESTS ===\n")
+  if (length(alpha_estimates) > 1 && !any(is.na(alpha_estimates))) {
+    cat("α estimates - Mean:", round(mean(alpha_estimates, na.rm = TRUE), 3),
+        "SD:", round(sd(alpha_estimates, na.rm = TRUE), 3), "\n")
+    cat("β estimates - Mean:", round(mean(beta_estimates, na.rm = TRUE), 3),
+        "SD:", round(sd(beta_estimates, na.rm = TRUE), 3), "\n")
+    cat("\nCoefficient of variation:\n")
+    cat("α:", round(sd(alpha_estimates, na.rm = TRUE) / mean(alpha_estimates, na.rm = TRUE), 3), "\n")
+    cat("β:", round(sd(beta_estimates, na.rm = TRUE) / mean(beta_estimates, na.rm = TRUE), 3), "\n")
+  } else {
+    cat("Insufficient data for stability tests\n")
+  }
+}
 ```
 
 ### Key Findings and Interpretation
