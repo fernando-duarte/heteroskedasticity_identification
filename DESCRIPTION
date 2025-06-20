@@ -48,11 +48,13 @@ Suggests:
     REndo (>= 2.4.0),
     rmarkdown,
     RStata,
+    sandwich,
     testthat (>= 3.0.0),
     tsgarch,
     tsmarch,
     uuid,
-    withr
+    withr,
+    zoo
 VignetteBuilder:
     knitr
 Config/build/vignette-compression: both

@@ -212,7 +212,7 @@ fit_dcc_garch_fallback <- function(returns, garch_order = c(1, 1), verbose = TRU
     sigma2_sq = sigma2_sq,
     sigma12 = sigma12,
     residuals = residuals,
-    spec = uspec,
+    spec = list(spec1 = spec1, spec2 = spec2),
     convergence = 0 # Assuming univariate fits converged if no error
   )
 
