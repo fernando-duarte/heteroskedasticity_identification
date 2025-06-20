@@ -51,7 +51,7 @@
 #'   beta2_0 = 1.0, beta2_1 = -1.0,
 #'   alpha1 = -0.5, alpha2 = 1.0,
 #'   regime_probs = c(0.3, 0.7),
-#'   sigma2_regimes = c(1.0, 3.0)  # Large difference in variances
+#'   sigma2_regimes = c(1.0, 3.0) # Large difference in variances
 #' )
 #' results <- run_rigobon_analysis(n_obs = 2000, params = params)
 #'
@@ -62,7 +62,8 @@
 #'
 #' @template references-rigobon
 #'
-#' @seealso \code{\link{generate_rigobon_data}}, \code{\link{run_rigobon_estimation}}, \code{\link{validate_rigobon_assumptions}}
+#' @seealso \code{\link{generate_rigobon_data}}, \code{\link{run_rigobon_estimation}},
+#'   \code{\link{validate_rigobon_assumptions}}
 #'
 #' @export
 run_rigobon_analysis <- function(n_obs = 1000,
@@ -73,7 +74,6 @@ run_rigobon_analysis <- function(n_obs = 1000,
                                  exog_vars = "Xk",
                                  verbose = TRUE,
                                  return_all = FALSE) {
-
   # Step 1: Data preparation
   if (is.null(data)) {
     # Generate data if not provided
@@ -82,7 +82,7 @@ run_rigobon_analysis <- function(n_obs = 1000,
       params <- list(
         beta1_0 = 0.5,
         beta1_1 = 1.5,
-        gamma1 = -0.8,  # True parameter to estimate
+        gamma1 = -0.8, # True parameter to estimate
         beta2_0 = 1.0,
         beta2_1 = -1.0,
         alpha1 = -0.5,
@@ -175,11 +175,15 @@ run_rigobon_analysis <- function(n_obs = 1000,
     # Instrument strength assessment
     avg_f <- mean(estimation_results$first_stage_f_stats)
     if (avg_f < 10) {
-      cat("\nWARNING: Average first-stage F =", round(avg_f, 2),
-          "< 10 (weak instruments)\n")
+      cat(
+        "\nWARNING: Average first-stage F =", round(avg_f, 2),
+        "< 10 (weak instruments)\n"
+      )
     } else {
-      cat("\nInstrument strength: Average F =", round(avg_f, 2),
-          "(strong instruments)\n")
+      cat(
+        "\nInstrument strength: Average F =", round(avg_f, 2),
+        "(strong instruments)\n"
+      )
     }
   }
 
@@ -250,7 +254,6 @@ validate_rigobon_assumptions <- function(data,
                                          regime_var = "regime",
                                          exog_vars = "Xk",
                                          verbose = TRUE) {
-
   if (verbose) {
     cat("\n--- Validating Rigobon Assumptions ---\n")
   }
@@ -260,7 +263,7 @@ validate_rigobon_assumptions <- function(data,
   y1_formula <- as.formula(paste("Y1 ~ Y2 +", paste(exog_vars, collapse = " + ")))
 
   e2 <- residuals(lm(y2_formula, data = data))
-  e1 <- residuals(lm(y1_formula, data = data))  # Note: biased due to endogeneity
+  e1 <- residuals(lm(y1_formula, data = data)) # Note: biased due to endogeneity
 
   # Get regime indicators
   regimes <- unique(data[[regime_var]])
@@ -322,7 +325,7 @@ validate_rigobon_assumptions <- function(data,
 
   # Simple test: coefficient of variation
   cv_covariances <- sd(covariances) / abs(mean(covariances))
-  constant_cov_valid <- cv_covariances < 0.2  # Less than 20% variation
+  constant_cov_valid <- cv_covariances < 0.2 # Less than 20% variation
 
   # Compile results
   results <- list(
@@ -335,8 +338,8 @@ validate_rigobon_assumptions <- function(data,
     ),
     all_valid = (
       any(sapply(het_test_results, function(x) x$significant)) &&
-      all(sapply(cov_tests, function(x) x$valid)) &&
-      constant_cov_valid
+        all(sapply(cov_tests, function(x) x$valid)) &&
+        constant_cov_valid
     )
   )
 
@@ -344,27 +347,34 @@ validate_rigobon_assumptions <- function(data,
   if (verbose) {
     cat("\n1. Heteroskedasticity across regimes:\n")
     for (eq in names(het_test_results)) {
-      cat(sprintf("   %s: p-value = %.4f %s\n",
-                  eq,
-                  het_test_results[[eq]]$p_value,
-                  ifelse(het_test_results[[eq]]$significant,
-                         "(significant)", "(not significant)")))
+      cat(sprintf(
+        "   %s: p-value = %.4f %s\n",
+        eq,
+        het_test_results[[eq]]$p_value,
+        ifelse(het_test_results[[eq]]$significant,
+          "(significant)", "(not significant)"
+        )
+      ))
     }
 
     cat("\n2. Covariance restriction Cov(Z, e1*e2) = 0:\n")
     all_valid <- TRUE
     for (regime in names(cov_tests)) {
-      cat(sprintf("   %s: p-value = %.4f %s\n",
-                  regime,
-                  cov_tests[[regime]]$p_value,
-                  ifelse(cov_tests[[regime]]$valid, "(valid)", "(violated)")))
+      cat(sprintf(
+        "   %s: p-value = %.4f %s\n",
+        regime,
+        cov_tests[[regime]]$p_value,
+        ifelse(cov_tests[[regime]]$valid, "(valid)", "(violated)")
+      ))
       all_valid <- all_valid && cov_tests[[regime]]$valid
     }
 
     cat("\n3. Constant covariance between errors:\n")
-    cat(sprintf("   Coefficient of variation: %.2f %s\n",
-                cv_covariances,
-                ifelse(constant_cov_valid, "(acceptable)", "(too variable)")))
+    cat(sprintf(
+      "   Coefficient of variation: %.2f %s\n",
+      cv_covariances,
+      ifelse(constant_cov_valid, "(acceptable)", "(too variable)")
+    ))
 
     cat("\nOverall: ")
     if (results$all_valid) {
@@ -418,7 +428,6 @@ compare_rigobon_methods <- function(data,
                                     true_gamma1 = NULL,
                                     methods = c("OLS", "Rigobon", "Lewbel"),
                                     verbose = TRUE) {
-
   results <- list()
 
   # Method 1: OLS (biased baseline)
@@ -438,8 +447,10 @@ compare_rigobon_methods <- function(data,
       estimate = as.numeric(rigobon_results$tsls$estimates["gamma1"]),
       se = as.numeric(rigobon_results$tsls$se["gamma1"]),
       first_stage_F = mean(rigobon_results$first_stage_f_stats),
-      method_info = sprintf("Rigobon 2SLS (%d regimes)",
-                            length(rigobon_results$regime_props))
+      method_info = sprintf(
+        "Rigobon 2SLS (%d regimes)",
+        length(rigobon_results$regime_props)
+      )
     )
   }
 

@@ -95,9 +95,11 @@ test_that("weak heteroskedasticity testing matches vignette Section 5", {
   se_manual_strong <- sqrt(diag(vcov(manual_strong)))["P"]
 
   # Strong heteroskedasticity should typically produce smaller SEs
-  expect_true(se_manual_strong <= se_manual_weak ||
-              abs(se_manual_strong - se_manual_weak) < 0.001,
-              label = "Strong heteroskedasticity should not increase SE substantially")
+  expect_true(
+    se_manual_strong <= se_manual_weak ||
+      abs(se_manual_strong - se_manual_weak) < 0.001,
+    label = "Strong heteroskedasticity should not increase SE substantially"
+  )
 })
 
 test_that("summary statistics generation matches vignette Section 6", {

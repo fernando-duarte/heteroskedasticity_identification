@@ -28,11 +28,11 @@ test_that("lewbel_triangular_moments generates correct moment conditions", {
 
   # Check dimensions
   expect_equal(nrow(moments), n)
-  expect_equal(ncol(moments), 2 + 2 + 1)  # 2 for X*e1, 2 for X*e2, 1 for Z*e1*e2
+  expect_equal(ncol(moments), 2 + 2 + 1) # 2 for X*e1, 2 for X*e2, 1 for Z*e1*e2
 
   # Check that moments have zero mean under true parameters
   # (This would be true if data were generated from the model)
-  expect_true(all(abs(colMeans(moments)) < 10))  # Loose check for random data
+  expect_true(all(abs(colMeans(moments)) < 10)) # Loose check for random data
 })
 
 
@@ -68,7 +68,7 @@ test_that("lewbel_gmm estimates triangular system correctly", {
 
   # Check that gamma1 estimate is reasonable
   gamma1_est <- coef(gmm_result)["gamma1"]
-  expect_true(abs(gamma1_est - params$gamma1) < 0.5)  # Within 0.5 of true value
+  expect_true(abs(gamma1_est - params$gamma1) < 0.5) # Within 0.5 of true value
 })
 
 test_that("lewbel_gmm handles different GMM types", {
@@ -115,7 +115,7 @@ test_that("lewbel_gmm works with custom Z variables", {
   data <- data.frame(
     Xk = rnorm(n),
     Z1 = rnorm(n),
-    Z2 = rnorm(n)^2,  # Squared for heteroskedasticity
+    Z2 = rnorm(n)^2, # Squared for heteroskedasticity
     Y2 = rnorm(n),
     Y1 = rnorm(n)
   )
@@ -267,7 +267,7 @@ test_that("rigobon_triangular_moments generates correct moment conditions", {
   # Check dimensions
   n_regimes <- length(unique(data$regime))
   expect_equal(nrow(moments), n)
-  expect_equal(ncol(moments), 2 + 2 + (n_regimes - 1))  # X*e1, X*e2, Z*e1*e2 (n_regimes-1 instruments)
+  expect_equal(ncol(moments), 2 + 2 + (n_regimes - 1)) # X*e1, X*e2, Z*e1*e2 (n_regimes-1 instruments)
 })
 
 
@@ -283,7 +283,7 @@ test_that("rigobon_gmm estimates triangular system correctly", {
     beta2_0 = 1.0, beta2_1 = -1.0,
     alpha1 = -0.5, alpha2 = 1.0,
     regime_probs = c(0.4, 0.6),
-    sigma2_regimes = c(1.0, 3.0)  # Strong heteroskedasticity
+    sigma2_regimes = c(1.0, 3.0) # Strong heteroskedasticity
   )
   data <- generate_rigobon_data(500, params)
 
@@ -438,7 +438,7 @@ test_that("prono_triangular_moments generates correct moment conditions", {
 
   # Check dimensions
   expect_equal(nrow(moments), 100)
-  expect_equal(ncol(moments), 2 + 2 + 1)  # X*e1, X*e2, Z*e1*e2
+  expect_equal(ncol(moments), 2 + 2 + 1) # X*e1, X*e2, Z*e1*e2
 })
 
 
@@ -455,7 +455,7 @@ test_that("prono_gmm estimates triangular system correctly", {
     beta2 = config$beta2,
     gamma1 = config$gamma1,
     garch_params = config$garch_params,
-    rho = 0.3  # Endogeneity
+    rho = 0.3 # Endogeneity
   )
 
   # Estimate using GMM

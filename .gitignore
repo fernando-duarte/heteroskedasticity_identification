@@ -79,6 +79,8 @@ TODO.txt
 TODO.md
 notes.md
 scratch/
+temp/
+test_results.txt
 
 # Temporary monitoring scripts
 monitor_pr_checks.sh

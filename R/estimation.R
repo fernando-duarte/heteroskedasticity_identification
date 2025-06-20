@@ -509,7 +509,6 @@ run_rigobon_estimation <- function(data,
                                    regime_var = "regime",
                                    df_adjust = "asymptotic",
                                    return_diagnostics = FALSE) {
-
   # Validate inputs
   required_vars <- c("Y1", endog_var, exog_vars, regime_var)
   if (!all(required_vars %in% names(data))) {
@@ -573,17 +572,20 @@ run_rigobon_estimation <- function(data,
     paste(iv_names, collapse = " + ")
   ))
 
-  tsls_model <- tryCatch({
-    if (requireNamespace("ivreg", quietly = TRUE)) {
-      ivreg::ivreg(iv_formula, data = data)
-    } else if (requireNamespace("AER", quietly = TRUE)) {
-      AER::ivreg(iv_formula, data = data)
-    } else {
-      stop("Neither ivreg nor AER package is available for IV regression")
+  tsls_model <- tryCatch(
+    {
+      if (requireNamespace("ivreg", quietly = TRUE)) {
+        ivreg::ivreg(iv_formula, data = data)
+      } else if (requireNamespace("AER", quietly = TRUE)) {
+        AER::ivreg(iv_formula, data = data)
+      } else {
+        stop("Neither ivreg nor AER package is available for IV regression")
+      }
+    },
+    error = function(e) {
+      stop(paste("IV regression failed:", e$message))
     }
-  }, error = function(e) {
-    stop(paste("IV regression failed:", e$message))
-  })
+  )
 
   tsls_est <- stats::coef(tsls_model)[endog_var]
   all_se_tsls <- extract_se_ivreg(tsls_model, df_adjust = df_adjust)
@@ -630,7 +632,7 @@ run_rigobon_estimation <- function(data,
     # Breusch-Pagan type test: regress e2^2 on regime dummies
     data$e2_sq <- e2_hat^2
     het_formula <- stats::as.formula(paste(
-      "e2_sq ~", paste(z_names[-1], collapse = " + ")  # Exclude one for collinearity
+      "e2_sq ~", paste(z_names[-1], collapse = " + ") # Exclude one for collinearity
     ))
     het_test <- stats::lm(het_formula, data = data)
     het_f_stat <- summary(het_test)$fstatistic

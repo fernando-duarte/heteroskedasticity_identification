@@ -236,13 +236,15 @@ library(boot)
 
 # Bootstrap function
 bootstrap_function <- function(data, indices) {
-  gmm_boot <- lewbel_gmm(data = data[indices, ],
-                         y1_var = "Y1", y2_var = "Y2",
-                         x_vars = c("X1", "X2", "X3"),
-                         model_type = "simultaneous",
-                         add_intercept = TRUE,
-                         compute_se = FALSE,
-                         verbose = FALSE) # Suppress messages within bootstrap
+  gmm_boot <- lewbel_gmm(
+    data = data[indices, ],
+    y1_var = "Y1", y2_var = "Y2",
+    x_vars = c("X1", "X2", "X3"),
+    model_type = "simultaneous",
+    add_intercept = TRUE,
+    compute_se = FALSE,
+    verbose = FALSE
+  ) # Suppress messages within bootstrap
   coef(gmm_boot)["gamma1"]
 }
 

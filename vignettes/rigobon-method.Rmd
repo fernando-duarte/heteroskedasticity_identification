@@ -62,19 +62,19 @@ Let's start with a simple two-regime example, such as before/after a policy chan
 # Set parameters for a two-regime model
 params_2reg <- list(
   # Structural parameters
-  beta1_0 = 0.5,   # Intercept in first equation
-  beta1_1 = 1.5,   # Coefficient on X in first equation
-  gamma1 = -0.8,   # TRUE endogenous parameter (what we want to estimate)
-  beta2_0 = 1.0,   # Intercept in second equation
-  beta2_1 = -1.0,  # Coefficient on X in second equation
+  beta1_0 = 0.5, # Intercept in first equation
+  beta1_1 = 1.5, # Coefficient on X in first equation
+  gamma1 = -0.8, # TRUE endogenous parameter (what we want to estimate)
+  beta2_0 = 1.0, # Intercept in second equation
+  beta2_1 = -1.0, # Coefficient on X in second equation
 
   # Error structure
-  alpha1 = -0.5,   # Factor loading for common shock
-  alpha2 = 1.0,    # Factor loading for common shock
+  alpha1 = -0.5, # Factor loading for common shock
+  alpha2 = 1.0, # Factor loading for common shock
 
   # Regime structure
-  regime_probs = c(0.4, 0.6),     # 40% in regime 1, 60% in regime 2
-  sigma2_regimes = c(1.0, 2.5)    # Variance 2.5x higher in regime 2
+  regime_probs = c(0.4, 0.6), # 40% in regime 1, 60% in regime 2
+  sigma2_regimes = c(1.0, 2.5) # Variance 2.5x higher in regime 2
 )
 
 # Generate data
@@ -128,10 +128,14 @@ results_2reg <- run_rigobon_estimation(
 # Display results
 cat("=== ESTIMATION RESULTS ===\n\n")
 cat("True gamma1:", params_2reg$gamma1, "\n")
-cat("OLS estimate:", round(results_2reg$ols$estimates["gamma1"], 4),
-    "(Bias:", round(results_2reg$ols$estimates["gamma1"] - params_2reg$gamma1, 4), ")\n")
-cat("Rigobon 2SLS:", round(results_2reg$tsls$estimates["gamma1"], 4),
-    "(Bias:", round(results_2reg$tsls$estimates["gamma1"] - params_2reg$gamma1, 4), ")\n")
+cat(
+  "OLS estimate:", round(results_2reg$ols$estimates["gamma1"], 4),
+  "(Bias:", round(results_2reg$ols$estimates["gamma1"] - params_2reg$gamma1, 4), ")\n"
+)
+cat(
+  "Rigobon 2SLS:", round(results_2reg$tsls$estimates["gamma1"], 4),
+  "(Bias:", round(results_2reg$tsls$estimates["gamma1"] - params_2reg$gamma1, 4), ")\n"
+)
 
 # First-stage diagnostics
 cat("\n=== FIRST-STAGE STRENGTH ===\n")
@@ -154,8 +158,8 @@ params_3reg <- list(
   beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
   beta2_0 = 1.0, beta2_1 = -1.0,
   alpha1 = -0.5, alpha2 = 1.0,
-  regime_probs = c(0.3, 0.4, 0.3),      # Equal split across regimes
-  sigma2_regimes = c(0.5, 1.0, 2.0)     # Increasing variance
+  regime_probs = c(0.3, 0.4, 0.3), # Equal split across regimes
+  sigma2_regimes = c(0.5, 1.0, 2.0) # Increasing variance
 )
 
 # Generate and estimate
@@ -195,7 +199,7 @@ validation <- validate_rigobon_assumptions(
 
 # Visualize the covariance restriction test
 # Extract centered regime dummies and error product
-e1 <- residuals(lm(Y1 ~ Y2 + Xk, data = data_2reg))  # Note: biased due to endogeneity
+e1 <- residuals(lm(Y1 ~ Y2 + Xk, data = data_2reg)) # Note: biased due to endogeneity
 e2 <- residuals(lm(Y2 ~ Xk, data = data_2reg))
 
 # Create centered dummies
@@ -207,10 +211,14 @@ cor_test1 <- cor.test(z1, e1 * e2)
 cor_test2 <- cor.test(z2, e1 * e2)
 
 cat("\nCovariance restriction tests:\n")
-cat("Corr(Z1, e1*e2) =", round(cor_test1$estimate, 4),
-    "p-value =", round(cor_test1$p.value, 4), "\n")
-cat("Corr(Z2, e1*e2) =", round(cor_test2$estimate, 4),
-    "p-value =", round(cor_test2$p.value, 4), "\n")
+cat(
+  "Corr(Z1, e1*e2) =", round(cor_test1$estimate, 4),
+  "p-value =", round(cor_test1$p.value, 4), "\n"
+)
+cat(
+  "Corr(Z2, e1*e2) =", round(cor_test2$estimate, 4),
+  "p-value =", round(cor_test2$p.value, 4), "\n"
+)
 ```
 
 ## Comparing Methods
@@ -244,10 +252,13 @@ comparison_full <- compare_rigobon_methods(
 # Visualize comparison
 ggplot(comparison_full, aes(x = Method, y = Estimate)) +
   geom_point(size = 4, color = "darkblue") +
-  geom_hline(yintercept = params_combined$gamma1,
-             linetype = "dashed", color = "red") +
+  geom_hline(
+    yintercept = params_combined$gamma1,
+    linetype = "dashed", color = "red"
+  ) +
   geom_text(aes(label = round(Estimate, 3)),
-            vjust = -1, size = 3) +
+    vjust = -1, size = 3
+  ) +
   labs(
     title = "Comparison of Identification Methods",
     subtitle = paste("True gamma1 =", params_combined$gamma1),
@@ -316,8 +327,10 @@ mc_long <- mc_df |>
 
 ggplot(mc_long, aes(x = Estimate, fill = Method)) +
   geom_density(alpha = 0.7) +
-  geom_vline(xintercept = params_2reg$gamma1,
-             linetype = "dashed", color = "red") +
+  geom_vline(
+    xintercept = params_2reg$gamma1,
+    linetype = "dashed", color = "red"
+  ) +
   labs(
     title = "Monte Carlo Distribution of Estimates",
     subtitle = paste("True value =", params_2reg$gamma1, "(red line)"),
@@ -329,8 +342,10 @@ ggplot(mc_long, aes(x = Estimate, fill = Method)) +
 
 # Average first-stage F-statistic
 cat("\nAverage first-stage F-statistic:", round(mean(mc_df$first_stage_F), 2), "\n")
-cat("Percentage with F > 10:",
-    round(mean(mc_df$first_stage_F > 10) * 100, 1), "%\n")
+cat(
+  "Percentage with F > 10:",
+  round(mean(mc_df$first_stage_F > 10) * 100, 1), "%\n"
+)
 ```
 
 ## Practical Considerations
@@ -365,7 +380,7 @@ Here's an example using time periods as regimes:
 ```{r time-regimes}
 # Simulate financial data with volatility regimes
 n_obs <- 1200
-time_periods <- 4  # Quarterly data
+time_periods <- 4 # Quarterly data
 
 # Create regime based on time
 regime_time <- rep(1:time_periods, each = n_obs / time_periods)
@@ -376,7 +391,7 @@ params_time <- list(
   beta2_0 = 1.0, beta2_1 = -1.0,
   alpha1 = -0.5, alpha2 = 1.0,
   regime_probs = rep(1 / time_periods, time_periods),
-  sigma2_regimes = c(0.8, 1.0, 1.5, 1.2)  # Different volatility by quarter
+  sigma2_regimes = c(0.8, 1.0, 1.5, 1.2) # Different volatility by quarter
 )
 
 # Generate and analyze
@@ -396,11 +411,14 @@ print(results_time$estimates)
 
 # Visualize volatility across time
 data_time$quarter <- factor(data_time$regime,
-                           labels = c("Q1", "Q2", "Q3", "Q4"))
+  labels = c("Q1", "Q2", "Q3", "Q4")
+)
 resid_time <- residuals(lm(Y2 ~ Xk, data = data_time))
 
-ggplot(data.frame(quarter = data_time$quarter, resid = resid_time),
-       aes(x = quarter, y = resid^2)) +
+ggplot(
+  data.frame(quarter = data_time$quarter, resid = resid_time),
+  aes(x = quarter, y = resid^2)
+) +
   geom_boxplot(fill = "lightgreen") +
   labs(
     title = "Volatility Patterns Across Quarters",
@@ -439,7 +457,7 @@ brady_params <- list(
   # Structural parameters (similar to Rigobon's estimates)
   beta1_0 = 0.5,
   beta1_1 = 1.5,
-  gamma1 = -0.65,    # β in Rigobon notation: Mexico → Argentina transmission
+  gamma1 = -0.65, # β in Rigobon notation: Mexico → Argentina transmission
   beta2_0 = 1.0,
   beta2_1 = -1.0,
 
@@ -448,17 +466,17 @@ brady_params <- list(
   # β = Mexico → Argentina transmission (our gamma1)
 
   # Error structure with correlation
-  alpha1 = -0.32,    # Creates correlation between shocks
+  alpha1 = -0.32, # Creates correlation between shocks
   alpha2 = 1.0,
 
   # Crisis regimes with variance increases matching Table 1 of Rigobon
   regime_probs = c(0.85, 0.15),
-  sigma2_regimes = c(1.0, 15.0)  # 15x variance increase (average from paper)
+  sigma2_regimes = c(1.0, 15.0) # 15x variance increase (average from paper)
 )
 
 # Generate a longer sample to mimic daily data over 5 years
-set.seed(19941219)  # Mexican crisis date
-n_days <- 1250  # ~5 years of trading days
+set.seed(19941219) # Mexican crisis date
+n_days <- 1250 # ~5 years of trading days
 
 brady_data <- generate_rigobon_data(n_obs = n_days, params = brady_params)
 
@@ -506,21 +524,27 @@ brady_data$vol_mexico <- rollapply(
 # Plot similar to Figure 3 in Rigobon
 vol_data <- brady_data |>
   select(date, vol_argentina, vol_mexico, is_crisis) |>
-  tidyr::pivot_longer(cols = c(vol_argentina, vol_mexico),
-               names_to = "country",
-               values_to = "volatility") |>
+  tidyr::pivot_longer(
+    cols = c(vol_argentina, vol_mexico),
+    names_to = "country",
+    values_to = "volatility"
+  ) |>
   filter(!is.na(volatility))
 
 ggplot(vol_data, aes(x = date, y = sqrt(volatility) * 100)) +
   geom_line(aes(color = country)) +
-  geom_rect(data = brady_data |>
-              filter(is_crisis) |>
-              group_by(grp = cumsum(c(1, diff(date) > 1))) |>
-              summarise(xmin = min(date), xmax = max(date)),
-            aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
-            alpha = 0.2, fill = "red", inherit.aes = FALSE) +
-  scale_color_manual(values = c("vol_argentina" = "blue", "vol_mexico" = "darkgreen"),
-                     labels = c("Argentina", "Mexico")) +
+  geom_rect(
+    data = brady_data |>
+      filter(is_crisis) |>
+      group_by(grp = cumsum(c(1, diff(date) > 1))) |>
+      summarise(xmin = min(date), xmax = max(date)),
+    aes(xmin = xmin, xmax = xmax, ymin = -Inf, ymax = Inf),
+    alpha = 0.2, fill = "red", inherit.aes = FALSE
+  ) +
+  scale_color_manual(
+    values = c("vol_argentina" = "blue", "vol_mexico" = "darkgreen"),
+    labels = c("Argentina", "Mexico")
+  ) +
   labs(
     title = "Brady Bond Return Volatility: Replicating Rigobon's Figure 3",
     subtitle = "20-day rolling standard deviation (Crisis periods shaded)",
@@ -570,9 +594,11 @@ brady_data$lag_mexico <- lag(brady_data$ret_mexico, 1)
 
 # First-stage regressions to get residuals
 stage1_arg <- lm(ret_argentina ~ lag_argentina + lag_mexico + Xk,
-                 data = brady_data, na.action = na.omit)
+  data = brady_data, na.action = na.omit
+)
 stage1_mex <- lm(ret_mexico ~ lag_argentina + lag_mexico + Xk,
-                 data = brady_data, na.action = na.omit)
+  data = brady_data, na.action = na.omit
+)
 
 # Extract residuals
 brady_clean <- brady_data[complete.cases(brady_data[, c("lag_argentina", "lag_mexico")]), ]
@@ -585,7 +611,7 @@ rigobon_results <- run_rigobon_estimation(
     Y1 = brady_clean$resid_argentina,
     Y2 = brady_clean$resid_mexico,
     regime = brady_clean$crisis_regime,
-    Xk = 0  # Already controlled for in first stage
+    Xk = 0 # Already controlled for in first stage
   ),
   return_diagnostics = TRUE
 )
@@ -594,13 +620,13 @@ rigobon_results <- run_rigobon_estimation(
 cat("\n=== REPLICATION OF RIGOBON'S TABLE 3 ===\n\n")
 
 # Extract estimates
-alpha_hat <- 1 / rigobon_results$tsls$estimates["gamma1"]  # Argentina → Mexico
-beta_hat <- rigobon_results$tsls$estimates["gamma1"]       # Mexico → Argentina
+alpha_hat <- 1 / rigobon_results$tsls$estimates["gamma1"] # Argentina → Mexico
+beta_hat <- rigobon_results$tsls$estimates["gamma1"] # Mexico → Argentina
 
 # Create results table
 results_table <- data.frame(
   Parameter = c("α (Argentina → Mexico)", "β (Mexico → Argentina)"),
-  True_Value = c(0.32, 0.65),  # Rigobon's approximate estimates
+  True_Value = c(0.32, 0.65), # Rigobon's approximate estimates
   OLS_Estimate = c(
     1 / rigobon_results$ols$estimates["gamma1"],
     rigobon_results$ols$estimates["gamma1"]
@@ -637,13 +663,13 @@ n_extended <- 2000
 
 # Define crisis periods (as percentages of sample)
 crisis_periods <- list(
-  mexican = c(0.20, 0.28),   # Mexican crisis
-  asian = c(0.55, 0.62),     # Asian crisis
-  russian = c(0.80, 0.83)    # Russian crisis
+  mexican = c(0.20, 0.28), # Mexican crisis
+  asian = c(0.55, 0.62), # Asian crisis
+  russian = c(0.80, 0.83) # Russian crisis
 )
 
 # Generate regime indicator
-regime_extended <- rep(1, n_extended)  # Start with all tranquil
+regime_extended <- rep(1, n_extended) # Start with all tranquil
 
 for (crisis in crisis_periods) {
   start_idx <- floor(crisis[1] * n_extended)
@@ -653,9 +679,9 @@ for (crisis in crisis_periods) {
 
 # Different variance multipliers for each crisis
 variance_multipliers <- c(
-  mexican = 20,   # Mexican crisis had largest impact
-  asian = 5,      # Asian crisis moderate impact
-  russian = 15    # Russian crisis large impact
+  mexican = 20, # Mexican crisis had largest impact
+  asian = 5, # Asian crisis moderate impact
+  russian = 15 # Russian crisis large impact
 )
 
 # Generate data with varying crisis intensities
@@ -701,15 +727,14 @@ for (crisis_name in names(brady_extended_list)) {
 
   # Extract estimates with error handling
   if (!is.null(results$tsls$estimates["gamma1"]) &&
-      !is.na(results$tsls$estimates["gamma1"]) &&
-      results$tsls$estimates["gamma1"] != 0) {
-
+    !is.na(results$tsls$estimates["gamma1"]) &&
+    results$tsls$estimates["gamma1"] != 0) {
     crisis_results[[crisis_name]] <- data.frame(
       Crisis = crisis_name,
       alpha_hat = 1 / results$tsls$estimates["gamma1"],
       beta_hat = results$tsls$estimates["gamma1"],
       F_stat = if (!is.null(results$first_stage_F)) mean(results$first_stage_F) else NA,
-      variance_ratio = NA  # covariance_matrices not available in current implementation
+      variance_ratio = NA # covariance_matrices not available in current implementation
     )
   }
 }
@@ -735,10 +760,14 @@ if (nrow(combined_results) > 0) {
 
   cat("\n=== PARAMETER STABILITY TESTS ===\n")
   if (length(alpha_estimates) > 1 && !any(is.na(alpha_estimates))) {
-    cat("α estimates - Mean:", round(mean(alpha_estimates, na.rm = TRUE), 3),
-        "SD:", round(sd(alpha_estimates, na.rm = TRUE), 3), "\n")
-    cat("β estimates - Mean:", round(mean(beta_estimates, na.rm = TRUE), 3),
-        "SD:", round(sd(beta_estimates, na.rm = TRUE), 3), "\n")
+    cat(
+      "α estimates - Mean:", round(mean(alpha_estimates, na.rm = TRUE), 3),
+      "SD:", round(sd(alpha_estimates, na.rm = TRUE), 3), "\n"
+    )
+    cat(
+      "β estimates - Mean:", round(mean(beta_estimates, na.rm = TRUE), 3),
+      "SD:", round(sd(beta_estimates, na.rm = TRUE), 3), "\n"
+    )
     cat("\nCoefficient of variation:\n")
     cat("α:", round(sd(alpha_estimates, na.rm = TRUE) / mean(alpha_estimates, na.rm = TRUE), 3), "\n")
     cat("β:", round(sd(beta_estimates, na.rm = TRUE) / mean(beta_estimates, na.rm = TRUE), 3), "\n")

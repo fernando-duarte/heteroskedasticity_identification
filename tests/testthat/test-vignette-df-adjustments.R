@@ -48,11 +48,13 @@ test_that("degrees of freedom adjustments match vignette expectations", {
   # The relationship can vary depending on sample size and model
   se_ratio_finite_asymp <- result_finite$tsls_se / result_asymp$tsls_se
   expect_true(se_ratio_finite_asymp > 0.8 && se_ratio_finite_asymp < 1.5,
-              label = "Finite and asymptotic SEs should be reasonably close")
+    label = "Finite and asymptotic SEs should be reasonably close"
+  )
 
   # Both should estimate similar coefficients
   expect_true(abs(result_asymp$tsls_gamma1 - result_finite$tsls_gamma1) < 0.1,
-              label = "DF adjustment should not substantially change coef")
+    label = "DF adjustment should not substantially change coef"
+  )
 })
 
 test_that("software matching scenarios work as in vignette", {
@@ -85,7 +87,8 @@ test_that("software matching scenarios work as in vignette", {
   # Document SE differences (relationship can vary)
   se_ratio_r_stata <- result_r_match$tsls_se / result_stata_match$tsls_se
   expect_true(se_ratio_r_stata > 0.8 && se_ratio_r_stata < 1.5,
-              label = "R and Stata-style SEs should be reasonably close")
+    label = "R and Stata-style SEs should be reasonably close"
+  )
 
   # Both should be close to true value
   expect_true(abs(result_stata_match$tsls_gamma1 - params$gamma1) < 0.1)
@@ -150,7 +153,8 @@ test_that("comprehensive estimation comparison matches vignette Section 3", {
 
     # Document the typical relationship
     expect_true(TRUE,
-                label = paste("SE ratio (REndo/Lewbel):", round(se_ratio, 4)))
+      label = paste("SE ratio (REndo/Lewbel):", round(se_ratio, 4))
+    )
 
     # Both should be reasonable estimates
     expect_true(abs(coef_manual - params$gamma1) < 0.2)
@@ -248,5 +252,6 @@ test_that("multiple scenarios comprehensive test", {
   standard_row <- results_summary[results_summary$Scenario == "Standard", ]
 
   expect_true(weak_row$Std_Error >= standard_row$Std_Error * 0.8,
-              label = "Weak het should not dramatically improve precision")
+    label = "Weak het should not dramatically improve precision"
+  )
 })

@@ -62,7 +62,7 @@ cat("- Conclusion: Strong evidence of volatility clustering\n\n")
 acf_vals <- acf(squared_resid, lag.max = 10, plot = FALSE)$acf
 cat("Autocorrelation of squared residuals:\n")
 for (i in 1:5) {
-  cat(sprintf("- Lag %d: %.3f\n", i, acf_vals[i+1]))
+  cat(sprintf("- Lag %d: %.3f\n", i, acf_vals[i + 1]))
 }
 
 # Analyze different portfolios

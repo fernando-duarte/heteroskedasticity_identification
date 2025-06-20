@@ -45,8 +45,10 @@ test_that("complete verification function works end-to-end", {
           "hetid/Stata (Z=X²-E[X²])", "Manual with Z=X",
           "REndo hetErrorsIV"
         ),
-        Coefficient = c(coef(model_z)["p"], coef(model_x)["p"],
-                        coef(rendo)["p"]),
+        Coefficient = c(
+          coef(model_z)["p"], coef(model_x)["p"],
+          coef(rendo)["p"]
+        ),
         SE = c(
           sqrt(diag(vcov(model_z)))["p"],
           sqrt(diag(vcov(model_x)))["p"],

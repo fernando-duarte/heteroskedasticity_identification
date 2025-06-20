@@ -8,8 +8,8 @@ test_that("generate_prono_data creates valid time series data", {
   expect_equal(df$time, 1:100)
 
   # Check that data is at percent scale (like Prono 2014)
-  expect_true(abs(mean(df$Y2) - 0.097) < 0.5)  # Should be near 0.097%
-  expect_true(sd(df$Y2) < 5)  # Weekly vol should be a few percent
+  expect_true(abs(mean(df$Y2) - 0.097) < 0.5) # Should be near 0.097%
+  expect_true(sd(df$Y2) < 5) # Weekly vol should be a few percent
 
   # Test GARCH parameter validation
   expect_error(
@@ -27,9 +27,11 @@ test_that("run_single_prono_simulation performs estimation correctly", {
   result <- run_single_prono_simulation(config)
 
   # Check that all expected fields are present
-  expect_true(all(c("gamma1_true", "gamma1_ols", "gamma1_iv",
-                    "se_ols", "se_iv", "bias_ols", "bias_iv",
-                    "f_stat", "n") %in% names(result)))
+  expect_true(all(c(
+    "gamma1_true", "gamma1_ols", "gamma1_iv",
+    "se_ols", "se_iv", "bias_ols", "bias_iv",
+    "f_stat", "n"
+  ) %in% names(result)))
 
   # Check that IV reduces bias compared to OLS (on average)
   expect_equal(result$gamma1_true, config$gamma1)
@@ -43,8 +45,8 @@ test_that("create_prono_config creates valid configuration", {
   expect_type(config, "list")
   expect_equal(config$n, 500)
   expect_equal(config$k, 1)
-  expect_equal(config$gamma1, 1.0)  # Default beta = 1
-  expect_equal(config$beta2[1], 0.097)  # Market mean = 0.097%
+  expect_equal(config$gamma1, 1.0) # Default beta = 1
+  expect_equal(config$beta2[1], 0.097) # Market mean = 0.097%
   expect_true("garch_params" %in% names(config))
   expect_equal(config$garch_params$alpha + config$garch_params$beta, 0.95)
 
@@ -101,11 +103,11 @@ test_that("run_prono_monte_carlo performs multiple simulations", {
 
   # With the default rho = 0.3, IV should generally do better
   # This is a statistical test, so we check it's at least not much worse
-  expect_true(mean_bias_iv <= mean_bias_ols * 1.2)  # Keep original tolerance
+  expect_true(mean_bias_iv <= mean_bias_ols * 1.2) # Keep original tolerance
 })
 
 test_that("run_prono_monte_carlo shows IV improvement with sufficient simulations", {
-  skip_on_cran()  # Skip on CRAN due to computation time
+  skip_on_cran() # Skip on CRAN due to computation time
   skip_if_not_installed("ivreg")
   skip_if_not_installed("tsgarch")
 
@@ -127,14 +129,18 @@ test_that("run_prono_monte_carlo shows IV improvement with sufficient simulation
     # Check if IV beats OLS (no tolerance relaxation)
     if (mean_bias_iv <= mean_bias_ols) {
       expect_true(mean_bias_iv <= mean_bias_ols,
-                  info = paste("Passed with", n_sims, "simulations"))
+        info = paste("Passed with", n_sims, "simulations")
+      )
       break
     } else if (n_sims == max(n_sims_to_try)) {
       # If we've tried the maximum and still failing, report the improvement ratio
       improvement_ratio <- mean_bias_iv / mean_bias_ols
       expect_true(mean_bias_iv <= mean_bias_ols,
-                  info = paste("IV/OLS bias ratio:", round(improvement_ratio, 3),
-                              "with", n_sims, "simulations"))
+        info = paste(
+          "IV/OLS bias ratio:", round(improvement_ratio, 3),
+          "with", n_sims, "simulations"
+        )
+      )
     }
   }
 })
@@ -145,8 +151,10 @@ test_that("Prono method handles missing tsgarch package gracefully", {
   # Temporarily mock the tsgarch availability check
   with_mocked_bindings(
     requireNamespace = function(package, ...) {
-      if (package == "tsgarch") return(FALSE)
-      TRUE  # Return TRUE for all other packages
+      if (package == "tsgarch") {
+        return(FALSE)
+      }
+      TRUE # Return TRUE for all other packages
     },
     {
       config <- create_prono_config(n = 100, k = 1, seed = 123)

@@ -70,7 +70,7 @@ acf_vals <- acf(squared_resids, lag.max = 5, plot = FALSE)
 
 cat("\nAutocorrelation of squared residuals:\n")
 for (i in 1:5) {
-  cat(sprintf("Lag %d: %.3f\n", i, acf_vals$acf[i+1]))
+  cat(sprintf("Lag %d: %.3f\n", i, acf_vals$acf[i + 1]))
 }
 
 cat("\n=== GMM vs 2SLS Comparison ===\n\n")
@@ -122,7 +122,7 @@ cat("\nResults with ρ = 0.40:\n")
 cat(sprintf("OLS bias: %.3f\n", mean(mc_results$bias_ols)))
 cat(sprintf("Prono (2SLS) bias: %.3f\n", mean(mc_results$bias_iv)))
 cat(sprintf("Bias reduction: %.1f%%\n",
-            100 * (1 - abs(mean(mc_results$bias_iv))/abs(mean(mc_results$bias_ols)))))
+            100 * (1 - abs(mean(mc_results$bias_iv)) / abs(mean(mc_results$bias_ols)))))
 
 cat("\nConclusion: Even without GMM, the Prono method in hetid provides\n")
 cat("substantial bias reduction for time series with GARCH effects.\n")

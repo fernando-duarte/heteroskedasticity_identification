@@ -274,12 +274,6 @@ cat("to replicate key aspects of Prono (2014) data characteristics.\n")
 cat("Final checks and summary statistics generated.\n")
 
 # Store results (optional)
-# validation_results <- list(
-#   market_summary = market_stats,
-#   rf_summary = rf_stats,
-#   factor_summary = factor_stats,
-#   # ... add other relevant summaries ...
-# )
 
 # ========================================================================
 # STEP 10: GMM IMPLEMENTATION CHECK

@@ -271,7 +271,6 @@ lewbel_gmm <- function(data,
                        compute_se = TRUE,
                        verbose = FALSE,
                        ...) {
-
   # Match arguments
   system <- match.arg(system)
   gmm_type <- match.arg(gmm_type)
@@ -308,12 +307,16 @@ lewbel_gmm <- function(data,
     has_intercept_in_x_vars <- any(sapply(x_vars, function(v) is.numeric(data[[v]]) && all(data[[v]] == 1)))
 
     if (!has_intercept_in_x_vars) {
-       # This is for naming and initial_values; moment functions handle X construction
+      # This is for naming and initial_values; moment functions handle X construction
     }
   }
   k_exog_for_params <- length(x_vars) +
-                       (if (add_intercept &&
-                           !any(sapply(x_vars, function(v) all(data[[v]] == 1) && is.numeric(data[[v]])))) 1 else 0)
+    (if (add_intercept &&
+      !any(sapply(x_vars, function(v) all(data[[v]] == 1) && is.numeric(data[[v]])))) {
+      1
+    } else {
+      0
+    })
 
 
   # Get initial values if not provided
@@ -346,7 +349,7 @@ lewbel_gmm <- function(data,
         ols_beta_names_intercept <- x_vars
       }
     } else {
-       ols_beta_names_intercept <- x_vars # No intercept
+      ols_beta_names_intercept <- x_vars # No intercept
     }
 
 
@@ -394,11 +397,13 @@ lewbel_gmm <- function(data,
   final_param_names <- unlist(param_names_list, use.names = FALSE)
 
   if (length(initial_values) != length(final_param_names)) {
-     warning(paste("Mismatch in length of initial_values (", length(initial_values),
-                   ") and constructed param_names (", length(final_param_names),
-                   "). Using gmm default names if issues persist."))
-     # This can happen if x_vars already contained an intercept like term.
-     # For now, let gmm handle it, but it's a sign of potential issues in init val construction.
+    warning(paste(
+      "Mismatch in length of initial_values (", length(initial_values),
+      ") and constructed param_names (", length(final_param_names),
+      "). Using gmm default names if issues persist."
+    ))
+    # This can happen if x_vars already contained an intercept like term.
+    # For now, let gmm handle it, but it's a sign of potential issues in init val construction.
   } else {
     names(initial_values) <- final_param_names
   }
@@ -443,7 +448,7 @@ lewbel_gmm <- function(data,
   additional_args$t0 <- initial_values
   additional_args$type <- gmm_type
   additional_args$wmatrix <- "optimal" # Typically "optimal" for twoStep/iterative/cue
-  additional_args$vcov <- vcov_method   # "HAC", "iid"
+  additional_args$vcov <- vcov_method # "HAC", "iid"
   additional_args$centeredVcov <- FALSE # Default in gmm is TRUE, consider implications
   additional_args$weightsMatrix <- NULL # Let gmm compute it unless provided in ...
   additional_args$model <- TRUE # Return model components
@@ -462,34 +467,38 @@ lewbel_gmm <- function(data,
   explicit_args <- c("g", "x", "t0", "type", "wmatrix", "vcov", "computeSE", "model")
   for (arg_name in explicit_args) {
     if (arg_name %in% names(additional_args) &&
-        !(arg_name %in% c("model"))) { # Keep our model=TRUE
+      !(arg_name %in% c("model"))) { # Keep our model=TRUE
       # This is tricky as gmm has its own computeSE, etc.
       # For now, let's assume ... doesn't override these core ones.
     }
   }
   # Control SE computation
   if (!compute_se) {
-      additional_args$vcov <- "iid" # Need a vcov type for gmm to run
-      # To truly skip SE, one might need to post-process or use internal gmm flags if available
-      # For now, compute_se = FALSE will use simple IID vcov and user should ignore SEs.
-      # The gmm package itself has a computeSE argument in summary.gmm, not in gmm().
-      # A more robust way might be to set vcov to a dummy function or use specific gmm options.
-      # Setting a very simple vcov type if SEs are not needed.
+    additional_args$vcov <- "iid" # Need a vcov type for gmm to run
+    # To truly skip SE, one might need to post-process or use internal gmm flags if available
+    # For now, compute_se = FALSE will use simple IID vcov and user should ignore SEs.
+    # The gmm package itself has a computeSE argument in summary.gmm, not in gmm().
+    # A more robust way might be to set vcov to a dummy function or use specific gmm options.
+    # Setting a very simple vcov type if SEs are not needed.
   }
 
 
   # Estimate GMM
   # Capture warnings and errors during GMM estimation
-  gmm_estimation_result <- tryCatch({
-    do.call(gmm::gmm, additional_args)
-  }, warning = function(w) {
-    if (verbose) messager("Warning during GMM estimation: ", w$message, v_type = "warning")
-    invokeRestart("muffleWarning") # Continue with warning
-    suppressWarnings(do.call(gmm::gmm, additional_args)) # Re-run and suppress to get result
-  }, error = function(e) {
-    stopper("Error during GMM estimation: ", e$message)
-    NULL
-  })
+  gmm_estimation_result <- tryCatch(
+    {
+      do.call(gmm::gmm, additional_args)
+    },
+    warning = function(w) {
+      if (verbose) messager("Warning during GMM estimation: ", w$message, v_type = "warning")
+      invokeRestart("muffleWarning") # Continue with warning
+      suppressWarnings(do.call(gmm::gmm, additional_args)) # Re-run and suppress to get result
+    },
+    error = function(e) {
+      stopper("Error during GMM estimation: ", e$message)
+      NULL
+    }
+  )
 
   if (is.null(gmm_estimation_result)) {
     return(NULL) # GMM failed
@@ -693,15 +702,15 @@ print.lewbel_gmm <- function(x, ...) {
 #' )
 #' data_multi_x <- generate_lewbel_data(1000, params_multi, n_x = 2) # Y1,Y2,X1,X2,Z1,Z2
 #' comparison_multi <- compare_gmm_2sls(data_multi_x,
-#'                                      x_vars = c("X1", "X2"),
-#'                                      true_gamma1 = params_multi$gamma1,
-#'                                      tsls_sim_config = list(
-#'                                         lewbel_x_vars = c("X1","X2") # Hypothetical
-#'                                         # Note: run_single_lewbel_simulation's internal
-#'                                         # DGP might not easily map to this if it assumes 1 Xk.
-#'                                         # This part is more illustrative for GMM side.
-#'                                         )
-#'                                     )
+#'   x_vars = c("X1", "X2"),
+#'   true_gamma1 = params_multi$gamma1,
+#'   tsls_sim_config = list(
+#'     lewbel_x_vars = c("X1", "X2") # Hypothetical
+#'     # Note: run_single_lewbel_simulation's internal
+#'     # DGP might not easily map to this if it assumes 1 Xk.
+#'     # This part is more illustrative for GMM side.
+#'   )
+#' )
 #' print(comparison_multi)
 #' }
 #' @export
@@ -712,7 +721,6 @@ compare_gmm_2sls <- function(data,
                              gmm_args = list(),
                              tsls_sim_config = list(),
                              verbose = TRUE) {
-
   if (verbose) messager("Comparing GMM and 2SLS estimates for Lewbel model...\n")
 
   # --- GMM Estimation ---
@@ -733,8 +741,8 @@ compare_gmm_2sls <- function(data,
   gmm_coefs_all <- coef(gmm_result)
   gmm_gamma1_name <- if (add_intercept) paste0("gamma1") else "gamma1" # Adjust if naming changes
   # Find gamma1 robustly
-   gmm_gamma1_idx <- which(names(gmm_coefs_all) == "gamma1")
-   if (length(gmm_gamma1_idx) == 0) gmm_gamma1_idx <- grep("gamma1", names(gmm_coefs_all))[1]
+  gmm_gamma1_idx <- which(names(gmm_coefs_all) == "gamma1")
+  if (length(gmm_gamma1_idx) == 0) gmm_gamma1_idx <- grep("gamma1", names(gmm_coefs_all))[1]
 
 
   gmm_gamma1 <- gmm_coefs_all[gmm_gamma1_idx]
@@ -770,16 +778,19 @@ compare_gmm_2sls <- function(data,
     if (verbose) messager(paste("Mapping", x_vars[1], "to Xk for 2SLS comparison."))
     names(data_for_tsls)[names(data_for_tsls) == x_vars[1]] <- "Xk"
   } else if (!("Xk" %in% names(data_for_tsls))) {
-      warning("Could not determine a unique 'Xk' from x_vars for 2SLS comparison. 2SLS results may be unreliable.")
+    warning("Could not determine a unique 'Xk' from x_vars for 2SLS comparison. 2SLS results may be unreliable.")
   }
 
 
-  tsls_result <- tryCatch({
-    run_single_lewbel_simulation(1, sim_config_final)
-  }, error = function(e) {
-    warning("2SLS estimation via run_single_lewbel_simulation failed: ", e$message)
-    list(tsls_gamma1 = NA, tsls_se_gamma1 = NA, tsls_f_stat = NA) # Return NAs
-  })
+  tsls_result <- tryCatch(
+    {
+      run_single_lewbel_simulation(1, sim_config_final)
+    },
+    error = function(e) {
+      warning("2SLS estimation via run_single_lewbel_simulation failed: ", e$message)
+      list(tsls_gamma1 = NA, tsls_se_gamma1 = NA, tsls_f_stat = NA) # Return NAs
+    }
+  )
 
 
   # --- OLS Estimation (for baseline comparison, also from tsls_result if available) ---
@@ -849,7 +860,7 @@ compare_gmm_2sls <- function(data,
 #'
 #' @export
 prono_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars,
-                                    garch_order = c(1, 1), add_intercept = TRUE) {
+                                     garch_order = c(1, 1), add_intercept = TRUE) {
   n <- nrow(data)
   k <- length(x_vars)
   if (add_intercept) k <- k + 1
@@ -874,31 +885,34 @@ prono_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars,
   # Fit GARCH to eps2 to get conditional variance
   sigma2_sq_hat <- NULL
 
-  tryCatch({
-    if (requireNamespace("tsgarch", quietly = TRUE)) {
-      # Convert to xts object as required by tsgarch
-      dates <- as.Date("2000-01-01") + seq_along(eps2) - 1
-      eps2_xts <- xts::xts(eps2, order.by = dates)
+  tryCatch(
+    {
+      if (requireNamespace("tsgarch", quietly = TRUE)) {
+        # Convert to xts object as required by tsgarch
+        dates <- as.Date("2000-01-01") + seq_along(eps2) - 1
+        eps2_xts <- xts::xts(eps2, order.by = dates)
 
-      # Specify GARCH model using tsgarch
-      garch_spec <- tsgarch::garch_modelspec(
-        y = eps2_xts,
-        model = "garch",
-        order = garch_order,
-        constant = TRUE,
-        distribution = "norm"
-      )
+        # Specify GARCH model using tsgarch
+        garch_spec <- tsgarch::garch_modelspec(
+          y = eps2_xts,
+          model = "garch",
+          order = garch_order,
+          constant = TRUE,
+          distribution = "norm"
+        )
 
-      # Fit the model
-      garch_fit <- tsmethods::estimate(garch_spec)
+        # Fit the model
+        garch_fit <- tsmethods::estimate(garch_spec)
 
-      # Extract fitted conditional variances
-      sigma2_sq_hat <- as.numeric(sigma(garch_fit))^2
+        # Extract fitted conditional variances
+        sigma2_sq_hat <- as.numeric(sigma(garch_fit))^2
+      }
+    },
+    error = function(e) {
+      # Fallback to squared residuals
+      sigma2_sq_hat <- eps2^2
     }
-  }, error = function(e) {
-    # Fallback to squared residuals
-    sigma2_sq_hat <- eps2^2
-  })
+  )
 
   if (is.null(sigma2_sq_hat)) {
     sigma2_sq_hat <- eps2^2
@@ -911,7 +925,7 @@ prono_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars,
   # Moment conditions
   m1 <- x_matrix * as.vector(eps1)
   m2 <- x_matrix * as.vector(eps2)
-  m3 <- prono_iv * as.vector(eps1)  # The Prono moment
+  m3 <- prono_iv * as.vector(eps1) # The Prono moment
 
   moments <- cbind(m1, m2, m3)
   moments
@@ -952,20 +966,19 @@ prono_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars,
 #'
 #' @export
 prono_gmm <- function(data,
-                     system = "triangular",
-                     y1_var = "Y1",
-                     y2_var = "Y2",
-                     x_vars = NULL,
-                     garch_order = c(1, 1),
-                     fit_garch = TRUE,
-                     add_intercept = TRUE,
-                     gmm_type = "twoStep",
-                     vcov = "HAC",
-                     initial_values = NULL,
-                     compute_se = TRUE,
-                     verbose = TRUE,
-                     ...) {
-
+                      system = "triangular",
+                      y1_var = "Y1",
+                      y2_var = "Y2",
+                      x_vars = NULL,
+                      garch_order = c(1, 1),
+                      fit_garch = TRUE,
+                      add_intercept = TRUE,
+                      gmm_type = "twoStep",
+                      vcov = "HAC",
+                      initial_values = NULL,
+                      compute_se = TRUE,
+                      verbose = TRUE,
+                      ...) {
   if (!requireNamespace("gmm", quietly = TRUE)) {
     stop("Package 'gmm' is required for GMM estimation. Please install it.")
   }
@@ -1034,24 +1047,27 @@ prono_gmm <- function(data,
 
     # Fit GARCH
     if (requireNamespace("tsgarch", quietly = TRUE)) {
-      tryCatch({
-        dates <- as.Date("2000-01-01") + seq_along(eps2_garch) - 1
-        eps2_xts <- xts::xts(eps2_garch, order.by = dates)
+      tryCatch(
+        {
+          dates <- as.Date("2000-01-01") + seq_along(eps2_garch) - 1
+          eps2_xts <- xts::xts(eps2_garch, order.by = dates)
 
-        garch_spec <- tsgarch::garch_modelspec(
-          y = eps2_xts,
-          model = "garch",
-          order = garch_order,
-          constant = TRUE,
-          distribution = "norm"
-        )
+          garch_spec <- tsgarch::garch_modelspec(
+            y = eps2_xts,
+            model = "garch",
+            order = garch_order,
+            constant = TRUE,
+            distribution = "norm"
+          )
 
-        garch_fit <- tsmethods::estimate(garch_spec)
-        data$sigma2_sq <- as.numeric(sigma(garch_fit))^2
-      }, error = function(e) {
-        if (verbose) warning("GARCH fitting failed, using squared residuals: ", e$message)
-        data$sigma2_sq <- eps2_garch^2
-      })
+          garch_fit <- tsmethods::estimate(garch_spec)
+          data$sigma2_sq <- as.numeric(sigma(garch_fit))^2
+        },
+        error = function(e) {
+          if (verbose) warning("GARCH fitting failed, using squared residuals: ", e$message)
+          data$sigma2_sq <- eps2_garch^2
+        }
+      )
     } else {
       warning("tsgarch package not available. Using squared residuals instead of GARCH-fitted variances.")
       data$sigma2_sq <- eps2_garch^2
@@ -1108,26 +1124,29 @@ prono_gmm <- function(data,
     e2_hat <- residuals(fit2)
 
     # Fit GARCH
-    tryCatch({
-      if (requireNamespace("tsgarch", quietly = TRUE)) {
-        dates <- as.Date("2000-01-01") + seq_along(e2_hat) - 1
-        e2_xts <- xts::xts(e2_hat, order.by = dates)
+    tryCatch(
+      {
+        if (requireNamespace("tsgarch", quietly = TRUE)) {
+          dates <- as.Date("2000-01-01") + seq_along(e2_hat) - 1
+          e2_xts <- xts::xts(e2_hat, order.by = dates)
 
-        garch_spec <- tsgarch::garch_modelspec(
-          y = e2_xts,
-          model = "garch",
-          order = garch_order,
-          constant = TRUE,
-          distribution = "norm"
-        )
+          garch_spec <- tsgarch::garch_modelspec(
+            y = e2_xts,
+            model = "garch",
+            order = garch_order,
+            constant = TRUE,
+            distribution = "norm"
+          )
 
-        garch_fit <- suppressWarnings(tsmethods::estimate(garch_spec))
-        data$sigma2_sq_hat <- as.numeric(sigma(garch_fit))^2
+          garch_fit <- suppressWarnings(tsmethods::estimate(garch_spec))
+          data$sigma2_sq_hat <- as.numeric(sigma(garch_fit))^2
+        }
+      },
+      error = function(e) {
+        # Fallback to squared residuals
+        data$sigma2_sq_hat <- e2_hat^2
       }
-    }, error = function(e) {
-      # Fallback to squared residuals
-      data$sigma2_sq_hat <- e2_hat^2
-    })
+    )
   }
 
   if ("sigma2_sq_hat" %in% names(data)) {
@@ -1149,7 +1168,7 @@ prono_gmm <- function(data,
     # F-statistic
     rss_r <- sum(residuals(fit_restricted)^2)
     rss_u <- sum(residuals(fit_full)^2)
-    df1 <- 1  # One instrument
+    df1 <- 1 # One instrument
     df2 <- n - ncol(xz_matrix)
     f_stat <- ((rss_r - rss_u) / df1) / (rss_u / df2)
 
@@ -1184,7 +1203,7 @@ prono_gmm <- function(data,
 #'
 #' @export
 rigobon_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars,
-                                      regime_var, add_intercept = TRUE) {
+                                       regime_var, add_intercept = TRUE) {
   n <- nrow(data)
   k <- length(x_vars)
   if (add_intercept) k <- k + 1
@@ -1262,7 +1281,7 @@ rigobon_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars,
 #'
 #' @export
 rigobon_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars,
-                                        regime_var, add_intercept = TRUE) {
+                                         regime_var, add_intercept = TRUE) {
   n <- nrow(data)
   k <- length(x_vars)
   if (add_intercept) k <- k + 1
@@ -1347,18 +1366,17 @@ rigobon_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars,
 #'
 #' @export
 rigobon_gmm <- function(data,
-                       system = "triangular",
-                       y1_var = "Y1",
-                       y2_var = "Y2",
-                       x_vars = "Xk",
-                       regime_var = "regime",
-                       add_intercept = TRUE,
-                       gmm_type = "twoStep",
-                       vcov = "HAC",
-                       initial_values = NULL,
-                       verbose = TRUE,
-                       ...) {
-
+                        system = "triangular",
+                        y1_var = "Y1",
+                        y2_var = "Y2",
+                        x_vars = "Xk",
+                        regime_var = "regime",
+                        add_intercept = TRUE,
+                        gmm_type = "twoStep",
+                        vcov = "HAC",
+                        initial_values = NULL,
+                        verbose = TRUE,
+                        ...) {
   if (!requireNamespace("gmm", quietly = TRUE)) {
     stop("Package 'gmm' is required for GMM estimation. Please install it.")
   }

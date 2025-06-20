@@ -265,7 +265,7 @@ avg_moments <- colMeans(moments)
 moment_names <- c(
   paste0("E[X*e1]_", 1:2),
   paste0("E[X*e2]_", 1:2),
-  paste0("E[Z", seq_len(length(unique(data$regime))), "*e1*e2]")
+  paste0("E[Z", seq_along(unique(data$regime)), "*e1*e2]")
 )
 
 p2 <- ggplot(data.frame(

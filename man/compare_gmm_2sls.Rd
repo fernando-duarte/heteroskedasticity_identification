@@ -72,15 +72,15 @@ params_multi <- list(
 )
 data_multi_x <- generate_lewbel_data(1000, params_multi, n_x = 2) # Y1,Y2,X1,X2,Z1,Z2
 comparison_multi <- compare_gmm_2sls(data_multi_x,
-                                     x_vars = c("X1", "X2"),
-                                     true_gamma1 = params_multi$gamma1,
-                                     tsls_sim_config = list(
-                                        lewbel_x_vars = c("X1","X2") # Hypothetical
-                                        # Note: run_single_lewbel_simulation's internal
-                                        # DGP might not easily map to this if it assumes 1 Xk.
-                                        # This part is more illustrative for GMM side.
-                                        )
-                                    )
+  x_vars = c("X1", "X2"),
+  true_gamma1 = params_multi$gamma1,
+  tsls_sim_config = list(
+    lewbel_x_vars = c("X1", "X2") # Hypothetical
+    # Note: run_single_lewbel_simulation's internal
+    # DGP might not easily map to this if it assumes 1 Xk.
+    # This part is more illustrative for GMM side.
+  )
+)
 print(comparison_multi)
 }
 }

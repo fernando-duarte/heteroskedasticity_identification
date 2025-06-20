@@ -50,9 +50,9 @@ end_date <- as.Date("2004-12-31")
 
 # Function to prepare weekly data
 prepare_weekly_data <- function(data, start_date, end_date) {
-  data %>%
-    mutate(date = as.Date(row.names(.))) %>%
-    filter(date >= start_date & date <= end_date) %>%
+  data |>
+    mutate(date = as.Date(row.names(.))) |>
+    filter(date >= start_date & date <= end_date) |>
     arrange(date)
 }
 
@@ -78,23 +78,23 @@ cat("Expected (from paper): 2166 weeks\n")
 estimate_prono_beta <- function(portfolio_returns, market_returns, rf_rate) {
 
   # Create excess returns
-  Y1 <- portfolio_returns - rf_rate  # Portfolio excess return
-  Y2 <- market_returns - rf_rate     # Market excess return
+  y1 <- portfolio_returns - rf_rate  # Portfolio excess return
+  y2 <- market_returns - rf_rate     # Market excess return
 
-  n <- length(Y1)
+  n <- length(y1)
 
   # Skip if too few observations
   if (n < 100) return(NULL)
 
   # OLS estimation (for comparison)
-  ols_fit <- lm(Y1 ~ Y2)
+  ols_fit <- lm(y1 ~ y2)
   beta_ols <- coef(ols_fit)[2]
   alpha_ols <- coef(ols_fit)[1]
 
   # Prono estimation
   tryCatch({
     # Get residuals from market model (second equation)
-    e2 <- residuals(lm(Y2 ~ 1))
+    e2 <- residuals(lm(y2 ~ 1))
 
     # Check if rugarch is available for GARCH estimation
     if (requireNamespace("rugarch", quietly = TRUE)) {
@@ -110,18 +110,18 @@ estimate_prono_beta <- function(portfolio_returns, market_returns, rf_rate) {
       # Extract conditional variance
       sigma2_sq <- as.numeric(rugarch::sigma(garch_fit))^2
 
-      # Construct Prono instrument: Z * e2
-      Z <- sigma2_sq - mean(sigma2_sq)
-      instrument <- Z * e2
+      # Construct Prono instrument: z * e2
+      z <- sigma2_sq - mean(sigma2_sq)
+      instrument <- z * e2
 
       # 2SLS with Prono instrument
-      # First stage: Regress Y2 on instrument
-      first_stage <- lm(Y2 ~ instrument)
-      Y2_fitted <- fitted(first_stage)
+      # First stage: Regress y2 on instrument
+      first_stage <- lm(y2 ~ instrument)
+      y2_fitted <- fitted(first_stage)
       f_stat <- summary(first_stage)$fstatistic[1]
 
-      # Second stage: Regress Y1 on fitted Y2
-      second_stage <- lm(Y1 ~ Y2_fitted)
+      # Second stage: Regress y1 on fitted y2
+      second_stage <- lm(y1 ~ y2_fitted)
       beta_prono <- coef(second_stage)[2]
       alpha_prono <- coef(second_stage)[1]
 
@@ -142,14 +142,14 @@ estimate_prono_beta <- function(portfolio_returns, market_returns, rf_rate) {
 
     } else {
       # Fallback: use squared residuals as proxy
-      Z <- e2^2 - mean(e2^2)
-      instrument <- Z * e2
+      z <- e2^2 - mean(e2^2)
+      instrument <- z * e2
 
-      first_stage <- lm(Y2 ~ instrument)
-      Y2_fitted <- fitted(first_stage)
+      first_stage <- lm(y2 ~ instrument)
+      y2_fitted <- fitted(first_stage)
       f_stat <- summary(first_stage)$fstatistic[1]
 
-      second_stage <- lm(Y1 ~ Y2_fitted)
+      second_stage <- lm(y1 ~ y2_fitted)
       beta_prono <- coef(second_stage)[2]
       alpha_prono <- coef(second_stage)[1]
 
@@ -165,11 +165,11 @@ estimate_prono_beta <- function(portfolio_returns, market_returns, rf_rate) {
     }
 
   }, error = function(e) {
-    return(list(
+    list(
       alpha_ols = alpha_ols,
       beta_ols = beta_ols,
       error = e$message
-    ))
+    )
   })
 }
 
@@ -178,15 +178,15 @@ estimate_prono_beta <- function(portfolio_returns, market_returns, rf_rate) {
 # ========================================================================
 
 # Merge data
-analysis_data <- factors_data %>%
+analysis_data <- factors_data |>
   select(date, mkt_excess = `Mkt-RF`, rf = RF, smb = SMB, hml = HML)
 
 # Example: Replicate results for specific portfolios mentioned in paper
 # Table VI shows results for Size 1, B/M 1 portfolio and Industry 21 (Machinery)
 
 # Get Small-Low (Size 1, B/M 1) portfolio
-small_low <- portfolios_25 %>%
-  select(date, portfolio_return = `SMALL LoBM`) %>%
+small_low <- portfolios_25 |>
+  select(date, portfolio_return = `SMALL LoBM`) |>
   inner_join(analysis_data, by = "date")
 
 cat("\n\nEstimating Prono betas for Size 1, B/M 1 portfolio...\n")
@@ -228,8 +228,8 @@ for (i in seq_along(portfolio_names)) {
   port_name <- portfolio_names[i]
 
   # Get portfolio data
-  port_data <- portfolios_25 %>%
-    select(date, portfolio_return = all_of(port_name)) %>%
+  port_data <- portfolios_25 |>
+    select(date, portfolio_return = all_of(port_name)) |>
     inner_join(analysis_data, by = "date")
 
   # Estimate betas
@@ -258,14 +258,14 @@ results_df <- bind_rows(all_results)
 cat("\n\nRunning second-pass cross-sectional regressions...\n")
 
 # Calculate average excess returns for each portfolio
-avg_returns <- portfolios_25 %>%
-  select(-date) %>%
-  summarise(across(everything(), mean, na.rm = TRUE)) %>%
+avg_returns <- portfolios_25 |>
+  select(-date) |>
+  summarise(across(everything(), mean, na.rm = TRUE)) |>
   pivot_longer(everything(), names_to = "portfolio", values_to = "avg_return")
 
 # Merge with beta estimates
-cross_section_data <- results_df %>%
-  select(portfolio, beta_ols, beta_prono) %>%
+cross_section_data <- results_df |>
+  select(portfolio, beta_ols, beta_prono) |>
   inner_join(avg_returns, by = "portfolio")
 
 # Cross-sectional regression: OLS betas
@@ -289,11 +289,11 @@ cat("CUE: Constant = 0.087 (0.040), Market premium = 0.033 (0.057)\n")
 
 cat("\nOur replication:\n")
 cat(sprintf("OLS: Constant = %.3f (%.3f), Market premium = %.3f (%.3f)\n",
-            coef(cs_ols)[1], summary(cs_ols)$coefficients[1,2],
-            coef(cs_ols)[2], summary(cs_ols)$coefficients[2,2]))
+            coef(cs_ols)[1], summary(cs_ols)$coefficients[1, 2],
+            coef(cs_ols)[2], summary(cs_ols)$coefficients[2, 2]))
 cat(sprintf("Prono: Constant = %.3f (%.3f), Market premium = %.3f (%.3f)\n",
-            coef(cs_prono)[1], summary(cs_prono)$coefficients[1,2],
-            coef(cs_prono)[2], summary(cs_prono)$coefficients[2,2]))
+            coef(cs_prono)[1], summary(cs_prono)$coefficients[1, 2],
+            coef(cs_prono)[2], summary(cs_prono)$coefficients[2, 2]))
 
 # Calculate average market excess return
 avg_mkt_excess <- mean(analysis_data$mkt_excess, na.rm = TRUE)

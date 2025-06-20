@@ -159,9 +159,9 @@ cat(
 # Check if true value is contained in the bounds
 true_gamma <- params$gamma1
 in_bounds_exact <- (true_gamma >= bounds_exact$bounds[1] &&
-                    true_gamma <= bounds_exact$bounds[2])
+  true_gamma <= bounds_exact$bounds[2])
 in_bounds_relaxed <- (true_gamma >= bounds_relaxed$bounds[1] &&
-                      true_gamma <= bounds_relaxed$bounds[2])
+  true_gamma <= bounds_relaxed$bounds[2])
 
 cat("\nTrue value γ₁ =", true_gamma, "\n")
 cat("Contained in exact bounds:", ifelse(in_bounds_exact, "✓", "✗"), "\n")

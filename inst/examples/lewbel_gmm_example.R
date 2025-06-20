@@ -143,14 +143,12 @@ u1 <- rnorm(n_sim) * exp(0.5 * data_sim$X1)
 u2 <- rnorm(n_sim) * exp(-0.5 * data_sim$X1)
 
 # Solve simultaneous system
-# Y1 = X*beta1 + gamma1*Y2 + u1
-# Y2 = X*beta2 + gamma2*Y1 + u2
 # Reduced form: Y = (I - Gamma)^(-1) * (X*Beta + U)
 
-X_mat <- as.matrix(cbind(1, data_sim[, c("X1", "X2", "X3")]))
-Gamma <- matrix(c(0, gamma1_true, gamma2_true, 0), 2, 2)
-Beta <- cbind(beta1, beta2)
-U <- cbind(u1, u2)
+x_mat <- as.matrix(cbind(1, data_sim[, c("X1", "X2", "X3")]))
+gamma_matrix <- matrix(c(0, gamma1_true, gamma2_true, 0), 2, 2)
+beta_matrix <- cbind(beta1, beta2)
+u_matrix <- cbind(u1, u2)
 
 # Check identification condition
 if (abs(gamma1_true * gamma2_true) >= 1) {
@@ -158,11 +156,11 @@ if (abs(gamma1_true * gamma2_true) >= 1) {
 }
 
 # Solve for Y
-I_minus_Gamma_inv <- solve(diag(2) - Gamma)
-Y <- (X_mat %*% Beta + U) %*% t(I_minus_Gamma_inv)
+i_minus_gamma_inv <- solve(diag(2) - gamma_matrix)
+y_matrix <- (x_mat %*% beta_matrix + u_matrix) %*% t(i_minus_gamma_inv)
 
-data_sim$Y1 <- Y[, 1]
-data_sim$Y2 <- Y[, 2]
+data_sim$Y1 <- y_matrix[, 1]
+data_sim$Y2 <- y_matrix[, 2]
 
 # Estimate simultaneous system
 cat("  True parameters:\n")
@@ -187,8 +185,8 @@ print(gmm_sim)
 cat("\n6. Using custom heteroskedasticity drivers (Z variables)...\n\n")
 
 # Add custom Z variables to data
-data$Z1 = data$Xk^2  # Squared X
-data$Z2 = abs(data$Xk)  # Absolute value of X
+data$Z1 <- data$Xk^2  # Squared X
+data$Z2 <- abs(data$Xk)  # Absolute value of X
 
 # Estimate with custom Z
 gmm_custom_z <- lewbel_gmm(
@@ -245,7 +243,7 @@ cat("\n8. Bootstrap inference for GMM estimates...\n\n")
 boot_gmm <- function(data, indices) {
   d <- data[indices, ]
   gmm_boot <- lewbel_gmm(d, system = "triangular")
-  return(coef(gmm_boot)["gamma1"])
+  coef(gmm_boot)["gamma1"]
 }
 
 # Run bootstrap

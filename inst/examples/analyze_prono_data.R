@@ -49,7 +49,6 @@ cat(sprintf("   Mean: %.3f%%\n", mean(market_excess)))
 cat(sprintf("   Standard Deviation: %.3f%%\n", sd(market_excess) * 100))
 
 # Skewness and Kurtosis (manual calculation for clarity)
-# Skewness = E[(X - mu)^3] / sigma^3
 # Kurtosis = E[(X - mu)^4] / sigma^4 (Excess kurtosis would subtract 3)
 n_market <- length(market_excess)
 mean_market <- mean(market_excess)

@@ -137,8 +137,11 @@ test_that("REndo instrument extraction works as in vignette Section 4", {
     # Document available components
     available_components <- names(rendo_model)
     expect_true(length(available_components) > 0,
-                label = paste("REndo model components:",
-                             paste(available_components, collapse = ", ")))
+      label = paste(
+        "REndo model components:",
+        paste(available_components, collapse = ", ")
+      )
+    )
   }
 
   if (!is.null(rendo_iv_extracted)) {
@@ -221,5 +224,6 @@ test_that("instrument construction comparison matches vignette Section 2", {
   # Document the correlation between different approaches
   # They may be correlated but should not be identical
   expect_true(abs(correlation) < 0.999,
-              label = "Different instrument methods should not be identical")
+    label = "Different instrument methods should not be identical"
+  )
 })

@@ -82,7 +82,7 @@ squared_resid <- resid2^2
 acf_result <- acf(squared_resid, lag.max = 5, plot = FALSE)
 cat("   Autocorrelation of squared residuals:\n")
 for (i in 1:5) {
-  cat(sprintf("   Lag %d: %.3f\n", i, acf_result$acf[i+1]))
+  cat(sprintf("   Lag %d: %.3f\n", i, acf_result$acf[i + 1]))
 }
 
 # 7. Implications for replication

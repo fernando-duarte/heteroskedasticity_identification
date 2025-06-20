@@ -53,8 +53,8 @@ params <- list(
   beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
   beta2_0 = 1.0, beta2_1 = -1.0,
   alpha1 = -0.5, alpha2 = 1.0,
-  regime_probs = c(0.4, 0.6),  # 40\% in regime 1, 60\% in regime 2
-  sigma2_regimes = c(1.0, 2.5)  # Variance is 2.5x higher in regime 2
+  regime_probs = c(0.4, 0.6), # 40\% in regime 1, 60\% in regime 2
+  sigma2_regimes = c(1.0, 2.5) # Variance is 2.5x higher in regime 2
 )
 data <- generate_rigobon_data(1000, params)
 

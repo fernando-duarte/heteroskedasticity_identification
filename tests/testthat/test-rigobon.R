@@ -20,7 +20,7 @@ test_that("generate_rigobon_data works correctly", {
   # Check regime assignment
   expect_true(all(data_2reg$regime %in% c(1, 2)))
   regime_props <- table(data_2reg$regime) / 1000
-  expect_equal(as.numeric(regime_props[1]), 0.4, tolerance = 0.1)  # Allow some randomness
+  expect_equal(as.numeric(regime_props[1]), 0.4, tolerance = 0.1) # Allow some randomness
   expect_equal(as.numeric(regime_props[2]), 0.6, tolerance = 0.1)
 
   # Check centered dummies
@@ -48,22 +48,28 @@ test_that("generate_rigobon_data validates inputs", {
     beta2_0 = 1.0, beta2_1 = -1.0,
     alpha1 = -0.5, alpha2 = 1.0
   )
-  expect_error(generate_rigobon_data(100, params_bad),
-               "params must contain 'regime_probs' and 'sigma2_regimes'")
+  expect_error(
+    generate_rigobon_data(100, params_bad),
+    "params must contain 'regime_probs' and 'sigma2_regimes'"
+  )
 
   # Mismatched lengths
   params_mismatch <- params_bad
   params_mismatch$regime_probs <- c(0.5, 0.5)
   params_mismatch$sigma2_regimes <- c(1.0)
-  expect_error(generate_rigobon_data(100, params_mismatch),
-               "Length of sigma2_regimes must match")
+  expect_error(
+    generate_rigobon_data(100, params_mismatch),
+    "Length of sigma2_regimes must match"
+  )
 
   # Probabilities don't sum to 1
   params_bad_probs <- params_bad
   params_bad_probs$regime_probs <- c(0.3, 0.4)
   params_bad_probs$sigma2_regimes <- c(1.0, 2.0)
-  expect_error(generate_rigobon_data(100, params_bad_probs),
-               "regime_probs must sum to 1")
+  expect_error(
+    generate_rigobon_data(100, params_bad_probs),
+    "regime_probs must sum to 1"
+  )
 })
 
 test_that("run_rigobon_estimation works correctly", {
@@ -73,7 +79,7 @@ test_that("run_rigobon_estimation works correctly", {
     beta2_0 = 1.0, beta2_1 = -1.0,
     alpha1 = -0.5, alpha2 = 1.0,
     regime_probs = c(0.4, 0.6),
-    sigma2_regimes = c(1.0, 3.0)  # Strong heteroskedasticity
+    sigma2_regimes = c(1.0, 3.0) # Strong heteroskedasticity
   )
 
   set.seed(123)
@@ -96,7 +102,7 @@ test_that("run_rigobon_estimation works correctly", {
   tsls_bias <- abs(results$tsls$estimates["gamma1"] - params$gamma1)
 
   # First-stage F should be reasonable
-  expect_true(all(results$first_stage_f_stats > 1))  # Very loose check
+  expect_true(all(results$first_stage_f_stats > 1)) # Very loose check
 
   # With diagnostics
   results_diag <- run_rigobon_estimation(data, return_diagnostics = TRUE)
@@ -107,7 +113,7 @@ test_that("run_rigobon_estimation works correctly", {
 
   # Check heteroskedasticity test
   expect_type(results_diag$heteroskedasticity_test$p_value, "double")
-  expect_true(results_diag$heteroskedasticity_test$p_value < 0.05)  # Should detect heteroskedasticity
+  expect_true(results_diag$heteroskedasticity_test$p_value < 0.05) # Should detect heteroskedasticity
 })
 
 test_that("run_rigobon_estimation handles edge cases", {
@@ -118,8 +124,10 @@ test_that("run_rigobon_estimation handles edge cases", {
     Xk = rnorm(100),
     regime = rep(1, 100)
   )
-  expect_error(run_rigobon_estimation(data_single),
-               "Need at least 2 regimes")
+  expect_error(
+    run_rigobon_estimation(data_single),
+    "Need at least 2 regimes"
+  )
 
   # Missing variables
   data_missing <- data.frame(
@@ -127,8 +135,10 @@ test_that("run_rigobon_estimation handles edge cases", {
     Xk = rnorm(100),
     regime = sample(1:2, 100, replace = TRUE)
   )
-  expect_error(run_rigobon_estimation(data_missing),
-               "Missing required variables")
+  expect_error(
+    run_rigobon_estimation(data_missing),
+    "Missing required variables"
+  )
 })
 
 test_that("run_rigobon_demo runs without error", {
@@ -143,7 +153,7 @@ test_that("run_rigobon_demo runs without error", {
 
   # Check comparison data frame
   expect_s3_class(demo$comparison, "data.frame")
-  expect_equal(nrow(demo$comparison), 2)  # OLS and Rigobon
+  expect_equal(nrow(demo$comparison), 2) # OLS and Rigobon
   expect_true(all(c("Method", "Estimate", "StdError", "Bias", "RMSE") %in% names(demo$comparison)))
 })
 
@@ -167,7 +177,7 @@ test_that("Rigobon method integrates with existing Lewbel framework", {
   cov_z1_e1e2 <- cov(data$Z1, data$epsilon1 * data$epsilon2)
   cov_z2_e1e2 <- cov(data$Z2, data$epsilon1 * data$epsilon2)
 
-  expect_true(abs(cov_z1_e1e2) < 0.1)  # Should be close to 0
+  expect_true(abs(cov_z1_e1e2) < 0.1) # Should be close to 0
   expect_true(abs(cov_z2_e1e2) < 0.1)
 
   # Check that we have heteroskedasticity: Cov(Z, epsilon2^2) != 0
@@ -217,8 +227,10 @@ test_that("run_rigobon_analysis works with default parameters", {
   expect_true(all(c("Method", "Estimate", "StdError") %in% names(results$estimates)))
 
   # Check diagnostics
-  expect_true(all(c("heteroskedasticity_test", "first_stage_F",
-                    "regime_proportions", "n_regimes") %in% names(results$diagnostics)))
+  expect_true(all(c(
+    "heteroskedasticity_test", "first_stage_F",
+    "regime_proportions", "n_regimes"
+  ) %in% names(results$diagnostics)))
   expect_type(results$diagnostics$heteroskedasticity_test$p_value, "double")
   expect_type(results$diagnostics$first_stage_F, "double")
 
@@ -317,17 +329,19 @@ test_that("validate_rigobon_assumptions detects valid assumptions", {
     beta2_0 = 1.0, beta2_1 = -1.0,
     alpha1 = -0.5, alpha2 = 1.0,
     regime_probs = c(0.4, 0.6),
-    sigma2_regimes = c(0.5, 3.0)  # Stronger heteroskedasticity difference
+    sigma2_regimes = c(0.5, 3.0) # Stronger heteroskedasticity difference
   )
 
-  set.seed(123)  # Different seed for more reliable results
-  data <- generate_rigobon_data(1500, params)  # Larger sample
+  set.seed(123) # Different seed for more reliable results
+  data <- generate_rigobon_data(1500, params) # Larger sample
 
   validation <- validate_rigobon_assumptions(data, verbose = FALSE)
 
   expect_type(validation, "list")
-  expect_true(all(c("regime_heteroskedasticity", "covariance_restriction",
-                    "constant_covariance", "all_valid") %in% names(validation)))
+  expect_true(all(c(
+    "regime_heteroskedasticity", "covariance_restriction",
+    "constant_covariance", "all_valid"
+  ) %in% names(validation)))
 
   # Should detect heteroskedasticity in equation2
   expect_true(validation$regime_heteroskedasticity$equation2$significant)
@@ -336,7 +350,7 @@ test_that("validate_rigobon_assumptions detects valid assumptions", {
   # The overall validity might be too strict for stochastic data
   # So we'll test the main requirement: heteroskedasticity exists
   has_heteroskedasticity <- validation$regime_heteroskedasticity$equation1$significant ||
-                           validation$regime_heteroskedasticity$equation2$significant
+    validation$regime_heteroskedasticity$equation2$significant
   expect_true(has_heteroskedasticity)
 })
 
@@ -388,7 +402,7 @@ test_that("validate_rigobon_assumptions returns correct structure", {
     beta2_0 = 1.0, beta2_1 = -1.0,
     alpha1 = -0.5, alpha2 = 1.0,
     regime_probs = c(0.4, 0.6),
-    sigma2_regimes = c(0.5, 3.0)  # Stronger heteroskedasticity difference
+    sigma2_regimes = c(0.5, 3.0) # Stronger heteroskedasticity difference
   )
 
   set.seed(123)
@@ -398,8 +412,10 @@ test_that("validate_rigobon_assumptions returns correct structure", {
 
   # Test structure
   expect_type(validation, "list")
-  expect_true(all(c("regime_heteroskedasticity", "covariance_restriction",
-                    "constant_covariance", "all_valid") %in% names(validation)))
+  expect_true(all(c(
+    "regime_heteroskedasticity", "covariance_restriction",
+    "constant_covariance", "all_valid"
+  ) %in% names(validation)))
 
   # Check heteroskedasticity test structure
   expect_type(validation$regime_heteroskedasticity, "list")
@@ -426,7 +442,7 @@ test_that("validate_rigobon_assumptions returns correct structure", {
   # The overall validity might be too strict for stochastic data
   # So we'll test the main requirement: heteroskedasticity exists
   has_heteroskedasticity <- validation$regime_heteroskedasticity$equation1$significant ||
-                           validation$regime_heteroskedasticity$equation2$significant
+    validation$regime_heteroskedasticity$equation2$significant
   expect_true(has_heteroskedasticity)
 })
 
@@ -452,10 +468,12 @@ test_that("compare_rigobon_methods works with all methods", {
   )
 
   expect_s3_class(comparison, "data.frame")
-  expect_equal(nrow(comparison), 3)  # OLS, Rigobon, Lewbel
-  expect_true(all(c("Method", "Estimate", "StdError", "TrueValue",
-                    "Bias", "RelativeBias_pct", "FirstStageF", "Details")
-                  %in% names(comparison)))
+  expect_equal(nrow(comparison), 3) # OLS, Rigobon, Lewbel
+  expect_true(all(c(
+    "Method", "Estimate", "StdError", "TrueValue",
+    "Bias", "RelativeBias_pct", "FirstStageF", "Details"
+  )
+  %in% names(comparison)))
 
   # Check that all estimates are numeric
   expect_true(all(is.numeric(comparison$Estimate)))

@@ -71,7 +71,7 @@ params <- list(
   beta2_0 = 1.0, beta2_1 = -1.0,
   alpha1 = -0.5, alpha2 = 1.0,
   regime_probs = c(0.3, 0.7),
-  sigma2_regimes = c(1.0, 3.0)  # Large difference in variances
+  sigma2_regimes = c(1.0, 3.0) # Large difference in variances
 )
 results <- run_rigobon_analysis(n_obs = 2000, params = params)
 
@@ -90,5 +90,6 @@ Review of Economics and Statistics, 85(4), 777-792.
 \doi{10.1162/003465303772815727}
 }
 \seealso{
-\code{\link{generate_rigobon_data}}, \code{\link{run_rigobon_estimation}}, \code{\link{validate_rigobon_assumptions}}
+\code{\link{generate_rigobon_data}}, \code{\link{run_rigobon_estimation}},
+\code{\link{validate_rigobon_assumptions}}
 }
