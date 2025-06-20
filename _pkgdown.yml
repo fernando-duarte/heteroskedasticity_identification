@@ -112,6 +112,9 @@ reference:
   - run_prono_monte_carlo
   - run_prono_demo
   - create_prono_config
+  - fit_diagonal_garch_prono
+  - prono_diagonal_garch
+  - replicate_prono_table2
 
 - title: "Analysis"
   desc: "Functions for analyzing simulation results"

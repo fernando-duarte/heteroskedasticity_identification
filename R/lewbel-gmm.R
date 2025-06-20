@@ -2,6 +2,7 @@
 #' @description Implementation of Generalized Method of Moments (GMM) estimation
 #' for Lewbel's (2012) heteroskedasticity-based identification strategy.
 #' @name lewbel-gmm
+#' @keywords internal
 #' @import gmm
 #' @import stats
 NULL
