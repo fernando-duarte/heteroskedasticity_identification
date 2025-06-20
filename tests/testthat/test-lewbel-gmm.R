@@ -1,5 +1,17 @@
 # Test for Lewbel GMM implementation
 
+# Helper function to suppress expected GARCH NaN warnings
+suppress_garch_nan_warning <- function(expr) {
+  withCallingHandlers(
+    expr,
+    warning = function(w) {
+      if (grepl("NaNs produced", conditionMessage(w))) {
+        invokeRestart("muffleWarning")
+      }
+    }
+  )
+}
+
 test_that("lewbel_triangular_moments generates correct moment conditions", {
   skip_if_not_installed("gmm")
 
@@ -436,13 +448,17 @@ test_that("prono_triangular_moments generates correct moment conditions", {
   theta <- c(0.05, 0.01, 1.0, 0.097, -0.005)
 
   # Generate moment conditions
-  moments <- prono_triangular_moments(
-    theta = theta,
-    data = data,
-    y1_var = "Y1",
-    y2_var = "Y2",
-    x_vars = "X1",
-    add_intercept = TRUE
+  # NaN warning from GARCH optimization is expected but not required
+  # The warning occurs when GARCH parameters are near the stationarity boundary
+  moments <- suppress_garch_nan_warning(
+    prono_triangular_moments(
+      theta = theta,
+      data = data,
+      y1_var = "Y1",
+      y2_var = "Y2",
+      x_vars = "X1",
+      add_intercept = TRUE
+    )
   )
 
   # Check dimensions
