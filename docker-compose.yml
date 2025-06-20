@@ -1,6 +1,5 @@
 # Docker Compose for hetid R package
 # Supports development, testing, and production environments
-# Updated for 2025 best practices
 
 services:
   # Production service - minimal runtime

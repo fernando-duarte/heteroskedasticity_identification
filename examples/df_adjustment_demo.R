@@ -1,5 +1,5 @@
 # Demonstration of degrees of freedom adjustment in hetid
-# This script shows how to use the new df_adjust parameter
+# This script shows how to use the df_adjust parameter
 
 # Load the package in development mode
 if (file.exists("DESCRIPTION")) {

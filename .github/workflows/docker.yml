@@ -1,6 +1,3 @@
-# Docker CI/CD workflow for hetid R package
-# Implements 2025 best practices for container testing and deployment
-
 name: Docker Build and Test
 
 on:

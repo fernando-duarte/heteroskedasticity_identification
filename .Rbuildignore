@@ -16,7 +16,7 @@
 # Project documentation (source files)
 # Project-specific directories
 # Python/reticulate
-# R package build ignore file - Updated June 2025
+# R package build ignore file
 # R temporary files
 # Regular expression to match dotfiles not covered above
 # Scripts and tools
@@ -206,6 +206,7 @@
 ^setup_env\.sh$
 ^simulation-results$
 ^tags$
+^test-utils\.R$
 ^test_docker_workflow\.sh$
 ^tests/testthat/\.cache$
 ^tmux\.md$

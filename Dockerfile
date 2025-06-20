@@ -1,6 +1,5 @@
 # syntax=docker/dockerfile:1.7
 # Production Dockerfile for hetid R package
-# Implements 2025 Docker best practices with multi-stage builds
 # Optimized for heteroskedasticity identification simulations
 
 #==============================================================================

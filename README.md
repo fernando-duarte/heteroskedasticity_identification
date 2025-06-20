@@ -136,6 +136,37 @@ print(comparison)
 
 The package also implements **Rigobon (2003)** regime-based identification. See the [Rigobon Guide](dev-guides/RIGOBON.md) for detailed usage.
 
+## Testing
+
+After cloning this repository:
+
+```r
+# Quick tests (recommended for contributors)
+# In RStudio or after opening R in project directory:
+devtools::test()  # Runs CRAN + fast tests
+
+# Or use Make:
+make test-fast    # CRAN + fast tests
+make test-all     # All tests (10+ minutes)
+
+# Minimal tests only
+Sys.setenv(HETID_TEST_LEVEL = "cran")
+devtools::test()
+```
+
+Note: Opening the project in RStudio or starting R in the project directory automatically configures the test environment for fast tests.
+
+### Test Organization
+
+The package uses a hierarchical test system:
+
+- **CRAN tests**: Very fast unit tests (< 1 minute total)
+- **Fast tests**: Quick tests for development (< 2 minutes)
+- **Integration tests**: Multi-component tests (< 5 minutes)
+- **Comprehensive tests**: Full validation including Monte Carlo (10+ minutes)
+
+See the [Makefile](Makefile) for all available test commands.
+
 ## Guides
 
 **[Development](dev-guides/DEVELOPMENT.md)**.

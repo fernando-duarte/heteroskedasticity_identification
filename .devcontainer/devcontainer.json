@@ -5,7 +5,6 @@
   // Note: Rocker images are currently amd64-only, will use emulation on ARM64
   "image": "rocker/tidyverse:latest",
 
-  // Modern devcontainer features
   "features": {
     // R-specific features from Rocker
     "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
@@ -75,7 +74,7 @@
       ],
 
       "settings": {
-        // R settings for modern development
+        // R settings
         "r.rterm.linux": "/usr/local/bin/radian",
         "r.rpath.linux": "/usr/local/bin/R",
         "r.bracketedPaste": true,
