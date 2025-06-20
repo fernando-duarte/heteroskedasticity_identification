@@ -58,7 +58,7 @@ test_that("lewbel_gmm estimates triangular system correctly", {
   expect_s3_class(gmm_result, "gmm")
 
   # Check attributes
-  expect_equal(attr(gmm_result, "lewbel_system"), "triangular")
+  expect_equal(attr(gmm_result, "hetid_system"), "triangular")
 
   # Check coefficient names
   coef_names <- names(coef(gmm_result))
