@@ -113,6 +113,10 @@ lewbel_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars, z_var
 #' The moment conditions are the same as the triangular system.
 #' Note: Requires gamma1 * gamma2 != 1 for identification.
 #'
+#' WARNING: Simultaneous systems are numerically challenging and require
+#' strong heteroskedasticity patterns for reliable identification. Consider
+#' using a triangular system if possible.
+#'
 #' @seealso
 #' \code{\link{lewbel_gmm}} for the main GMM estimation function.
 #' \code{\link{lewbel_triangular_moments}} for triangular system moments.
@@ -189,6 +193,8 @@ lewbel_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars, z_v
 #'
 #' @param data Data frame containing all variables.
 #' @param system Character. Type of system: "triangular" or "simultaneous" (default: "triangular").
+#'   Note: Simultaneous systems require strong identification conditions - either many
+#'   regimes (4+) or large variance differences across regimes for numerical stability.
 #' @param y1_var Character. Name of the first dependent variable (default: "Y1").
 #' @param y2_var Character. Name of the second dependent variable/endogenous regressor (default: "Y2").
 #' @param x_vars Character vector. Names of exogenous variables (default: "Xk").
@@ -208,6 +214,12 @@ lewbel_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars, z_v
 #' This function implements Lewbel's (2012) heteroskedasticity-based identification
 #' using the GMM framework. The method exploits heteroskedasticity in the error
 #' terms to generate valid instruments for endogenous regressors.
+#'
+#' For simultaneous equation systems, identification becomes more challenging.
+#' The system requires sufficient variation in heteroskedasticity patterns to
+#' distinguish between the bidirectional effects. In practice, this means you need
+#' either many distinct heteroskedasticity regimes or very large differences in
+#' variance across existing regimes.
 #'
 #' @seealso
 #' \code{\link{lewbel_triangular_moments}}, \code{\link{lewbel_simultaneous_moments}} for moment condition functions.
@@ -300,7 +312,8 @@ lewbel_gmm <- function(data,
     }
   }
   k_exog_for_params <- length(x_vars) +
-                       (if (add_intercept && !any(sapply(x_vars, function(v) all(data[[v]] == 1) && is.numeric(data[[v]])))) 1 else 0)
+                       (if (add_intercept &&
+                           !any(sapply(x_vars, function(v) all(data[[v]] == 1) && is.numeric(data[[v]])))) 1 else 0)
 
 
   # Get initial values if not provided
@@ -407,43 +420,49 @@ lewbel_gmm <- function(data,
     }
   }
 
-  # Set up vcov options for gmm call, removing ones handled manually
-  gmm_vcov_opts <- list() # For arguments to gmm()'s vcov.args
+  # Set up vcov options for gmm call
   vcov_method <- vcov # Store original vcov string for gmm call
 
-  if (vcov_method == "HAC") {
-    gmm_vcov_opts$kernel <- hetid_opt("GMM_HAC_KERNEL") # e.g. "Quadratic Spectral"
-    gmm_vcov_opts$prewhite <- hetid_opt("GMM_HAC_PREWHITE") # e.g. 1
-    gmm_vcov_opts$ar.method <- hetid_opt("GMM_HAC_AR_METHOD") # e.g. "ols"
-    # Bandwidth will be chosen by sandwich::lrvar by default if not specified
-    if (!is.null(list(...)$bw)) gmm_vcov_opts$bw <- list(...)$bw
-  } else if (vcov_method == "cluster" && !is.null(cluster_var)) {
-    # The 'cluster' argument to gmm's vcov.args needs the actual cluster vector
-    gmm_vcov_opts$cluster <- data[[cluster_var]]
-    # gmm() will pass this to sandwich::vcovCL
+  # Handle clustered standard errors
+  if (vcov_method == "cluster") {
+    if (is.null(cluster_var)) {
+      stopper("cluster_var must be specified when vcov = 'cluster'")
+    }
+    if (!(cluster_var %in% names(data))) {
+      stopper("Cluster variable not found in data")
+    }
+    # gmm package doesn't directly support clustered SE
+    warning("Clustered standard errors not directly supported by gmm package. Using HAC instead.")
+    vcov_method <- "HAC"
   }
-  # For "iid", no specific vcov.args needed for gmm itself, it handles it.
 
-
-  # Prepare arguments for gmm call, removing ones handled manually
+  # Prepare arguments for gmm call
   additional_args <- list(...)
   additional_args$g <- moment_fn
   additional_args$x <- data
   additional_args$t0 <- initial_values
   additional_args$type <- gmm_type
   additional_args$wmatrix <- "optimal" # Typically "optimal" for twoStep/iterative/cue
-  additional_args$vcov <- vcov_method   # "HAC", "iid", "cluster"
-  additional_args$vcov.args <- gmm_vcov_opts
-  additional_args$centeredV <- FALSE # Default in gmm is TRUE, consider implications
+  additional_args$vcov <- vcov_method   # "HAC", "iid"
+  additional_args$centeredVcov <- FALSE # Default in gmm is TRUE, consider implications
   additional_args$weightsMatrix <- NULL # Let gmm compute it unless provided in ...
   additional_args$model <- TRUE # Return model components
 
+  # Set HAC-specific options if needed
+  if (vcov_method == "HAC") {
+    additional_args$kernel <- hetid_opt("GMM_HAC_KERNEL") # e.g. "Quadratic Spectral"
+    additional_args$prewhite <- hetid_opt("GMM_HAC_PREWHITE") # e.g. 1
+    additional_args$ar.method <- hetid_opt("GMM_HAC_AR_METHOD") # e.g. "ols"
+    # Bandwidth will be chosen automatically if not specified
+    if (!is.null(list(...)$bw)) additional_args$bw <- list(...)$bw
+  }
+
   # Remove args that are explicitly named in lewbel_gmm signature if they were passed via ...
   # to avoid them being duplicated.
-  explicit_args <- c("g", "x", "t0", "type", "wmatrix", "vcov", "vcov.args", "computeSE", "model")
+  explicit_args <- c("g", "x", "t0", "type", "wmatrix", "vcov", "computeSE", "model")
   for (arg_name in explicit_args) {
     if (arg_name %in% names(additional_args) &&
-        !(arg_name %in% c("vcov.args", "model"))) { # Keep our constructed vcov.args and model=T
+        !(arg_name %in% c("model"))) { # Keep our model=TRUE
       # This is tricky as gmm has its own computeSE, etc.
       # For now, let's assume ... doesn't override these core ones.
     }
@@ -451,7 +470,6 @@ lewbel_gmm <- function(data,
   # Control SE computation
   if (!compute_se) {
       additional_args$vcov <- "iid" # Need a vcov type for gmm to run
-      additional_args$vcov.args <- list()
       # To truly skip SE, one might need to post-process or use internal gmm flags if available
       # For now, compute_se = FALSE will use simple IID vcov and user should ignore SEs.
       # The gmm package itself has a computeSE argument in summary.gmm, not in gmm().
@@ -765,16 +783,21 @@ compare_gmm_2sls <- function(data,
 
 
   # --- OLS Estimation (for baseline comparison, also from tsls_result if available) ---
-  ols_gamma1 <- tsls_result$ols_gamma1 # Assuming OLS is part of tsls_result
-  ols_se_gamma1 <- tsls_result$ols_se_gamma1
+  ols_gamma1 <- if (!is.null(tsls_result$ols_gamma1)) tsls_result$ols_gamma1 else NA
+  ols_se_gamma1 <- if (!is.null(tsls_result$ols_se)) tsls_result$ols_se else NA
 
   # Compile results
+  # Extract 2SLS results with appropriate field names
+  tsls_gamma1 <- if (!is.null(tsls_result$tsls_gamma1)) tsls_result$tsls_gamma1 else NA
+  tsls_se_gamma1 <- if (!is.null(tsls_result$tsls_se)) tsls_result$tsls_se else NA
+  tsls_f_stat <- if (!is.null(tsls_result$first_stage_F)) tsls_result$first_stage_F else NA
+
   comparison_df <- data.frame(
     Estimator = c("OLS", "2SLS (Lewbel)", "GMM (Lewbel)"),
-    gamma1 = c(ols_gamma1, tsls_result$tsls_gamma1, gmm_gamma1),
-    StdError = c(ols_se_gamma1, tsls_result$tsls_se_gamma1, gmm_se_gamma1),
-    Bias = c(ols_gamma1 - true_gamma1, tsls_result$tsls_gamma1 - true_gamma1, gmm_gamma1 - true_gamma1),
-    `F-stat (1st stage)` = c(NA, tsls_result$tsls_f_stat, NA), # F-stat primarily for 2SLS
+    gamma1 = c(ols_gamma1, tsls_gamma1, gmm_gamma1),
+    StdError = c(ols_se_gamma1, tsls_se_gamma1, gmm_se_gamma1),
+    Bias = c(ols_gamma1 - true_gamma1, tsls_gamma1 - true_gamma1, gmm_gamma1 - true_gamma1),
+    `F-stat (1st stage)` = c(NA, tsls_f_stat, NA), # F-stat primarily for 2SLS
     `J-stat (Overid)` = c(NA, NA, gmm_j_test_stat),
     `J p-value` = c(NA, NA, gmm_j_p_value),
     row.names = NULL
@@ -797,18 +820,6 @@ compare_gmm_2sls <- function(data,
 # Helper to ensure Z matrix for Lewbel has at least one column.
 # This was an issue in lewbel_gmm when z_vars = NULL and x_vars was only intercept.
 # Now handled inside the moment functions.
-# check_z_matrix <- function(z_matrix, x_vars_for_z, add_intercept_for_z) {
-#   if (is.null(z_matrix) || NCOL(z_matrix) == 0) {
-#     err_msg <- "Z matrix for Lewbel instruments is empty or has zero columns."
-#     if (is.null(x_vars_for_z) || length(x_vars_for_z) == 0) {
-#       err_msg <- paste(err_msg, "No x_vars were specified to construct Z from.")
-#     } else if (add_intercept_for_z && length(x_vars_for_z) == 1 && x_vars_for_z[1] == "(Intercept)") {
-#       err_msg <- paste(err_msg, "Only an intercept was provided to construct Z from.")
-#     }
-#     stop(err_msg)
-#   }
-#   invisible(TRUE)
-# }
 
 
 #' Define GMM Moment Conditions for Prono Triangular System
@@ -1022,8 +1033,8 @@ prono_gmm <- function(data,
     eps2_garch <- data[[y2_var]] - x_matrix_garch %*% beta2_init
 
     # Fit GARCH
-    tryCatch({
-      if (requireNamespace("tsgarch", quietly = TRUE)) {
+    if (requireNamespace("tsgarch", quietly = TRUE)) {
+      tryCatch({
         dates <- as.Date("2000-01-01") + seq_along(eps2_garch) - 1
         eps2_xts <- xts::xts(eps2_garch, order.by = dates)
 
@@ -1037,11 +1048,14 @@ prono_gmm <- function(data,
 
         garch_fit <- tsmethods::estimate(garch_spec)
         data$sigma2_sq <- as.numeric(sigma(garch_fit))^2
-      }
-    }, error = function(e) {
-      if (verbose) warning("GARCH fitting failed, using squared residuals: ", e$message)
+      }, error = function(e) {
+        if (verbose) warning("GARCH fitting failed, using squared residuals: ", e$message)
+        data$sigma2_sq <- eps2_garch^2
+      })
+    } else {
+      warning("tsgarch package not available. Using squared residuals instead of GARCH-fitted variances.")
       data$sigma2_sq <- eps2_garch^2
-    })
+    }
   }
 
   # Define moment function
@@ -1060,25 +1074,92 @@ prono_gmm <- function(data,
     ...
   )
 
-  # Add custom attributes
-  attr(gmm_result, "hetid_system") <- system
-  attr(gmm_result, "hetid_vars") <- list(
-    y1 = y1_var,
-    y2 = y2_var,
-    x = x_vars
-  )
-  attr(gmm_result, "hetid_opts") <- list(
-    add_intercept = add_intercept,
-    gmm_type = gmm_type,
-    vcov_type = vcov,
-    garch_order = garch_order,
-    n_obs = n
+  # Create result object with expected structure
+  result <- list(
+    coefficients = coef(gmm_result),
+    vcov = vcov(gmm_result),
+    gmm_fit = gmm_result,
+    system = system,
+    variables = list(
+      y1 = y1_var,
+      y2 = y2_var,
+      x = x_vars
+    ),
+    options = list(
+      add_intercept = add_intercept,
+      gmm_type = gmm_type,
+      vcov_type = vcov,
+      garch_order = garch_order,
+      n_obs = n
+    )
   )
 
-  class(gmm_result) <- c("prono_gmm", class(gmm_result))
+  # Add J-test if available
+  if (!is.null(gmm_result$test)) {
+    result$J_test <- gmm_result$test
+  }
+
+  # Always try to calculate first-stage F-statistic
+  # If sigma2_sq_hat is not in data, we need to fit GARCH first
+  if (!"sigma2_sq_hat" %in% names(data)) {
+    # Fit GARCH to get the instrument
+    formula2 <- as.formula(paste(y2_var, "~", paste(x_vars, collapse = " + ")))
+    fit2 <- lm(formula2, data = data)
+    e2_hat <- residuals(fit2)
+
+    # Fit GARCH
+    tryCatch({
+      if (requireNamespace("tsgarch", quietly = TRUE)) {
+        dates <- as.Date("2000-01-01") + seq_along(e2_hat) - 1
+        e2_xts <- xts::xts(e2_hat, order.by = dates)
+
+        garch_spec <- tsgarch::garch_modelspec(
+          y = e2_xts,
+          model = "garch",
+          order = garch_order,
+          constant = TRUE,
+          distribution = "norm"
+        )
+
+        garch_fit <- suppressWarnings(tsmethods::estimate(garch_spec))
+        data$sigma2_sq_hat <- as.numeric(sigma(garch_fit))^2
+      }
+    }, error = function(e) {
+      # Fallback to squared residuals
+      data$sigma2_sq_hat <- e2_hat^2
+    })
+  }
+
+  if ("sigma2_sq_hat" %in% names(data)) {
+    # Simple F-test for relevance of GARCH variance as instrument
+    # First stage: Y2 ~ X + sigma2_sq_hat
+    x_matrix <- as.matrix(data[, x_vars, drop = FALSE])
+    if (add_intercept) x_matrix <- cbind(1, x_matrix)
+
+    y2 <- data[[y2_var]]
+    z <- data[["sigma2_sq_hat"]]
+
+    # Full model
+    xz_matrix <- cbind(x_matrix, z)
+    fit_full <- lm(y2 ~ xz_matrix - 1)
+
+    # Restricted model (without instrument)
+    fit_restricted <- lm(y2 ~ x_matrix - 1)
+
+    # F-statistic
+    rss_r <- sum(residuals(fit_restricted)^2)
+    rss_u <- sum(residuals(fit_full)^2)
+    df1 <- 1  # One instrument
+    df2 <- n - ncol(xz_matrix)
+    f_stat <- ((rss_r - rss_u) / df1) / (rss_u / df2)
+
+    result$first_stage_F <- f_stat
+  }
+
+  class(result) <- c("prono_gmm", "lewbel_gmm", "list")
 
   if (verbose) messager("Prono GMM estimation complete.", v_type = "success")
-  gmm_result
+  result
 }
 
 
@@ -1169,6 +1250,12 @@ rigobon_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars,
 #'
 #' @return Matrix of moment conditions.
 #'
+#' @details
+#' WARNING: Simultaneous systems with regime-based identification are
+#' numerically challenging. They require many regimes (4+) with substantial
+#' variance differences for reliable estimation. The system may be singular
+#' or near-singular with insufficient heteroskedasticity variation.
+#'
 #' @references
 #' Rigobon, R. (2003). Identification through heteroskedasticity.
 #' Review of Economics and Statistics, 85(4), 777-792.
@@ -1218,13 +1305,11 @@ rigobon_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars,
       m_ij1[regime_i] <- eps1[regime_i] * eps2[regime_i]
       m_ij1[regime_j] <- -eps1[regime_j] * eps2[regime_j]
 
-      # Additional moment for simultaneous system
-      m_ij2 <- numeric(n)
-      m_ij2[regime_i] <- eps1[regime_i]^2 - eps2[regime_i]^2
-      m_ij2[regime_j] <- -(eps1[regime_j]^2 - eps2[regime_j]^2)
-
       rigobon_moments_list[[paste0("r", i, "_", j, "_cov")]] <- m_ij1
-      rigobon_moments_list[[paste0("r", i, "_", j, "_var")]] <- m_ij2
+
+      # Note: We do NOT include the variance difference moment
+      # E[(eps1^2 - eps2^2)_i - (eps1^2 - eps2^2)_j] = 0
+      # This moment is not in Rigobon (2003) and causes singularity issues
     }
   }
 
@@ -1241,6 +1326,8 @@ rigobon_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars,
 #'
 #' @param data Data frame containing all variables.
 #' @param system Character. Either "triangular" (default) or "simultaneous".
+#'   Note: Simultaneous systems require many regimes (4+) and large variance
+#'   differences across regimes for numerical stability and identification.
 #' @param y1_var Character. Name of the first dependent variable.
 #' @param y2_var Character. Name of the second dependent variable.
 #' @param x_vars Character vector. Names of exogenous variables.
@@ -1275,6 +1362,8 @@ rigobon_gmm <- function(data,
   if (!requireNamespace("gmm", quietly = TRUE)) {
     stop("Package 'gmm' is required for GMM estimation. Please install it.")
   }
+
+  if (verbose) messager("Rigobon GMM Estimation", v_type = "info")
 
   # Check regime variable
   if (!regime_var %in% names(data)) {
@@ -1330,24 +1419,53 @@ rigobon_gmm <- function(data,
     ...
   )
 
-  # Add custom attributes
-  attr(gmm_result, "hetid_system") <- system
-  attr(gmm_result, "hetid_vars") <- list(
-    y1 = y1_var,
-    y2 = y2_var,
-    x = x_vars,
-    regime = regime_var
-  )
-  attr(gmm_result, "hetid_opts") <- list(
-    add_intercept = add_intercept,
-    gmm_type = gmm_type,
-    vcov_type = vcov,
-    n_obs = n,
-    n_regimes = length(unique_regimes)
+  # Create result object with expected structure
+  coefs <- coef(gmm_result)
+
+  # Name the coefficients properly
+  param_names <- c()
+  if (add_intercept) {
+    param_names <- c(param_names, "beta1_(Intercept)")
+  }
+  param_names <- c(param_names, paste0("beta1_", x_vars))
+  param_names <- c(param_names, "gamma1")
+  if (add_intercept) {
+    param_names <- c(param_names, "beta2_(Intercept)")
+  }
+  param_names <- c(param_names, paste0("beta2_", x_vars))
+  if (system == "simultaneous") {
+    param_names <- c(param_names, "gamma2")
+  }
+
+  names(coefs) <- param_names
+
+  result <- list(
+    coefficients = coefs,
+    vcov = vcov(gmm_result),
+    gmm_fit = gmm_result,
+    n_regimes = length(unique_regimes),
+    system = system,
+    variables = list(
+      y1 = y1_var,
+      y2 = y2_var,
+      x = x_vars,
+      regime = regime_var
+    ),
+    options = list(
+      add_intercept = add_intercept,
+      gmm_type = gmm_type,
+      vcov_type = vcov,
+      n_obs = n
+    )
   )
 
-  class(gmm_result) <- c("rigobon_gmm", class(gmm_result))
+  # Add J-test if available
+  if (!is.null(gmm_result$test)) {
+    result$J_test <- gmm_result$test
+  }
+
+  class(result) <- c("rigobon_gmm", "lewbel_gmm", "list")
 
   if (verbose) messager("Rigobon GMM estimation complete.", v_type = "success")
-  gmm_result
+  result
 }

@@ -1,0 +1,156 @@
+ℹ Testing hetid
+Start test: lewbel_triangular_moments generates correct moment conditions
+  'test-lewbel-gmm.R:30:3' [success]
+  'test-lewbel-gmm.R:31:3' [success]
+  'test-lewbel-gmm.R:35:3' [success]
+End test: lewbel_triangular_moments generates correct moment conditions
+
+Start test: lewbel_simultaneous_moments handles identification condition
+  'test-lewbel-gmm.R:54:3' [success]
+End test: lewbel_simultaneous_moments handles identification condition
+
+Start test: lewbel_gmm estimates triangular system correctly
+  'test-lewbel-gmm.R:87:3' [success]
+  'test-lewbel-gmm.R:88:3' [success]
+  'test-lewbel-gmm.R:91:3' [failure]
+  'test-lewbel-gmm.R:95:3' [success]
+  'test-lewbel-gmm.R:96:3' [success]
+  'test-lewbel-gmm.R:97:3' [success]
+  'test-lewbel-gmm.R:101:3' [success]
+End test: lewbel_gmm estimates triangular system correctly
+
+Start test: lewbel_gmm handles different GMM types
+  'test-lewbel-gmm.R:120:3' [success]
+  'test-lewbel-gmm.R:124:3' [success]
+  'test-lewbel-gmm.R:128:3' [success]
+  'test-lewbel-gmm.R:135:3' [success]
+  'test-lewbel-gmm.R:136:3' [success]
+End test: lewbel_gmm handles different GMM types
+
+Start test: lewbel_gmm works with custom Z variables
+  'test-lewbel-gmm.R:157:3' [success]
+  'test-lewbel-gmm.R:161:3' [success]
+End test: lewbel_gmm works with custom Z variables
+
+Start test: summary and print methods work correctly
+  'test-lewbel-gmm.R:182:3' [success]
+  'test-lewbel-gmm.R:183:3' [success]
+  'test-lewbel-gmm.R:186:3' [success]
+  'test-lewbel-gmm.R:187:3' [success]
+End test: summary and print methods work correctly
+
+Start test: lewbel_gmm handles simultaneous system
+  'test-lewbel-gmm.R:213:3' [success]
+  'test-lewbel-gmm.R:217:3' [success]
+  'test-lewbel-gmm.R:220:3' [success]
+End test: lewbel_gmm handles simultaneous system
+
+Start test: compare_gmm_2sls returns comparison data frame
+Comparing GMM and 2SLS estimates for Lewbel model...
+
+Running GMM estimation...
+Running 2SLS estimation (via simulation framework)...
+
+--- Comparison Summary ---
+      Estimator  gamma1 StdError Bias F.stat..1st.stage. J.stat..Overid.
+1           OLS -0.7990 0.003126   NA                 NA              NA
+2 2SLS (Lewbel) -0.7977 0.003236   NA               2235              NA
+3  GMM (Lewbel) -0.7998 0.002594   NA                 NA              NA
+  J.p.value
+1        NA
+2        NA
+3        NA
+
+Note: 2SLS results are from run_single_lewbel_simulation using the provided data.
+      GMM results are from lewbel_gmm.
+  'test-lewbel-gmm.R:241:3' [success]
+  'test-lewbel-gmm.R:242:3' [success]
+  'test-lewbel-gmm.R:243:3' [success]
+  'test-lewbel-gmm.R:244:3' [success]
+  'test-lewbel-gmm.R:247:3' [success]
+End test: compare_gmm_2sls returns comparison data frame
+
+Start test: lewbel_gmm handles missing gmm package gracefully
+  'test-lewbel-gmm.R:261:7' [success]
+End test: lewbel_gmm handles missing gmm package gracefully
+
+Start test: lewbel_gmm handles different vcov specifications
+  'test-lewbel-gmm.R:286:3' [success]
+  'test-lewbel-gmm.R:290:3' [success]
+  'test-lewbel-gmm.R:295:3' [success]
+End test: lewbel_gmm handles different vcov specifications
+
+Start test: rigobon_triangular_moments generates correct moment conditions
+  'test-lewbel-gmm.R:331:3' [success]
+  'test-lewbel-gmm.R:332:3' [success]
+End test: rigobon_triangular_moments generates correct moment conditions
+
+Start test: rigobon_simultaneous_moments generates correct moment conditions
+  'test-lewbel-gmm.R:365:3' [success]
+  'test-lewbel-gmm.R:372:3' [success]
+End test: rigobon_simultaneous_moments generates correct moment conditions
+
+Start test: rigobon_gmm estimates triangular system correctly
+  'test-lewbel-gmm.R:394:3' [success]
+  'test-lewbel-gmm.R:395:3' [success]
+  'test-lewbel-gmm.R:396:3' [success]
+  'test-lewbel-gmm.R:398:3' [success]
+  'test-lewbel-gmm.R:401:3' [success]
+  'test-lewbel-gmm.R:405:3' [success]
+End test: rigobon_gmm estimates triangular system correctly
+
+Start test: rigobon_gmm handles edge cases
+Rigobon GMM Estimation info
+  'test-lewbel-gmm.R:419:3' [success]
+Rigobon GMM Estimation info
+  'test-lewbel-gmm.R:426:3' [success]
+End test: rigobon_gmm handles edge cases
+
+Start test: rigobon_gmm simultaneous system works
+  'test-lewbel-gmm.R:452:11' [warning]
+Error in AA %*% t(X) : requires numeric/complex matrix/vector arguments
+  'test-lewbel-gmm.R:452:11' [warning]
+Error in AA %*% t(X) : requires numeric/complex matrix/vector arguments
+  'test-lewbel-gmm.R:468:5' [skip]
+End test: rigobon_gmm simultaneous system works
+
+Start test: rigobon_gmm different GMM types produce consistent results
+  'test-lewbel-gmm.R:503:3' [success]
+End test: rigobon_gmm different GMM types produce consistent results
+
+Start test: rigobon_gmm verbose output works
+Rigobon GMM estimation complete. success
+  'test-lewbel-gmm.R:521:3' [success]
+End test: rigobon_gmm verbose output works
+
+Start test: rigobon_gmm compares well with 2SLS
+  'test-lewbel-gmm.R:553:3' [success]
+End test: rigobon_gmm compares well with 2SLS
+
+Start test: prono_triangular_moments generates correct moment conditions
+  'test-lewbel-gmm.R:580:3' [warning]
+  'test-lewbel-gmm.R:590:3' [success]
+  'test-lewbel-gmm.R:591:3' [success]
+End test: prono_triangular_moments generates correct moment conditions
+
+Start test: prono_gmm estimates triangular system correctly
+  'test-lewbel-gmm.R:615:3' [success]
+  'test-lewbel-gmm.R:616:3' [success]
+  'test-lewbel-gmm.R:617:3' [success]
+  'test-lewbel-gmm.R:618:3' [success]
+  'test-lewbel-gmm.R:621:3' [success]
+  'test-lewbel-gmm.R:625:3' [success]
+End test: prono_gmm estimates triangular system correctly
+
+Start test: prono_gmm handles missing tsgarch gracefully
+Auto-detected x_vars: X1
+Prono GMM estimation complete. success
+  'test-lewbel-gmm.R:645:7' [success]
+End test: prono_gmm handles missing tsgarch gracefully
+
+Start test: prono_gmm works with pre-fitted GARCH variances
+  'test-lewbel-gmm.R:669:3' [success]
+  'test-lewbel-gmm.R:670:3' [success]
+End test: prono_gmm works with pre-fitted GARCH variances
+
+Start test: prono_gmm compares well with 2SLS

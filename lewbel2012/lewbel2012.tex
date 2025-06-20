@@ -51,20 +51,25 @@ year = {2010},
 issn = {0304-4076},
 doi = {https://doi.org/10.1016/j.jeconom.2009.05.005},
 url = {https://www.sciencedirect.com/science/article/pii/S0304407609001675},
-author = {Roger Klein and Francis Vella}
+author = {Roger Klein and Francis Vella},
+shortauthor = {K\&V}
 }
 
 \end{filecontents}
 
 \documentclass{article}
+\usepackage{csquotes}
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{mathtools}
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{amssymb}
 \usepackage{geometry}
 \geometry{verbose}
-\usepackage[backend=biber, style=authoryear, citestyle=authoryear]{biblatex}
+
+% This line is now correct and should be the only biblatex line
+\usepackage[backend=biber, style=authoryear-comp]{biblatex}
 \addbibresource{refs.bib}
 
 \usepackage{enumitem}
@@ -86,34 +91,33 @@ author = {Roger Klein and Francis Vella}
 \newtheorem{cor}{Corollary}[section]
 
 % ---------- transpose symbol ----------
-\newcommand{\T}{^{\intercal}}
+\newcommand{\T}{^{\top}}
 \makeatother
-
-\begin{document}
 
 \title{Heteroskedasticity-Based Identification}
 \author{}
 \date{}
+
+\begin{document}
+
 \maketitle
 
-\section{Preliminaries and Notation}
+\section{Identification Through Heteroskedasticity}
 
 This document summarizes the heteroskedasticity-based identification
 strategy for models with endogenous regressors, as developed by \textcite{lewbel2012},
-\textcite{rigobon2003} and \textcite{prono2014}, and proposes an
+\textcite{klein2010estimating}, \textcite{rigobon2003} and \textcite{prono2014}, and proposes an
 application to a time-series context. The method provides a way to
 construct valid instruments from the model's data when traditional
 external instruments are unavailable and heteroskedasticity is present.
 
-Throughout, $Z\coloneqq g(X)$ denotes a transformation of the exogenous
-variables, constructed to be mean-zero.\footnote{Thus, we write $Z$ to mean the centered variable $Z-\E[Z]$ for population
-moments and the sample-demeaned version, $Z_{i}-\bar{Z}$, in calculations
-when using empirical data in a finite sample.} All instruments are therefore understood to be mean-zero.
+\section[Lewbel (2012)]{\textcite{lewbel2012}}
 
-\section{Structural Forms and Reduced-Form Residuals}
+\subsection{Structural Forms and Reduced-Form Residuals}
 
 Let $(Y_{1},Y_{2})$ be an endogenous vector, $X$ a vector of exogenous
-variables (including a constant), and $Z\coloneqq g(X)$ as above.
+variables (including a constant).
+
 The models we consider are:
 
 \begin{align*}
@@ -133,13 +137,13 @@ with the triangular case obtained by setting $\gamma_{2}=0$.
 \begin{remark} The algebra follows directly from solving the two-equation
 system for the reduced form and collecting the error terms. \end{remark}
 
-\section{Core Assumptions for Lewbel-Style Identification}
+\subsection{Core Assumptions for Lewbel-Style Identification}
 
 The method relies on the following key assumptions:
 
 \begin{enumerate}[label=(LW\arabic*), ref=(LW\arabic*)]
 \item \label{enu:exogeneity}\textbf{Strict exogeneity.} $\E[\varepsilon_{j}\mid X]=0$
-for $j=1,2$. \emph{Time-series note:} in Section \ref{sec:timeseries}
+for $j=1,2$. \\ \emph{Time-series note:} in Section \ref{sec:timeseries}
 we weaken this to a martingale-difference assumption.
 \item \label{enu:error_covariance}\textbf{Covariance restriction.} $\cov(Z,\varepsilon_{1}\varepsilon_{2})=0$.
 This holds automatically if the errors have a common factor structure
@@ -157,9 +161,9 @@ space for $(\gamma_{1},\gamma_{2})$ precludes the observationally
 equivalent pair $(1/\gamma_{2},1/\gamma_{1})$.
 \end{enumerate}
 
-\section{Triangular System: Closed-Form Identification and 2SLS}
+\subsection{Triangular System: Closed-Form Identification and 2SLS}
 
-\subsection{Closed-form}
+The coefficient $\gamma$ has closed-form:
 
 \begin{equation}
 \gamma_{1}=\frac{\cov(Z,W_{1}W_{2})}{\cov(Z,W_{2}^{2})}.\label{eq:gamma1_id}
@@ -187,16 +191,15 @@ obtain fitted values $\hat{Y}_{2}$.
 \item \textbf{Second stage.} Regress $Y_{1}$ on $[X,\hat{Y}_{2}]$ to estimate
 $(\beta_{1},\gamma_{1})$.
 \end{enumerate}
-The simultaneous system cannot be tackled with 2SLS, it needs GMM.
 
-\paragraph{Practical guidance.}
+\paragraph{Weak Instruments}
 
 Weak-instrument concerns apply because the instrument is generated.
 Report the first-stage F-statistic on $IV$ and, where necessary,
 use weak-IV-robust inference. Standard errors should account for the
 first-stage estimation step, typically via GMM or bootstrap.
 
-\section{GMM Moment Conditions}
+\subsection{GMM Moment Conditions}
 
 The identification strategy can be expressed more generally using
 GMM. The core idea is to form moment conditions that are zero at the
@@ -211,7 +214,7 @@ and $\varepsilon_{2}(\theta)\coloneqq Y_{2}-X\T\beta_{2}$.
 \begin{equation}
 Q_{\text{TRI}}(\theta)\coloneqq\begin{pmatrix}X\cdot\varepsilon_{1}(\theta)\\[3pt]
 X\cdot\varepsilon_{2}(\theta)\\[3pt]
-Z\cdot\varepsilon_{1}(\theta)\cdot\varepsilon_{2}(\theta)
+(Z-\bar{Z})\cdot\varepsilon_{1}(\theta)\cdot\varepsilon_{2}(\theta)
 \end{pmatrix}.\label{eq:moment_tri}
 \end{equation}
 The instruments are constructed directly from the exogenous data:
@@ -219,8 +222,8 @@ The instruments are constructed directly from the exogenous data:
 \itemsep0pt
 \item For the two mean equations, the instruments are the exogenous variables
 $X$.
-\item For the covariance restriction, the instrument is the heteroskedasticity
-driver $Z$.
+\item For the covariance restriction, the instrument is the de-meaned heteroskedasticity
+driver $Z-\bar{Z}$.
 \end{itemize}
 Since the errors are functions of data and parameters, the entire
 moment vector is observable for any candidate $\theta$.
@@ -233,31 +236,33 @@ and $\varepsilon_{2}(\theta)\coloneqq Y_{2}-X\T\beta_{2}-Y_{1}\gamma_{2}$.
 \begin{equation}
 Q_{\text{SIM}}(\theta)\coloneqq\begin{pmatrix}X\cdot\varepsilon_{1}(\theta)\\[3pt]
 X\cdot\varepsilon_{2}(\theta)\\[3pt]
-Z\cdot\varepsilon_{1}(\theta)\cdot\varepsilon_{2}(\theta)
+(Z-\bar{Z})\cdot\varepsilon_{1}(\theta)\cdot\varepsilon_{2}(\theta)
 \end{pmatrix}.\label{eq:moment_sim}
 \end{equation}
 The instruments are again constructed from exogenous data: $X$ for
-the mean equations and $Z$ for the covariance restriction. Estimation
-proceeds by finding the parameter vector $\hat{\theta}$ that minimizes
+the mean equations and $Z-\bar{Z}$ for the covariance restriction.
+
+\subsection{GMM Estimation}
+Estimation proceeds by finding the parameter vector $\hat{\theta}$ that minimizes
 the sample analog of the moment conditions, $\bar{Q}(\theta)\T W\bar{Q}(\theta)$,
 where $W$ is a weighting matrix.
 
-Note that in this case Assumption \ref{enu:het} requires $Z$ to
+Note that in the case of a simultaneous system, Assumption \ref{enu:het} requires $Z$ to
 contain at least two elements. Some times we can use a constant as
-an instrument (and include it in $Z$)
+an instrument (and include it in $Z-\bar{Z}$).
 \begin{cor}
 \label{cor:const_Z}Let Assumptions \ref{enu:exogeneity}, \ref{enu:error_covariance},
 \ref{enu:het}, and \ref{enu:norm} hold in the simultaneous equation
-model, replacing $\operatorname{cov}(Z,\varepsilon_{1}\varepsilon_{2})$
-in Assumption \ref{enu:error_covariance} with $E\left(Z\varepsilon_{1}\varepsilon_{2}\right)$
-and replacing $\operatorname{cov}\left(Z,W_{j}^{2}\right)$ with $E\left(ZW_{j}^{2}\right)$
+model, replacing $\cov(Z,\varepsilon_{1}\varepsilon_{2})$
+in Assumption \ref{enu:error_covariance} with $\E((Z-\bar{Z})\varepsilon_{1}\varepsilon_{2})$
+and replacing $\cov(Z,W_{j}^{2})$ with $\E((Z-\bar{Z})W_{j}^{2})$
 in Assumption \ref{enu:het}, for $j=1,2$. Then, all the parameters
 are identified.
 \end{cor}
 
-Corollary \ref{cor:const_Z} can be used when $E\left(\varepsilon_{1}\varepsilon_{2}\right)=0$.
+Corollary \ref{cor:const_Z} can be used when $\E[\varepsilon_{1}\varepsilon_{2}]=0$.
 
-\section{Set Identification Under a Relaxed Covariance Restriction}
+\subsection{Set Identification Under a Relaxed Covariance Restriction}
 
 When assumption \ref{enu:error_covariance} is weakened to allow for
 a small correlation, $|\corr(Z,\varepsilon_{1}\varepsilon_{2})|\le\tau|\corr(Z,\varepsilon_{2}^{2})|,\;\tau\in[0,1)$,
@@ -289,7 +294,9 @@ corresponding to the interval for $\gamma_{1}$.
 
 This set-identification cannot be used in the simultaneous system.
 
-\section{Semiparametric Control Function Approach}
+\section[Klein and Vella (2010)]{\textcite{klein2010estimating}}
+
+\subsection{Semiparametric Control Function Approach}
 
 An alternative to the IV/GMM framework for the triangular system is the semiparametric control function approach of \textcite{klein2010estimating}. This method addresses endogeneity by directly augmenting the structural equation with a non-constant control term.
 
@@ -318,7 +325,7 @@ The key assumptions which provide this structure are:
 \end{enumerate}
 
 \subsection{Identification via Control Function}
-The K\&V assumptions transform the inestimable general form of $A(X)$ into a specific, identifiable structure. The derivation proceeds as follows:
+The \textcite{klein2010estimating} assumptions transform the inestimable general form of $A(X)$ into a specific, identifiable structure. The derivation proceeds as follows:
 \begin{align*}
 A(X) &= \frac{\cov(\varepsilon_1, \varepsilon_2 \mid X)}{\var(\varepsilon_2 \mid X)} &&\text{(General Definition)} \\
 &= \frac{\corr(\varepsilon_1, \varepsilon_2 \mid X) S_1(X) S_2(X)}{S_2^2(X)} &&\text{(Definition of Correlation)} \\
@@ -378,9 +385,9 @@ GMM provides a more robust alternative that does not require a full distribution
 Q(\theta) \coloneqq \begin{pmatrix}
 X \cdot \varepsilon_1(\theta) \\
 X \cdot \varepsilon_2(\theta) \\
-X \cdot \left(\varepsilon_1(\theta)^2 - \exp(X\T\delta_1)\right) \\
-X \cdot \left(\varepsilon_2(\theta)^2 - \exp(X\T\delta_2)\right) \\
-X \cdot \left(\varepsilon_1(\theta)\varepsilon_2(\theta) - \rho_0 \exp(\frac{1}{2}X\T(\delta_1+\delta_2))\right)
+X \cdot (\varepsilon_1(\theta)^2 - \exp(X\T\delta_1)) \\
+X \cdot (\varepsilon_2(\theta)^2 - \exp(X\T\delta_2)) \\
+X \cdot (\varepsilon_1(\theta)\varepsilon_2(\theta) - \rho_0 \exp(\frac{1}{2}X\T(\delta_1+\delta_2)))
 \end{pmatrix}.
 \]
 The first two sets of moments identify the mean parameters ($\beta_1, \gamma_1, \beta_2$). The next two sets use the assumed variance structure to identify the variance parameters ($\delta_1, \delta_2$), and the final set identifies the correlation parameter $\rho_0$. The GMM estimator $\hat{\theta}_{\text{GMM}}$ minimizes the standard quadratic form $\bar{Q}(\theta)\T W \bar{Q}(\theta)$ for a given weighting matrix $W$.
@@ -390,7 +397,7 @@ The first two sets of moments identify the mean parameters ($\beta_1, \gamma_1, 
 The core idea can be adapted to other contexts by properly defining
 the heteroskedasticity-generating variable $Z$.
 
-\subsection{Conditional heteroskedasticity \textcite{prono2014}}
+\subsection[Prono (2014)]{\textcite{prono2014}}
 
 \paragraph{Model.}
 
@@ -424,7 +431,8 @@ as instruments for $Y_{2t}$ in the first structural equation. Use
 HAC-robust standard errors.
 \end{enumerate}
 
-\subsection{Regime Heteroskedasticity \textcite{rigobon2003}}
+\subsection[Rigobon (2003)]{\textcite{rigobon2003}}
+
 \label{sec:rigobon_application}
 \paragraph{Model Framework.}
 The core idea of \textcite{rigobon2003} is that identification can be achieved if the error variances differ across observable, discrete regimes, $s \in \{1, \dots, S\}$ (e.g., pre- and post-policy change, or high- vs. low-volatility periods). The structural parameters of the model are assumed to be constant across these regimes. The structural equations are:
@@ -474,7 +482,7 @@ The regime indicators are used to construct a piecewise control function. The si
     \item \textbf{Estimate regime-specific variances.} For each regime $s$, compute the sample variance of the residuals, $\hat{\sigma}_{2s}^2 = \frac{1}{N_s}\sum_{i \in s} \hat{\varepsilon}_{2i}^2$. For any candidate $(\beta_{1k}, \gamma_{1k})$, compute $\hat{\varepsilon}_{1k}$ and its regime-specific variances $\hat{\sigma}_{1ks}^2$.
     \item \textbf{Estimate via nonlinear least squares (NLS).} The main equation is specified with an interacted control function:
     \[
-    Y_1 = X\T\beta_1 + \gamma_1 Y_2 + \rho_0 \sum_{s=1}^S D_s \left( \frac{\sigma_{1s}}{\sigma_{2s}} \hat{\varepsilon}_2 \right) + \eta_1
+    Y_1 = X\T\beta_1 + \gamma_1 Y_2 + \rho_0 \sum_{s=1}^S D_s \! \left( \frac{\sigma_{1s}}{\sigma_{2s}} \hat{\varepsilon}_2 \right) + \eta_1
     \]
     The parameters $(\beta_1, \gamma_1, \rho_0)$ and the variance ratios $(\sigma_{1s}/\sigma_{2s})$ for $s=1,\dots,S$ are estimated jointly via NLS.
 \end{enumerate}
@@ -516,11 +524,12 @@ The full set of parameters is $\theta\coloneqq(\beta_{1}\T,\beta_{2}\T,\gamma_{1
 The moment conditions implied by the model are $\E[Q_{t}(\theta)]=0$,
 where:
 \[
-Q_{t}(\theta)\coloneqq\begin{pmatrix}X_{t}\varepsilon_{1t}(\theta)\\[2pt]
-X_{t}\varepsilon_{2t}(\theta)\\[2pt]
-Z_{t}\varepsilon_{1t}(\theta)\varepsilon_{2t}(\theta)\\[2pt]
-Z_{t}\!\left(\varepsilon_{1t}(\theta)^{2}-e^{X_{t}\T\delta_{1}}\right)\\[2pt]
-Z_{t}\!\left(\varepsilon_{2t}(\theta)^{2}-e^{X_{t}\T\delta_{2}}\right)
+Q_{t}(\theta)\coloneqq\begin{pmatrix}
+X_{t} \cdot \varepsilon_{1t}(\theta)\\[2pt]
+X_{t} \cdot \varepsilon_{2t}(\theta)\\[2pt]
+Z_{t} \cdot \varepsilon_{1t}(\theta)\varepsilon_{2t}(\theta)\\[2pt]
+Z_{t} \cdot   (\varepsilon_{1t}(\theta)^{2}-e^{X_{t}\T\delta_{1}})\\[2pt]
+Z_{t} \cdot   (\varepsilon_{2t}(\theta)^{2}-e^{X_{t}\T\delta_{2}})
 \end{pmatrix}.
 \]
 

@@ -36,6 +36,12 @@ Matrix of moment conditions.
 Creates the moment function for GMM estimation of a simultaneous equations
 system using Rigobon's regime-based identification.
 }
+\details{
+WARNING: Simultaneous systems with regime-based identification are
+numerically challenging. They require many regimes (4+) with substantial
+variance differences for reliable estimation. The system may be singular
+or near-singular with insufficient heteroskedasticity variation.
+}
 \references{
 Rigobon, R. (2003). Identification through heteroskedasticity.
 Review of Economics and Statistics, 85(4), 777-792.

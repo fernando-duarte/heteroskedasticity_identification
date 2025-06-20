@@ -24,7 +24,9 @@ lewbel_gmm(
 \arguments{
 \item{data}{Data frame containing all variables.}
 
-\item{system}{Character. Type of system: "triangular" or "simultaneous" (default: "triangular").}
+\item{system}{Character. Type of system: "triangular" or "simultaneous" (default: "triangular").
+Note: Simultaneous systems require strong identification conditions - either many
+regimes (4+) or large variance differences across regimes for numerical stability.}
 
 \item{y1_var}{Character. Name of the first dependent variable (default: "Y1").}
 
@@ -61,6 +63,12 @@ model using Generalized Method of Moments (GMM).
 This function implements Lewbel's (2012) heteroskedasticity-based identification
 using the GMM framework. The method exploits heteroskedasticity in the error
 terms to generate valid instruments for endogenous regressors.
+
+For simultaneous equation systems, identification becomes more challenging.
+The system requires sufficient variation in heteroskedasticity patterns to
+distinguish between the bidirectional effects. In practice, this means you need
+either many distinct heteroskedasticity regimes or very large differences in
+variance across existing regimes.
 }
 \examples{
 \dontrun{

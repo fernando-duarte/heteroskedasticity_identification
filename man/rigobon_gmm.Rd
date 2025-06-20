@@ -22,7 +22,9 @@ rigobon_gmm(
 \arguments{
 \item{data}{Data frame containing all variables.}
 
-\item{system}{Character. Either "triangular" (default) or "simultaneous".}
+\item{system}{Character. Either "triangular" (default) or "simultaneous".
+Note: Simultaneous systems require many regimes (4+) and large variance
+differences across regimes for numerical stability and identification.}
 
 \item{y1_var}{Character. Name of the first dependent variable.}
 
