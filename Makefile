@@ -36,10 +36,21 @@ check-full:
 	@echo "Running full package check (all tests)..."
 	@Rscript -e "Sys.setenv(HETID_TEST_LEVEL='comprehensive', NOT_CRAN='true'); devtools::check()"
 
-# Simulate CRAN check environment
+# Simulate CRAN check environment (proper workflow)
 check-cran:
-	@echo "Simulating CRAN check environment..."
-	@Rscript -e "Sys.unsetenv(c('NOT_CRAN', 'HETID_TEST_LEVEL')); devtools::check()"
+	@echo "Building package..."
+	@R CMD build . --no-build-vignettes
+	@echo "Running CRAN check on built package..."
+	@R CMD check hetid_*.tar.gz --as-cran --no-manual
+	@rm -f hetid_*.tar.gz
+
+# Proper R CMD check workflow
+check-proper:
+	@echo "Building package with vignettes..."
+	@R CMD build .
+	@echo "Running R CMD check on built package..."
+	@R CMD check hetid_*.tar.gz
+	@rm -f hetid_*.tar.gz
 
 # Documentation
 document:
@@ -74,6 +85,7 @@ help:
 	@echo "  check-fast        - Quick package check (CRAN + fast tests)"
 	@echo "  check-full        - Full package check (all tests)"
 	@echo "  check-cran        - Simulate CRAN check environment"
+	@echo "  check-proper      - Proper R CMD check with build"
 	@echo "  document          - Update documentation"
 	@echo "  install           - Install package"
 	@echo "  build             - Build package"

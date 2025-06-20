@@ -7,7 +7,7 @@
 [![Docker Build and Test](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/docker.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/docker.yml)
 [![pkgdown](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/pkgdown.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/pkgdown.yml)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![codecov](https://codecov.io/gh/fernando-duarte/heteroskedasticity_identification/graph/badge.svg?token=2PGQW4CZHL)](https://codecov.io/gh/fernando-duarte/heteroskedasticity_identification)
+[![codecov](https://codecov.io/gh/fernando-duarte/heteroskedasticity_identification/graph/badge.svg?token=2PGQW4CZHL)](https://app.codecov.io/gh/fernando-duarte/heteroskedasticity_identification)
 [![Security Checks](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/r-security.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/r-security.yml)
 <!-- badges: end -->
 
