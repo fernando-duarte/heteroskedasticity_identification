@@ -1094,20 +1094,25 @@ prono_gmm <- function(data,
   result <- list(
     coefficients = coef(gmm_result),
     vcov = vcov(gmm_result),
-    gmm_fit = gmm_result,
-    system = system,
-    variables = list(
-      y1 = y1_var,
-      y2 = y2_var,
-      x = x_vars
-    ),
-    options = list(
-      add_intercept = add_intercept,
-      gmm_type = gmm_type,
-      vcov_type = vcov,
-      garch_order = garch_order,
-      n_obs = n
-    )
+    gmm_fit = gmm_result
+    # system, variables, options will be moved to attributes
+  )
+
+  # Add attributes for consistency with lewbel_gmm summary/print
+  attr(result, "hetid_system") <- system
+  attr(result, "hetid_vars") <- list(
+    y1 = y1_var,
+    y2 = y2_var,
+    x = x_vars,
+    z = NULL, # Prono uses GARCH-based IV, not a simple Z variable.
+    cluster = NULL
+  )
+  attr(result, "hetid_opts") <- list(
+    add_intercept = add_intercept,
+    gmm_type = gmm_type,
+    vcov_type = vcov,
+    n_obs = n,
+    prono_garch_order = garch_order # Store Prono-specific option
   )
 
   # Add J-test if available
@@ -1116,63 +1121,50 @@ prono_gmm <- function(data,
   }
 
   # Always try to calculate first-stage F-statistic
-  # If sigma2_sq_hat is not in data, we need to fit GARCH first
+  # This block is preserved and assigns to result$first_stage_F
   if (!"sigma2_sq_hat" %in% names(data)) {
-    # Fit GARCH to get the instrument
     formula2 <- as.formula(paste(y2_var, "~", paste(x_vars, collapse = " + ")))
     fit2 <- lm(formula2, data = data)
     e2_hat <- residuals(fit2)
-
-    # Fit GARCH
     tryCatch(
       {
         if (requireNamespace("tsgarch", quietly = TRUE)) {
           dates <- as.Date("2000-01-01") + seq_along(e2_hat) - 1
           e2_xts <- xts::xts(e2_hat, order.by = dates)
-
           garch_spec <- tsgarch::garch_modelspec(
-            y = e2_xts,
-            model = "garch",
-            order = garch_order,
-            constant = TRUE,
-            distribution = "norm"
+            y = e2_xts, model = "garch", order = garch_order,
+            constant = TRUE, distribution = "norm"
           )
-
           garch_fit <- suppressWarnings(tsmethods::estimate(garch_spec))
           data$sigma2_sq_hat <- as.numeric(sigma(garch_fit))^2
         }
       },
       error = function(e) {
-        # Fallback to squared residuals
         data$sigma2_sq_hat <- e2_hat^2
       }
     )
   }
 
   if ("sigma2_sq_hat" %in% names(data)) {
-    # Simple F-test for relevance of GARCH variance as instrument
-    # First stage: Y2 ~ X + sigma2_sq_hat
-    x_matrix <- as.matrix(data[, x_vars, drop = FALSE])
-    if (add_intercept) x_matrix <- cbind(1, x_matrix)
-
-    y2 <- data[[y2_var]]
-    z <- data[["sigma2_sq_hat"]]
-
-    # Full model
-    xz_matrix <- cbind(x_matrix, z)
-    fit_full <- lm(y2 ~ xz_matrix - 1)
-
-    # Restricted model (without instrument)
-    fit_restricted <- lm(y2 ~ x_matrix - 1)
-
-    # F-statistic
+    x_matrix_f <- as.matrix(data[, x_vars, drop = FALSE])
+    if (add_intercept) x_matrix_f <- cbind(1, x_matrix_f)
+    y2_f <- data[[y2_var]]
+    z_instrument_fstat <- data[["sigma2_sq_hat"]]
+    xz_matrix_f <- cbind(x_matrix_f, z_instrument_fstat)
+    fit_full <- lm(y2_f ~ xz_matrix_f - 1)
+    fit_restricted <- lm(y2_f ~ x_matrix_f - 1)
     rss_r <- sum(residuals(fit_restricted)^2)
     rss_u <- sum(residuals(fit_full)^2)
-    df1 <- 1 # One instrument
-    df2 <- n - ncol(xz_matrix)
-    f_stat <- ((rss_r - rss_u) / df1) / (rss_u / df2)
-
-    result$first_stage_F <- f_stat
+    df1 <- 1
+    df2 <- n - ncol(xz_matrix_f)
+    if (df2 > 0) {
+        f_stat <- ((rss_r - rss_u) / df1) / (rss_u / df2)
+        result$first_stage_F <- f_stat
+    } else {
+        result$first_stage_F <- NA_real_
+    }
+  } else {
+      result$first_stage_F <- NA_real_
   }
 
   class(result) <- c("prono_gmm", "lewbel_gmm", "list")
@@ -1455,26 +1447,33 @@ rigobon_gmm <- function(data,
     param_names <- c(param_names, "gamma2")
   }
 
-  names(coefs) <- param_names
+  # Ensure names are assigned if length matches, otherwise gmm default names are kept by gmm_result
+  if (length(coefs) == length(param_names)) {
+    names(coefs) <- param_names
+  }
 
   result <- list(
     coefficients = coefs,
     vcov = vcov(gmm_result),
     gmm_fit = gmm_result,
-    n_regimes = length(unique_regimes),
-    system = system,
-    variables = list(
-      y1 = y1_var,
-      y2 = y2_var,
-      x = x_vars,
-      regime = regime_var
-    ),
-    options = list(
-      add_intercept = add_intercept,
-      gmm_type = gmm_type,
-      vcov_type = vcov,
-      n_obs = n
-    )
+    n_regimes = length(unique_regimes) # Keep n_regimes as a specific and tested list element
+    # system, variables, options will be moved to attributes
+  )
+
+  # Add attributes for consistency with lewbel_gmm summary/print
+  attr(result, "hetid_system") <- system
+  attr(result, "hetid_vars") <- list(
+    y1 = y1_var,
+    y2 = y2_var,
+    x = x_vars,
+    z = paste0("Regime-based (", regime_var, ")"), # Description for Z in Rigobon context
+    cluster = NULL
+  )
+  attr(result, "hetid_opts") <- list(
+    add_intercept = add_intercept,
+    gmm_type = gmm_type,
+    vcov_type = vcov,
+    n_obs = n
   )
 
   # Add J-test if available

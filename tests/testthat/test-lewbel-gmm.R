@@ -294,8 +294,17 @@ test_that("rigobon_gmm estimates triangular system correctly", {
   expect_s3_class(result, c("rigobon_gmm", "lewbel_gmm"))
   expect_true("coefficients" %in% names(result))
   expect_true("vcov" %in% names(result))
-  # J_test is optional (only present when overidentified)
   expect_equal(result$n_regimes, 2)
+
+  # Check attributes (new checks for refactored structure)
+  expect_equal(attr(result, "hetid_system"), "triangular")
+  expect_true(is.list(attr(result, "hetid_vars")))
+  expect_true("y1" %in% names(attr(result, "hetid_vars")))
+  expect_true("x" %in% names(attr(result, "hetid_vars")))
+  expect_true("z" %in% names(attr(result, "hetid_vars")))
+  expect_true(is.list(attr(result, "hetid_opts")))
+  expect_true("n_obs" %in% names(attr(result, "hetid_opts")))
+  expect_true("add_intercept" %in% names(attr(result, "hetid_opts")))
 
   # Check coefficient names
   expect_true("gamma1" %in% names(result$coefficients))
@@ -466,6 +475,16 @@ test_that("prono_gmm estimates triangular system correctly", {
   expect_true("coefficients" %in% names(result))
   expect_true("vcov" %in% names(result))
   expect_true("first_stage_F" %in% names(result))
+
+  # Check attributes (new checks for refactored structure)
+  expect_equal(attr(result, "hetid_system"), "triangular")
+  expect_true(is.list(attr(result, "hetid_vars")))
+  expect_true("y1" %in% names(attr(result, "hetid_vars")))
+  expect_true("x" %in% names(attr(result, "hetid_vars")))
+  expect_null(attr(result, "hetid_vars")$z) # z is explicitly NULL for prono_gmm
+  expect_true(is.list(attr(result, "hetid_opts")))
+  expect_true("n_obs" %in% names(attr(result, "hetid_opts")))
+  expect_true("prono_garch_order" %in% names(attr(result, "hetid_opts")))
 
   # Check coefficient names
   expect_true("gamma1" %in% names(result$coefficients))
