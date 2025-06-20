@@ -1,5 +1,5 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
-# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+
 on:
   push:
     branches: [main, master]
@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      # Run all tests for coverage (comprehensive level)
+      HETID_TEST_LEVEL: comprehensive
+      NOT_CRAN: true
 
     steps:
       - uses: actions/checkout@v4

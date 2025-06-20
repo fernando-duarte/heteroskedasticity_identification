@@ -4,7 +4,6 @@
   // Use the new Rocker devcontainer image with R 4.5.0
   "image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.5.0",
 
-  // Modern devcontainer features
   "features": {
     // R-specific features from Rocker
     "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
@@ -74,7 +73,7 @@
       ],
 
       "settings": {
-        // R settings for modern development
+        // R settings
         "r.rterm.linux": "/usr/local/bin/radian",
         "r.rpath.linux": "/usr/local/bin/R",
         "r.bracketedPaste": true,
@@ -146,7 +145,7 @@
 
   // Port forwarding for RStudio Server and other services
   "forwardPorts": [
-    8787,  // RStudio Server (already included in tidyverse image)
+    8787,  // RStudio Server (included in tidyverse image)
     8080,  // httpgd for VS Code plots
     3838,  // Shiny apps
     4321   // Quarto preview

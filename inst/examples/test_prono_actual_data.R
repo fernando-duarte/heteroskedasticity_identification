@@ -63,7 +63,7 @@ ols_coef <- coef(ols_fit)["Y2"]
 ols_se <- summary(ols_fit)$coefficients["Y2", "Std. Error"]
 cat("Coefficient on Y2:", sprintf("%.4f", ols_coef), "\n")
 cat("Standard error:", sprintf("%.4f", ols_se), "\n")
-cat("t-statistic:", sprintf("%.2f", ols_coef/ols_se), "\n\n")
+cat("t-statistic:", sprintf("%.2f", ols_coef / ols_se), "\n\n")
 
 # Test 2: Prono method with univariate GARCH
 cat("TEST 2: PRONO METHOD WITH UNIVARIATE GARCH\n")
@@ -117,7 +117,7 @@ tryCatch({
 
   cat("GMM coefficient on Y2:", sprintf("%.4f", gmm_coef), "\n")
   cat("GMM standard error:", sprintf("%.4f", gmm_se), "\n")
-  cat("GMM t-statistic:", sprintf("%.2f", gmm_coef/gmm_se), "\n")
+  cat("GMM t-statistic:", sprintf("%.2f", gmm_coef / gmm_se), "\n")
 
   if (!is.null(gmm_result$J_test)) {
     cat("J-test statistic:", sprintf("%.2f", gmm_result$J_test$J_stat), "\n")
@@ -133,7 +133,7 @@ cat("\n=== SUMMARY COMPARISON ===\n")
 cat("Method              Coefficient    Std Error    t-stat\n")
 cat("-------------------------------------------------------\n")
 cat(sprintf("OLS                 %8.4f      %8.4f    %6.2f\n",
-    ols_coef, ols_se, ols_coef/ols_se))
+    ols_coef, ols_se, ols_coef / ols_se))
 
 if (exists("prono_result")) {
   cat(sprintf("Prono IV            %8.4f      %8.4f    %6.2f\n",
@@ -143,7 +143,7 @@ if (exists("prono_result")) {
 
 if (exists("gmm_coef")) {
   cat(sprintf("Prono GMM           %8.4f      %8.4f    %6.2f\n",
-      gmm_coef, gmm_se, gmm_coef/gmm_se))
+      gmm_coef, gmm_se, gmm_coef / gmm_se))
 }
 
 cat("\nNote: Y1 = Small-value portfolio excess return\n")

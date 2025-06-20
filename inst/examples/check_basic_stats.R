@@ -65,7 +65,7 @@ market_excess <- rnorm(2166, mean = 0.097, sd = 2.2)
 h <- numeric(2166)
 h[1] <- 2.2^2
 for (t in 2:2166) {
-  h[t] <- 0.01 + 0.1 * (market_excess[t-1] - 0.097)^2 + 0.85 * h[t-1]
+  h[t] <- 0.01 + 0.1 * (market_excess[t - 1] - 0.097)^2 + 0.85 * h[t - 1]
   market_excess[t] <- 0.097 + sqrt(h[t]) * rnorm(1)
 }
 

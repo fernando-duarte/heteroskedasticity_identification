@@ -43,15 +43,14 @@
 #'
 #' @export
 generate_prono_data <- function(n = 500,
-                               beta1 = c(0.05, 0.01),
-                               beta2 = c(0.097, -0.005),
-                               gamma1 = 1.0,
-                               k = 1,
-                               garch_params = list(omega = 0.2, alpha = 0.1, beta = 0.85),
-                               sigma1 = 1.5,
-                               rho = 0.3,
-                               seed = NULL) {
-
+                                beta1 = c(0.05, 0.01),
+                                beta2 = c(0.097, -0.005),
+                                gamma1 = 1.0,
+                                k = 1,
+                                garch_params = list(omega = 0.2, alpha = 0.1, beta = 0.85),
+                                sigma1 = 1.5,
+                                rho = 0.3,
+                                seed = NULL) {
   if (!is.null(seed)) set.seed(seed)
 
   # Validate GARCH parameters
@@ -60,9 +59,9 @@ generate_prono_data <- function(n = 500,
   }
 
   # Generate exogenous variables
-  X <- matrix(rnorm(n * k), nrow = n, ncol = k)
-  X_with_const <- cbind(1, X)
-  colnames(X_with_const) <- c("const", paste0("X", seq_len(k)))
+  x <- matrix(rnorm(n * k), nrow = n, ncol = k)
+  x_with_const <- cbind(1, x)
+  colnames(x_with_const) <- c("const", paste0("X", seq_len(k)))
 
   # Generate GARCH(1,1) errors for epsilon2
   eps2 <- numeric(n)
@@ -79,8 +78,8 @@ generate_prono_data <- function(n = 500,
   for (t in 1:n) {
     if (t > 1) {
       sigma2_sq[t] <- garch_params$omega +
-                      garch_params$alpha * eps2[t-1]^2 +
-                      garch_params$beta * sigma2_sq[t-1]
+        garch_params$alpha * eps2[t - 1]^2 +
+        garch_params$beta * sigma2_sq[t - 1]
     }
     eps2[t] <- sqrt(sigma2_sq[t]) * z2[t]
   }
@@ -89,21 +88,21 @@ generate_prono_data <- function(n = 500,
   eps1 <- sigma1 * (rho * z2 + sqrt(1 - rho^2) * z1)
 
   # Generate endogenous variables
-  Y2 <- X_with_const %*% beta2 + eps2
-  Y1 <- X_with_const %*% beta1 + gamma1 * Y2 + eps1
+  y2 <- x_with_const %*% beta2 + eps2
+  y1 <- x_with_const %*% beta1 + gamma1 * y2 + eps1
 
   # Create data frame
   df <- data.frame(
-    Y1 = as.vector(Y1),
-    Y2 = as.vector(Y2),
-    X_with_const,
+    Y1 = as.vector(y1),
+    Y2 = as.vector(y2),
+    x_with_const,
     eps1 = eps1,
     eps2 = eps2,
     sigma2_sq = sigma2_sq,
     time = 1:n
   )
 
-  return(df)
+  df
 }
 
 #' Run single Prono simulation with GARCH-based instruments
@@ -127,7 +126,6 @@ generate_prono_data <- function(n = 500,
 #'
 #' @export
 run_single_prono_simulation <- function(config, return_details = FALSE) {
-
   # Generate data
   df <- generate_prono_data(
     n = config$n,
@@ -144,19 +142,19 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
   # Extract variables
   n <- nrow(df)
   k <- config$k
-  X_vars <- paste0("X", seq_len(k))
+  x_vars <- paste0("X", seq_len(k))
 
   # True parameters
   true_gamma1 <- config$gamma1
 
   # Step 1: OLS estimation (biased)
-  ols_formula <- as.formula(paste("Y1 ~ Y2 +", paste(X_vars, collapse = " + ")))
+  ols_formula <- as.formula(paste("Y1 ~ Y2 +", paste(x_vars, collapse = " + ")))
   ols_fit <- lm(ols_formula, data = df)
   gamma1_ols <- coef(ols_fit)["Y2"]
   se_ols <- extract_se_lm(ols_fit, config$se_type)["Y2"]
 
   # Step 2: Estimate second equation and get residuals
-  second_eq_formula <- as.formula(paste("Y2 ~", paste(X_vars, collapse = " + ")))
+  second_eq_formula <- as.formula(paste("Y2 ~", paste(x_vars, collapse = " + ")))
   second_eq_fit <- lm(second_eq_formula, data = df)
   e2_hat <- residuals(second_eq_fit)
 
@@ -164,41 +162,43 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
   sigma2_sq_hat <- NULL
   garch_fit <- NULL
 
-  tryCatch({
-    # Check if tsgarch is available
-    if (!requireNamespace("tsgarch", quietly = TRUE)) {
-      stop("Package 'tsgarch' is required for GARCH modeling. Please install it.")
+  tryCatch(
+    {
+      # Check if tsgarch is available
+      if (!requireNamespace("tsgarch", quietly = TRUE)) {
+        stop("Package 'tsgarch' is required for GARCH modeling. Please install it.")
+      }
+
+      # Convert to xts object as required by tsgarch
+      dates <- as.Date("2000-01-01") + seq_along(e2_hat) - 1
+      e2_xts <- xts::xts(e2_hat, order.by = dates)
+
+      # Specify GARCH(1,1) model using tsgarch
+      garch_spec <- tsgarch::garch_modelspec(
+        y = e2_xts,
+        model = "garch",
+        order = c(1, 1),
+        constant = TRUE,
+        distribution = "norm"
+      )
+
+      # Fit GARCH model
+      # Note: tsgarch may produce "NaNs produced" warnings when fitting GARCH to data
+      # with no ARCH effects (alpha ≈ 0). This is expected behavior indicating that
+      # the conditional variance is essentially constant, making the Hessian matrix
+      # singular when computing standard errors. The warning is harmless and does not
+      # affect the validity of the conditional variance estimates.
+      garch_fit <- tsmethods::estimate(garch_spec)
+
+      # Extract conditional variances (sigma returns standard deviations)
+      sigma2_sq_hat <- as.numeric(sigma(garch_fit))^2
+    },
+    error = function(e) {
+      warning("GARCH fitting failed, using squared residuals as proxy: ", e$message)
+      # Fallback: use squared residuals as proxy for conditional variance
+      sigma2_sq_hat <- e2_hat^2
     }
-
-    # Convert to xts object as required by tsgarch
-    dates <- as.Date("2000-01-01") + seq_along(e2_hat) - 1
-    e2_xts <- xts::xts(e2_hat, order.by = dates)
-
-    # Specify GARCH(1,1) model using tsgarch
-    garch_spec <- tsgarch::garch_modelspec(
-      y = e2_xts,
-      model = "garch",
-      order = c(1, 1),
-      constant = TRUE,
-      distribution = "norm"
-    )
-
-    # Fit GARCH model
-    # Note: tsgarch may produce "NaNs produced" warnings when fitting GARCH to data
-    # with no ARCH effects (alpha ≈ 0). This is expected behavior indicating that
-    # the conditional variance is essentially constant, making the Hessian matrix
-    # singular when computing standard errors. The warning is harmless and does not
-    # affect the validity of the conditional variance estimates.
-    garch_fit <- tsmethods::estimate(garch_spec)
-
-    # Extract conditional variances (sigma returns standard deviations)
-    sigma2_sq_hat <- as.numeric(sigma(garch_fit))^2
-
-  }, error = function(e) {
-    warning("GARCH fitting failed, using squared residuals as proxy: ", e$message)
-    # Fallback: use squared residuals as proxy for conditional variance
-    sigma2_sq_hat <- e2_hat^2
-  })
+  )
 
   # Ensure we have sigma2_sq_hat
   if (is.null(sigma2_sq_hat)) {
@@ -206,17 +206,19 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
   }
 
   # Step 4: Construct Prono instrument
-  # Z_t = fitted conditional variance (demeaned)
-  Z_t <- sigma2_sq_hat - mean(sigma2_sq_hat)
-  prono_iv <- Z_t * e2_hat
+  # z_t = fitted conditional variance (demeaned)
+  z_t <- sigma2_sq_hat - mean(sigma2_sq_hat)
+  prono_iv <- z_t * e2_hat
 
   # Add instrument to data frame
   df$prono_iv <- prono_iv
 
   # Step 5: 2SLS with Prono instrument
   iv_formula <- as.formula(
-    paste("Y1 ~ Y2 +", paste(X_vars, collapse = " + "),
-          "| ", paste(X_vars, collapse = " + "), " + prono_iv")
+    paste(
+      "Y1 ~ Y2 +", paste(x_vars, collapse = " + "),
+      "| ", paste(x_vars, collapse = " + "), " + prono_iv"
+    )
   )
 
   # Try different IV packages
@@ -225,22 +227,28 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
 
   # Try ivreg package first
   if (requireNamespace("ivreg", quietly = TRUE)) {
-    tryCatch({
-      iv_fit <- ivreg::ivreg(iv_formula, data = df)
-      iv_package <- "ivreg"
-    }, error = function(e) {
-      iv_fit <- NULL
-    })
+    tryCatch(
+      {
+        iv_fit <- ivreg::ivreg(iv_formula, data = df)
+        iv_package <- "ivreg"
+      },
+      error = function(e) {
+        iv_fit <- NULL
+      }
+    )
   }
 
   # Fallback to AER if ivreg fails
   if (is.null(iv_fit) && requireNamespace("AER", quietly = TRUE)) {
-    tryCatch({
-      iv_fit <- AER::ivreg(iv_formula, data = df)
-      iv_package <- "AER"
-    }, error = function(e) {
-      stop("IV estimation failed with both ivreg and AER packages")
-    })
+    tryCatch(
+      {
+        iv_fit <- AER::ivreg(iv_formula, data = df)
+        iv_package <- "AER"
+      },
+      error = function(e) {
+        stop("IV estimation failed with both ivreg and AER packages")
+      }
+    )
   }
 
   if (is.null(iv_fit)) {
@@ -253,17 +261,20 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
 
   # First-stage F-statistic
   first_stage_formula <- as.formula(
-    paste("Y2 ~", paste(X_vars, collapse = " + "), " + prono_iv")
+    paste("Y2 ~", paste(x_vars, collapse = " + "), " + prono_iv")
   )
   first_stage <- lm(first_stage_formula, data = df)
 
   # F-stat for excluded instrument
-  restricted_formula <- as.formula(paste("Y2 ~", paste(X_vars, collapse = " + ")))
+  restricted_formula <- as.formula(paste("Y2 ~", paste(x_vars, collapse = " + ")))
   restricted <- lm(restricted_formula, data = df)
 
-  f_stat <- tryCatch({
-    anova(restricted, first_stage, test = "F")[2, "F"]
-  }, error = function(e) NA)
+  f_stat <- tryCatch(
+    {
+      anova(restricted, first_stage, test = "F")[2, "F"]
+    },
+    error = function(e) NA
+  )
 
   # Compile results
   results <- list(
@@ -285,7 +296,7 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
     results$garch_fit <- garch_fit
   }
 
-  return(results)
+  results
 }
 
 #' Run Prono Monte Carlo simulation
@@ -319,15 +330,18 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
 #' @importFrom utils txtProgressBar setTxtProgressBar
 #' @export
 run_prono_monte_carlo <- function(config,
-                                 n_sims = 1000,
-                                 parallel = FALSE,
-                                 n_cores = NULL,
-                                 progress = TRUE) {
-
+                                  n_sims = 1000,
+                                  parallel = FALSE,
+                                  n_cores = NULL,
+                                  progress = TRUE) {
   messager("Starting Prono Monte Carlo simulation", v = config$verbose)
-  messager(sprintf("Parameters: n=%d, k=%d, gamma1=%.2f, n_sims=%d",
-                   config$n, config$k, config$gamma1, n_sims),
-           v = config$verbose)
+  messager(
+    sprintf(
+      "Parameters: n=%d, k=%d, gamma1=%.2f, n_sims=%d",
+      config$n, config$k, config$gamma1, n_sims
+    ),
+    v = config$verbose
+  )
 
   # Generate seeds for reproducibility
   seeds <- if (!is.null(config$seed)) {
@@ -343,23 +357,26 @@ run_prono_monte_carlo <- function(config,
       n_cores <- parallel::detectCores() - 1
     }
     messager(sprintf("Running in parallel with %d cores", n_cores),
-             v = config$verbose)
+      v = config$verbose
+    )
 
     cl <- parallel::makeCluster(n_cores)
     on.exit(parallel::stopCluster(cl))
 
     # Export necessary objects
-    parallel::clusterExport(cl, c("run_single_prono_simulation",
-                                  "generate_prono_data",
-                                  "extract_se_lm",
-                                  "extract_se_ivreg"),
-                           envir = environment())
+    parallel::clusterExport(cl, c(
+      "run_single_prono_simulation",
+      "generate_prono_data",
+      "extract_se_lm",
+      "extract_se_ivreg"
+    ),
+    envir = environment()
+    )
 
     results_list <- parallel::parLapply(cl, seeds, function(s) {
       config$seed <- s
       run_single_prono_simulation(config)
     })
-
   } else {
     results_list <- vector("list", n_sims)
 
@@ -390,9 +407,10 @@ run_prono_monte_carlo <- function(config,
   results_df <- do.call(rbind, lapply(results_list, as.data.frame))
 
   messager(sprintf("Completed %d successful simulations", nrow(results_df)),
-           v = config$verbose)
+    v = config$verbose
+  )
 
-  return(results_df)
+  results_df
 }
 
 #' Create default configuration for Prono simulations
@@ -406,7 +424,6 @@ run_prono_monte_carlo <- function(config,
 #' @return Configuration list with parameters scaled for percent returns
 #' @export
 create_prono_config <- function(n = 500, k = 1, ...) {
-
   # Default configuration for percent-scale returns matching Prono (2014)
   config <- list(
     # Sample size
@@ -414,23 +431,23 @@ create_prono_config <- function(n = 500, k = 1, ...) {
 
     # Model parameters (scaled for percent returns)
     k = k,
-    beta1 = c(0.05, rep(0.01, k)),     # Portfolio return equation
-    beta2 = c(0.097, rep(-0.005, k)),  # Market return equation (mean = 0.097%)
-    gamma1 = 1.0,                      # True beta (unitless)
+    beta1 = c(0.05, rep(0.01, k)), # Portfolio return equation
+    beta2 = c(0.097, rep(-0.005, k)), # Market return equation (mean = 0.097%)
+    gamma1 = 1.0, # True beta (unitless)
 
     # GARCH parameters for percent returns
     garch_params = list(
-      omega = 0.2,    # For ~2% weekly volatility: 0.2/(1-0.1-0.85) = 4, sqrt(4) = 2%
-      alpha = 0.1,    # ARCH coefficient
-      beta = 0.85     # GARCH coefficient (alpha + beta < 1)
+      omega = 0.2, # For ~2% weekly volatility: 0.2/(1-0.1-0.85) = 4, sqrt(4) = 2%
+      alpha = 0.1, # ARCH coefficient
+      beta = 0.85 # GARCH coefficient (alpha + beta < 1)
     ),
 
     # Error parameters
-    sigma1 = 1.5,   # Portfolio idiosyncratic volatility in percent
-    rho = 0.3,      # Correlation (endogeneity)
+    sigma1 = 1.5, # Portfolio idiosyncratic volatility in percent
+    rho = 0.3, # Correlation (endogeneity)
 
     # Estimation options
-    se_type = "asymptotic",  # Can be "asymptotic" or "finite"
+    se_type = "asymptotic", # Can be "asymptotic" or "finite"
 
     # Other options
     seed = 123,
@@ -443,7 +460,7 @@ create_prono_config <- function(n = 500, k = 1, ...) {
     config[[arg]] <- user_args[[arg]]
   }
 
-  return(config)
+  config
 }
 
 #' Run Prono demonstration
@@ -472,7 +489,6 @@ create_prono_config <- function(n = 500, k = 1, ...) {
 #'
 #' @export
 run_prono_demo <- function(n = 500, print_results = TRUE) {
-
   cat("==================================================\n")
   cat("Prono (2014) GARCH-Based Identification Demo\n")
   cat("==================================================\n\n")
@@ -489,10 +505,14 @@ run_prono_demo <- function(n = 500, print_results = TRUE) {
     cat("where epsilon2 follows GARCH(1,1)\n\n")
 
     cat(sprintf("True gamma1: %.3f\n", results$gamma1_true))
-    cat(sprintf("OLS estimate: %.3f (bias: %.3f)\n",
-                results$gamma1_ols, results$bias_ols))
-    cat(sprintf("Prono IV estimate: %.3f (bias: %.3f)\n",
-                results$gamma1_iv, results$bias_iv))
+    cat(sprintf(
+      "OLS estimate: %.3f (bias: %.3f)\n",
+      results$gamma1_ols, results$bias_ols
+    ))
+    cat(sprintf(
+      "Prono IV estimate: %.3f (bias: %.3f)\n",
+      results$gamma1_iv, results$bias_iv
+    ))
     cat(sprintf("First-stage F-statistic: %.2f\n", results$f_stat))
 
     # Check if GARCH fit is available

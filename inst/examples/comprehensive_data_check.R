@@ -13,7 +13,7 @@ cat("Observations: 2,166 weekly returns\n\n")
 
 # 1. MARKET EXCESS RETURN (Mkt-RF)
 cat("1. MARKET EXCESS RETURN (Mkt-RF)\n")
-cat(paste(rep("=", 50), collapse=""), "\n")
+cat(paste(rep("=", 50), collapse = ""), "\n")
 cat("Prono reports: 0.097% weekly mean\n")
 cat("Expected from Fama-French data:\n")
 cat("  - Mean: 0.10-0.15% weekly (5-8% annual)\n")
@@ -22,7 +22,7 @@ cat("  - Prono's 0.097% = 5.04% annual (REASONABLE)\n\n")
 
 # 2. RISK-FREE RATE
 cat("2. RISK-FREE RATE (RF)\n")
-cat(paste(rep("=", 50), collapse=""), "\n")
+cat(paste(rep("=", 50), collapse = ""), "\n")
 cat("Expected for 1963-2004 period:\n")
 cat("  - 1960s: ~4% annual (0.077% weekly)\n")
 cat("  - 1970s: ~6% annual (0.115% weekly)\n")
@@ -33,7 +33,7 @@ cat("  - Period average: ~5% annual (0.096% weekly)\n\n")
 
 # 3. SIZE FACTOR (SMB)
 cat("3. SIZE FACTOR (SMB)\n")
-cat(paste(rep("=", 50), collapse=""), "\n")
+cat(paste(rep("=", 50), collapse = ""), "\n")
 cat("Expected from Fama-French data:\n")
 cat("  - Mean: 0.02-0.04% weekly (~1-2% annual)\n")
 cat("  - SD: 1.2-1.5% weekly\n")
@@ -41,7 +41,7 @@ cat("  - Interpretation: Small stocks outperform large\n\n")
 
 # 4. VALUE FACTOR (HML)
 cat("4. VALUE FACTOR (HML)\n")
-cat(paste(rep("=", 50), collapse=""), "\n")
+cat(paste(rep("=", 50), collapse = ""), "\n")
 cat("Expected from Fama-French data:\n")
 cat("  - Mean: 0.08-0.10% weekly (~4-5% annual)\n")
 cat("  - SD: 1.3-1.6% weekly\n")
@@ -49,7 +49,7 @@ cat("  - Interpretation: Value stocks outperform growth\n\n")
 
 # 5. 25 SIZE-B/M PORTFOLIOS
 cat("5. 25 SIZE-B/M PORTFOLIOS\n")
-cat(paste(rep("=", 50), collapse=""), "\n")
+cat(paste(rep("=", 50), collapse = ""), "\n")
 cat("Expected patterns:\n")
 
 # Create expected statistics table
@@ -88,7 +88,7 @@ cat("- Large stocks: Lower volatility (~2-2.5% weekly)\n\n")
 
 # 6. 30 INDUSTRY PORTFOLIOS
 cat("6. 30 INDUSTRY PORTFOLIOS\n")
-cat(paste(rep("=", 50), collapse=""), "\n")
+cat(paste(rep("=", 50), collapse = ""), "\n")
 cat("Expected characteristics by industry type:\n")
 
 industry_examples <- data.frame(
@@ -108,7 +108,7 @@ cat("- Cross-sectional spread in volatility\n\n")
 
 # 7. SUMMARY COMPARISON TABLE
 cat("7. SUMMARY COMPARISON\n")
-cat("="*50, "\n\n")
+cat(paste(rep("=", 50), collapse = ""), "\n\n")
 
 summary_table <- data.frame(
   Data_Series = c("Market Excess (Mkt-RF)",

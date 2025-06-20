@@ -65,7 +65,7 @@ cat(sprintf("OLS estimate:   %.4f (bias: %+.4f)\n",
 cat(sprintf("Prono estimate: %.4f (bias: %+.4f)\n",
             result$gamma1_iv, result$bias_iv))
 cat(sprintf("Bias reduction: %.1f%%\n",
-            100 * (1 - abs(result$bias_iv)/abs(result$bias_ols))))
+            100 * (1 - abs(result$bias_iv) / abs(result$bias_ols))))
 
 ## ----monte-carlo, cache=TRUE--------------------------------------------------
 # Run 500 simulations
@@ -227,4 +227,3 @@ ggplot(n_sensitivity, aes(x = n)) +
   scale_color_manual(values = c("OLS" = "#E74C3C", "Prono IV" = "#3498DB"))
 
 ## ----eval=FALSE---------------------------------------------------------------
-# install.packages("rugarch")

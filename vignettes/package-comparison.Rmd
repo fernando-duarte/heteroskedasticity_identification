@@ -229,8 +229,10 @@ verify_lewbel_implementations <- function(n = 1000, seed = 12345, verbose = TRUE
       cat("   Coefficient:", round(results_list$rendo$coef, 6), "\n")
       cat("   Standard error:", round(results_list$rendo$se, 6), "\n")
       cat("   t-statistic:", round(results_list$rendo$coef / results_list$rendo$se, 3), "\n")
-      cat("   SE ratio (REndo/Standard):",
-          round(results_list$rendo$se / results_list$standard$se, 4), "\n")
+      cat(
+        "   SE ratio (REndo/Standard):",
+        round(results_list$rendo$se / results_list$standard$se, 4), "\n"
+      )
 
       # Check which manual method REndo matches
       diff_to_z <- abs(results_list$rendo$coef - results_list$standard$coef)
@@ -343,7 +345,7 @@ results <- verify_lewbel_implementations()
 # Note: run_single_lewbel_simulation is from the hetid package
 # hetid default: asymptotic (matches Stata)
 params <- list(
-  sample_size = 1000,  # Required parameter
+  sample_size = 1000, # Required parameter
   beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
   beta2_0 = 1.0, beta2_1 = -1.0,
   alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
@@ -389,7 +391,7 @@ cat("Ratio (finite/asymptotic):", round(result_finite$tsls_se / result_asymp$tsl
 ```{r matching-software}
 # To match Stata ivreg2h (asymptotic SEs):
 params <- list(
-  sample_size = 1000,  # Required parameter
+  sample_size = 1000, # Required parameter
   beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
   beta2_0 = 1.0, beta2_1 = -1.0,
   alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2

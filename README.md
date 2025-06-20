@@ -7,7 +7,7 @@
 [![Docker Build and Test](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/docker.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/docker.yml)
 [![pkgdown](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/pkgdown.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/pkgdown.yml)
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
-[![codecov](https://codecov.io/gh/fernando-duarte/heteroskedasticity_identification/graph/badge.svg?token=2PGQW4CZHL)](https://codecov.io/gh/fernando-duarte/heteroskedasticity_identification)
+[![codecov](https://codecov.io/gh/fernando-duarte/heteroskedasticity_identification/graph/badge.svg?token=2PGQW4CZHL)](https://app.codecov.io/gh/fernando-duarte/heteroskedasticity_identification)
 [![Security Checks](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/r-security.yml/badge.svg)](https://github.com/fernando-duarte/heteroskedasticity_identification/actions/workflows/r-security.yml)
 <!-- badges: end -->
 
@@ -135,6 +135,37 @@ print(comparison)
 ```
 
 The package also implements **Rigobon (2003)** regime-based identification. See the [Rigobon Guide](dev-guides/RIGOBON.md) for detailed usage.
+
+## Testing
+
+After cloning this repository:
+
+```r
+# Quick tests (recommended for contributors)
+# In RStudio or after opening R in project directory:
+devtools::test()  # Runs CRAN + fast tests
+
+# Or use Make:
+make test-fast    # CRAN + fast tests
+make test-all     # All tests (10+ minutes)
+
+# Minimal tests only
+Sys.setenv(HETID_TEST_LEVEL = "cran")
+devtools::test()
+```
+
+Note: Opening the project in RStudio or starting R in the project directory automatically configures the test environment for fast tests.
+
+### Test Organization
+
+The package uses a hierarchical test system:
+
+- **CRAN tests**: Very fast unit tests (< 1 minute total)
+- **Fast tests**: Quick tests for development (< 2 minutes)
+- **Integration tests**: Multi-component tests (< 5 minutes)
+- **Comprehensive tests**: Full validation including Monte Carlo (10+ minutes)
+
+See the [Makefile](Makefile) for all available test commands.
 
 ## Guides
 

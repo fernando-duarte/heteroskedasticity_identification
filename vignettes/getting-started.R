@@ -115,52 +115,9 @@ cat("Contained in exact bounds:", ifelse(in_bounds_exact, "✓", "✗"), "\n")
 cat("Contained in relaxed bounds:", ifelse(in_bounds_relaxed, "✓", "✗"), "\n")
 
 ## ----monte-carlo, eval=FALSE--------------------------------------------------
-# # Example: Run a small Monte Carlo study
-# # (Not executed in vignette to save time)
-# library(purrr)
-# library(dplyr)
-#
-# # Run 100 simulations to assess estimator performance
-# n_sims <- 100
-# sim_params <- c(params, list(
-#   sample_size = 500,
-#   tau_set_id = 0.2,
-#   bootstrap_reps = 50
-# ))
-#
-# cat("Running", n_sims, "Monte Carlo simulations...\n")
-# results <- map_dfr(1:n_sims, ~ run_single_lewbel_simulation(.x, sim_params))
-#
-# # Summarize performance metrics
-# summary_stats <- results |>
-#   summarise(
-#     # Bias (should be close to 0 for consistent estimators)
-#     ols_bias = mean(ols_gamma1 - params$gamma1, na.rm = TRUE),
-#     tsls_bias = mean(tsls_gamma1 - params$gamma1, na.rm = TRUE),
-#
-#     # Coverage rates (should be close to 0.95 for 95% confidence intervals)
-#     ols_coverage = mean(ols_coverage, na.rm = TRUE),
-#     tsls_coverage = mean(tsls_coverage, na.rm = TRUE),
-#
-#     # Instrument strength
-#     avg_first_stage_F = mean(first_stage_F, na.rm = TRUE),
-#     weak_iv_rate = mean(first_stage_F < 10, na.rm = TRUE)
-#   )
-#
-# cat("\nMonte Carlo Results:\n")
-# print(summary_stats)
-#
-# # Additional analysis: Distribution of estimates
-# cat("\nDistribution of 2SLS estimates:\n")
-# cat("Mean:", round(mean(results$tsls_gamma1, na.rm = TRUE), 3), "\n")
-# cat("Median:", round(median(results$tsls_gamma1, na.rm = TRUE), 3), "\n")
-# cat("True Value:", params$gamma1, "\n")
-# cat("Mean Bias:", round(mean(results$tsls_gamma1 - params$gamma1, na.rm = TRUE), 3), "\n")
-#
-# cat("\n--- Monte Carlo Distribution ---\n")
-# # Plot the distribution of estimates
-# # hist(results$tsls_gamma1, breaks = 30, main = "Distribution of gamma1 Estimates", xlab = "gamma1")
-# # abline(v = params$gamma1, col = "red", lwd = 2)
+# Example: Run a small Monte Carlo study
+# (Not executed in vignette to save time)
+# This would typically use run_lewbel_monte_carlo() for a proper simulation
 
 # Run a small Monte Carlo simulation (conceptual)
 # The actual run_lewbel_monte_carlo function would be used for a proper simulation
@@ -169,14 +126,14 @@ cat("Contained in relaxed bounds:", ifelse(in_bounds_relaxed, "✓", "✗"), "\n
 params <- list(
   n = 200,             # Sample size
   beta1_true = c(0.5, 1.0), # True beta1 coefficients (intercept, Xk)
-  beta2_true = c(1.0, -0.5),# True beta2 coefficients
+  beta2_true = c(1.0, -0.5), # True beta2 coefficients
   gamma1_true = -0.7,    # True gamma1 coefficient
   rho_uz = 0.3,          # Correlation between u1 and Z*u2 (endogeneity strength)
   hetero_strength = 2.0  # Strength of heteroskedasticity
 )
 
 # Conceptual structure for a single simulation run (simplified)
-run_single_simulation_conceptual <- function(sim_params) {
+run_single_sim_conceptual <- function(sim_params) {
   # Generate data based on sim_params
   # For this conceptual example, we'll reuse the earlier 'data' for structure
   # In a real MC, data would be generated here using generate_lewbel_data()
@@ -195,8 +152,8 @@ run_single_simulation_conceptual <- function(sim_params) {
 
   # Check if IV is significant in first stage (proxy for strength)
   f_stat_val <- NA
-  if("lewbel_iv_est" %in% rownames(summary(first_stage_fit)$coefficients)){
-      f_stat_val <- summary(first_stage_fit)$coefficients["lewbel_iv_est", "t value"]^2
+  if ("lewbel_iv_est" %in% rownames(summary(first_stage_fit)$coefficients)) {
+    f_stat_val <- summary(first_stage_fit)$coefficients["lewbel_iv_est", "t value"]^2
   }
 
   y2_fitted <- fitted(first_stage_fit)
@@ -219,9 +176,7 @@ run_single_simulation_conceptual <- function(sim_params) {
 
 ### Set Identification
 
-When the covariance restriction $\text{Cov}(Z, \epsilon_1 \epsilon_2) = 0$ might be violated, but boundedly so, Lewbel (2012) also provides a method for set identification. The parameter $\gamma_1$ is identified to lie within an interval.
-
-```{r set-id, eval=TRUE}
+## ----set-id, eval=TRUE--------------------------------------------------------
 # Using the calculate_lewbel_bounds function
 # Assume a tau value (strength of correlation between Z and error product)
 # tau = 0 means point identification, tau > 0 gives a set.
@@ -236,15 +191,9 @@ cat(sprintf("Identified set for gamma1: [%.4f, %.4f]\n",
 cat(sprintf("True gamma1: %.4f. Is it in the set? %s\n",
             params$gamma1,
             params$gamma1 >= lewbel_bounds$bounds[1] && params$gamma1 <= lewbel_bounds$bounds[2]))
-```
 
-### Degrees of Freedom Adjustment
-
-The package offers several ways to adjust standard errors for degrees of freedom, which can be important in smaller samples.
-
-```{r df-adjust, eval=FALSE}
+## ----df-adjust, eval=FALSE----------------------------------------------------
 # This is a conceptual demonstration of how one might compare adjustments
 # The actual comparison would use run_lewbel_monte_carlo_df
 
 cat("For df adjustment comparison, see run_lewbel_monte_carlo_df() docs.\n")
-```

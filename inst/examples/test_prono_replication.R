@@ -65,7 +65,7 @@ for (i in 1:n_portfolios) {
 
   # Generate GARCH errors for market
   for (t in 2:n_weeks) {
-    sigma2_sq[t] <- omega + alpha * eps2[t-1] ^ 2 + beta * sigma2_sq[t-1]
+    sigma2_sq[t] <- omega + alpha * eps2[t - 1]^2 + beta * sigma2_sq[t - 1]
     eps2[t] <- sqrt(sigma2_sq[t]) * rnorm(1)
   }
 

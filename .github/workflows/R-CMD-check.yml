@@ -1,5 +1,4 @@
 # Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
-# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 
 name: R-CMD-check
 
@@ -15,7 +14,7 @@ on:
 permissions:
   contents: read
 
-# Improved concurrency control following 2025 best practices
+# Concurrency control
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name != 'pull_request' || github.run_id }}
   cancel-in-progress: true
@@ -47,6 +46,9 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
       # Enable CRAN incoming checks for release workflows
       _R_CHECK_CRAN_INCOMING_: ${{ github.event_name == 'release' && 'true' || 'false' }}
+      # Run all tests in CI/CD (comprehensive level)
+      HETID_TEST_LEVEL: comprehensive
+      NOT_CRAN: true
 
     steps:
       - name: Checkout repository

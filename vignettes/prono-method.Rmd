@@ -79,17 +79,17 @@ First, let's generate some data with the appropriate structure:
 # Set parameters for percent-scale returns (matching Prono 2014)
 params <- list(
   n = 500,
-  k = 1,  # number of exogenous variables
-  beta1 = c(0.08, 0.02),      # Portfolio return equation (percent)
-  beta2 = c(0.097, -0.01),    # Market return equation (mean = 0.097%)
-  gamma1 = 1.2,               # True beta (unitless)
+  k = 1, # number of exogenous variables
+  beta1 = c(0.08, 0.02), # Portfolio return equation (percent)
+  beta2 = c(0.097, -0.01), # Market return equation (mean = 0.097%)
+  gamma1 = 1.2, # True beta (unitless)
   garch_params = list(
-    omega = 0.05,             # For ~2% weekly volatility
+    omega = 0.05, # For ~2% weekly volatility
     alpha = 0.15,
     beta = 0.75
   ),
-  sigma1 = 1.8,               # Portfolio idiosyncratic vol (percent)
-  rho = 0.6,                  # Correlation between errors (endogeneity)
+  sigma1 = 1.8, # Portfolio idiosyncratic vol (percent)
+  rho = 0.6, # Correlation between errors (endogeneity)
   seed = 123
 )
 
@@ -104,12 +104,14 @@ Let's plot the conditional variance to see the GARCH effect:
 
 ```{r plot-variance}
 # Note: sigma2_sq is variance of percent returns
-plot(data$time, sqrt(data$sigma2_sq), type = "l",
-     main = "Conditional Volatility (GARCH Effect)",
-     xlab = "Time", ylab = "Volatility (%)",
-     col = "blue", lwd = 2)
+plot(data$time, sqrt(data$sigma2_sq),
+  type = "l",
+  main = "Conditional Volatility (GARCH Effect)",
+  xlab = "Time", ylab = "Volatility (%)",
+  col = "blue", lwd = 2
+)
 grid()
-abline(h = 2, lty = 2, col = "red")  # 2% typical weekly volatility
+abline(h = 2, lty = 2, col = "red") # 2% typical weekly volatility
 ```
 
 ### 3. Run Single Estimation
@@ -120,12 +122,12 @@ Now let's run the Prono estimation procedure:
 # Create configuration with percent-scale parameters
 config <- create_prono_config(
   n = 500,
-  beta1 = c(0.08, 0.02),      # Portfolio returns in percent
-  beta2 = c(0.097, -0.01),    # Market returns (mean 0.097%)
-  gamma1 = 1.2,               # True beta
+  beta1 = c(0.08, 0.02), # Portfolio returns in percent
+  beta2 = c(0.097, -0.01), # Market returns (mean 0.097%)
+  gamma1 = 1.2, # True beta
   garch_params = list(omega = 0.05, alpha = 0.15, beta = 0.75),
-  sigma1 = 1.8,               # Idiosyncratic vol in percent
-  rho = 0.6,                  # Endogeneity
+  sigma1 = 1.8, # Idiosyncratic vol in percent
+  rho = 0.6, # Endogeneity
   seed = 123
 )
 
@@ -135,14 +137,22 @@ result <- run_single_prono_simulation(config, return_details = TRUE)
 # Compare estimates
 cat("Estimation Results:\n")
 cat(sprintf("True beta:      %.4f\n", result$gamma1_true))
-cat(sprintf("OLS estimate:   %.4f (bias: %+.4f)\n",
-            result$gamma1_ols, result$bias_ols))
-cat(sprintf("Prono estimate: %.4f (bias: %+.4f)\n",
-            result$gamma1_iv, result$bias_iv))
-cat(sprintf("Bias reduction: %.1f%%\n",
-            100 * (1 - abs(result$bias_iv) / abs(result$bias_ols))))
-cat(sprintf("\nData check - Y2 mean: %.3f%% (target: 0.097%%)\n",
-            mean(result$data$Y2)))
+cat(sprintf(
+  "OLS estimate:   %.4f (bias: %+.4f)\n",
+  result$gamma1_ols, result$bias_ols
+))
+cat(sprintf(
+  "Prono estimate: %.4f (bias: %+.4f)\n",
+  result$gamma1_iv, result$bias_iv
+))
+cat(sprintf(
+  "Bias reduction: %.1f%%\n",
+  100 * (1 - abs(result$bias_iv) / abs(result$bias_ols))
+))
+cat(sprintf(
+  "\nData check - Y2 mean: %.3f%% (target: 0.097%%)\n",
+  mean(result$data$Y2)
+))
 ```
 
 ## Monte Carlo Simulation
@@ -166,8 +176,10 @@ summary_stats <- data.frame(
   Method = c("OLS", "Prono IV"),
   Mean_Bias = c(mean(mc_results$bias_ols), mean(mc_results$bias_iv)),
   SD_Bias = c(sd(mc_results$bias_ols), sd(mc_results$bias_iv)),
-  RMSE = c(sqrt(mean(mc_results$bias_ols^2)),
-           sqrt(mean(mc_results$bias_iv^2)))
+  RMSE = c(
+    sqrt(mean(mc_results$bias_ols^2)),
+    sqrt(mean(mc_results$bias_iv^2))
+  )
 )
 
 print(summary_stats, digits = 4)
@@ -187,9 +199,11 @@ plot_data <- data.frame(
 p1 <- ggplot(plot_data, aes(x = Estimate, fill = Method)) +
   geom_density(alpha = 0.6) +
   geom_vline(xintercept = config$gamma1, linetype = "dashed", size = 1) +
-  labs(title = "Distribution of Estimates",
-       subtitle = sprintf("True value = %.1f (dashed line)", config$gamma1),
-       x = "Estimate", y = "Density") +
+  labs(
+    title = "Distribution of Estimates",
+    subtitle = sprintf("True value = %.1f (dashed line)", config$gamma1),
+    x = "Estimate", y = "Density"
+  ) +
   theme_minimal() +
   scale_fill_manual(values = c("OLS" = "#E74C3C", "Prono IV" = "#3498DB"))
 
@@ -199,9 +213,11 @@ print(p1)
 p2 <- ggplot(plot_data, aes(x = Method, y = Bias, fill = Method)) +
   geom_boxplot(alpha = 0.6) +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  labs(title = "Bias Distribution",
-       subtitle = "Unbiased = 0 (dashed line)",
-       y = "Bias") +
+  labs(
+    title = "Bias Distribution",
+    subtitle = "Unbiased = 0 (dashed line)",
+    y = "Bias"
+  ) +
   theme_minimal() +
   scale_fill_manual(values = c("OLS" = "#E74C3C", "Prono IV" = "#3498DB")) +
   theme(legend.position = "none")
@@ -228,9 +244,11 @@ print(f_summary, digits = 2)
 ggplot(mc_results, aes(x = f_stat)) +
   geom_histogram(bins = 30, fill = "#2ECC71", alpha = 0.7) +
   geom_vline(xintercept = 10, linetype = "dashed", color = "red", size = 1) +
-  labs(title = "Distribution of First-Stage F-Statistics",
-       subtitle = "Weak instrument threshold = 10 (red line)",
-       x = "F-statistic", y = "Count") +
+  labs(
+    title = "Distribution of First-Stage F-Statistics",
+    subtitle = "Weak instrument threshold = 10 (red line)",
+    x = "F-statistic", y = "Count"
+  ) +
   theme_minimal()
 ```
 
@@ -251,7 +269,7 @@ results_list <- list()
 for (i in seq_along(alpha_values)) {
   config_temp <- config
   config_temp$garch_params$alpha <- alpha_values[i]
-  config_temp$garch_params$beta <- 0.9 - alpha_values[i]  # Keep sum < 1
+  config_temp$garch_params$beta <- 0.9 - alpha_values[i] # Keep sum < 1
 
   mc_temp <- run_prono_monte_carlo(
     config_temp,
@@ -273,20 +291,24 @@ sensitivity_results <- do.call(rbind, results_list)
 # Plot results
 par(mfrow = c(1, 2))
 plot(sensitivity_results$alpha, abs(sensitivity_results$mean_bias_iv),
-     type = "b", col = "blue", pch = 19,
-     xlab = "GARCH Alpha Parameter",
-     ylab = "Absolute Bias",
-     main = "Bias vs GARCH Parameter")
+  type = "b", col = "blue", pch = 19,
+  xlab = "GARCH Alpha Parameter",
+  ylab = "Absolute Bias",
+  main = "Bias vs GARCH Parameter"
+)
 lines(sensitivity_results$alpha, abs(sensitivity_results$mean_bias_ols),
-      type = "b", col = "red", pch = 17)
+  type = "b", col = "red", pch = 17
+)
 legend("topright", c("Prono IV", "OLS"),
-       col = c("blue", "red"), pch = c(19, 17), lty = 1)
+  col = c("blue", "red"), pch = c(19, 17), lty = 1
+)
 
 plot(sensitivity_results$alpha, sensitivity_results$mean_f_stat,
-     type = "b", col = "darkgreen", pch = 19,
-     xlab = "GARCH Alpha Parameter",
-     ylab = "Mean F-statistic",
-     main = "Instrument Strength vs GARCH Parameter")
+  type = "b", col = "darkgreen", pch = 19,
+  xlab = "GARCH Alpha Parameter",
+  ylab = "Mean F-statistic",
+  main = "Instrument Strength vs GARCH Parameter"
+)
 abline(h = 10, lty = 2, col = "red")
 ```
 
@@ -325,10 +347,12 @@ ggplot(n_sensitivity, aes(x = n)) +
   geom_point(aes(y = abs(bias_ols), color = "OLS"), size = 3) +
   geom_point(aes(y = abs(bias_iv), color = "Prono IV"), size = 3) +
   scale_x_log10() +
-  labs(title = "Bias vs Sample Size",
-       x = "Sample Size (log scale)",
-       y = "Absolute Bias",
-       color = "Method") +
+  labs(
+    title = "Bias vs Sample Size",
+    x = "Sample Size (log scale)",
+    y = "Absolute Bias",
+    color = "Method"
+  ) +
   theme_minimal() +
   scale_color_manual(values = c("OLS" = "#E74C3C", "Prono IV" = "#3498DB"))
 ```
@@ -403,15 +427,15 @@ Prono (2014) uses the following simulation design:
 # Set up parameters matching Prono (2014) Table I, Case 1
 prono_params <- list(
   # True structural parameters
-  beta1_0 = 1,    # Intercept in first equation
-  beta2 = 1,      # Coefficient on Y2
-  delta = 1,      # Intercept in second equation
+  beta1_0 = 1, # Intercept in first equation
+  beta2 = 1, # Coefficient on Y2
+  delta = 1, # Intercept in second equation
 
   # GARCH parameters from Table I, Case 1
   garch_params = list(
     omega = 0.1,
-    alpha = 0.1,   # Paper uses α₁₁ = α₁₂ = 0.10
-    beta = 0.7     # Paper uses β₁₂,₁₀ = β₂₂,₂₀ = 0.70
+    alpha = 0.1, # Paper uses α₁₁ = α₁₂ = 0.10
+    beta = 0.7 # Paper uses β₁₂,₁₀ = β₂₂,₂₀ = 0.70
   ),
 
   # Sample size (paper uses 1000 after dropping 200)
@@ -424,7 +448,6 @@ prono_params <- list(
 
 # Function to run Prono replication with specified correlation
 run_prono_replication <- function(rho, n_sims = 1000) {
-
   results <- vector("list", n_sims)
 
   # Progress bar for long simulation
@@ -434,10 +457,10 @@ run_prono_replication <- function(rho, n_sims = 1000) {
     # Create config for this simulation
     config <- create_prono_config(
       n = prono_params$n,
-      k = 1,  # At least one X variable needed
-      beta1 = c(prono_params$beta1_0, 0),  # Intercept + 0 for X
-      beta2 = c(prono_params$delta, 0),     # Intercept + 0 for X
-      gamma1 = prono_params$beta2,    # This is β₂ in paper
+      k = 1, # At least one X variable needed
+      beta1 = c(prono_params$beta1_0, 0), # Intercept + 0 for X
+      beta2 = c(prono_params$delta, 0), # Intercept + 0 for X
+      gamma1 = prono_params$beta2, # This is β₂ in paper
       garch_params = prono_params$garch_params,
       sigma1 = prono_params$sigma1,
       rho = rho,
@@ -446,18 +469,21 @@ run_prono_replication <- function(rho, n_sims = 1000) {
     )
 
     # Run single simulation
-    tryCatch({
-      sim_result <- run_single_prono_simulation(config)
-      results[[i]] <- data.frame(
-        ols_beta2 = sim_result$gamma1_ols,
-        prono_beta2 = sim_result$gamma1_iv,
-        ols_bias = sim_result$bias_ols,
-        prono_bias = sim_result$bias_iv,
-        f_stat = sim_result$f_stat
-      )
-    }, error = function(e) {
-      results[[i]] <- NULL
-    })
+    tryCatch(
+      {
+        sim_result <- run_single_prono_simulation(config)
+        results[[i]] <- data.frame(
+          ols_beta2 = sim_result$gamma1_ols,
+          prono_beta2 = sim_result$gamma1_iv,
+          ols_bias = sim_result$bias_ols,
+          prono_bias = sim_result$bias_iv,
+          f_stat = sim_result$f_stat
+        )
+      },
+      error = function(e) {
+        results[[i]] <- NULL
+      }
+    )
 
     setTxtProgressBar(pb, i)
   }
@@ -472,8 +498,10 @@ run_prono_replication <- function(rho, n_sims = 1000) {
     Mean_Bias = c(mean(results_df$ols_bias), mean(results_df$prono_bias)),
     Median_Bias = c(median(results_df$ols_bias), median(results_df$prono_bias)),
     SD = c(sd(results_df$ols_beta2), sd(results_df$prono_beta2)),
-    RMSE = c(sqrt(mean(results_df$ols_bias^2)),
-             sqrt(mean(results_df$prono_bias^2)))
+    RMSE = c(
+      sqrt(mean(results_df$ols_bias^2)),
+      sqrt(mean(results_df$prono_bias^2))
+    )
   )
 
   list(results = results_df, summary = summary_stats)
@@ -481,7 +509,7 @@ run_prono_replication <- function(rho, n_sims = 1000) {
 
 # Run replications for both correlation states
 cat("Running replication for ρ = 0.20 (low correlation)...\n")
-results_low <- run_prono_replication(rho = 0.20, n_sims = 200)  # Reduced for vignette
+results_low <- run_prono_replication(rho = 0.20, n_sims = 200) # Reduced for vignette
 
 cat("\nRunning replication for ρ = 0.40 (high correlation)...\n")
 results_high <- run_prono_replication(rho = 0.40, n_sims = 200)
@@ -530,11 +558,13 @@ plot_data <- rbind(
 p_replication <- ggplot(plot_data, aes(x = Estimate, fill = Method)) +
   geom_density(alpha = 0.6) +
   geom_vline(xintercept = 1, linetype = "dashed", size = 1) +
-  facet_wrap(~ Correlation, scales = "free_y") +
-  labs(title = "Replication of Prono (2014) Results",
-       subtitle = "True β₂ = 1 (dashed line)",
-       x = "Estimate of β₂",
-       y = "Density") +
+  facet_wrap(~Correlation, scales = "free_y") +
+  labs(
+    title = "Replication of Prono (2014) Results",
+    subtitle = "True β₂ = 1 (dashed line)",
+    x = "Estimate of β₂",
+    y = "Density"
+  ) +
   theme_minimal() +
   scale_fill_manual(values = c("OLS" = "#E74C3C", "Prono" = "#3498DB")) +
   theme(legend.position = "bottom")
@@ -543,21 +573,27 @@ print(p_replication)
 
 # First-stage F-statistics
 f_stats_data <- data.frame(
-  Correlation = c(rep("Low (ρ = 0.20)", nrow(results_low$results)),
-                  rep("High (ρ = 0.40)", nrow(results_high$results))),
+  Correlation = c(
+    rep("Low (ρ = 0.20)", nrow(results_low$results)),
+    rep("High (ρ = 0.40)", nrow(results_high$results))
+  ),
   F_stat = c(results_low$results$f_stat, results_high$results$f_stat)
 )
 
 p_fstats <- ggplot(f_stats_data, aes(x = F_stat, fill = Correlation)) +
   geom_histogram(alpha = 0.6, bins = 30, position = "identity") +
   geom_vline(xintercept = 10, linetype = "dashed", color = "red") +
-  labs(title = "First-Stage F-Statistics in Replication",
-       subtitle = "Weak instrument threshold = 10 (red line)",
-       x = "F-statistic",
-       y = "Count") +
+  labs(
+    title = "First-Stage F-Statistics in Replication",
+    subtitle = "Weak instrument threshold = 10 (red line)",
+    x = "F-statistic",
+    y = "Count"
+  ) +
   theme_minimal() +
-  scale_fill_manual(values = c("Low (ρ = 0.20)" = "#3498DB",
-                               "High (ρ = 0.40)" = "#E74C3C"))
+  scale_fill_manual(values = c(
+    "Low (ρ = 0.20)" = "#3498DB",
+    "High (ρ = 0.40)" = "#E74C3C"
+  ))
 
 print(p_fstats)
 ```
@@ -614,12 +650,16 @@ ff30_industries <- download_french_data("30 Industry Portfolios")
 # Alternative using FFdownload package
 library(FFdownload)
 tempf <- tempfile(fileext = ".RData")
-inputlist <- c("F-F_Research_Data_Factors",
-               "25_Portfolios_5x5",
-               "30_Industry_Portfolios")
-FFdownload(output_file = tempf,
-           inputlist = inputlist,
-           exclude_daily = FALSE)  # We want weekly data
+inputlist <- c(
+  "F-F_Research_Data_Factors",
+  "25_Portfolios_5x5",
+  "30_Industry_Portfolios"
+)
+FFdownload(
+  output_file = tempf,
+  inputlist = inputlist,
+  exclude_daily = FALSE
+) # We want weekly data
 ```
 
 ### Downloading Treasury Bill Rates
@@ -632,15 +672,15 @@ fredr_set_key("YOUR_API_KEY_HERE")
 
 # Download 1-month (4-week) Treasury bill rate
 tb_rate <- fredr(
-  series_id = "TB4WK",  # 4-week Treasury bill secondary market rate
+  series_id = "TB4WK", # 4-week Treasury bill secondary market rate
   observation_start = as.Date("1963-07-05"),
   observation_end = as.Date("2004-12-31"),
-  frequency = "w"  # Weekly
+  frequency = "w" # Weekly
 )
 
 # Alternative: 3-month Treasury bill (if 1-month not available for full period)
 tb_rate_3m <- fredr(
-  series_id = "TB3MS",  # 3-month Treasury bill secondary market rate
+  series_id = "TB3MS", # 3-month Treasury bill secondary market rate
   observation_start = as.Date("1963-07-05"),
   observation_end = as.Date("2004-12-31"),
   frequency = "w"
@@ -658,13 +698,16 @@ Since CRSP data requires a subscription, we can use alternatives:
 # Option 2: Download S&P 500 as proxy (using tidyquant)
 library(tidyquant)
 sp500 <- tq_get("^GSPC",
-                get = "stock.prices",
-                from = "1963-07-05",
-                to = "2004-12-31") %>%
-  tq_transmute(select = adjusted,
-               mutate_fun = periodReturn,
-               period = "weekly",
-               col_rename = "sp500_return")
+  get = "stock.prices",
+  from = "1963-07-05",
+  to = "2004-12-31"
+) |>
+  tq_transmute(
+    select = adjusted,
+    mutate_fun = periodReturn,
+    period = "weekly",
+    col_rename = "sp500_return"
+  )
 
 # Option 3: Use broader market ETF data (if available for period)
 # Note: Most ETFs don't go back to 1963
@@ -678,7 +721,6 @@ sp500 <- tq_get("^GSPC",
 
 # Assume we have weekly portfolio returns and factors
 prepare_prono_data <- function(portfolio_returns, market_factor, rf_rate) {
-
   # Merge all data by date
   data <- portfolio_returns |>
     left_join(market_factor, by = "date") |>
@@ -688,7 +730,7 @@ prepare_prono_data <- function(portfolio_returns, market_factor, rf_rate) {
   data <- data |>
     mutate(
       Y1 = portfolio_return - RF, # Portfolio excess return
-      Y2 = market_factor - RF    # Market excess return (the factor)
+      Y2 = market_factor - RF # Market excess return (the factor)
     )
 
   # Structure for Prono's model: Y1 = portfolio excess return, Y2 = market excess return
@@ -720,10 +762,10 @@ run_prono_asset_pricing <- function(data, window_size = 260) {
     # Create Prono configuration for percent returns
     config <- create_prono_config(
       n = nrow(window_data),
-      k = 0,  # No additional X variables
-      beta1 = c(mean(window_data$Y1), 0),  # Use sample mean
-      beta2 = c(mean(window_data$Y2), 0),  # Use sample mean (should be ~0.097%)
-      gamma1 = 1,  # Initial guess for beta
+      k = 0, # No additional X variables
+      beta1 = c(mean(window_data$Y1), 0), # Use sample mean
+      beta2 = c(mean(window_data$Y2), 0), # Use sample mean (should be ~0.097%)
+      gamma1 = 1, # Initial guess for beta
       verbose = FALSE
     )
 
@@ -731,31 +773,34 @@ run_prono_asset_pricing <- function(data, window_size = 260) {
     prono_df <- data.frame(
       Y1 = window_data$Y1,
       Y2 = window_data$Y2,
-      time = 1:nrow(window_data)
+      time = seq_len(nrow(window_data))
     )
 
     # Estimate using Prono method
-    tryCatch({
-      # First get residuals for GARCH estimation
-      e2 <- residuals(lm(Y2 ~ 1, data = prono_df))
+    tryCatch(
+      {
+        # First get residuals for GARCH estimation
+        e2 <- residuals(lm(Y2 ~ 1, data = prono_df))
 
-      # Fit GARCH if tsgarch available
-      if (requireNamespace("tsgarch", quietly = TRUE)) {
-        spec <- tsgarch::garch_modelspec(
-          y = e2,
-          model = "garch",
-          order = c(1, 1),
-          constant = TRUE,
-          distribution = "norm"
-        )
-        garch_fit <- tsgarch::estimate(spec)
+        # Fit GARCH if tsgarch available
+        if (requireNamespace("tsgarch", quietly = TRUE)) {
+          spec <- tsgarch::garch_modelspec(
+            y = e2,
+            model = "garch",
+            order = c(1, 1),
+            constant = TRUE,
+            distribution = "norm"
+          )
+          garch_fit <- tsgarch::estimate(spec)
 
-        # Continue with Prono estimation...
-      }
-    }, error = function(e) NULL)
+          # Continue with Prono estimation...
+        }
+      },
+      error = function(e) NULL
+    )
   }
 
-  return(results)
+  results
 }
 ```
 

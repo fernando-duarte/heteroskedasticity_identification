@@ -57,7 +57,7 @@ cat(sprintf("   OLS bias: %.3f (Prono reports ~0.375 for ρ=0.4)\n",
             mean(mc_results$bias_ols)))
 cat(sprintf("   IV bias: %.3f\n", mean(mc_results$bias_iv)))
 cat(sprintf("   Bias reduction: %.1f%%\n",
-            100 * (1 - abs(mean(mc_results$bias_iv))/abs(mean(mc_results$bias_ols)))))
+            100 * (1 - abs(mean(mc_results$bias_iv)) / abs(mean(mc_results$bias_ols)))))
 
 # 5. Summary
 cat("\n=== SUMMARY ===\n")

@@ -16,7 +16,7 @@
 # Project documentation (source files)
 # Project-specific directories
 # Python/reticulate
-# R package build ignore file - Updated June 2025
+# R package build ignore file
 # R temporary files
 # Regular expression to match dotfiles not covered above
 # Scripts and tools
@@ -46,6 +46,7 @@
 ^.*\.tmp$
 ^.*\.toc$
 ^.*\.zip$
+^.*\\.DS_Store$
 ^.*_cache$
 ^.*_files$
 ^.*~$
@@ -64,6 +65,7 @@
 ^Dockerfile$
 ^Dockerfile\.dev$
 ^FINAL_DOCKER_FIXES\.md$
+^GMM_DOCUMENTATION_UPDATES\.md$
 ^LICENSE\.md$
 ^Makefile$
 ^Meta$
@@ -77,6 +79,7 @@
 ^RENDO_COMPARISON_REPORT\.md$
 ^RENDO_MATCHING_SUMMARY\.md$
 ^REPLICATION_RESULTS\.md$
+^Rplots\.pdf$
 ^STATA_COMPARISON_REPORT\.md$
 ^TAGS$
 ^TODO$
@@ -104,6 +107,7 @@
 ^\.augmentrules$
 ^\.circleci$
 ^\.claude$
+^\.codecov\.yml$
 ^\.coverage$
 ^\.cursorignore$
 ^\.cursorrules$
@@ -128,13 +132,17 @@
 ^\.pre-commit-hooks\.yaml$
 ^\.pytest_cache$
 ^\.secrets$
+^\.styler\.yml$
 ^\.sublime-project$
 ^\.sublime-workspace$
 ^\.tags$
 ^\.tox$
 ^\.travis\.yml$
+^\.trivyignore$
 ^\.venv$
 ^\.vscode$
+^\\.DS_Store$
+^\\.\\.*Rcheck
 ^__pycache__$
 ^_book$
 ^_pkgdown\.yml$
@@ -153,8 +161,10 @@
 ^cran-comments\.md$
 ^credentials$
 ^data-raw$
+^detailed_test_failures\.txt$
 ^dev$
 ^dev-guides$
+^dev-guides/\\.DS_Store$
 ^dev/.*$
 ^diary\.md$
 ^doc$
@@ -165,6 +175,9 @@
 ^enable_github_pages\.sh$
 ^error\.md$
 ^examples$
+^final_test_output\.txt$
+^final_test_results\.txt$
+^final_test_run\.txt$
 ^hetid\.Rcheck$
 ^hetid_.*\.tar\.gz$
 ^htmlcov$
@@ -172,12 +185,14 @@
 ^ideas\.txt$
 ^inst/.*\.md$
 ^inst/WORDLIST$
+^inst/\\.DS_Store$
 ^inst/extdata/.*\.RData$
 ^inst/precommit-.*\.md$
 ^inst/scripts$
 ^journal\.md$
 ^lewbel2012$
-^lewbel2012/.*\.pdf$
+^lewbel2012/
+^lewbel2012/\\.DS_Store$
 ^lewbel_implementations_comparison\.tex$
 ^lewbel_methods_summary\.tex$
 ^local-todo\.md$
@@ -206,7 +221,11 @@
 ^setup_env\.sh$
 ^simulation-results$
 ^tags$
+^temp$
+^test-utils\.R$
 ^test_docker_workflow\.sh$
+^test_output\.txt$
+^test_results\.txt$
 ^tests/testthat/\.cache$
 ^tmux\.md$
 ^tools$

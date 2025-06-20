@@ -38,10 +38,9 @@
 #'
 #' @export
 fit_diagonal_garch_prono <- function(data,
-                                    garch_order = c(1, 1),
-                                    ar_ma_order = c(1, 1),
-                                    verbose = TRUE) {
-
+                                     garch_order = c(1, 1),
+                                     ar_ma_order = c(1, 1),
+                                     verbose = TRUE) {
   # Extract returns first
   returns <- as.matrix(data[, c("Y1", "Y2")])
   colnames(returns) <- c("Y1", "Y2")
@@ -63,82 +62,87 @@ fit_diagonal_garch_prono <- function(data,
     cat("Data dimensions:", nrow(returns), "observations,", ncol(returns), "series\n")
   }
 
-  tryCatch({
-    # Step 1: Specify univariate GARCH for each series
-    # Using tsgarch for univariate specifications
-    spec1 <- tsgarch::garch_modelspec(
-      model = "garch",
-      order = garch_order,
-      constant = TRUE,
-      distribution = "norm"
-    )
+  tryCatch(
+    {
+      # Step 1: Specify univariate GARCH for each series
+      # Using tsgarch for univariate specifications
+      spec1 <- tsgarch::garch_modelspec(
+        model = "garch",
+        order = garch_order,
+        constant = TRUE,
+        distribution = "norm"
+      )
 
-    spec2 <- tsgarch::garch_modelspec(
-      model = "garch",
-      order = garch_order,
-      constant = TRUE,
-      distribution = "norm"
-    )
+      spec2 <- tsgarch::garch_modelspec(
+        model = "garch",
+        order = garch_order,
+        constant = TRUE,
+        distribution = "norm"
+      )
 
-    # Step 2: Create multivariate specification using diagonal VECH
-    # The diagonal VECH is the most direct implementation of Prono's model
-    mv_spec <- tsmarch::dcc_modelspec(
-      uspec = list(spec1, spec2),
-      dynamics = "adcc",  # Asymmetric DCC can reduce to diagonal
-      distribution = "mvnorm"
-    )
+      # Step 2: Create multivariate specification using diagonal VECH
+      # The diagonal VECH is the most direct implementation of Prono's model
+      mv_spec <- tsmarch::dcc_modelspec(
+        uspec = list(spec1, spec2),
+        dynamics = "adcc", # Asymmetric DCC can reduce to diagonal
+        distribution = "mvnorm"
+      )
 
-    # Step 3: Fit the model
-    mv_fit <- tryCatch({
-      # Using a simpler fit for faster execution in tests, eval.se = TRUE is very slow
-      tsmethods::estimate(mv_spec, y = returns)
-    }, error = function(e) {
-      if (verbose) messager("DCC-GARCH fitting failed: ", e$message, ". Check data and model specification.")
-    })
+      # Step 3: Fit the model
+      mv_fit <- tryCatch(
+        {
+          # Using a simpler fit for faster execution in tests, eval.se = TRUE is very slow
+          tsmethods::estimate(mv_spec, y = returns)
+        },
+        error = function(e) {
+          if (verbose) messager("DCC-GARCH fitting failed: ", e$message, ". Check data and model specification.")
+        }
+      )
 
-    if (is.null(mv_fit)) {
-      return(NULL)
+      if (is.null(mv_fit)) {
+        return(NULL)
+      }
+
+      # Extract conditional variances and covariances
+      h_t_matrix <- fitted(mv_fit) # Conditional covariance matrices
+      n_obs <- dim(h_t_matrix)[3]
+      sigma1_sq <- numeric(n_obs)
+      sigma2_sq <- numeric(n_obs)
+      sigma12 <- numeric(n_obs)
+
+      for (t in 1:n_obs) {
+        h_matrix <- h_t_matrix[, , t]
+        sigma1_sq[t] <- h_matrix[1, 1]
+        sigma2_sq[t] <- h_matrix[2, 2]
+        sigma12[t] <- h_matrix[1, 2]
+      }
+
+      # Residuals (standardized)
+      std_resid <- as.data.frame(residuals(mv_fit))
+
+      # Return results
+      result <- list(
+        fit = mv_fit,
+        sigma1_sq = sigma1_sq,
+        sigma2_sq = sigma2_sq,
+        sigma12 = sigma12,
+        residuals = std_resid,
+        spec = mv_spec,
+        convergence = mv_fit$convergence
+      )
+
+      result
+    },
+    error = function(e) {
+      if (verbose) {
+        cat("Error in diagonal GARCH fitting:", e$message, "\n")
+        cat("Falling back to simpler specification...\n")
+      }
+
+      # Fallback: Use DCC-GARCH which is well-tested
+      fit_dcc_garch_fallback(returns, garch_order, verbose)
     }
-
-    # Extract conditional variances and covariances
-    h_t_matrix <- fitted(mv_fit)  # Conditional covariance matrices
-    n_obs <- dim(h_t_matrix)[3]
-    sigma1_sq <- numeric(n_obs)
-    sigma2_sq <- numeric(n_obs)
-    sigma12 <- numeric(n_obs)
-
-    for (t in 1:n_obs) {
-      h_matrix <- h_t_matrix[, , t]
-      sigma1_sq[t] <- h_matrix[1, 1]
-      sigma2_sq[t] <- h_matrix[2, 2]
-      sigma12[t] <- h_matrix[1, 2]
-    }
-
-    # Residuals (standardized)
-    std_resid <- as.data.frame(residuals(mv_fit))
-
-    # Return results
-    result <- list(
-      fit = mv_fit,
-      sigma1_sq = sigma1_sq,
-      sigma2_sq = sigma2_sq,
-      sigma12 = sigma12,
-      residuals = std_resid,
-      spec = mv_spec,
-      convergence = mv_fit$convergence
-    )
-
-    result
-
-  }, error = function(e) {
-    if (verbose) {
-      cat("Error in diagonal GARCH fitting:", e$message, "\n")
-      cat("Falling back to simpler specification...\n")
-    }
-
-    # Fallback: Use DCC-GARCH which is well-tested
-    fit_dcc_garch_fallback(returns, garch_order, verbose)
-  })
+  )
 }
 
 
@@ -153,7 +157,6 @@ fit_diagonal_garch_prono <- function(data,
 #' @return Same structure as fit_diagonal_garch_prono
 #' @keywords internal
 fit_dcc_garch_fallback <- function(returns, garch_order = c(1, 1), verbose = TRUE) {
-
   if (!requireNamespace("tsgarch", quietly = TRUE)) {
     stop("Package 'tsgarch' is required for GARCH modeling. Please install it.")
   }
@@ -209,7 +212,7 @@ fit_dcc_garch_fallback <- function(returns, garch_order = c(1, 1), verbose = TRU
     sigma2_sq = sigma2_sq,
     sigma12 = sigma12,
     residuals = residuals,
-    spec = uspec,
+    spec = list(spec1 = spec1, spec2 = spec2),
     convergence = 0 # Assuming univariate fits converged if no error
   )
 
@@ -277,10 +280,9 @@ estimate_dynamic_correlation <- function(z1, z2, lambda = 0.94) {
 #'
 #' @export
 prono_diagonal_garch <- function(data,
-                                method = c("2sls", "gmm"),
-                                garch_order = c(1, 1),
-                                verbose = TRUE) {
-
+                                 method = c("2sls", "gmm"),
+                                 garch_order = c(1, 1),
+                                 verbose = TRUE) {
   method <- match.arg(method)
 
   # Step 1: Fit diagonal GARCH to get conditional variances
@@ -300,7 +302,7 @@ prono_diagonal_garch <- function(data,
       n = nrow(data),
       beta1 = c(mean(data$Y1), rep(0, sum(grepl("^X", names(data))))),
       beta2 = c(mean(data$Y2), rep(0, sum(grepl("^X", names(data))))),
-      gamma1 = 1.0,  # Initial guess
+      gamma1 = 1.0, # Initial guess
       k = sum(grepl("^X", names(data))),
       garch_params = list(omega = 0.2, alpha = 0.1, beta = 0.85),
       sigma1 = sd(data$Y1),
@@ -321,7 +323,7 @@ prono_diagonal_garch <- function(data,
     result <- prono_gmm(
       data,
       gmm_type = "twoStep",
-      fit_garch = FALSE,  # Already fitted
+      fit_garch = FALSE, # Already fitted
       verbose = verbose
     )
   }
@@ -365,11 +367,10 @@ prono_diagonal_garch <- function(data,
 #' @importFrom utils txtProgressBar setTxtProgressBar
 #' @export
 replicate_prono_table2 <- function(n_sim = 1000,
-                                  n_obs = 500,
-                                  config = create_prono_config(n = n_obs),
-                                  use_diagonal_garch = TRUE,
-                                  verbose = TRUE) {
-
+                                   n_obs = 500,
+                                   config = create_prono_config(n = n_obs),
+                                   use_diagonal_garch = TRUE,
+                                   verbose = TRUE) {
   results <- vector("list", n_sim)
 
   if (verbose) {
@@ -392,32 +393,35 @@ replicate_prono_table2 <- function(n_sim = 1000,
 
     if (use_diagonal_garch) {
       # Use diagonal GARCH
-      tryCatch({
-        est <- prono_diagonal_garch(data, method = "2sls", verbose = FALSE)
-        results[[i]] <- data.frame(
-          sim = i,
-          gamma1_true = config$gamma1,
-          gamma1_ols = est$gamma1_ols,
-          gamma1_iv = est$gamma1_iv,
-          bias_ols = est$bias_ols,
-          bias_iv = est$bias_iv,
-          se_ols = est$se_ols,
-          se_iv = est$se_iv,
-          f_stat = est$f_stat
-        )
-      }, error = function(e) {
-        results[[i]] <- data.frame(
-          sim = i,
-          gamma1_true = config$gamma1,
-          gamma1_ols = NA,
-          gamma1_iv = NA,
-          bias_ols = NA,
-          bias_iv = NA,
-          se_ols = NA,
-          se_iv = NA,
-          f_stat = NA
-        )
-      })
+      tryCatch(
+        {
+          est <- prono_diagonal_garch(data, method = "2sls", verbose = FALSE)
+          results[[i]] <- data.frame(
+            sim = i,
+            gamma1_true = config$gamma1,
+            gamma1_ols = est$gamma1_ols,
+            gamma1_iv = est$gamma1_iv,
+            bias_ols = est$bias_ols,
+            bias_iv = est$bias_iv,
+            se_ols = est$se_ols,
+            se_iv = est$se_iv,
+            f_stat = est$f_stat
+          )
+        },
+        error = function(e) {
+          results[[i]] <- data.frame(
+            sim = i,
+            gamma1_true = config$gamma1,
+            gamma1_ols = NA,
+            gamma1_iv = NA,
+            bias_ols = NA,
+            bias_iv = NA,
+            se_ols = NA,
+            se_iv = NA,
+            f_stat = NA
+          )
+        }
+      )
     } else {
       # Use standard univariate GARCH
       # Update config with new seed
