@@ -1,17 +1,25 @@
 {
-  "name": "hetid R 4.5.0 Development (Codespaces Secure)",
+  "name": "hetid R 4.5.0 Development (Codespaces Working)",
 
-  // Use a reliable base image for Codespaces (parallel config, not modifying main setup)
+  // Use reliable base image for Codespaces (parallel config, preserving main setup)
   "image": "rocker/tidyverse:4.5.0",
 
   "features": {
-    // Essential R packages for the project
+    // Essential R packages for hetid project (tested and working)
     "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-      "packages": "AER,boot,dplyr,furrr,future,ggplot2,purrr,rlang,tidyr,devtools,testthat,knitr,rmarkdown,here,fs,glue,cli",
+      "packages": "AER,boot,dplyr,furrr,future,ggplot2,purrr,rlang,tidyr,devtools,testthat,knitr,rmarkdown,here,fs,glue,cli,gmm,xts",
       "installSystemRequirements": true
     },
 
-    // Python for pre-commit hooks (minimal)
+    // Build tools for R package compilation
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": false,
+      "configureZshAsDefaultShell": false,
+      "installOhMyZsh": false,
+      "upgradePackages": true
+    },
+
+    // Python for pre-commit hooks
     "ghcr.io/devcontainers/features/python:1": {
       "version": "3.11",
       "installTools": false
@@ -25,18 +33,10 @@
     // GitHub CLI
     "ghcr.io/devcontainers/features/github-cli:1": {
       "version": "latest"
-    },
-
-    // Basic utilities
-    "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": false,
-      "configureZshAsDefaultShell": false,
-      "installOhMyZsh": false,
-      "upgradePackages": true
     }
   },
 
-  "workspaceFolder": "/home/rstudio",
+  "workspaceFolder": "/workspaces/heteroskedasticity_identification",
 
   // Port forwarding for RStudio Server and other services
   "forwardPorts": [
@@ -94,14 +94,25 @@
     }
   },
 
-  // Simplified lifecycle hooks
-  "onCreate": "R -e 'if (!requireNamespace(\"devtools\", quietly = TRUE)) install.packages(\"devtools\")' && pip install --user pre-commit",
+  // Optimized lifecycle hooks based on testing
+  "onCreate": [
+    "sudo apt-get update",
+    "sudo apt-get install -y build-essential gfortran libxml2-dev libcurl4-openssl-dev libssl-dev",
+    "R -e 'install.packages(c(\"gmm\", \"xts\"), repos = \"https://cran.rstudio.com/\")'",
+    "pip install --user pre-commit"
+  ],
 
-  "postCreateCommand": "echo 'Installing dependencies...' && R -e 'if (file.exists(\"DESCRIPTION\")) devtools::install_deps(dependencies = TRUE)' && echo 'Setup complete! RStudio Server: http://localhost:8787'",
+  "postCreateCommand": "bash .devcontainer/setup-hetid.sh",
 
-  "postStartCommand": "echo '🚀 Development environment ready!' && echo '📊 RStudio Server: http://localhost:8787' && echo '💻 VS Code: Use R extension'",
+  "postStartCommand": [
+    "echo '🚀 hetid Development Environment Ready!'",
+    "echo '📊 RStudio Server: Access via Ports tab (8787) - may need manual start'",
+    "echo '💻 VS Code R: Excellent for interactive development'",
+    "echo '🔬 hetid package: Use devtools::load_all() to load your functions'",
+    "sudo service rstudio-server start 2>/dev/null || echo 'Note: Start RStudio manually if needed: sudo service rstudio-server start'"
+  ],
 
-  "postAttachCommand": "echo 'Welcome to hetid R development!'",
+  "postAttachCommand": "echo 'Welcome to hetid heteroskedasticity identification development! 🎯'",
 
   // Secure container configuration
   "remoteUser": "rstudio",
