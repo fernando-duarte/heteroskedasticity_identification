@@ -43,7 +43,7 @@ The triangular model consists of two equations:
 \deqn{Y_2 = X'\beta_2 + \epsilon_2}
 
 where Y_1 is the outcome variable, Y_2 is the endogenous regressor,
-X is a vector of exogenous variables, and (\epsilon_1, \epsilon_2) are
+X is a vector of exogenous variables, and \eqn{(\epsilon_1, \epsilon_2)} are
 the structural errors.
 
 The error structure follows a single-factor model:
