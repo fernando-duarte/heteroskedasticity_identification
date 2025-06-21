@@ -81,6 +81,9 @@ scratch/
 temp/
 test_results.txt
 
+# Development data persistence (Codespaces)
+.dev-data/
+
 # Temporary monitoring scripts
 monitor_pr_checks.sh
 check_monitor_status.sh

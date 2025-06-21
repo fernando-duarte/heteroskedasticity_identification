@@ -12,16 +12,15 @@ services:
       args:
         BUILDKIT_INLINE_CACHE: 1
 
-    # Codespaces-specific environment variables
+    # Codespaces-specific environment variables (secure configuration)
     environment:
-      - DISABLE_AUTH=true
-      - ROOT=true
       - RSTUDIO_WHICH_R=/usr/local/bin/R
       - R_LIBS_USER=/usr/local/lib/R/site-library
       - GITHUB_CODESPACES=true
       - CODESPACE_NAME=${CODESPACE_NAME:-hetid-dev}
       - GITHUB_USER=${GITHUB_USER:-}
       - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+      - PASSWORD=${RSTUDIO_PASSWORD:-codespaces}
 
     # Port mappings for Codespaces
     ports:
@@ -38,6 +37,9 @@ services:
       - hetid-codespaces-libs:/usr/local/lib/R/site-library
       - hetid-codespaces-rstudio:/home/rstudio/.rstudio
       - hetid-codespaces-cache:/home/rstudio/.cache
+
+      # Development data persistence (git-ignored)
+      - hetid-dev-data:/home/rstudio/hetid/.dev-data
 
       # Git configuration from Codespaces
       - /tmp/.gitconfig:/home/rstudio/.gitconfig:ro
@@ -78,6 +80,8 @@ volumes:
   hetid-codespaces-rstudio:
     driver: local
   hetid-codespaces-cache:
+    driver: local
+  hetid-dev-data:
     driver: local
 
 networks:

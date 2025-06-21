@@ -1,0 +1,77 @@
+{
+  "name": "hetid R 4.5.0 Development (Codespaces Secure)",
+
+  // Extend the main devcontainer configuration
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "../docker-compose.dev.yml",
+    "docker-compose.codespaces.yml"
+  ],
+  "service": "hetid-dev",
+  "workspaceFolder": "/home/rstudio/hetid",
+  "shutdownAction": "stopCompose",
+
+  // Security-focused port configuration
+  "portsAttributes": {
+    "8787": {
+      "label": "RStudio Server",
+      "onAutoForward": "notify",
+      "visibility": "private",
+      "requireLocalPort": false,
+      "protocol": "http"
+    },
+    "8080": {
+      "label": "R Graphics (httpgd)",
+      "onAutoForward": "silent",
+      "visibility": "private",
+      "requireLocalPort": false
+    },
+    "3838": {
+      "label": "Shiny Apps",
+      "onAutoForward": "notify",
+      "visibility": "private"
+    },
+    "4321": {
+      "label": "Quarto Preview",
+      "onAutoForward": "openPreview",
+      "visibility": "private"
+    }
+  },
+
+  // Secure container configuration
+  "remoteUser": "rstudio",
+  "containerUser": "rstudio",
+
+  // Secure environment variables (no ROOT or DISABLE_AUTH)
+  "remoteEnv": {
+    "RSTUDIO_WHICH_R": "/usr/local/bin/R",
+    "R_LIBS_USER": "/usr/local/lib/R/site-library",
+    "GITHUB_CODESPACES": "true",
+    "PAK_INSTALL_RETRIES": "3"
+  },
+
+  // Free tier compatible resources
+  "hostRequirements": {
+    "cpus": 2,
+    "memory": "4gb",
+    "storage": "32gb"
+  },
+
+  // Secure run arguments
+  "runArgs": [
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+
+  // Post-creation setup
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+
+  // Lifecycle scripts
+  "postStartCommand": "echo 'Secure Codespace started! RStudio Server available on port 8787 (authentication required)'",
+
+  // Persistent mounts
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/home/rstudio/hetid,type=bind,consistency=cached"
+  ]
+}
