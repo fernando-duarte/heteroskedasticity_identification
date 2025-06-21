@@ -39,7 +39,7 @@ See the [package website](https://fernando-duarte.github.io/heteroskedasticity_i
 
 ## Quick Start Options
 
-### 🚀 GitHub Codespaces
+### GitHub Codespaces
 
 Get started instantly with a fully configured cloud development environment:
 

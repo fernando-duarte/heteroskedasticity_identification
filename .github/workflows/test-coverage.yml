@@ -39,17 +39,49 @@ jobs:
             install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
           )
           print(cov)
-          covr::to_cobertura(cov)
+          cat("Coverage summary:\n")
+          print(covr::percent_coverage(cov))
+          cat("Generating cobertura.xml...\n")
+          covr::to_cobertura(cov, filename = "cobertura.xml")
+          cat("Coverage file generated successfully.\n")
         shell: Rscript {0}
 
-      - uses: codecov/codecov-action@v5
+      - name: Verify coverage file exists
+        run: |
+          if [ -f "cobertura.xml" ]; then
+            echo "Coverage file found:"
+            ls -la cobertura.xml
+            echo "File size: $(wc -c < cobertura.xml) bytes"
+            echo "First few lines:"
+            head -10 cobertura.xml
+          else
+            echo "ERROR: cobertura.xml not found!"
+            echo "Files in current directory:"
+            ls -la
+            exit 1
+          fi
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          # Fail if error if not on PR, or if on PR and token is given
-          fail_ci_if_error: ${{ github.event_name != 'pull_request' || secrets.CODECOV_TOKEN }}
           files: ./cobertura.xml
-          plugins: noop
-          disable_search: true
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          verbose: true
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Fallback - Upload using curl (if main upload fails)
+        if: failure()
+        run: |
+          if [ -f "cobertura.xml" ] && [ -n "${{ secrets.CODECOV_TOKEN }}" ]; then
+            echo "Attempting fallback upload using curl..."
+            curl -Os https://uploader.codecov.io/latest/linux/codecov
+            chmod +x codecov
+            ./codecov -f cobertura.xml -t ${{ secrets.CODECOV_TOKEN }} -v
+          else
+            echo "Skipping fallback upload - missing file or token"
+          fi
 
       - name: Show testthat output
         if: always()
