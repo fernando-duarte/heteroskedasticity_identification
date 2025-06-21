@@ -47,7 +47,7 @@ test_that("analyze_sample_size_results with verbose output", {
     analyze_sample_size_results,
     results_by_n = results_by_n,
     config = config,
-    expected_output = c("Sample Size Analysis", "Consistency Check")
+    expected_output = c("Consistency Check", "Performance by Sample Size")
   )
 
   expect_s3_class(analysis, "data.frame")
