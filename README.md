@@ -20,17 +20,16 @@ The `hetid` package implements identification through heteroskedasticity methods
   - Traditional 2SLS (Two-Stage Least Squares) estimation
   - Set identification when point identification assumptions are relaxed
 - **Rigobon (2003)**: Identification using discrete regime indicators
-  - GMM estimation for regime-based heteroskedasticity (new!)
+  - GMM estimation for regime-based heteroskedasticity
   - 2SLS with regime-based instruments
   - Support for both triangular and simultaneous systems
 - **Prono (2014)**: GARCH-based heteroskedasticity identification
-  - GMM estimation using conditional variance from GARCH models (new!)
+  - GMM estimation using conditional variance from GARCH models
   - 2SLS with GARCH-based instruments
-  - Suitable for financial time series with volatility clustering
-- **Set identification** when point identification hypotheses are not met
+  - Support for triangular systems
 - **Comparison tools** with other implementations (REndo, Stata)
-- **Monte Carlo validation** of theoretical results
-- **Visualization tools** for understanding estimator performance
+- **Monte Carlo simulation** to validate theoretical results and bootstrap
+- **Visualization tools**
 
 ### Applications
 - Identification in models with endogenous regressors by heteroskedasticity
@@ -40,7 +39,7 @@ See the [package website](https://fernando-duarte.github.io/heteroskedasticity_i
 
 ## Quick Start Options
 
-### 🚀 GitHub Codespaces (Recommended)
+### 🚀 GitHub Codespaces
 
 Get started instantly with a fully configured cloud development environment:
 
@@ -74,7 +73,9 @@ devtools::install_github("fernando-duarte/heteroskedasticity_identification")
 
 ### Note on Vignettes
 
-If you're installing from a path containing spaces (e.g., "Dropbox (Personal)"), vignettes may not build correctly during installation. To view the vignette after installation:
+If you're installing from a path containing spaces (e.g., "Dropbox (Personal)"),
+vignettes may not build correctly during installation. To view the vignette
+after installation:
 
 ```r
 # Build vignettes manually if needed
@@ -82,15 +83,6 @@ devtools::build_vignettes()
 
 # View available vignettes
 browseVignettes("hetid")
-```
-
-### Dependencies
-
-The package now includes GMM estimation capabilities using the `gmm` package:
-
-```r
-# Core dependency (installed automatically)
-install.packages("gmm")  # For GMM estimation
 ```
 
 ### Optional Dependencies
@@ -135,11 +127,11 @@ config <- create_default_config()
 data <- generate_lewbel_data(100, config)
 result <- run_single_lewbel_simulation(1, config)
 
-# NEW: GMM estimation for Lewbel
+# GMM estimation for Lewbel
 gmm_result <- lewbel_gmm(data, system = "triangular")
 summary(gmm_result)
 
-# NEW: GMM estimation for Rigobon
+# GMM estimation for Rigobon
 rigobon_data <- generate_rigobon_data(500, list(
   beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
   beta2_0 = 1.0, beta2_1 = -1.0,
@@ -149,7 +141,7 @@ rigobon_data <- generate_rigobon_data(500, list(
 rigobon_result <- rigobon_gmm(rigobon_data)
 summary(rigobon_result)
 
-# NEW: GMM estimation for Prono
+# GMM estimation for Prono
 prono_data <- generate_prono_data(500, create_prono_config())
 prono_result <- prono_gmm(prono_data)
 summary(prono_result)
@@ -158,8 +150,6 @@ summary(prono_result)
 comparison <- compare_gmm_2sls(data)
 print(comparison)
 ```
-
-The package also implements **Rigobon (2003)** regime-based identification. See the [Rigobon Guide](dev-guides/RIGOBON.md) for detailed usage.
 
 ## Testing
 
@@ -179,7 +169,8 @@ Sys.setenv(HETID_TEST_LEVEL = "cran")
 devtools::test()
 ```
 
-Note: Opening the project in RStudio or starting R in the project directory automatically configures the test environment for fast tests.
+Note: Opening the project in RStudio or starting R in the project directory
+automatically configures the test environment for fast tests.
 
 ### Test Organization
 
@@ -197,13 +188,20 @@ See the [Makefile](Makefile) for all available test commands.
 **[Development](dev-guides/DEVELOPMENT.md)**.
 **[Usage](dev-guides/USAGE.md)**.
 **[Troubleshooting](dev-guides/TROUBLESHOOTING.md)**.
-**[Rigobon Method](dev-guides/RIGOBON.md)**.
 
-## References
+## Citation
 
-- Lewbel, A. (2012). Using heteroscedasticity to identify and estimate mismeasured and endogenous regressor models. *Journal of Business & Economic Statistics*, 30(1), 67-80.
-- Prono, T. (2014). The role of conditional heteroskedasticity in identifying and estimating linear triangular systems, with applications to asset pricing models that include a mismeasured factor. *Journal of Applied Econometrics*, 29(5), 800-824.
-- Rigobon, R. (2003). Identification through heteroskedasticity. *The Review of Economics and Statistics*, 85(4), 777-792.
+To cite this package in publications, please use:
+
+```r
+citation("hetid")
+```
+
+This will show citations for:
+- The `hetid` package itself
+- Lewbel (2012) - when using heteroskedasticity identification methods
+- Rigobon (2003) - when using regime-based identification methods
+- Prono (2014) - when using GARCH-based identification methods
 
 ## License
 

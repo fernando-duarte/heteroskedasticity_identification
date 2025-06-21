@@ -39,3 +39,48 @@ bibentry(
     "https://doi.org/10.1080/07350015.2012.643126"
   )
 )
+
+# Reference to the Rigobon paper
+citHeader("\nIf you use the Rigobon (2003) method, please also cite:")
+
+bibentry(
+  bibtype = "Article",
+  title = "Identification through Heteroskedasticity",
+  author = person("Roberto", "Rigobon"),
+  journal = "The Review of Economics and Statistics",
+  year = "2003",
+  volume = "85",
+  number = "4",
+  pages = "777--792",
+  doi = "10.1162/003465303772815727",
+  url = "https://doi.org/10.1162/003465303772815727",
+  textVersion = paste(
+    "Rigobon, Roberto (2003).",
+    "Identification through Heteroskedasticity.",
+    "The Review of Economics and Statistics, 85(4), 777-792.",
+    "https://doi.org/10.1162/003465303772815727"
+  )
+)
+
+# Reference to the Prono paper
+citHeader("\nIf you use the Prono (2014) method, please also cite:")
+
+bibentry(
+  bibtype = "Article",
+  title = "The role of conditional heteroskedasticity in identifying and estimating linear triangular systems, with applications to asset pricing models that include a mismeasured factor",
+  author = person("Todd", "Prono"),
+  journal = "Journal of Applied Econometrics",
+  year = "2014",
+  volume = "29",
+  number = "5",
+  pages = "800--824",
+  doi = "10.1002/jae.2331",
+  url = "https://doi.org/10.1002/jae.2331",
+  textVersion = paste(
+    "Prono, Todd (2014).",
+    "The role of conditional heteroskedasticity in identifying and estimating linear triangular systems,",
+    "with applications to asset pricing models that include a mismeasured factor.",
+    "Journal of Applied Econometrics, 29(5), 800-824.",
+    "https://doi.org/10.1002/jae.2331"
+  )
+)
