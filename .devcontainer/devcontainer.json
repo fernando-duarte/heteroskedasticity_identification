@@ -1,42 +1,38 @@
 {
-  "name": "hetid R 4.5.0 Development (VS Code + RStudio)",
+  "name": "hetid R 4.5.0 Development (Codespaces Simple)",
 
-  // Use the official Rocker devcontainer image with specific R version
-  // Multi-arch support eliminates need for platform specification
-  "image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.5.0",
+  // Use a more reliable and widely available R image for Codespaces
+  // This image is better supported in GitHub Codespaces environment
+  "image": "rocker/tidyverse:4.5.0",
 
   "features": {
-    // R-specific features from Rocker
+    // Essential R packages for the project
     "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-      "packages": "AER,boot,dplyr,furrr,future,ggplot2,purrr,rlang,tidyr,devtools,testthat,knitr,rmarkdown,lintr,styler,covr,pkgdown,here,fs,glue,cli,bench,profvis,httpgd",
+      "packages": "AER,boot,dplyr,furrr,future,ggplot2,purrr,rlang,tidyr,devtools,testthat,knitr,rmarkdown,here,fs,glue,cli",
       "installSystemRequirements": true
     },
-    "ghcr.io/rocker-org/devcontainer-features/r-history:1": {},
-    "ghcr.io/rocker-org/devcontainer-features/renv-cache:1": {},
-    "ghcr.io/rocker-org/devcontainer-features/pandoc:1": {},
-    "ghcr.io/rocker-org/devcontainer-features/quarto:1": {},
 
-    // Python for pre-commit hooks
+    // Python for pre-commit hooks (minimal)
     "ghcr.io/devcontainers/features/python:1": {
       "version": "3.11",
-      "installTools": true
+      "installTools": false
     },
 
-    // Git and GitHub integration
+    // Git integration
     "ghcr.io/devcontainers/features/git:1": {
-      "ppa": true,
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers/features/github-cli:1": {
-      "installDirectlyFromGitHubRelease": true,
       "version": "latest"
     },
 
-    // Additional development tools
+    // GitHub CLI
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    },
+
+    // Basic utilities
     "ghcr.io/devcontainers/features/common-utils:2": {
-      "installZsh": true,
+      "installZsh": false,
       "configureZshAsDefaultShell": false,
-      "installOhMyZsh": true,
+      "installOhMyZsh": false,
       "upgradePackages": true
     }
   },
@@ -45,19 +41,16 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        // R language support (essential for devcontainer)
+        // R language support
         "REditorSupport.r",
-        "RDebugger.r-debugger",
         "reditorsupport.r-lsp",
 
         // Core development tools
-        "quarto.quarto",
         "ms-python.python",
         "GitHub.vscode-pull-request-github"
       ],
 
       "settings": {
-        // Core devcontainer-specific settings
         "terminal.integrated.defaultProfile.linux": "bash",
         "workbench.colorTheme": "Default Dark+",
         "workbench.startupEditor": "readme"
@@ -67,7 +60,7 @@
 
   // Port forwarding for RStudio Server and other services
   "forwardPorts": [
-    8787,  // RStudio Server (already included in tidyverse image)
+    8787,  // RStudio Server
     8080,  // httpgd for VS Code plots
     3838,  // Shiny apps
     4321   // Quarto preview
@@ -99,58 +92,41 @@
     }
   },
 
-  // Lifecycle hooks
-  "onCreate": "R -e 'if (!requireNamespace(\"renv\", quietly = TRUE)) install.packages(\"renv\")' && pip install --user pre-commit",
+  // Simplified lifecycle hooks
+  "onCreate": "R -e 'if (!requireNamespace(\"devtools\", quietly = TRUE)) install.packages(\"devtools\")' && pip install --user pre-commit",
 
-  "postCreateCommand": "pre-commit install && R -e 'devtools::install_deps(dependencies = TRUE)' && echo 'Setup complete! RStudio Server: http://localhost:8787'",
+  "postCreateCommand": "echo 'Installing dependencies...' && R -e 'if (file.exists(\"DESCRIPTION\")) devtools::install_deps(dependencies = TRUE)' && echo 'Setup complete! RStudio Server: http://localhost:8787'",
 
-  "postStartCommand": "echo '🚀 Development environment ready!' && echo '📊 RStudio Server: http://localhost:8787' && echo '📈 R Graphics: http://localhost:8080' && echo '💻 VS Code: Use R extension or radian terminal'",
+  "postStartCommand": "echo '🚀 Development environment ready!' && echo '📊 RStudio Server: http://localhost:8787' && echo '💻 VS Code: Use R extension'",
 
-  "postAttachCommand": "echo 'Welcome to hetid R development! Run \"make help\" for available commands.'",
+  "postAttachCommand": "echo 'Welcome to hetid R development!'",
 
-  // Container user configuration (rootless for security)
+  // Container user configuration
   "remoteUser": "rstudio",
   "containerUser": "rstudio",
 
-  // Environment variables (secure configuration)
+  // Environment variables
   "remoteEnv": {
     "RSTUDIO_WHICH_R": "/usr/local/bin/R",
     "R_LIBS_USER": "/usr/local/lib/R/site-library",
-    "RENV_PATHS_CACHE": "/renv/cache",
-    "QUARTO_PYTHON": "/usr/local/bin/python",
-    "PAK_INSTALL_RETRIES": "3"
+    "GITHUB_CODESPACES": "true"
   },
 
   // Working directory
-  "workspaceFolder": "/home/rstudio/workspace",
+  "workspaceFolder": "/home/rstudio",
 
-  // Mounts for better performance and persistence
-  "mounts": [
-    // Persist renv cache across rebuilds
-    "source=hetid-renv-cache,target=/renv/cache,type=volume",
-    // Persist R packages across rebuilds
-    "source=hetid-r-packages,target=/usr/local/lib/R/site-library,type=volume",
-    // Persist user home directory items
-    "source=hetid-rstudio-config,target=/home/rstudio/.config,type=volume"
-  ],
-
-  // Resource requirements (free tier compatible)
+  // Free tier compatible resources
   "hostRequirements": {
     "cpus": 2,
     "memory": "4gb",
     "storage": "32gb"
   },
 
-  // Additional options (removed platform specification for multi-arch support)
+  // Basic run arguments
   "runArgs": [
-    "--cap-add=SYS_PTRACE",
-    "--security-opt",
-    "seccomp=unconfined"
+    "--cap-add=SYS_PTRACE"
   ],
 
   // Wait for the container to be ready
-  "waitFor": "postCreateCommand",
-
-  // Update content command (runs when rebuilding)
-  "updateContentCommand": "R -e 'devtools::install_deps(dependencies = TRUE)'"
+  "waitFor": "postCreateCommand"
 }
