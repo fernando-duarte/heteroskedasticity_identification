@@ -1,17 +1,18 @@
 {
   "name": "hetid R 4.5.0 Development (VS Code + RStudio)",
 
-  // Use the standard Rocker tidyverse image with latest R
-  // Note: Rocker images are currently amd64-only, will use emulation on ARM64
-  "image": "rocker/tidyverse:latest",
+  // Use the official Rocker devcontainer image with specific R version
+  // Multi-arch support eliminates need for platform specification
+  "image": "ghcr.io/rocker-org/devcontainer/tidyverse:4.5.0",
 
   "features": {
     // R-specific features from Rocker
     "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-      "packages": "AER,boot,dplyr,furrr,future,ggplot2,purrr,rlang,tidyr,devtools,testthat,knitr,rmarkdown,lintr,styler,covr,pkgdown,here,fs,glue,cli,bench,profvis",
+      "packages": "AER,boot,dplyr,furrr,future,ggplot2,purrr,rlang,tidyr,devtools,testthat,knitr,rmarkdown,lintr,styler,covr,pkgdown,here,fs,glue,cli,bench,profvis,httpgd",
       "installSystemRequirements": true
     },
     "ghcr.io/rocker-org/devcontainer-features/r-history:1": {},
+    "ghcr.io/rocker-org/devcontainer-features/renv-cache:1": {},
     "ghcr.io/rocker-org/devcontainer-features/pandoc:1": {},
     "ghcr.io/rocker-org/devcontainer-features/quarto:1": {},
 
@@ -209,19 +210,18 @@
     "source=hetid-rstudio-config,target=/home/rstudio/.config,type=volume"
   ],
 
-  // Resource requirements
+  // Resource requirements (free tier compatible)
   "hostRequirements": {
-    "cpus": 4,
-    "memory": "8gb",
+    "cpus": 2,
+    "memory": "4gb",
     "storage": "32gb"
   },
 
-  // Additional options
+  // Additional options (removed platform specification for multi-arch support)
   "runArgs": [
     "--cap-add=SYS_PTRACE",
     "--security-opt",
-    "seccomp=unconfined",
-    "--platform=linux/amd64"
+    "seccomp=unconfined"
   ],
 
   // Wait for the container to be ready
