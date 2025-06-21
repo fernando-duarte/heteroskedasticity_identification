@@ -1,88 +1,200 @@
-#' Run Lewbel Monte Carlo Simulation with DF Adjustment
+#' @title Internal Helper Functions for Simulations
+#' @description Helper functions to reduce code duplication in simulation functions
+#' @name simulation-helpers
+#' @keywords internal
+NULL
+
+#' Run Parallel Simulation with Common Setup
 #'
-#' This is a high-level wrapper around run_lewbel_monte_carlo that adds
-#' support for degrees of freedom adjustment.
+#' Internal helper that encapsulates the common pattern for running
+#' parallel simulations with furrr. Used by run_main_simulation and
+#' run_bootstrap_demonstration to avoid code duplication.
 #'
-#' @param config Configuration list from create_default_config()
-#' @template param-df-adjust
-#' @param verbose Logical. Whether to print progress messages (default: TRUE)
+#' @param n_simulations Integer. Number of simulations to run
+#' @param config List. Configuration object with simulation parameters
+#' @param sim_function Function. The simulation function to call (e.g., run_single_lewbel_simulation)
+#' @param compute_bounds_se_rule Function or logical. Rule for determining compute_bounds_se per iteration
+#' @param verbose Logical. Whether to show progress
+#' @param progress_message Character. Message to display when starting
 #'
-#' @return List containing simulation results and configuration
-#' @export
-run_lewbel_monte_carlo_df <- function(config,
-                                      df_adjust = "asymptotic",
-                                      verbose = TRUE) {
-  # Add df_adjust to config
-  config$df_adjust <- df_adjust
+#' @return Data frame with simulation results
+#' @keywords internal
+#' @noRd
+.run_parallel_simulation <- function(n_simulations,
+                                    config,
+                                    sim_function,
+                                    compute_bounds_se_rule,
+                                    verbose = TRUE,
+                                    progress_message = "Starting simulation...") {
 
   if (verbose) {
-    cat(sprintf("Running Monte Carlo with %s standard errors\n", df_adjust))
+    cat(sprintf("\n%s\n", progress_message))
   }
 
-  # Run the standard Monte Carlo
-  run_lewbel_monte_carlo(config, verbose = verbose)
+  # Set up parallel processing
+  future::plan(future::multisession, workers = future::availableCores() - 1)
+
+  # Build parameter list once (same for all iterations)
+  params_list <- list(
+    sample_size = config$main_sample_size,
+    beta1_0 = config$beta1_0,
+    beta1_1 = config$beta1_1,
+    gamma1 = config$gamma1,
+    beta2_0 = config$beta2_0,
+    beta2_1 = config$beta2_1,
+    alpha1 = config$alpha1,
+    alpha2 = config$alpha2,
+    delta_het = config$delta_het,
+    tau_set_id = config$tau_set_id,
+    bootstrap_reps = config$bootstrap_reps
+  )
+
+  # Run simulations in parallel
+  results <- furrr::future_map_dfr(
+    seq_len(n_simulations),
+    function(i) {
+      # Determine compute_bounds_se for this iteration
+      compute_bounds_se <- if (is.function(compute_bounds_se_rule)) {
+        compute_bounds_se_rule(i)
+      } else {
+        compute_bounds_se_rule
+      }
+
+      sim_function(
+        sim_id = i,
+        params = params_list,
+        endog_var = config$endog_var_name,
+        exog_vars = config$exog_var_names,
+        compute_bounds_se = compute_bounds_se,
+        df_adjust = if (is.null(config$df_adjust)) {
+          "asymptotic"
+        } else {
+          config$df_adjust
+        }
+      )
+    },
+    .options = furrr::furrr_options(
+      seed = TRUE,
+      chunk_size = NULL,
+      globals = list(
+        run_single_lewbel_simulation = run_single_lewbel_simulation,
+        generate_lewbel_data = generate_lewbel_data,
+        calculate_lewbel_bounds = calculate_lewbel_bounds,
+        extract_se_lm = extract_se_lm,
+        extract_se_ivreg = extract_se_ivreg,
+        get_critical_value = get_critical_value,
+        adjust_se_for_df = adjust_se_for_df
+      )
+    ),
+    .progress = verbose
+  )
+
+  # Clean up parallel workers
+  future::plan(future::sequential)
+
+  results
 }
 
-#' Compare Results with Different DF Adjustments
+#' Run Parameter Sweep Analysis
 #'
-#' Run simulations with both asymptotic and finite sample standard errors
-#' and compare the results.
+#' Internal helper that encapsulates the common pattern for running
+#' parameter sweep analyses. Used by run_sample_size_analysis and
+#' run_sensitivity_analysis to avoid code duplication.
 #'
-#' @param config Configuration list
-#' @param verbose Logical. Whether to print progress
+#' @param param_values Vector. Values of the parameter to sweep over
+#' @param param_name Character. Name of the parameter being varied
+#' @param n_reps Integer. Number of replications per parameter value
+#' @param config List. Configuration object with simulation parameters
+#' @param seeds Matrix. Seeds for each parameter value
+#' @param sim_function Function. The simulation function to call
+#' @param verbose Logical. Whether to show progress
+#' @param progress_prefix Character. Prefix for progress messages
 #'
-#' @return List containing results for both methods
-#' @export
-compare_df_adjustments <- function(config, verbose = TRUE) {
-  if (verbose) {
-    cat("Running comparison of DF adjustments...\n")
-  }
-
-  # Run with asymptotic SEs
-  results_asymp <- run_lewbel_monte_carlo_df(config,
-    df_adjust = "asymptotic",
-    verbose = verbose
-  )
-
-  # Run with finite sample SEs
-  results_finite <- run_lewbel_monte_carlo_df(config,
-    df_adjust = "finite",
-    verbose = verbose
-  )
-
-  # Compare coverage rates
-  comparison <- data.frame(
-    method = c("Asymptotic", "Finite Sample"),
-    ols_coverage = c(
-      mean(results_asymp$results$main$ols_coverage, na.rm = TRUE),
-      mean(results_finite$results$main$ols_coverage, na.rm = TRUE)
-    ),
-    tsls_coverage = c(
-      mean(results_asymp$results$main$tsls_coverage, na.rm = TRUE),
-      mean(results_finite$results$main$tsls_coverage, na.rm = TRUE)
-    ),
-    mean_ols_se = c(
-      mean(results_asymp$results$main$ols_se, na.rm = TRUE),
-      mean(results_finite$results$main$ols_se, na.rm = TRUE)
-    ),
-    mean_tsls_se = c(
-      mean(results_asymp$results$main$tsls_se, na.rm = TRUE),
-      mean(results_finite$results$main$tsls_se, na.rm = TRUE)
-    )
-  )
+#' @return Data frame with parameter sweep results
+#' @keywords internal
+#' @noRd
+.run_parameter_sweep <- function(param_values,
+                                param_name,
+                                n_reps,
+                                config,
+                                seeds,
+                                sim_function,
+                                verbose = TRUE,
+                                progress_prefix = "Parameter") {
 
   if (verbose) {
-    cat("\n=== Coverage Rate Comparison ===\n")
-    print(comparison)
-
-    # Calculate SE ratio
-    se_ratio <- comparison$mean_tsls_se[2] / comparison$mean_tsls_se[1]
-    cat(sprintf("\nFinite/Asymptotic SE ratio: %.4f\n", se_ratio))
+    cat(sprintf("\nRunning %s analysis...\n", progress_prefix))
   }
 
-  list(
-    asymptotic = results_asymp,
-    finite = results_finite,
-    comparison = comparison
+  # Set up parallel processing
+  future::plan(future::multisession, workers = future::availableCores() - 1)
+
+  results <- purrr::map2_dfr(
+    param_values, seq_along(param_values),
+    function(param_val, idx) {
+      if (verbose) {
+        if (is.numeric(param_val)) {
+          cat(sprintf("  %s = %.1f...\n", param_name, param_val))
+        } else {
+          cat(sprintf("  %s = %s...\n", param_name, param_val))
+        }
+      }
+
+      # Set seed based on the first seed in the matrix row
+      set.seed(seeds[idx, 1])
+
+      furrr::future_map_dfr(
+        seq_len(n_reps),
+        function(j) {
+          # Build parameter list with the varying parameter
+          params_list <- list(
+            sample_size = config$main_sample_size,
+            beta1_0 = config$beta1_0,
+            beta1_1 = config$beta1_1,
+            gamma1 = config$gamma1,
+            beta2_0 = config$beta2_0,
+            beta2_1 = config$beta2_1,
+            alpha1 = config$alpha1,
+            alpha2 = config$alpha2,
+            delta_het = config$delta_het,
+            tau_set_id = config$tau_set_id,
+            bootstrap_reps = config$bootstrap_reps
+          )
+
+          # Override the varying parameter
+          params_list[[param_name]] <- param_val
+
+          sim_function(
+            sim_id = j,
+            params = params_list,
+            endog_var = config$endog_var_name,
+            exog_vars = config$exog_var_names,
+            compute_bounds_se = FALSE,
+            df_adjust = if (is.null(config$df_adjust)) {
+              "asymptotic"
+            } else {
+              config$df_adjust
+            }
+          )
+        },
+        .options = furrr::furrr_options(
+          seed = TRUE,
+          globals = list(
+            run_single_lewbel_simulation = run_single_lewbel_simulation,
+            generate_lewbel_data = generate_lewbel_data,
+            calculate_lewbel_bounds = calculate_lewbel_bounds,
+            extract_se_lm = extract_se_lm,
+            extract_se_ivreg = extract_se_ivreg,
+            get_critical_value = get_critical_value,
+            adjust_se_for_df = adjust_se_for_df
+          )
+        )
+      )
+    }
   )
+
+  # Clean up parallel workers
+  future::plan(future::sequential)
+
+  results
 }
