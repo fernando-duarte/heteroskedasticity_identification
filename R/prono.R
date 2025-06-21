@@ -165,8 +165,12 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
   tryCatch(
     {
       # Check if tsgarch is available
-      if (!requireNamespace("tsgarch", quietly = TRUE)) {
-        stop("Package 'tsgarch' is required for GARCH modeling. Please install it.")
+      if (!requireNamespace(.hetid_const("packages$TSGARCH"), quietly = TRUE)) {
+        stop(sprintf(
+          .hetid_const("messages$PACKAGE_REQUIRED"),
+          .hetid_const("packages$TSGARCH"),
+          .hetid_const("packages$TSGARCH")
+        ))
       }
 
       # Convert to xts object as required by tsgarch

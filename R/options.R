@@ -37,7 +37,10 @@ hetid_opt <- function(option_name) {
     "alpha_level" = "ALPHA_LEVEL",
     "weak_f_threshold" = "WEAK_INSTRUMENT_F_THRESHOLD",
     "parallel_offset" = "DEFAULT_PARALLEL_WORKER_OFFSET",
-    "bootstrap_reps" = "DEFAULT_BOOTSTRAP_REPS"
+    "bootstrap_reps" = "DEFAULT_BOOTSTRAP_REPS",
+    "GMM_HAC_KERNEL" = "GMM_HAC_KERNEL",
+    "GMM_HAC_PREWHITE" = "GMM_HAC_PREWHITE",
+    "GMM_HAC_AR_METHOD" = "GMM_HAC_AR_METHOD"
   )
 
   # Get R option with hetid prefix
@@ -47,8 +50,15 @@ hetid_opt <- function(option_name) {
   # If user hasn't set it, use constant
   if (is.null(user_value)) {
     const_name <- option_map[[option_name]]
-    if (!is.null(const_name) && exists(const_name, envir = constants_env)) {
-      return(get(const_name, envir = constants_env))
+    if (!is.null(const_name)) {
+      # Try to get the constant using .hetid_const
+      tryCatch(
+        return(.hetid_const(const_name)),
+        error = function(e) {
+          # If constant not found, return NULL
+          NULL
+        }
+      )
     }
   }
 
@@ -60,6 +70,6 @@ hetid_opt <- function(option_name) {
 #' @return The constant value from the package's constants environment
 #' @keywords internal
 hetid_const <- function(constant_name) {
-  constants_env <- get("constants_env", envir = asNamespace("hetid"))
-  constants_env[[constant_name]]
+  # Use the .hetid_const function from constants.R
+  .hetid_const(constant_name)
 }

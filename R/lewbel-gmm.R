@@ -271,10 +271,10 @@ lewbel_gmm <- function(data,
   vcov <- match.arg(vcov)
 
   # Check required packages
-  if (!requireNamespace("gmm", quietly = TRUE)) {
-    stop("Package 'gmm' is required but not installed. Please install it with: install.packages('gmm')")
+  if (!requireNamespace(.hetid_const("packages$GMM"), quietly = TRUE)) {
+    stop(sprintf(.hetid_const("messages$PACKAGE_REQUIRED"), .hetid_const("packages$GMM"), .hetid_const("packages$GMM")))
   }
-  if (vcov == "HAC" && !requireNamespace("sandwich", quietly = TRUE)) {
+  if (vcov == .hetid_const("VCOV_HAC") && !requireNamespace(.hetid_const("packages$SANDWICH"), quietly = TRUE)) {
     stop("Package 'sandwich' is required for HAC vcov. Please install it with: install.packages('sandwich')")
   }
 
@@ -352,7 +352,7 @@ lewbel_gmm <- function(data,
     beta2_init_vec <- coef(ols2)[ols_beta_names_intercept]
 
 
-    if (system == .SYSTEM_TRIANGULAR) {
+    if (system == .hetid_const("SYSTEM$TRIANGULAR")) {
       initial_values <- c(beta1_init_vec, gamma1_init_val, beta2_init_vec)
     } else { # simultaneous
       gamma2_init_val <- 0.1 # Small initial value for gamma2
@@ -384,7 +384,7 @@ lewbel_gmm <- function(data,
   param_names_list$beta2_slopes <- paste0("beta2_", x_vars)
 
   # Gamma2 (for simultaneous)
-  if (system == "simultaneous") {
+  if (system == .hetid_const("SYSTEM$SIMULTANEOUS")) {
     param_names_list$gamma2 <- "gamma2"
   }
 
@@ -405,7 +405,7 @@ lewbel_gmm <- function(data,
 
   # Select moment function
   # Pass add_intercept explicitly to moment functions
-  if (system == "triangular") {
+  if (system == .hetid_const("SYSTEM$TRIANGULAR")) {
     moment_fn <- function(theta, dat) { # Changed arg name from x to dat to avoid clash
       lewbel_triangular_moments(theta, dat, y1_var, y2_var, x_vars, z_vars, add_intercept)
     }
@@ -432,7 +432,7 @@ lewbel_gmm <- function(data,
     }
     # gmm package doesn't directly support clustered SE
     warning("Clustered standard errors not directly supported by gmm package. Using HAC instead.")
-    vcov_method <- "HAC"
+    vcov_method <- .hetid_const("VCOV_HAC")
   }
 
   # Prepare arguments for gmm call
@@ -448,7 +448,7 @@ lewbel_gmm <- function(data,
   additional_args$model <- TRUE # Return model components
 
   # Set HAC-specific options if needed
-  if (vcov_method == "HAC") {
+  if (vcov_method == .hetid_const("VCOV_HAC")) {
     additional_args$kernel <- hetid_opt("GMM_HAC_KERNEL") # e.g. "Quadratic Spectral"
     additional_args$prewhite <- hetid_opt("GMM_HAC_PREWHITE") # e.g. 1
     additional_args$ar.method <- hetid_opt("GMM_HAC_AR_METHOD") # e.g. "ols"
@@ -719,7 +719,7 @@ compare_gmm_2sls <- function(data,
   if (verbose) messager("Running GMM estimation...")
   gmm_call_args <- list(
     data = data,
-    system = .SYSTEM_TRIANGULAR, # Comparison typically for triangular
+    system = .hetid_const("SYSTEM$TRIANGULAR"), # Comparison typically for triangular
     y1_var = y1_var,
     y2_var = y2_var,
     x_vars = x_vars,
@@ -879,7 +879,7 @@ prono_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars,
 
   tryCatch(
     {
-      if (requireNamespace("tsgarch", quietly = TRUE)) {
+      if (requireNamespace(.hetid_const("packages$TSGARCH"), quietly = TRUE)) {
         # Convert to xts object as required by tsgarch
         dates <- as.Date("2000-01-01") + seq_along(eps2) - 1
         eps2_xts <- xts::xts(eps2, order.by = dates)
@@ -1120,7 +1120,7 @@ prono_gmm <- function(data,
     e2_hat <- residuals(fit2)
     tryCatch(
       {
-        if (requireNamespace("tsgarch", quietly = TRUE)) {
+        if (requireNamespace(.hetid_const("packages$TSGARCH"), quietly = TRUE)) {
           dates <- as.Date("2000-01-01") + seq_along(e2_hat) - 1
           e2_xts <- xts::xts(e2_hat, order.by = dates)
           garch_spec <- tsgarch::garch_modelspec(
@@ -1391,7 +1391,7 @@ rigobon_gmm <- function(data,
     ols1 <- lm(formula1, data = data)
     ols2 <- lm(formula2, data = data)
 
-    if (system == .SYSTEM_TRIANGULAR) {
+    if (system == .hetid_const("SYSTEM$TRIANGULAR")) {
       initial_values <- c(coef(ols1)[-2], coef(ols1)[2], coef(ols2))
     } else {
       # For simultaneous, add gamma2
@@ -1400,7 +1400,7 @@ rigobon_gmm <- function(data,
   }
 
   # Define moment function
-  if (system == "triangular") {
+  if (system == .hetid_const("SYSTEM$TRIANGULAR")) {
     moment_fn <- function(theta, dat) {
       rigobon_triangular_moments(theta, dat, y1_var, y2_var, x_vars, regime_var, add_intercept)
     }
@@ -1435,7 +1435,7 @@ rigobon_gmm <- function(data,
     param_names <- c(param_names, "beta2_(Intercept)")
   }
   param_names <- c(param_names, paste0("beta2_", x_vars))
-  if (system == "simultaneous") {
+  if (system == .hetid_const("SYSTEM$SIMULTANEOUS")) {
     param_names <- c(param_names, "gamma2")
   }
 

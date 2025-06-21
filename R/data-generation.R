@@ -79,8 +79,8 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
   X_mat <- matrix(
     stats::rnorm(
       n_obs * n_x,
-      mean = hetid_const("DEFAULT_X_MEAN"),
-      sd = hetid_const("DEFAULT_X_SD")
+      mean = .hetid_const("DEFAULT_X_MEAN"),
+      sd = .hetid_const("DEFAULT_X_SD")
     ),
     nrow = n_obs, ncol = n_x
   )
@@ -104,8 +104,8 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
   exponent <- params$delta_het * Z_het
   # Cap between min and max exponent
   exponent <- pmin(
-    pmax(exponent, hetid_const("MIN_EXPONENT")),
-    hetid_const("MAX_EXPONENT")
+    pmax(exponent, .hetid_const("MIN_EXPONENT")),
+    .hetid_const("MAX_EXPONENT")
   )
   V2 <- stats::rnorm(n_obs) * sqrt(exp(exponent))
 
@@ -354,8 +354,8 @@ generate_rigobon_data <- function(n_obs, params, n_x = 1) {
   X_mat <- matrix(
     stats::rnorm(
       n_obs * n_x,
-      mean = hetid_const("DEFAULT_X_MEAN"),
-      sd = hetid_const("DEFAULT_X_SD")
+      mean = .hetid_const("DEFAULT_X_MEAN"),
+      sd = .hetid_const("DEFAULT_X_SD")
     ),
     nrow = n_obs, ncol = n_x
   )

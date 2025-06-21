@@ -5,7 +5,7 @@
 \alias{.hetid_constants}
 \title{Internal constants for the hetid package}
 \format{
-An object of class \code{environment} of length 18.
+An object of class \code{environment} of length 55.
 }
 \usage{
 .hetid_constants

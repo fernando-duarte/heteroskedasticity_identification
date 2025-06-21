@@ -434,8 +434,8 @@ compare_rigobon_methods <- function(data,
   if ("OLS" %in% methods) {
     ols_fit <- lm(Y1 ~ Y2 + Xk, data = data)
     results$OLS <- list(
-      estimate = as.numeric(coef(ols_fit)["Y2"]),
-      se = as.numeric(summary(ols_fit)$coefficients["Y2", "Std. Error"]),
+      estimate = as.numeric(coef(ols_fit)[.hetid_const("columns$Y2")]),
+      se = as.numeric(summary(ols_fit)$coefficients[.hetid_const("columns$Y2"), .hetid_const("columns$STD_ERROR")]),
       method_info = "Standard OLS (ignores endogeneity)"
     )
   }
@@ -470,8 +470,10 @@ compare_rigobon_methods <- function(data,
       f_stat <- as.numeric(summary(first_stage)$fstatistic[1])
 
       results$Lewbel <- list(
-        estimate = as.numeric(coef(lewbel_fit)["Y2"]),
-        se = as.numeric(summary(lewbel_fit)$coefficients["Y2", "Std. Error"]),
+        estimate = as.numeric(coef(lewbel_fit)[.hetid_const("columns$Y2")]),
+        se = as.numeric(summary(lewbel_fit)$coefficients[
+          .hetid_const("columns$Y2"), .hetid_const("columns$STD_ERROR")
+        ]),
         first_stage_F = f_stat,
         method_info = "Standard Lewbel (continuous Z)"
       )

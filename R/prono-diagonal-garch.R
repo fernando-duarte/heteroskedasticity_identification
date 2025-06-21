@@ -47,7 +47,7 @@ fit_diagonal_garch_prono <- function(data,
 
   # Check if required packages are available
   has_tsmarch <- requireNamespace("tsmarch", quietly = TRUE)
-  has_tsgarch <- requireNamespace("tsgarch", quietly = TRUE)
+  has_tsgarch <- requireNamespace(.hetid_const("packages$TSGARCH"), quietly = TRUE)
 
   if (!has_tsmarch || !has_tsgarch) {
     if (verbose) {
@@ -157,8 +157,12 @@ fit_diagonal_garch_prono <- function(data,
 #' @return Same structure as fit_diagonal_garch_prono
 #' @keywords internal
 fit_dcc_garch_fallback <- function(returns, garch_order = c(1, 1), verbose = TRUE) {
-  if (!requireNamespace("tsgarch", quietly = TRUE)) {
-    stop("Package 'tsgarch' is required for GARCH modeling. Please install it.")
+  if (!requireNamespace(.hetid_const("packages$TSGARCH"), quietly = TRUE)) {
+    stop(sprintf(
+      .hetid_const("messages$PACKAGE_REQUIRED"),
+      .hetid_const("packages$TSGARCH"),
+      .hetid_const("packages$TSGARCH")
+    ))
   }
 
   # Convert to xts as required by tsgarch

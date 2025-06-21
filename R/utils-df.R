@@ -7,7 +7,7 @@
 #' @return Adjusted standard error
 #' @export
 adjust_se_for_df <- function(se, n, k, df_adjust = "asymptotic") {
-  if (df_adjust == "finite") {
+  if (df_adjust == .hetid_const("df_adjust$FINITE")) {
     # Finite sample correction: multiply by sqrt(n/(n-k))
     se * sqrt(n / (n - k))
   } else {
@@ -25,7 +25,7 @@ adjust_se_for_df <- function(se, n, k, df_adjust = "asymptotic") {
 #' @return Critical value
 #' @export
 get_critical_value <- function(n, k, alpha = .hetid_const("ALPHA_DEFAULT"), df_adjust = "asymptotic") {
-  if (df_adjust == "finite") {
+  if (df_adjust == .hetid_const("df_adjust$FINITE")) {
     # Use t-distribution with n-k degrees of freedom
     qt(1 - alpha / 2, df = n - k)
   } else {
@@ -47,7 +47,7 @@ extract_se_ivreg <- function(model, df_adjust = "asymptotic") {
   # Extract raw standard errors
   se_raw <- sqrt(diag(vcov_mat))
 
-  if (df_adjust == "finite") {
+  if (df_adjust == .hetid_const("df_adjust$FINITE")) {
     # ivreg already uses finite sample SEs by default (like lm)
     se_adjusted <- se_raw
   } else {
@@ -69,7 +69,7 @@ extract_se_ivreg <- function(model, df_adjust = "asymptotic") {
 extract_se_lm <- function(model, df_adjust = "asymptotic") {
   summ <- summary(model)
 
-  if (df_adjust == "finite") {
+  if (df_adjust == .hetid_const("df_adjust$FINITE")) {
     # lm already uses finite sample SEs by default
     se_adjusted <- summ$coefficients[, "Std. Error"]
   } else {

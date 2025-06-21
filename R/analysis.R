@@ -72,7 +72,7 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
 
     # Weak instrument diagnostics
     weak_iv_pct <- mean(
-      results_clean$first_stage_F < hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"),
+      results_clean$first_stage_F < .hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"),
       na.rm = TRUE
     ) * 100
     # If all F-statistics are NA, set weak_iv_pct to 0
@@ -80,7 +80,7 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
     cat(sprintf(
       paste0(
         "\nWeak instrument diagnostic: %.1f%% of simulations have ",
-        "first-stage F < ", hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), "\n"
+        "first-stage F < ", .hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), "\n"
       ),
       weak_iv_pct
     ))
@@ -127,7 +127,7 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
     weak_iv_pct = {
       pct <- mean(
         results_clean$first_stage_F <
-          hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"),
+          .hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"),
         na.rm = TRUE
       ) * 100
       if (is.nan(pct)) 0 else pct
@@ -201,7 +201,7 @@ analyze_bootstrap_results <- function(results_main,
     # Slice and round
     bootstrap_table <- dplyr::slice_head(
       bootstrap_selected,
-      n = hetid_const("BOOTSTRAP_TABLE_DISPLAY_LIMIT")
+      n = .hetid_const("BOOTSTRAP_TABLE_DISPLAY_LIMIT")
     )
     bootstrap_table <- dplyr::mutate(
       bootstrap_table,

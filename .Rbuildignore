@@ -21,6 +21,7 @@
 # Regular expression to match dotfiles not covered above
 # Scripts and tools
 # See: https://r-pkgs.org/package-structure-state.html
+# Specific files to exclude
 # Temporary and backup files
 # Testing
 ^.*\.Rcheck$
@@ -154,6 +155,7 @@
 ^bookdown$
 ^build_local_documentation\.R$
 ^check_monitor_status\.sh$
+^check_output\.log$
 ^cleanup-analysis-report\.md$
 ^code_to_do\.md$
 ^codecov\.yml$
@@ -178,6 +180,7 @@
 ^final_test_output\.txt$
 ^final_test_results\.txt$
 ^final_test_run\.txt$
+^heteroskedasticity\.Rproj$
 ^hetid\.Rcheck$
 ^hetid_.*\.tar\.gz$
 ^htmlcov$
@@ -236,5 +239,6 @@
 ^verify_lewbel_implementations\.R$
 ^vignettes/.*\.html$
 ^vignettes/.*_cache$
+^vignettes/.*_files$
 ^vignettes/figure$
 ^yarn\.lock$

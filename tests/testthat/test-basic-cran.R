@@ -16,7 +16,7 @@ test_that("create_default_config works", {
     "beta2_0", "beta2_1", "alpha1", "alpha2", "delta_het"
   ) %in% names(config)))
   expect_equal(config$gamma1, -0.8)
-  expect_equal(config$main_sample_size, 500) # Updated default
+  expect_equal(config$main_sample_size, 1000) # Default from constants
 })
 
 test_that("create_default_config with custom parameters works", {

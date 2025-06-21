@@ -127,7 +127,7 @@ Learn heteroskedasticity-based identification methods interactively!
 ## 📚 What You'll Learn
 
 - **Lewbel (2012)**: Identification using continuous heteroskedasticity
-- **Rigobon (2003)**: Regime-based identification methods  
+- **Rigobon (2003)**: Regime-based identification methods
 - **Prono (2014)**: GARCH-based identification for time series
 - **Practical applications** in economics and finance
 
@@ -183,7 +183,7 @@ Add template repository link to main README:
 
 This provides:
 - Interactive tutorials and exercises
-- Sample datasets and examples  
+- Sample datasets and examples
 - Simplified Codespaces environment
 - Step-by-step learning path
 ```

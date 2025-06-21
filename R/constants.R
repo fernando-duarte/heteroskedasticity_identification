@@ -124,6 +124,47 @@
   VERBOSE_FALSE = "FALSE"
 )
 
+# Constants from sysdata.rda
+.hetid_constants$DEFAULT_NUM_SIMULATIONS <- 100
+.hetid_constants$DEFAULT_MAIN_SAMPLE_SIZE <- 1000
+.hetid_constants$DEFAULT_SAMPLE_SIZES <- c(500, 1000, 2000)
+.hetid_constants$DEFAULT_BOOTSTRAP_REPS <- 100
+.hetid_constants$DEFAULT_BOOTSTRAP_SUBSET_SIZE <- 10
+.hetid_constants$DEFAULT_BOOTSTRAP_DEMO_SIZE <- 50
+.hetid_constants$DEFAULT_BASE_SEED <- 42
+.hetid_constants$SEED_MULTIPLIER_MAIN <- 10000
+.hetid_constants$SEED_OFFSET_BY_N <- 20000
+.hetid_constants$SEED_OFFSET_BY_DELTA <- 30000
+.hetid_constants$SEED_MULTIPLIER_BOOTSTRAP <- 40000
+.hetid_constants$DEFAULT_X_MEAN <- 0
+.hetid_constants$DEFAULT_X_SD <- 1
+.hetid_constants$MIN_EXPONENT <- -5
+.hetid_constants$MAX_EXPONENT <- 5
+.hetid_constants$WEAK_ID_TOLERANCE <- 1e-6
+.hetid_constants$INSTRUMENT_SD_THRESHOLD <- 1e-10
+.hetid_constants$WEAK_INSTRUMENT_F_THRESHOLD <- 10
+.hetid_constants$ALPHA_LEVEL <- 0.05
+.hetid_constants$DISPLAY_DIGITS <- 3
+.hetid_constants$Z_CRITICAL_95 <- 1.96
+.hetid_constants$BOOTSTRAP_TABLE_DISPLAY_LIMIT <- 20
+.hetid_constants$PLOT_BASE_FONT_SIZE <- 14
+.hetid_constants$PLOT_LINE_WIDTH_THIN <- 0.5
+.hetid_constants$PLOT_LINE_WIDTH_NORMAL <- 1
+.hetid_constants$PLOT_LINE_WIDTH_THICK <- 2
+.hetid_constants$DEFAULT_PARALLEL_WORKER_OFFSET <- 1
+.hetid_constants$PLOT_HISTOGRAM_BINS <- 30
+.hetid_constants$PLOT_MIN_BOOTSTRAP_THRESHOLD <- 30
+.hetid_constants$PLOT_BOOTSTRAP_DISPLAY_LIMIT <- 20
+.hetid_constants$DEMO_SAMPLE_SIZES <- c(500, 1000)
+.hetid_constants$DEMO_N_REPS <- 20
+.hetid_constants$DEMO_BOOTSTRAP_REPS <- 100
+.hetid_constants$DEMO_BOOTSTRAP_SIZE <- 20
+
+# GMM options
+.hetid_constants$GMM_HAC_KERNEL <- "Quadratic Spectral"
+.hetid_constants$GMM_HAC_PREWHITE <- 1
+.hetid_constants$GMM_HAC_AR_METHOD <- "ols"
+
 # Lock the environment to prevent modifications
 lockEnvironment(.hetid_constants, bindings = TRUE)
 

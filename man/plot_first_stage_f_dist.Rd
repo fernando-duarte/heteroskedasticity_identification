@@ -27,7 +27,7 @@ seeds <- generate_all_seeds(config)
 results <- run_main_simulation(config, seeds)
 results_clean <- na.omit(results)
 weak_iv_pct <- mean(results_clean$first_stage_F <
-  hetid_const("WEAK_INSTRUMENT_F_THRESHOLD")) * 100
+  .hetid_const("WEAK_INSTRUMENT_F_THRESHOLD")) * 100
 p4 <- plot_first_stage_f_dist(results_clean, weak_iv_pct)
 print(p4)
 }
