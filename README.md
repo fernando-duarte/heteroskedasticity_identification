@@ -38,7 +38,32 @@ The `hetid` package implements identification through heteroskedasticity methods
 
 See the [package website](https://fernando-duarte.github.io/heteroskedasticity_identification/) for complete documentation and examples.
 
-## Installation
+## Quick Start Options
+
+### 🚀 GitHub Codespaces (Recommended)
+
+Get started instantly with a fully configured cloud development environment:
+
+**For Contributors & Developers:**
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/fernando-duarte/heteroskedasticity_identification?quickstart=1)
+
+**For Learners & Exploration:**
+[![Open Learning Environment](https://img.shields.io/badge/Open%20Learning%20Environment-blue?logo=github&logoColor=white)](https://codespaces.new/fernando-duarte/heteroskedasticity_identification?devcontainer_path=.devcontainer/devcontainer-codespaces.json)
+
+**What's Included:**
+- ✅ **RStudio Server** (port 8787) - Full IDE experience
+- ✅ **VS Code** with R extensions - Modern editor with IntelliSense
+- ✅ **Pre-installed dependencies** - All packages ready to use
+- ✅ **Interactive examples** - Run demos immediately
+- ✅ **Secure environment** - Private ports, authentication enabled
+
+**Getting Started in Codespaces:**
+1. Click one of the buttons above
+2. Wait 2-3 minutes for environment setup
+3. Access RStudio Server via the Ports tab (port 8787)
+4. Run `hetid_demo()` to test the package
+
+### 📦 Local Installation
 
 You can install the development version of hetid from GitHub with:
 
