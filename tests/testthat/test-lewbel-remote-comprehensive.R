@@ -77,24 +77,27 @@ test_that("hetid works on simulated UK Engel curve-like data", {
     # Run REndo for comparison
     # Both warning and no warning are valid outcomes
     # Warning occurs when heteroskedasticity is weak (p-value > 0.05)
-    fit_rendo <- tryCatch({
-      REndo::hetErrorsIV(
-        foodshare ~ age + lntotalexp | lntotalexp | IIV(age),
-        data = uk_data
-      )
-    }, warning = function(w) {
-      # If warning about weak instruments, that's expected
-      if (grepl("heteroscedasticity.*not satisfied", conditionMessage(w))) {
-        # Still run the function but note the warning occurred
-        suppressWarnings(REndo::hetErrorsIV(
+    fit_rendo <- tryCatch(
+      {
+        REndo::hetErrorsIV(
           foodshare ~ age + lntotalexp | lntotalexp | IIV(age),
           data = uk_data
-        ))
-      } else {
-        # Re-throw unexpected warnings
-        warning(w)
+        )
+      },
+      warning = function(w) {
+        # If warning about weak instruments, that's expected
+        if (grepl("heteroscedasticity.*not satisfied", conditionMessage(w))) {
+          # Still run the function but note the warning occurred
+          suppressWarnings(REndo::hetErrorsIV(
+            foodshare ~ age + lntotalexp | lntotalexp | IIV(age),
+            data = uk_data
+          ))
+        } else {
+          # Re-throw unexpected warnings
+          warning(w)
+        }
       }
-    })
+    )
 
     # Compare results
     coef_hetid <- coef(tsls_hetid)

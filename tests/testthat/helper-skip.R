@@ -7,9 +7,9 @@ get_test_level <- function() {
   if (level == "") {
     # Default based on environment
     if (nzchar(Sys.getenv("NOT_CRAN"))) {
-      return("fast")  # Local development default
+      return("fast") # Local development default
     } else {
-      return("cran")  # CRAN default
+      return("cran") # CRAN default
     }
   }
   level

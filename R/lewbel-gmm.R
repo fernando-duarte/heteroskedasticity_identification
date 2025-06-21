@@ -1159,13 +1159,13 @@ prono_gmm <- function(data,
     df1 <- 1
     df2 <- n - ncol(xz_matrix_f)
     if (df2 > 0) {
-        f_stat <- ((rss_r - rss_u) / df1) / (rss_u / df2)
-        result$first_stage_F <- f_stat
+      f_stat <- ((rss_r - rss_u) / df1) / (rss_u / df2)
+      result$first_stage_F <- f_stat
     } else {
-        result$first_stage_F <- NA_real_
+      result$first_stage_F <- NA_real_
     }
   } else {
-      result$first_stage_F <- NA_real_
+    result$first_stage_F <- NA_real_
   }
 
   class(result) <- c("prono_gmm", "lewbel_gmm", "list")

@@ -222,6 +222,7 @@
 ^simulation-results$
 ^tags$
 ^temp$
+^temp-refactor$
 ^test-utils\.R$
 ^test_docker_workflow\.sh$
 ^test_output\.txt$
