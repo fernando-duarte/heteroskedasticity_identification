@@ -123,7 +123,7 @@ ensure_stata_packages <- function() {
 #' @return A data.frame with test data for Lewbel identification.
 #'
 #' @export
-generate_hetid_test_data <- function(n = .N_DEFAULT, seed = 42) {
+generate_hetid_test_data <- function(n = .hetid_const("N_DEFAULT"), seed = 42) {
   set.seed(seed)
 
   params <- list(

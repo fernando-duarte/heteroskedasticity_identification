@@ -4,7 +4,7 @@
 \alias{generate_hetid_test_data}
 \title{Generate consistent test data for all comparisons}
 \usage{
-generate_hetid_test_data(n = .N_DEFAULT, seed = 42)
+generate_hetid_test_data(n = .hetid_const("N_DEFAULT"), seed = 42)
 }
 \arguments{
 \item{n}{Integer. Number of observations to generate (default: 1000).}

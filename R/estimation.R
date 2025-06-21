@@ -644,7 +644,7 @@ run_rigobon_estimation <- function(data,
       F_stat = het_f_stat[1],
       p_value = het_p_value,
       interpretation = ifelse(
-        het_p_value < .ALPHA_DEFAULT,
+        het_p_value < .hetid_const("ALPHA_DEFAULT"),
         "Significant heteroskedasticity across regimes (good for identification)",
         "No significant heteroskedasticity across regimes (weak identification)"
       )

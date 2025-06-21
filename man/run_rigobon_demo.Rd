@@ -4,7 +4,11 @@
 \alias{run_rigobon_demo}
 \title{Run Rigobon (2003) Identification Demo}
 \usage{
-run_rigobon_demo(n_obs = .N_DEFAULT, n_regimes = 2, verbose = TRUE)
+run_rigobon_demo(
+  n_obs = .hetid_const("N_DEFAULT"),
+  n_regimes = 2,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{n_obs}{Integer. Sample size (default: 1000).}

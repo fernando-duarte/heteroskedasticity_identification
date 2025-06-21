@@ -5,7 +5,7 @@
 \title{Rigobon (2003) Regime-Based Heteroskedasticity Identification}
 \usage{
 run_rigobon_analysis(
-  n_obs = .N_DEFAULT,
+  n_obs = .hetid_const("N_DEFAULT"),
   params = NULL,
   data = NULL,
   regime_var = "regime",

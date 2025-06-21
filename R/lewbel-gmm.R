@@ -112,10 +112,6 @@ lewbel_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars, z_var
 #' The moment conditions are the same as the triangular system.
 #' Note: Requires gamma1 * gamma2 != 1 for identification.
 #'
-#' WARNING: Simultaneous systems are numerically challenging and require
-#' strong heteroskedasticity patterns for reliable identification. Consider
-#' using a triangular system if possible.
-#'
 #' @seealso
 #' \code{\link{lewbel_gmm}} for the main GMM estimation function.
 #' \code{\link{lewbel_triangular_moments}} for triangular system moments.

@@ -47,10 +47,6 @@ For the simultaneous system:
 
 The moment conditions are the same as the triangular system.
 Note: Requires gamma1 * gamma2 != 1 for identification.
-
-WARNING: Simultaneous systems are numerically challenging and require
-strong heteroskedasticity patterns for reliable identification. Consider
-using a triangular system if possible.
 }
 \references{
 Lewbel, A. (2012). Using heteroscedasticity to identify and estimate
