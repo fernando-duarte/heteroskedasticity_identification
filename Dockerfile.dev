@@ -14,8 +14,9 @@ LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.authors="Fernando Duarte <duarte@alum.mit.edu>"
 
 # Install comprehensive system dependencies
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt \
+# Note: Only cache /var/cache/apt to avoid lock conflicts in concurrent builds
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    rm -f /var/lib/apt/lists/lock && \
     apt-get update && apt-get install -y \
     # Core development tools
     build-essential \
