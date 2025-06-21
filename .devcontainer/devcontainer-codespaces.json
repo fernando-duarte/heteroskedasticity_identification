@@ -1,15 +1,50 @@
 {
   "name": "hetid R 4.5.0 Development (Codespaces Secure)",
 
-  // Extend the main devcontainer configuration
-  "dockerComposeFile": [
-    "../docker-compose.yml",
-    "../docker-compose.dev.yml",
-    "docker-compose.codespaces.yml"
+  // Use a reliable base image for Codespaces (parallel config, not modifying main setup)
+  "image": "rocker/tidyverse:4.5.0",
+
+  "features": {
+    // Essential R packages for the project
+    "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
+      "packages": "AER,boot,dplyr,furrr,future,ggplot2,purrr,rlang,tidyr,devtools,testthat,knitr,rmarkdown,here,fs,glue,cli",
+      "installSystemRequirements": true
+    },
+
+    // Python for pre-commit hooks (minimal)
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11",
+      "installTools": false
+    },
+
+    // Git integration
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest"
+    },
+
+    // GitHub CLI
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    },
+
+    // Basic utilities
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": false,
+      "configureZshAsDefaultShell": false,
+      "installOhMyZsh": false,
+      "upgradePackages": true
+    }
+  },
+
+  "workspaceFolder": "/home/rstudio",
+
+  // Port forwarding for RStudio Server and other services
+  "forwardPorts": [
+    8787,  // RStudio Server
+    8080,  // httpgd for VS Code plots
+    3838,  // Shiny apps
+    4321   // Quarto preview
   ],
-  "service": "hetid-dev",
-  "workspaceFolder": "/home/rstudio/hetid",
-  "shutdownAction": "stopCompose",
 
   // Security-focused port configuration
   "portsAttributes": {
@@ -38,6 +73,36 @@
     }
   },
 
+  // VS Code customizations
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // R language support
+        "REditorSupport.r",
+        "reditorsupport.r-lsp",
+
+        // Core development tools
+        "ms-python.python",
+        "GitHub.vscode-pull-request-github"
+      ],
+
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "workbench.colorTheme": "Default Dark+",
+        "workbench.startupEditor": "readme"
+      }
+    }
+  },
+
+  // Simplified lifecycle hooks
+  "onCreate": "R -e 'if (!requireNamespace(\"devtools\", quietly = TRUE)) install.packages(\"devtools\")' && pip install --user pre-commit",
+
+  "postCreateCommand": "echo 'Installing dependencies...' && R -e 'if (file.exists(\"DESCRIPTION\")) devtools::install_deps(dependencies = TRUE)' && echo 'Setup complete! RStudio Server: http://localhost:8787'",
+
+  "postStartCommand": "echo '🚀 Development environment ready!' && echo '📊 RStudio Server: http://localhost:8787' && echo '💻 VS Code: Use R extension'",
+
+  "postAttachCommand": "echo 'Welcome to hetid R development!'",
+
   // Secure container configuration
   "remoteUser": "rstudio",
   "containerUser": "rstudio",
@@ -46,8 +111,7 @@
   "remoteEnv": {
     "RSTUDIO_WHICH_R": "/usr/local/bin/R",
     "R_LIBS_USER": "/usr/local/lib/R/site-library",
-    "GITHUB_CODESPACES": "true",
-    "PAK_INSTALL_RETRIES": "3"
+    "GITHUB_CODESPACES": "true"
   },
 
   // Free tier compatible resources
@@ -57,21 +121,11 @@
     "storage": "32gb"
   },
 
-  // Secure run arguments
+  // Basic run arguments
   "runArgs": [
-    "--cap-add=SYS_PTRACE",
-    "--security-opt",
-    "seccomp=unconfined"
+    "--cap-add=SYS_PTRACE"
   ],
 
-  // Post-creation setup
-  "postCreateCommand": "bash .devcontainer/setup.sh",
-
-  // Lifecycle scripts
-  "postStartCommand": "echo 'Secure Codespace started! RStudio Server available on port 8787 (authentication required)'",
-
-  // Persistent mounts
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/home/rstudio/hetid,type=bind,consistency=cached"
-  ]
+  // Wait for the container to be ready
+  "waitFor": "postCreateCommand"
 }
