@@ -1,0 +1,14 @@
+name: Codespaces Prebuild
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  prebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codespaces-prebuild@v1
+        with:
+          devcontainer-path: .devcontainer/devcontainer-codespaces.json
