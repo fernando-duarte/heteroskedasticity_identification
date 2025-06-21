@@ -128,37 +128,72 @@ configure_rstudio() {
     # Create RStudio config directory
     sudo mkdir -p /etc/rstudio
 
-    # Create optimized RStudio Server config for Codespaces
+    # Create minimal RStudio Server config for Codespaces
     sudo tee /etc/rstudio/rserver.conf > /dev/null << 'EOF'
 # RStudio Server Configuration for GitHub Codespaces
 www-port=8787
 www-address=0.0.0.0
-auth-none=1
-auth-minimum-user-id=100
-server-user=rstudio
-server-daemonize=1
-www-enable-origin-check=0
-www-same-site=none
-www-frame-origin=*
 rsession-which-r=/usr/local/bin/R
 EOF
+
+    # Create session config to ensure proper R session handling
+    sudo tee /etc/rstudio/rsession.conf > /dev/null << 'EOF'
+# RStudio Session Configuration for Codespaces
+session-timeout-minutes=0
+session-disconnected-timeout-minutes=0
+EOF
+
+    # Set environment variables for RStudio Server authentication bypass
+    export DISABLE_AUTH=true
+    export ROOT=true
 
     # Set proper permissions
     sudo chown -R rstudio:rstudio /etc/rstudio 2>/dev/null || true
 
-    print_success "RStudio Server configured"
+    print_success "RStudio Server configured with authentication disabled"
 }
 
 # Start RStudio Server
 start_rstudio() {
-    print_status "Starting RStudio Server..."
+    print_status "Starting RStudio Server with authentication disabled..."
 
-    if sudo service rstudio-server start; then
+    # Ensure environment variables are set for RStudio Server
+    sudo tee -a /etc/environment > /dev/null << 'EOF'
+DISABLE_AUTH=true
+ROOT=true
+EOF
+
+    # Stop any existing RStudio Server processes
+    sudo pkill -f rstudio-server 2>/dev/null || true
+
+    # Start RStudio Server with environment variables
+    if sudo -E service rstudio-server start; then
         print_success "RStudio Server started successfully"
-        print_status "Access RStudio via Ports tab (port 8787)"
+        print_status "Access RStudio via Ports tab (port 8787) - no authentication required"
+
+        # Verify it's running
+        sleep 2
+        if netstat -tlnp | grep -q :8787; then
+            print_success "RStudio Server is listening on port 8787"
+        else
+            print_warning "RStudio Server may not be listening properly"
+        fi
     else
-        print_warning "RStudio Server failed to start automatically"
-        print_status "You can start it manually with: sudo service rstudio-server start"
+        print_warning "RStudio Server failed to start with service command"
+        print_status "Trying alternative startup method..."
+
+        # Try starting manually with explicit environment
+        sudo DISABLE_AUTH=true ROOT=true /usr/lib/rstudio-server/bin/rserver \
+            --www-port=8787 \
+            --www-address=0.0.0.0 \
+            --server-daemonize=1 &
+
+        sleep 2
+        if netstat -tlnp | grep -q :8787; then
+            print_success "RStudio Server started with manual method"
+        else
+            print_error "RStudio Server failed to start"
+        fi
     fi
 }
 

@@ -106,10 +106,13 @@
 
   "postStartCommand": [
     "echo '🚀 hetid Development Environment Ready!'",
-    "echo '📊 RStudio Server: Access via Ports tab (8787) - may need manual start'",
+    "echo '📊 RStudio Server: Starting with authentication disabled...'",
+    "sudo pkill -f rstudio-server 2>/dev/null || true",
+    "sudo DISABLE_AUTH=true ROOT=true service rstudio-server start 2>/dev/null || sudo DISABLE_AUTH=true ROOT=true /usr/lib/rstudio-server/bin/rserver --www-port=8787 --www-address=0.0.0.0 --server-daemonize=1 &",
+    "sleep 2",
     "echo '💻 VS Code R: Excellent for interactive development'",
     "echo '🔬 hetid package: Use devtools::load_all() to load your functions'",
-    "sudo service rstudio-server start 2>/dev/null || echo 'Note: Start RStudio manually if needed: sudo service rstudio-server start'"
+    "if netstat -tlnp | grep -q :8787; then echo '✅ RStudio Server ready on port 8787'; else echo '⚠️  RStudio Server may need manual start'; fi"
   ],
 
   "postAttachCommand": "echo 'Welcome to hetid heteroskedasticity identification development! 🎯'",
@@ -118,11 +121,13 @@
   "remoteUser": "rstudio",
   "containerUser": "rstudio",
 
-  // Secure environment variables (no ROOT or DISABLE_AUTH)
+  // Environment variables for RStudio Server in Codespaces
   "remoteEnv": {
     "RSTUDIO_WHICH_R": "/usr/local/bin/R",
     "R_LIBS_USER": "/usr/local/lib/R/site-library",
-    "GITHUB_CODESPACES": "true"
+    "GITHUB_CODESPACES": "true",
+    "DISABLE_AUTH": "true",
+    "ROOT": "true"
   },
 
   // Free tier compatible resources
