@@ -72,7 +72,7 @@ lewbel_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars, z_var
     } else if (!add_intercept && ncol(x_matrix) > 0) {
       z_matrix <- scale(x_matrix, center = TRUE, scale = FALSE)
     } else {
-      stop("Cannot automatically construct Z. No exogenous variables specified or only an intercept.")
+      stop(.hetid_const("messages$CANNOT_AUTO_CONSTRUCT_Z_NO_X"))
     }
   } else {
     z_matrix <- as.matrix(data[, z_vars, drop = FALSE])
@@ -154,7 +154,7 @@ lewbel_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars, z_v
     } else if (!add_intercept && ncol(x_matrix) > 0) {
       z_matrix <- scale(x_matrix, center = TRUE, scale = FALSE)
     } else {
-      stop("Cannot auto-construct Z for simultaneous equations. No valid exogenous X for Z.")
+      stop(.hetid_const("messages$CANNOT_AUTO_CONSTRUCT_Z_SIMUL"))
     }
     if (z_sq) { # If TRUE, Z = [Z, Z^2] for simultaneous eq, as per Lewbel (2012) p.70, for Cov(Z,eps_i^2) != 0
       z_matrix <- cbind(z_matrix, z_matrix^2)
@@ -275,7 +275,11 @@ lewbel_gmm <- function(data,
     stop(sprintf(.hetid_const("messages$PACKAGE_REQUIRED"), .hetid_const("packages$GMM"), .hetid_const("packages$GMM")))
   }
   if (vcov == .hetid_const("VCOV_HAC") && !requireNamespace(.hetid_const("packages$SANDWICH"), quietly = TRUE)) {
-    stop("Package 'sandwich' is required for HAC vcov. Please install it with: install.packages('sandwich')")
+    stop(sprintf(
+      .hetid_const("messages$PACKAGE_REQUIRED"),
+      .hetid_const("packages$SANDWICH"),
+      .hetid_const("packages$SANDWICH")
+    ))
   }
 
 
@@ -971,8 +975,12 @@ prono_gmm <- function(data,
                       compute_se = TRUE,
                       verbose = TRUE,
                       ...) {
-  if (!requireNamespace("gmm", quietly = TRUE)) {
-    stop("Package 'gmm' is required for GMM estimation. Please install it.")
+  if (!requireNamespace(.hetid_const("packages$GMM"), quietly = TRUE)) {
+    stop(sprintf(
+      .hetid_const("messages$PACKAGE_REQUIRED"),
+      .hetid_const("packages$GMM"),
+      .hetid_const("packages$GMM")
+    ))
   }
 
   # Auto-detect x_vars if not provided
@@ -1361,8 +1369,12 @@ rigobon_gmm <- function(data,
                         initial_values = NULL,
                         verbose = TRUE,
                         ...) {
-  if (!requireNamespace("gmm", quietly = TRUE)) {
-    stop("Package 'gmm' is required for GMM estimation. Please install it.")
+  if (!requireNamespace(.hetid_const("packages$GMM"), quietly = TRUE)) {
+    stop(sprintf(
+      .hetid_const("messages$PACKAGE_REQUIRED"),
+      .hetid_const("packages$GMM"),
+      .hetid_const("packages$GMM")
+    ))
   }
 
   if (verbose) messager("Rigobon GMM Estimation", v_type = "info")
@@ -1374,7 +1386,7 @@ rigobon_gmm <- function(data,
 
   unique_regimes <- unique(data[[regime_var]])
   if (length(unique_regimes) < 2) {
-    stop("Rigobon identification requires at least 2 regimes")
+    stop(.hetid_const("messages$NEED_TWO_REGIMES"))
   }
 
   # Prepare data

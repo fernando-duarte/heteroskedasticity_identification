@@ -469,8 +469,8 @@ replicate_prono_table2 <- function(n_sim = 1000,
     RMSE = c(sqrt(mean(results_df$bias_ols^2)), sqrt(mean(results_df$bias_iv^2))),
     Mean_SE = c(mean(results_df$se_ols), mean(results_df$se_iv)),
     Coverage = c(
-      mean(abs(results_df$bias_ols) <= 1.96 * results_df$se_ols),
-      mean(abs(results_df$bias_iv) <= 1.96 * results_df$se_iv)
+      mean(abs(results_df$bias_ols) <= .hetid_const("Z_CRITICAL_95") * results_df$se_ols),
+      mean(abs(results_df$bias_iv) <= .hetid_const("Z_CRITICAL_95") * results_df$se_iv)
     ),
     Mean_F_stat = c(NA, mean(results_df$f_stat, na.rm = TRUE))
   )

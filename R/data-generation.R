@@ -62,7 +62,7 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
   # Validate parameters for multiple X
   if (n_x > 1) {
     if (length(params$beta1_1) != n_x || length(params$beta2_1) != n_x) {
-      stop("For n_x > 1, beta1_1 and beta2_1 must be vectors of length n_x")
+      stop(.hetid_const("messages$INVALID_N_X_PARAMS"))
     }
   } else {
     # Ensure scalar parameters are treated as length-1 vectors for consistency
@@ -208,7 +208,7 @@ verify_lewbel_assumptions <- function(data = NULL, config = NULL,
     current_n_obs <- as.integer(n_obs) # Ensure n_obs is an integer
     test_data <- generate_lewbel_data(current_n_obs, params)
   } else {
-    stop("Must provide either (data, config) or (n_obs, params)")
+    stop(.hetid_const("messages$MISSING_DATA_OR_PARAMS"))
   }
 
   # Calculate sample moments
@@ -319,22 +319,22 @@ verify_lewbel_assumptions <- function(data = NULL, config = NULL,
 generate_rigobon_data <- function(n_obs, params, n_x = 1) {
   # Validate regime parameters
   if (!("regime_probs" %in% names(params)) || !("sigma2_regimes" %in% names(params))) {
-    stop("params must contain 'regime_probs' and 'sigma2_regimes'")
+    stop(.hetid_const("messages$MISSING_REGIME_PARAMS"))
   }
 
   n_regimes <- length(params$regime_probs)
   if (length(params$sigma2_regimes) != n_regimes) {
-    stop("Length of sigma2_regimes must match length of regime_probs")
+    stop(.hetid_const("messages$REGIME_LENGTH_MISMATCH"))
   }
 
   if (abs(sum(params$regime_probs) - 1) > 1e-10) {
-    stop("regime_probs must sum to 1")
+    stop(.hetid_const("messages$REGIME_PROBS_SUM"))
   }
 
   # Validate parameters for multiple X
   if (n_x > 1) {
     if (length(params$beta1_1) != n_x || length(params$beta2_1) != n_x) {
-      stop("For n_x > 1, beta1_1 and beta2_1 must be vectors of length n_x")
+      stop(.hetid_const("messages$INVALID_N_X_PARAMS"))
     }
   } else {
     # Ensure scalar parameters are treated as length-1 vectors

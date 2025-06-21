@@ -461,7 +461,7 @@ compare_rigobon_methods <- function(data,
     lewbel_iv <- (data$Z - mean(data$Z)) * e2_hat
 
     # Run 2SLS
-    if (requireNamespace("ivreg", quietly = TRUE)) {
+    if (requireNamespace(.hetid_const("packages$IVREG"), quietly = TRUE)) {
       iv_formula <- Y1 ~ Y2 + Xk | Xk + lewbel_iv
       lewbel_fit <- ivreg::ivreg(iv_formula, data = data)
 

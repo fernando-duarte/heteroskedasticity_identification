@@ -37,7 +37,18 @@
   PACKAGE_REQUIRED = "Package '%s' is required but not installed. Please install it with: install.packages('%s')",
   VARIABLE_NOT_FOUND = "Variable '%s' not found in data",
   ESTIMATION_FAILED = "%s estimation failed: %s",
-  CONVERGENCE_FAILED = "Convergence not achieved in %d iterations"
+  CONVERGENCE_FAILED = "Convergence not achieved in %d iterations",
+  NEED_TWO_REGIMES = "Need at least 2 regimes for Rigobon identification",
+  CANNOT_AUTO_CONSTRUCT_Z_NO_X = paste0(
+    "Cannot automatically construct Z. ",
+    "No exogenous variables specified or only an intercept."
+  ),
+  CANNOT_AUTO_CONSTRUCT_Z_SIMUL = "Cannot auto-construct Z for simultaneous equations. No valid exogenous X for Z.",
+  INVALID_N_X_PARAMS = "For n_x > 1, beta1_1 and beta2_1 must be vectors of length n_x",
+  MISSING_DATA_OR_PARAMS = "Must provide either (data, config) or (n_obs, params)",
+  MISSING_REGIME_PARAMS = "params must contain 'regime_probs' and 'sigma2_regimes'",
+  REGIME_LENGTH_MISMATCH = "Length of sigma2_regimes must match length of regime_probs",
+  REGIME_PROBS_SUM = "regime_probs must sum to 1"
 )
 
 # Package names (for dependency checks)

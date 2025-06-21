@@ -8,7 +8,7 @@ calculate_lewbel_bounds(
   data,
   tau,
   compute_se = FALSE,
-  b_reps = 100,
+  b_reps = .hetid_const("DEFAULT_BOOTSTRAP_REPS"),
   df_adjust = "asymptotic"
 )
 }

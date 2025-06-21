@@ -230,7 +230,7 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
   iv_package <- NULL
 
   # Try ivreg package first
-  if (requireNamespace("ivreg", quietly = TRUE)) {
+  if (requireNamespace(.hetid_const("packages$IVREG"), quietly = TRUE)) {
     tryCatch(
       {
         iv_fit <- ivreg::ivreg(iv_formula, data = df)

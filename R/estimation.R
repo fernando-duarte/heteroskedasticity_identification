@@ -57,7 +57,7 @@
 calculate_lewbel_bounds <- function(data,
                                     tau,
                                     compute_se = FALSE,
-                                    b_reps = 100,
+                                    b_reps = .hetid_const("DEFAULT_BOOTSTRAP_REPS"),
                                     df_adjust = "asymptotic") {
   # Main calculation function
   calculate_bounds_internal <- function(df, indices = seq_len(nrow(df))) {
@@ -521,7 +521,7 @@ run_rigobon_estimation <- function(data,
   n_regimes <- length(regimes)
 
   if (n_regimes < 2) {
-    stop("Need at least 2 regimes for Rigobon identification")
+    stop(.hetid_const("messages$NEED_TWO_REGIMES"))
   }
 
   # Calculate regime proportions
@@ -574,12 +574,16 @@ run_rigobon_estimation <- function(data,
 
   tsls_model <- tryCatch(
     {
-      if (requireNamespace("ivreg", quietly = TRUE)) {
+      if (requireNamespace(.hetid_const("packages$IVREG"), quietly = TRUE)) {
         ivreg::ivreg(iv_formula, data = data)
-      } else if (requireNamespace("AER", quietly = TRUE)) {
+      } else if (requireNamespace(.hetid_const("packages$AER"), quietly = TRUE)) {
         AER::ivreg(iv_formula, data = data)
       } else {
-        stop("Neither ivreg nor AER package is available for IV regression")
+        stop(sprintf(
+          "Neither %s nor %s package is available for IV regression",
+          .hetid_const("packages$IVREG"),
+          .hetid_const("packages$AER")
+        ))
       }
     },
     error = function(e) {
