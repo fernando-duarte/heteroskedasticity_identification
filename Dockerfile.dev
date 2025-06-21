@@ -108,11 +108,12 @@ RUN --mount=type=cache,target=/root/.cache/R,sharing=locked \
 # - Subsequent builds with no changes: 0 seconds (uses cached layer)
 # - GitHub Actions cache via 'cache-from: type=gha' ensures persistence across workflow runs
 # - PDF generation during R CMD check: ~30-60 seconds (not cached, runs each time)
-RUN R -e "tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
+RUN R -e "if (!requireNamespace('tinytex', quietly = TRUE)) { install.packages('tinytex') }; \
+          tinytex::install_tinytex(force = TRUE, dir = '/opt/TinyTeX', extra_packages = c('inconsolata', 'times', 'tex-gyre', 'fancyhdr', 'natbib', 'caption'))" && \
     /opt/TinyTeX/bin/*/tlmgr path add
 
-# Ensure TinyTeX is in PATH
-ENV PATH="/opt/TinyTeX/bin/x86_64-linux:${PATH}"
+# Ensure TinyTeX is in PATH (handle both x86_64 and ARM64)
+ENV PATH="/opt/TinyTeX/bin/x86_64-linux:/opt/TinyTeX/bin/aarch64-linux:${PATH}"
 
 # Configure R for development (before setting up directories)
 RUN echo "options(repos = c(CRAN = 'https://cloud.r-project.org/'))" >> /usr/local/lib/R/etc/Rprofile.site && \
