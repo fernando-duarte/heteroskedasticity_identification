@@ -1,0 +1,32 @@
+{
+  "recommendations": [
+    // R language support
+    "REditorSupport.r",
+    "RDebugger.r-debugger",
+    "reditorsupport.r-lsp",
+
+    // Data science and visualization
+    "quarto.quarto",
+    "ms-toolsai.jupyter",
+    "ms-python.python",
+
+    // Development tools
+    "ms-vscode.vscode-json",
+    "redhat.vscode-yaml",
+    "ms-azuretools.vscode-docker",
+
+    // Git and GitHub
+    "GitHub.vscode-pull-request-github",
+    "GitHub.copilot",
+    "GitHub.copilot-chat",
+    "ms-vscode.live-share",
+
+    // Code quality
+    "streetsidesoftware.code-spell-checker",
+    "EditorConfig.EditorConfig",
+
+    // Markdown and documentation
+    "yzhang.markdown-all-in-one",
+    "DavidAnson.vscode-markdownlint"
+  ]
+}

@@ -174,8 +174,8 @@ $RECYCLE.BIN/
 
 ### IDE-specific files ###
 
-# Visual Studio Code
-.vscode/
+# Visual Studio Code (allow .vscode for devcontainer configuration)
+# .vscode/
 *.code-workspace
 
 # Cursor AI
