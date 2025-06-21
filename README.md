@@ -189,19 +189,13 @@ See the [Makefile](Makefile) for all available test commands.
 **[Usage](dev-guides/USAGE.md)**.
 **[Troubleshooting](dev-guides/TROUBLESHOOTING.md)**.
 
-## Citation
+## References
 
-To cite this package in publications, please use:
+- Lewbel, A. (2012). Using heteroscedasticity to identify and estimate mismeasured and endogenous regressor models. *Journal of Business & Economic Statistics*, 30(1), 67-80. https://doi.org/10.1080/07350015.2012.643126
 
-```r
-citation("hetid")
-```
+- Prono, T. (2014). The role of conditional heteroskedasticity in identifying and estimating linear triangular systems, with applications to asset pricing models that include a mismeasured factor. *Journal of Applied Econometrics*, 29(5), 800-824. https://doi.org/10.1002/jae.2331
 
-This will show citations for:
-- The `hetid` package itself
-- Lewbel (2012) - when using heteroskedasticity identification methods
-- Rigobon (2003) - when using regime-based identification methods
-- Prono (2014) - when using GARCH-based identification methods
+- Rigobon, R. (2003). Identification through heteroskedasticity. *The Review of Economics and Statistics*, 85(4), 777-792. https://doi.org/10.1162/003465303772815727
 
 ## License
 
