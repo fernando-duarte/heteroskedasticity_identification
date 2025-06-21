@@ -7,7 +7,8 @@
 generate_all_seeds(config)
 }
 \arguments{
-\item{config}{List. Configuration object from create_default_config().}
+\item{config}{List. Configuration object created by \code{\link{create_default_config}}
+or related configuration functions.}
 }
 \value{
 A list containing seed vectors/matrices for different simulation

@@ -30,7 +30,7 @@ If provided, skips data generation.}
 
 \item{exog_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 
-\item{verbose}{Logical. Whether to print detailed results (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 
 \item{return_all}{Logical. Whether to return all intermediate results
 (default: FALSE).}
@@ -85,7 +85,7 @@ results <- run_rigobon_analysis(data = my_data, regime_var = "period")
 Rigobon, R. (2003). "Identification Through Heteroskedasticity."
 The Review of Economics and Statistics, 85(4), 777-792.
 
-Rigobon, R. (2003). Identification Through Heteroskedasticity.
+Rigobon, R. (2003). Identification through heteroskedasticity.
 Review of Economics and Statistics, 85(4), 777-792.
 \doi{10.1162/003465303772815727}
 }

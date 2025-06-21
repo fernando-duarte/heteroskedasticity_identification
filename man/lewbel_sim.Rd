@@ -37,8 +37,8 @@ The error structure follows a single-factor model with heteroskedasticity:
 where \eqn{V_2 \sim N(0, \exp(1.2 \cdot Z))} with \eqn{Z = X2^2 - E[X2^2]}.
 }
 \references{
-Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
-Mismeasured and Endogenous Regressor Models. Journal of Business &
-Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
+Lewbel, A. (2012). Using heteroscedasticity to identify and estimate
+mismeasured and endogenous regressor models. Journal of Business & Economic
+Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
 }
 \keyword{datasets}

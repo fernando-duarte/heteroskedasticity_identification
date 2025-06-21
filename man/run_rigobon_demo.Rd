@@ -11,7 +11,7 @@ run_rigobon_demo(n_obs = .N_DEFAULT, n_regimes = 2, verbose = TRUE)
 
 \item{n_regimes}{Integer. Number of regimes (default: 2).}
 
-\item{verbose}{Logical. Whether to print detailed output (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 A list containing:
@@ -40,7 +40,7 @@ demo_quiet <- run_rigobon_demo(verbose = FALSE)
 
 }
 \references{
-Rigobon, R. (2003). Identification Through Heteroskedasticity.
+Rigobon, R. (2003). Identification through heteroskedasticity.
 Review of Economics and Statistics, 85(4), 777-792.
 \doi{10.1162/003465303772815727}
 }

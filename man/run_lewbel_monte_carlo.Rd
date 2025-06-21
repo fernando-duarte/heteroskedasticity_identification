@@ -15,8 +15,7 @@ run_lewbel_monte_carlo(
 )
 }
 \arguments{
-\item{config}{List. Configuration object from create_default_config().
-If NULL, uses default configuration.}
+\item{config}{If NULL, uses default configuration.}
 
 \item{run_verification}{Logical. Whether to run assumption verification
 (default: TRUE).}
@@ -33,8 +32,7 @@ If NULL, uses default configuration.}
 \item{generate_plots}{Logical. Whether to generate visualization plots
 (default: TRUE).}
 
-\item{verbose}{Logical. Whether to print progress and results (default:
-TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 A list containing:
@@ -90,9 +88,9 @@ results <- run_lewbel_monte_carlo(
 
 }
 \references{
-Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
-Mismeasured and Endogenous Regressor Models. Journal of Business &
-Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
+Lewbel, A. (2012). Using heteroscedasticity to identify and estimate
+mismeasured and endogenous regressor models. Journal of Business & Economic
+Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
 }
 \seealso{
 \code{\link{run_single_lewbel_simulation}}, \code{\link{calculate_lewbel_bounds}}

@@ -24,8 +24,11 @@ calculate_lewbel_bounds(
 \item{b_reps}{Integer. Number of bootstrap replications if compute_se = TRUE
 (default: 100).}
 
-\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic"
-(default) or "finite". Affects standard errors and confidence intervals.}
+\item{df_adjust}{Character. Method for degrees of freedom adjustment:
+\itemize{
+\item "asymptotic": No adjustment (default)
+\item "finite": Finite sample adjustment using HC2 formula
+}}
 }
 \value{
 A list containing:
@@ -72,7 +75,7 @@ bounds_set <- calculate_lewbel_bounds(
 
 }
 \references{
-Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
-Mismeasured and Endogenous Regressor Models. Journal of Business &
-Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
+Lewbel, A. (2012). Using heteroscedasticity to identify and estimate
+mismeasured and endogenous regressor models. Journal of Business & Economic
+Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
 }

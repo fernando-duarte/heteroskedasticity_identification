@@ -19,7 +19,7 @@ compare_rigobon_methods(
 \item{methods}{Character vector. Methods to compare (default:
 c("OLS", "Rigobon", "Lewbel")).}
 
-\item{verbose}{Logical. Whether to print comparison results (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 A data frame comparing the methods with columns for estimates,
@@ -48,7 +48,7 @@ comparison <- compare_rigobon_methods(data, true_gamma1 = params$gamma1)
 
 }
 \references{
-Rigobon, R. (2003). Identification Through Heteroskedasticity.
+Rigobon, R. (2003). Identification through heteroskedasticity.
 Review of Economics and Statistics, 85(4), 777-792.
 \doi{10.1162/003465303772815727}
 }

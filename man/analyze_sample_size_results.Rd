@@ -9,9 +9,10 @@ analyze_sample_size_results(results_by_n, config, verbose = TRUE)
 \arguments{
 \item{results_by_n}{Data.frame. Results from run_sample_size_analysis().}
 
-\item{config}{List. Configuration object from create_default_config().}
+\item{config}{List. Configuration object created by \code{\link{create_default_config}}
+or related configuration functions.}
 
-\item{verbose}{Logical. Whether to print output (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 A data.frame with sample size analysis.

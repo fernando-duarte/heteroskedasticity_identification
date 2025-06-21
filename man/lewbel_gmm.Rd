@@ -22,7 +22,8 @@ lewbel_gmm(
 )
 }
 \arguments{
-\item{data}{Data frame containing all variables.}
+\item{data}{Data frame containing all required variables. Must include the
+dependent variables and any exogenous regressors specified in the model.}
 
 \item{system}{Character. Type of system: "triangular" or "simultaneous" (default: "triangular").
 Note: Simultaneous systems require strong identification conditions - either many
@@ -48,7 +49,7 @@ regimes (4+) or large variance differences across regimes for numerical stabilit
 
 \item{compute_se}{Logical. Whether to compute standard errors (default: TRUE). Passed to gmm call.}
 
-\item{verbose}{Logical. Whether to print messages (default: FALSE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 
 \item{...}{Additional arguments passed to gmm().}
 }
@@ -98,9 +99,9 @@ cat("GMM estimate:", coef(gmm_tri)["gamma1"], "\n")
 
 }
 \references{
-Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
-Mismeasured and Endogenous Regressor Models. Journal of Business &
-Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
+Lewbel, A. (2012). Using heteroscedasticity to identify and estimate
+mismeasured and endogenous regressor models. Journal of Business & Economic
+Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
 }
 \seealso{
 \code{\link{lewbel_triangular_moments}}, \code{\link{lewbel_simultaneous_moments}} for moment condition functions.

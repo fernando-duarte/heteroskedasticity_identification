@@ -190,6 +190,7 @@ GEOS
 Geospatial
 getenv
 getOption
+getRversion
 gfortran
 ggplot
 ggsave
@@ -200,7 +201,6 @@ gitignored
 GitOps
 globals
 globalVariables
-getRversion
 gmm
 GMM
 goodpractice
@@ -218,6 +218,7 @@ hac
 HAC
 hardcode
 hardcoded
+HC
 het
 heteroskedastic
 heteroskedasticity
@@ -398,9 +399,9 @@ nolint
 nOLS
 NONINFRINGEMENT
 nOr
+noRd
 NOTEs
 nOur
-noRd
 nOutput
 nOverall
 nPART
@@ -743,3 +744,12 @@ ymin
 yml
 δZ
 zA
+dupree
+dup
+duplications
+dups
+nTop
+rds
+saveRDS
+homoskedasticity
+htest

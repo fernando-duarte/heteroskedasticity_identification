@@ -18,7 +18,7 @@ validate_rigobon_assumptions(
 
 \item{exog_vars}{Character vector. Names of exogenous variables.}
 
-\item{verbose}{Logical. Whether to print test results (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 A list containing test results:
@@ -60,7 +60,7 @@ validation <- validate_rigobon_assumptions(data)
 
 }
 \references{
-Rigobon, R. (2003). Identification Through Heteroskedasticity.
+Rigobon, R. (2003). Identification through heteroskedasticity.
 Review of Economics and Statistics, 85(4), 777-792.
 \doi{10.1162/003465303772815727}
 }

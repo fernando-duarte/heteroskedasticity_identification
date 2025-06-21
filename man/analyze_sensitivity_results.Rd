@@ -9,9 +9,10 @@ analyze_sensitivity_results(results_by_delta, config, verbose = TRUE)
 \arguments{
 \item{results_by_delta}{Data.frame. Results from run_sensitivity_analysis().}
 
-\item{config}{List. Configuration object from create_default_config().}
+\item{config}{List. Configuration object created by \code{\link{create_default_config}}
+or related configuration functions.}
 
-\item{verbose}{Logical. Whether to print output (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 A data.frame with sensitivity analysis.
