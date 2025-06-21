@@ -76,22 +76,26 @@
   "portsAttributes": {
     "8787": {
       "label": "RStudio Server",
-      "onAutoForward": "openBrowserOnce",
+      "onAutoForward": "notify",
+      "visibility": "private",
       "requireLocalPort": false,
       "protocol": "http"
     },
     "8080": {
       "label": "R Graphics (httpgd)",
       "onAutoForward": "silent",
+      "visibility": "private",
       "requireLocalPort": false
     },
     "3838": {
       "label": "Shiny Apps",
-      "onAutoForward": "notify"
+      "onAutoForward": "notify",
+      "visibility": "private"
     },
     "4321": {
       "label": "Quarto Preview",
-      "onAutoForward": "openPreview"
+      "onAutoForward": "openPreview",
+      "visibility": "private"
     }
   },
 
@@ -104,17 +108,17 @@
 
   "postAttachCommand": "echo 'Welcome to hetid R development! Run \"make help\" for available commands.'",
 
-  // Container user (rstudio user is default in rocker images)
+  // Container user configuration (rootless for security)
   "remoteUser": "rstudio",
+  "containerUser": "rstudio",
 
-  // Environment variables
+  // Environment variables (secure configuration)
   "remoteEnv": {
-    "DISABLE_AUTH": "true",
-    "ROOT": "true",
     "RSTUDIO_WHICH_R": "/usr/local/bin/R",
     "R_LIBS_USER": "/usr/local/lib/R/site-library",
     "RENV_PATHS_CACHE": "/renv/cache",
-    "QUARTO_PYTHON": "/usr/local/bin/python"
+    "QUARTO_PYTHON": "/usr/local/bin/python",
+    "PAK_INSTALL_RETRIES": "3"
   },
 
   // Working directory
