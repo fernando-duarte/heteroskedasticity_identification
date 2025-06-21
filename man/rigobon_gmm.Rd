@@ -42,7 +42,7 @@ differences across regimes for numerical stability and identification.}
 
 \item{initial_values}{Numeric vector. Initial parameter values.}
 
-\item{verbose}{Logical. Print progress messages.}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 
 \item{...}{Additional arguments passed to gmm::gmm.}
 }

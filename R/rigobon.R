@@ -28,7 +28,7 @@
 #' @param regime_var Character. Name of regime variable in data (default: "regime").
 #' @param endog_var Character. Name of endogenous variable (default: "Y2").
 #' @param exog_vars Character vector. Names of exogenous variables (default: "Xk").
-#' @param verbose Logical. Whether to print detailed results (default: TRUE).
+#' @template param-verbose
 #' @param return_all Logical. Whether to return all intermediate results
 #'   (default: FALSE).
 #'
@@ -214,7 +214,7 @@ run_rigobon_analysis <- function(n_obs = .N_DEFAULT,
 #' @param data Data.frame. Must contain Y1, Y2, regime, and X variables.
 #' @param regime_var Character. Name of regime variable (default: "regime").
 #' @param exog_vars Character vector. Names of exogenous variables.
-#' @param verbose Logical. Whether to print test results (default: TRUE).
+#' @template param-verbose
 #'
 #' @return A list containing test results:
 #'   \itemize{
@@ -397,7 +397,7 @@ validate_rigobon_assumptions <- function(data,
 #' @param true_gamma1 Numeric. Optional. True value of the endogenous parameter.
 #' @param methods Character vector. Methods to compare (default:
 #'   c("OLS", "Rigobon", "Lewbel")).
-#' @param verbose Logical. Whether to print comparison results (default: TRUE).
+#' @template param-verbose
 #'
 #' @return A data frame comparing the methods with columns for estimates,
 #'   standard errors, bias (if true value provided), and method-specific

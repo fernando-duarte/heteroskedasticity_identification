@@ -17,8 +17,8 @@ compare_gmm_2sls(
 )
 }
 \arguments{
-\item{data}{Data frame containing all variables. Must contain "Y1", "Y2", and "Xk"
-(or variables specified by y1_var, y2_var, x_vars).}
+\item{data}{Data frame containing all required variables. Must include the
+dependent variables and any exogenous regressors specified in the model.}
 
 \item{y1_var}{Character. Name of the first dependent variable (default: "Y1").}
 

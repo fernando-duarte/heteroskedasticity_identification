@@ -156,7 +156,7 @@ create_default_config <- function(
 #' Pre-generates all seeds needed for different parts of the Lewbel simulation
 #' to ensure reproducibility across parallel execution.
 #'
-#' @param config List. Configuration object from create_default_config().
+#' @template param-config
 #'
 #' @return A list containing seed vectors/matrices for different simulation
 #'   parts.

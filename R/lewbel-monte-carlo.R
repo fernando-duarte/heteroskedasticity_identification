@@ -4,8 +4,8 @@
 #' of Lewbel's (2012) heteroscedasticity-based identification strategy. This
 #' is the main function that orchestrates all simulation components.
 #'
-#' @param config List. Configuration object from create_default_config().
-#'   If NULL, uses default configuration.
+#' @template param-config
+#' @param config If NULL, uses default configuration.
 #' @param run_verification Logical. Whether to run assumption verification
 #'   (default: TRUE).
 #' @param run_bootstrap_demo Logical. Whether to run bootstrap demonstration
@@ -16,8 +16,7 @@
 #'   (default: TRUE).
 #' @param generate_plots Logical. Whether to generate visualization plots
 #'   (default: TRUE).
-#' @param verbose Logical. Whether to print progress and results (default:
-#'   TRUE).
+#' @template param-verbose
 #'
 #' @details
 #' This function runs a complete Monte Carlo evaluation including:
@@ -222,7 +221,7 @@ run_lewbel_monte_carlo <- function(config = NULL,
 #' reduced parameters for faster execution.
 #'
 #' @param num_simulations Integer. Number of simulations to run (default: 100).
-#' @param verbose Logical. Whether to print output (default: TRUE).
+#' @template param-verbose
 #'
 #' @return Results from run_lewbel_monte_carlo() with reduced parameters.
 #'
@@ -269,7 +268,7 @@ run_lewbel_demo <- function(num_simulations = 100, verbose = TRUE) {
 #'
 #' @param n_obs Integer. Sample size (default: 1000).
 #' @param n_regimes Integer. Number of regimes (default: 2).
-#' @param verbose Logical. Whether to print detailed output (default: TRUE).
+#' @template param-verbose
 #'
 #' @return A list containing:
 #'   \itemize{

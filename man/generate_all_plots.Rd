@@ -22,9 +22,9 @@ generate_all_plots(
 
 \item{bootstrap_examples}{Data.frame. Bootstrap examples.}
 
-\item{config}{List. Configuration object.}
+\item{config}{List. Configuration object containing true parameter values.}
 
-\item{verbose}{Logical. Whether to print plots (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 A list of ggplot2 objects.

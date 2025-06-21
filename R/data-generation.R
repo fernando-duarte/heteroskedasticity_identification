@@ -155,7 +155,7 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
 #'   with params).
 #' @param params List. Parameters for the DGP (same format as
 #'   generate_lewbel_data).
-#' @param verbose Logical. Whether to print detailed output (default: TRUE).
+#' @template param-verbose
 #'
 #' @details
 #' The function tests:

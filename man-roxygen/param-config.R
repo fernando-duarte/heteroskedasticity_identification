@@ -1,1 +1,2 @@
-#' @param config List. Configuration object from create_default_config().
+#' @param config List. Configuration object created by \code{\link{create_default_config}}
+#'   or related configuration functions.

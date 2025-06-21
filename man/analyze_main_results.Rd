@@ -9,9 +9,10 @@ analyze_main_results(results, config, verbose = TRUE)
 \arguments{
 \item{results}{Data.frame. Results from run_main_simulation().}
 
-\item{config}{List. Configuration object from create_default_config().}
+\item{config}{List. Configuration object created by \code{\link{create_default_config}}
+or related configuration functions.}
 
-\item{verbose}{Logical. Whether to print output (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 A list containing summary tables and statistics.

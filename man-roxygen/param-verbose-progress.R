@@ -1,1 +1,2 @@
-#' @param verbose Logical. Whether to print progress messages (default: TRUE).
+#' @param verbose Logical. Whether to show progress information during execution
+#'   (default: TRUE).

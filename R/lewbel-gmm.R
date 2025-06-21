@@ -13,9 +13,8 @@ NULL
 #' using Lewbel's heteroskedasticity-based identification.
 #'
 #' @param theta Numeric vector. Parameters to estimate: c(beta1, gamma1, beta2).
-#' @param data Data frame containing the variables.
-#' @param y1_var Character. Name of the first dependent variable (default: "Y1").
-#' @param y2_var Character. Name of the second dependent variable/endogenous regressor (default: "Y2").
+#' @template param-data
+#' @template param-y-vars
 #' @param x_vars Character vector. Names of exogenous variables (default: "Xk").
 #' @param z_vars Character vector. Names of heteroskedasticity drivers (default: NULL, uses centered X).
 #' @param add_intercept Logical. Whether to add an intercept to the exogenous variables.
@@ -96,9 +95,8 @@ lewbel_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars, z_var
 #' system using Lewbel's heteroskedasticity-based identification.
 #'
 #' @param theta Numeric vector. Parameters: c(beta1, gamma1, beta2, gamma2).
-#' @param data Data frame containing the variables.
-#' @param y1_var Character. Name of the first dependent variable (default: "Y1").
-#' @param y2_var Character. Name of the second dependent variable (default: "Y2").
+#' @template param-data
+#' @template param-y-vars
 #' @param x_vars Character vector. Names of exogenous variables (default: "Xk").
 #' @param z_vars Character vector. Names of heteroskedasticity drivers (default: NULL).
 #' @param add_intercept Logical. Whether to add an intercept to the exogenous variables.
@@ -192,12 +190,11 @@ lewbel_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars, z_v
 #' Main function to estimate Lewbel's heteroskedasticity-based identification
 #' model using Generalized Method of Moments (GMM).
 #'
-#' @param data Data frame containing all variables.
+#' @template param-data
 #' @param system Character. Type of system: "triangular" or "simultaneous" (default: "triangular").
 #'   Note: Simultaneous systems require strong identification conditions - either many
 #'   regimes (4+) or large variance differences across regimes for numerical stability.
-#' @param y1_var Character. Name of the first dependent variable (default: "Y1").
-#' @param y2_var Character. Name of the second dependent variable/endogenous regressor (default: "Y2").
+#' @template param-y-vars
 #' @param x_vars Character vector. Names of exogenous variables (default: "Xk").
 #' @param z_vars Character vector. Names of heteroskedasticity drivers (default: NULL).
 #' @param add_intercept Logical. Whether to add an intercept to the exogenous variables (default: TRUE).
@@ -206,7 +203,7 @@ lewbel_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars, z_v
 #' @param vcov Character. Type of variance-covariance matrix: "HAC", "iid", or "cluster" (default: "HAC").
 #' @param cluster_var Character. Variable name for clustering if vcov = "cluster" (default: NULL).
 #' @param compute_se Logical. Whether to compute standard errors (default: TRUE). Passed to gmm call.
-#' @param verbose Logical. Whether to print messages (default: FALSE).
+#' @template param-verbose
 #' @param ... Additional arguments passed to gmm().
 #'
 #' @return An object of class "gmm" containing estimation results.
@@ -656,10 +653,8 @@ print.lewbel_gmm <- function(x, ...) {
 #'
 #' Compares GMM estimates with traditional 2SLS (Lewbel) estimates for the triangular system.
 #'
-#' @param data Data frame containing all variables. Must contain "Y1", "Y2", and "Xk"
-#'             (or variables specified by y1_var, y2_var, x_vars).
-#' @param y1_var Character. Name of the first dependent variable (default: "Y1").
-#' @param y2_var Character. Name of the second dependent variable/endogenous regressor (default: "Y2").
+#' @template param-data
+#' @template param-y-vars
 #' @param x_vars Character vector. Names of exogenous variables (default: "Xk").
 #'               For 2SLS via run_single_lewbel_simulation, it assumes a single "Xk" if
 #'               default simulation parameters are used. For GMM, can be multiple.
@@ -673,7 +668,7 @@ print.lewbel_gmm <- function(x, ...) {
 #'                          \code{\link{run_single_lewbel_simulation}}.
 #'                          The `sample_size` will be set to `nrow(data)`.
 #'                          `lewbel_x_vars` in this config should match `x_vars` here.
-#' @param verbose Logical. Whether to print progress messages (default: TRUE).
+#' @template param-verbose
 #'
 #' @return A data frame comparing estimates, standard errors, and test statistics.
 #'
@@ -950,7 +945,7 @@ prono_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars,
 #' @param vcov Character. Variance-covariance matrix type: "iid", "HAC" (default), or "cluster".
 #' @param initial_values Numeric vector. Initial parameter values (optional).
 #' @param compute_se Logical. Whether to compute standard errors (default: TRUE).
-#' @param verbose Logical. Print progress messages (default: TRUE).
+#' @template param-verbose
 #' @param ... Additional arguments passed to gmm::gmm.
 #'
 #' @return An object of class "prono_gmm" containing GMM estimation results.
@@ -1348,7 +1343,7 @@ rigobon_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars,
 #' @param gmm_type Character. GMM type.
 #' @param vcov Character. Variance-covariance matrix type.
 #' @param initial_values Numeric vector. Initial parameter values.
-#' @param verbose Logical. Print progress messages.
+#' @template param-verbose
 #' @param ... Additional arguments passed to gmm::gmm.
 #'
 #' @return An object of class "rigobon_gmm" containing GMM estimation results.

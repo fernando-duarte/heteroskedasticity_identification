@@ -339,7 +339,7 @@ analyze_sensitivity_results <- function(results_by_delta,
 #' @param analysis List. Optional. Analysis results object containing
 #'   simulation metrics.
 #' @template param-config-optional
-#' @param verbose Logical. Whether to print the summary (default: TRUE).
+#' @template param-verbose
 #'
 #' @examples
 #' \dontrun{
