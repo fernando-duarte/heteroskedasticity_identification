@@ -7,7 +7,7 @@
   "features": {
     // Essential R packages for hetid project (tested and working)
     "ghcr.io/rocker-org/devcontainer-features/r-packages:1": {
-      "packages": "AER,boot,dplyr,furrr,future,ggplot2,purrr,rlang,tidyr,devtools,testthat,knitr,rmarkdown,here,fs,glue,cli,gmm,xts",
+      "packages": "AER,boot,dplyr,furrr,future,ggplot2,purrr,rlang,tidyr,devtools,testthat,knitr,rmarkdown,here,fs,glue,cli,gmm,xts,languageserver,lintr,styler,httpgd",
       "installSystemRequirements": true
     },
 

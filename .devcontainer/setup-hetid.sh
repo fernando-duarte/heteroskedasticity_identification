@@ -66,6 +66,39 @@ install_r_packages() {
     print_success "Core R packages installed"
 }
 
+# Install VS Code R Language Server and related packages
+install_vscode_r_packages() {
+    print_status "Installing VS Code R Language Server..."
+
+    R --slave -e "
+        # Install R Language Server for VS Code (this is what VS Code was trying to install)
+        if (!requireNamespace('languageserver', quietly = TRUE)) {
+            cat('Installing R Language Server for VS Code...\n')
+            install.packages('languageserver', repos = 'https://p3m.dev/cran/__linux__/noble/2025-06-12')
+        } else {
+            cat('R Language Server already installed\n')
+        }
+
+        # Install additional packages that enhance VS Code R experience
+        vscode_packages <- c('lintr', 'styler', 'httpgd')
+        for (pkg in vscode_packages) {
+            if (!requireNamespace(pkg, quietly = TRUE)) {
+                cat('Installing', pkg, 'for VS Code R support...\n')
+                tryCatch({
+                    install.packages(pkg, repos = 'https://cran.rstudio.com/')
+                }, error = function(e) {
+                    cat('Skipping', pkg, 'due to installation error\n')
+                })
+            } else {
+                cat(pkg, 'already installed\n')
+            }
+        }
+        cat('VS Code R packages ready!\n')
+    "
+
+    print_success "VS Code R Language Server installed"
+}
+
 # Install hetid package dependencies (skip problematic ones)
 install_hetid_deps() {
     print_status "Installing hetid package dependencies..."
@@ -184,6 +217,7 @@ main() {
     # Run setup steps
     install_system_deps
     install_r_packages
+    install_vscode_r_packages
     install_hetid_deps
     configure_rstudio
     start_rstudio
@@ -197,6 +231,7 @@ main() {
     print_status "Quick start:"
     echo "  • RStudio Server: Access via Ports tab (port 8787)"
     echo "  • VS Code R: Open R files and use Ctrl+Enter to run code"
+    echo "  • R Language Server: Pre-installed for VS Code IntelliSense"
     echo "  • Load package: rdev or R -e 'devtools::load_all()'"
     echo "  • Test functions: hetid_load && hetid_status"
     echo ""
