@@ -296,7 +296,7 @@ run_lewbel_demo <- function(num_simulations = 100, verbose = TRUE) {
 #' @seealso \code{\link{generate_rigobon_data}}, \code{\link{run_rigobon_estimation}}
 #'
 #' @export
-run_rigobon_demo <- function(n_obs = 1000, n_regimes = 2, verbose = TRUE) {
+run_rigobon_demo <- function(n_obs = .N_DEFAULT, n_regimes = 2, verbose = TRUE) {
   if (verbose) {
     cat("\n========================================\n")
     cat("RIGOBON (2003) IDENTIFICATION DEMO\n")

@@ -359,7 +359,7 @@ lewbel_gmm <- function(data,
     beta2_init_vec <- coef(ols2)[ols_beta_names_intercept]
 
 
-    if (system == "triangular") {
+    if (system == .SYSTEM_TRIANGULAR) {
       initial_values <- c(beta1_init_vec, gamma1_init_val, beta2_init_vec)
     } else { # simultaneous
       gamma2_init_val <- 0.1 # Small initial value for gamma2
@@ -728,7 +728,7 @@ compare_gmm_2sls <- function(data,
   if (verbose) messager("Running GMM estimation...")
   gmm_call_args <- list(
     data = data,
-    system = "triangular", # Comparison typically for triangular
+    system = .SYSTEM_TRIANGULAR, # Comparison typically for triangular
     y1_var = y1_var,
     y2_var = y2_var,
     x_vars = x_vars,
@@ -1400,7 +1400,7 @@ rigobon_gmm <- function(data,
     ols1 <- lm(formula1, data = data)
     ols2 <- lm(formula2, data = data)
 
-    if (system == "triangular") {
+    if (system == .SYSTEM_TRIANGULAR) {
       initial_values <- c(coef(ols1)[-2], coef(ols1)[2], coef(ols2))
     } else {
       # For simultaneous, add gamma2

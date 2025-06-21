@@ -231,7 +231,7 @@ verify_lewbel_assumptions <- function(data = NULL, config = NULL,
     ))
     cat(sprintf("Test H0: Cov(Z, e1*e2) = 0, p-value = %.4f\n", p_value))
 
-    if (p_value < 0.05) {
+    if (p_value < .ALPHA_DEFAULT) {
       warning("Key assumption Cov(Z, e1*e2) = 0 appears to be violated!")
     } else {
       cat("Key assumptions appear to be satisfied.\n")

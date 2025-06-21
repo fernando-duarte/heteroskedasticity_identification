@@ -24,7 +24,7 @@ adjust_se_for_df <- function(se, n, k, df_adjust = "asymptotic") {
 #' @param df_adjust Character string: "asymptotic" (default) or "finite"
 #' @return Critical value
 #' @export
-get_critical_value <- function(n, k, alpha = 0.05, df_adjust = "asymptotic") {
+get_critical_value <- function(n, k, alpha = .ALPHA_DEFAULT, df_adjust = "asymptotic") {
   if (df_adjust == "finite") {
     # Use t-distribution with n-k degrees of freedom
     qt(1 - alpha / 2, df = n - k)

@@ -200,6 +200,7 @@ gitignored
 GitOps
 globals
 globalVariables
+getRversion
 gmm
 GMM
 goodpractice

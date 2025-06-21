@@ -4,7 +4,7 @@
 \alias{get_critical_value}
 \title{Get critical value for confidence intervals}
 \usage{
-get_critical_value(n, k, alpha = 0.05, df_adjust = "asymptotic")
+get_critical_value(n, k, alpha = .ALPHA_DEFAULT, df_adjust = "asymptotic")
 }
 \arguments{
 \item{n}{Sample size}

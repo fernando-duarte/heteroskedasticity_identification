@@ -66,7 +66,7 @@
 #'   \code{\link{validate_rigobon_assumptions}}
 #'
 #' @export
-run_rigobon_analysis <- function(n_obs = 1000,
+run_rigobon_analysis <- function(n_obs = .N_DEFAULT,
                                  params = NULL,
                                  data = NULL,
                                  regime_var = "regime",
@@ -288,7 +288,7 @@ validate_rigobon_assumptions <- function(data,
     het_test_results[[eq]] <- list(
       variances = variances,
       p_value = bartlett_test$p.value,
-      significant = bartlett_test$p.value < 0.05
+      significant = bartlett_test$p.value < .ALPHA_DEFAULT
     )
   }
 
@@ -311,7 +311,7 @@ validate_rigobon_assumptions <- function(data,
       covariance = cov_val,
       t_stat = t_stat,
       p_value = p_val,
-      valid = p_val > 0.05
+      valid = p_val > .ALPHA_DEFAULT
     )
   }
 
