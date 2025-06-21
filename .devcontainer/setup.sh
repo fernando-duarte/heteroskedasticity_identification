@@ -56,14 +56,23 @@ configure_git() {
 install_dependencies() {
     print_status "Installing R package dependencies..."
 
-    # Install package in development mode
+    # Get retry configuration
+    local retries=${PAK_INSTALL_RETRIES:-3}
+
+    # Install pak first for faster binary installs
+    print_status "Installing pak for faster package installation..."
     R --slave -e "
-        if (!requireNamespace('devtools', quietly = TRUE)) {
-            install.packages('devtools', repos = 'https://cloud.r-project.org/')
+        if (!requireNamespace('pak', quietly = TRUE)) {
+            install.packages('pak', repos = 'https://r-lib.github.io/p/pak/stable/')
         }
-        devtools::install_deps(dependencies = TRUE)
+    "
+
+    # Install package dependencies with pak and retry logic
+    print_status "Installing dependencies with pak (retries: $retries)..."
+    R --slave -e "
+        pak::pak('./DESCRIPTION', ask = FALSE, retries = $retries)
         devtools::load_all()
-        cat('Package dependencies installed successfully\n')
+        cat('Package dependencies installed successfully with pak\n')
     "
 
     print_success "R package dependencies installed"
