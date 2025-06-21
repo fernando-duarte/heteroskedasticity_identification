@@ -324,8 +324,8 @@ plot_bootstrap_ci <- function(bootstrap_examples, config) {
 #' @param results_by_n Data.frame. Sample size analysis results.
 #' @param results_by_delta Data.frame. Sensitivity analysis results.
 #' @param bootstrap_examples Data.frame. Bootstrap examples.
-#' @param config List. Configuration object.
-#' @param verbose Logical. Whether to print plots (default: TRUE).
+#' @template param-config-viz
+#' @template param-verbose
 #'
 #' @return A list of ggplot2 objects.
 #'

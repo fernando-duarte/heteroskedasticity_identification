@@ -46,7 +46,7 @@ prono_gmm(
 
 \item{compute_se}{Logical. Whether to compute standard errors (default: TRUE).}
 
-\item{verbose}{Logical. Print progress messages (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 
 \item{...}{Additional arguments passed to gmm::gmm.}
 }

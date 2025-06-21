@@ -38,9 +38,20 @@ a common factor structure for the errors to ensure the covariance restriction
 Cov(Z, \eqn{\epsilon_1 \epsilon_2}) = 0 is satisfied.
 }
 \details{
-The triangular model is:
-\deqn{Y_1 = \beta_{1,0} + \beta_{1,1}X + \gamma_1 Y_2 + \epsilon_1}
-\deqn{Y_2 = \beta_{2,0} + \beta_{2,1}X + \epsilon_2}
+The triangular model consists of two equations:
+\deqn{Y_1 = X'\beta_1 + \gamma_1 Y_2 + \epsilon_1}
+\deqn{Y_2 = X'\beta_2 + \epsilon_2}
+
+where Y_1 is the outcome variable, Y_2 is the endogenous regressor,
+X is a vector of exogenous variables, and \eqn{(\epsilon_1, \epsilon_2)} are
+the structural errors.
+
+The error structure follows a single-factor model:
+\deqn{\epsilon_1 = \alpha_1 U + V_1}
+\deqn{\epsilon_2 = \alpha_2 U + V_2}
+
+where U, V_1, and V_2 are mutually independent, and heteroskedasticity
+is introduced through the variance of V_2.
 
 where U, V_1 are independent standard normal, and V_2 ~ N(0, exp(\eqn{\delta}
 Z))
@@ -67,9 +78,9 @@ data_multi <- generate_lewbel_data(1000, params_multi, n_x = 2)
 
 }
 \references{
-Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
-Mismeasured and Endogenous Regressor Models. Journal of Business &
-Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
+Lewbel, A. (2012). Using heteroscedasticity to identify and estimate
+mismeasured and endogenous regressor models. Journal of Business & Economic
+Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
 }
 \seealso{
 \code{\link{verify_lewbel_assumptions}} for testing the assumptions,

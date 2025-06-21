@@ -18,11 +18,12 @@ lewbel_simultaneous_moments(
 \arguments{
 \item{theta}{Numeric vector. Parameters: c(beta1, gamma1, beta2, gamma2).}
 
-\item{data}{Data frame containing the variables.}
+\item{data}{Data frame containing all required variables. Must include the
+dependent variables and any exogenous regressors specified in the model.}
 
 \item{y1_var}{Character. Name of the first dependent variable (default: "Y1").}
 
-\item{y2_var}{Character. Name of the second dependent variable (default: "Y2").}
+\item{y2_var}{Character. Name of the second dependent variable/endogenous regressor (default: "Y2").}
 
 \item{x_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 
@@ -52,9 +53,9 @@ strong heteroskedasticity patterns for reliable identification. Consider
 using a triangular system if possible.
 }
 \references{
-Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
-Mismeasured and Endogenous Regressor Models. Journal of Business &
-Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
+Lewbel, A. (2012). Using heteroscedasticity to identify and estimate
+mismeasured and endogenous regressor models. Journal of Business & Economic
+Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
 }
 \seealso{
 \code{\link{lewbel_gmm}} for the main GMM estimation function.

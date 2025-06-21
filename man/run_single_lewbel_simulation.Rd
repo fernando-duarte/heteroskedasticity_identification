@@ -30,8 +30,11 @@ run_single_lewbel_simulation(
 \item{return_models}{Logical. Whether to return the fitted model objects
 (default: FALSE).}
 
-\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic"
-(default) or "finite". Affects standard errors and confidence intervals.}
+\item{df_adjust}{Character. Method for degrees of freedom adjustment:
+\itemize{
+\item "asymptotic": No adjustment (default)
+\item "finite": Finite sample adjustment using HC2 formula
+}}
 }
 \value{
 If return_models = FALSE: A data.frame with one row containing
@@ -70,9 +73,9 @@ result_with_models <- run_single_lewbel_simulation(
 
 }
 \references{
-Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
-Mismeasured and Endogenous Regressor Models. Journal of Business &
-Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
+Lewbel, A. (2012). Using heteroscedasticity to identify and estimate
+mismeasured and endogenous regressor models. Journal of Business & Economic
+Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
 }
 \seealso{
 \code{\link{calculate_lewbel_bounds}} for set identification

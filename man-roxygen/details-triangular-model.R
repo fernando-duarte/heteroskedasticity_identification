@@ -1,4 +1,8 @@
 #' @details
-#' The triangular model is:
-#' \deqn{Y_1 = \beta_{1,0} + \beta_{1,1}X + \gamma_1 Y_2 + \epsilon_1}
-#' \deqn{Y_2 = \beta_{2,0} + \beta_{2,1}X + \epsilon_2}
+#' The triangular model consists of two equations:
+#' \deqn{Y_1 = X'\beta_1 + \gamma_1 Y_2 + \epsilon_1}
+#' \deqn{Y_2 = X'\beta_2 + \epsilon_2}
+#'
+#' where Y_1 is the outcome variable, Y_2 is the endogenous regressor,
+#' X is a vector of exogenous variables, and \eqn{(\epsilon_1, \epsilon_2)} are
+#' the structural errors.

@@ -11,9 +11,10 @@ analyze_bootstrap_results(results_main, bootstrap_demo, config, verbose = TRUE)
 
 \item{bootstrap_demo}{Data.frame. Bootstrap demonstration results.}
 
-\item{config}{List. Configuration object from create_default_config().}
+\item{config}{List. Configuration object created by \code{\link{create_default_config}}
+or related configuration functions.}
 
-\item{verbose}{Logical. Whether to print output (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 A data.frame with bootstrap examples.

@@ -25,7 +25,7 @@ with params).}
 \item{params}{List. Parameters for the DGP (same format as
 generate_lewbel_data).}
 
-\item{verbose}{Logical. Whether to print detailed output (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 Invisibly returns a list with verification results and data.
@@ -65,9 +65,9 @@ verify_lewbel_assumptions(params = params)
 
 }
 \references{
-Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
-Mismeasured and Endogenous Regressor Models. Journal of Business &
-Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
+Lewbel, A. (2012). Using heteroscedasticity to identify and estimate
+mismeasured and endogenous regressor models. Journal of Business & Economic
+Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
 }
 \seealso{
 \code{\link{generate_lewbel_data}} for generating data that meets assumptions

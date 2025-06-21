@@ -12,7 +12,7 @@ simulation metrics.}
 
 \item{config}{List. Optional. Configuration object (not currently used).}
 
-\item{verbose}{Logical. Whether to print the summary (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \description{
 Prints a comprehensive summary of simulation findings.

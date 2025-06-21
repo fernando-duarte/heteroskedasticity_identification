@@ -9,7 +9,7 @@ run_lewbel_demo(num_simulations = 100, verbose = TRUE)
 \arguments{
 \item{num_simulations}{Integer. Number of simulations to run (default: 100).}
 
-\item{verbose}{Logical. Whether to print output (default: TRUE).}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 Results from run_lewbel_monte_carlo() with reduced parameters.
@@ -29,9 +29,9 @@ demo_results <- run_lewbel_demo(100, verbose = FALSE)
 
 }
 \references{
-Lewbel, A. (2012). Using Heteroscedasticity to Identify and Estimate
-Mismeasured and Endogenous Regressor Models. Journal of Business &
-Economic Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
+Lewbel, A. (2012). Using heteroscedasticity to identify and estimate
+mismeasured and endogenous regressor models. Journal of Business & Economic
+Statistics, 30(1), 67-80. \doi{10.1080/07350015.2012.643126}
 }
 \seealso{
 \code{\link{run_lewbel_monte_carlo}}

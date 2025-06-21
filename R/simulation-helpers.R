@@ -11,10 +11,10 @@ NULL
 #' run_bootstrap_demonstration to avoid code duplication.
 #'
 #' @param n_simulations Integer. Number of simulations to run
-#' @param config List. Configuration object with simulation parameters
+#' @template param-config
 #' @param sim_function Function. The simulation function to call (e.g., run_single_lewbel_simulation)
 #' @param compute_bounds_se_rule Function or logical. Rule for determining compute_bounds_se per iteration
-#' @param verbose Logical. Whether to show progress
+#' @template param-verbose
 #' @param progress_message Character. Message to display when starting
 #'
 #' @return Data frame with simulation results
@@ -104,10 +104,10 @@ NULL
 #' @param param_values Vector. Values of the parameter to sweep over
 #' @param param_name Character. Name of the parameter being varied
 #' @param n_reps Integer. Number of replications per parameter value
-#' @param config List. Configuration object with simulation parameters
-#' @param seeds Matrix. Seeds for each parameter value
+#' @template param-config
+#' @template param-seeds
 #' @param sim_function Function. The simulation function to call
-#' @param verbose Logical. Whether to show progress
+#' @template param-verbose
 #' @param progress_prefix Character. Prefix for progress messages
 #'
 #' @return Data frame with parameter sweep results

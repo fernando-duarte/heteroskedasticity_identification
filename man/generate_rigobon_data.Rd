@@ -71,7 +71,7 @@ data_3reg <- generate_rigobon_data(1000, params_3reg)
 
 }
 \references{
-Rigobon, R. (2003). Identification Through Heteroskedasticity.
+Rigobon, R. (2003). Identification through heteroskedasticity.
 Review of Economics and Statistics, 85(4), 777-792.
 \doi{10.1162/003465303772815727}
 }
