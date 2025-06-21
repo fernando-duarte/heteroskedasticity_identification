@@ -1,0 +1,123 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "R: Check Package",
+      "type": "shell",
+      "command": "R",
+      "args": [
+        "CMD",
+        "check",
+        "."
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "R: Test Package",
+      "type": "shell",
+      "command": "R",
+      "args": [
+        "-e",
+        "devtools::test()"
+      ],
+      "group": "test",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "R: Document Package",
+      "type": "shell",
+      "command": "R",
+      "args": [
+        "-e",
+        "devtools::document()"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "R: Install Package",
+      "type": "shell",
+      "command": "R",
+      "args": [
+        "-e",
+        "devtools::install()"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "R: Load All",
+      "type": "shell",
+      "command": "R",
+      "args": [
+        "-e",
+        "devtools::load_all()"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "R: Build Site",
+      "type": "shell",
+      "command": "R",
+      "args": [
+        "-e",
+        "pkgdown::build_site()"
+      ],
+      "group": "build",
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": true,
+        "clear": false
+      },
+      "problemMatcher": []
+    }
+  ]
+}

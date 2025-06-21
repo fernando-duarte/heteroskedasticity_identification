@@ -1,0 +1,75 @@
+{
+  // R language settings
+  "r.rterm.linux": "/usr/local/bin/radian",
+  "r.rpath.linux": "/usr/local/bin/R",
+  "r.plot.useHttpgd": true,
+  "r.bracketedPaste": true,
+  "r.sessionWatcher": true,
+  "r.alwaysUseActiveTerminal": true,
+  "r.lsp.enabled": true,
+  "r.lsp.diagnostics": true,
+
+  // R code formatting
+  "[r]": {
+    "editor.formatOnSave": true,
+    "editor.wordSeparators": "`~!@#%$^&*()-=+[{]}\\|;:'\",<>/?",
+    "editor.rulers": [80],
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+
+  // R linting
+  "r.linting.enable": true,
+  "r.linting.linters": "default,T_and_F_symbol_linter",
+
+  // Python settings for pre-commit
+  "python.defaultInterpreterPath": "/usr/local/bin/python",
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+
+  // Terminal settings
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": "/bin/bash"
+    },
+    "zsh": {
+      "path": "/usr/bin/zsh"
+    },
+    "radian": {
+      "path": "/usr/local/bin/radian",
+      "args": ["--no-save", "--no-restore"]
+    },
+    "R": {
+      "path": "/usr/local/bin/R",
+      "args": ["--interactive", "--no-save", "--no-restore"]
+    }
+  },
+
+  // File associations
+  "files.associations": {
+    "*.R": "r",
+    "*.Rmd": "rmd",
+    "*.qmd": "quarto",
+    "*.Rproj": "xml"
+  },
+
+  // Editor settings
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.rulers": [80, 120],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.encoding": "utf8",
+
+  // Git settings
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+
+  // Docker settings
+  "docker.showStartPage": false,
+
+  // Quarto settings
+  "quarto.render.previewType": "internal"
+}

@@ -45,102 +45,22 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        // R language support
+        // R language support (essential for devcontainer)
         "REditorSupport.r",
         "RDebugger.r-debugger",
+        "reditorsupport.r-lsp",
 
-        // Data science and visualization
+        // Core development tools
         "quarto.quarto",
-        "ms-toolsai.jupyter",
         "ms-python.python",
-
-        // Development tools
-        "ms-vscode.vscode-json",
-        "redhat.vscode-yaml",
-        "ms-azuretools.vscode-docker",
-
-        // Git and GitHub
-        "GitHub.vscode-pull-request-github",
-        "GitHub.copilot",
-        "GitHub.copilot-chat",
-        "ms-vscode.live-share",
-
-        // Code quality
-        "streetsidesoftware.code-spell-checker",
-        "EditorConfig.EditorConfig",
-
-        // Markdown and documentation
-        "yzhang.markdown-all-in-one",
-        "DavidAnson.vscode-markdownlint"
+        "GitHub.vscode-pull-request-github"
       ],
 
       "settings": {
-        // R settings
-        "r.rterm.linux": "/usr/local/bin/radian",
-        "r.rpath.linux": "/usr/local/bin/R",
-        "r.bracketedPaste": true,
-        "r.plot.useHttpgd": true,
-        "r.lsp.enabled": true,
-        "r.lsp.diagnostics": true,
-        "r.sessionWatcher": true,
-        "r.alwaysUseActiveTerminal": true,
-
-        // R code formatting
-        "[r]": {
-          "editor.wordSeparators": "`~!@#%$^&*()-=+[{]}\\|;:'\",<>/?",
-          "editor.rulers": [80],
-          "editor.tabSize": 2,
-          "editor.insertSpaces": true,
-          "editor.formatOnSave": false
-        },
-
-        // Python settings for pre-commit
-        "python.defaultInterpreterPath": "/usr/local/bin/python",
-        "python.linting.enabled": true,
-        "python.linting.pylintEnabled": true,
-
-        // Terminal settings
+        // Core devcontainer-specific settings
         "terminal.integrated.defaultProfile.linux": "bash",
-        "terminal.integrated.profiles.linux": {
-          "bash": {
-            "path": "/bin/bash"
-          },
-          "zsh": {
-            "path": "/usr/bin/zsh"
-          },
-          "radian": {
-            "path": "/usr/local/bin/radian",
-            "args": ["--no-save", "--no-restore"]
-          },
-          "R": {
-            "path": "/usr/local/bin/R",
-            "args": ["--interactive", "--no-save", "--no-restore"]
-          }
-        },
-
-        // File associations
-        "files.associations": {
-          "*.R": "r",
-          "*.Rmd": "rmd",
-          "*.qmd": "quarto",
-          "*.Rproj": "xml"
-        },
-
-        // Editor settings
-        "editor.tabSize": 2,
-        "editor.insertSpaces": true,
-        "editor.rulers": [80, 120],
-        "files.trimTrailingWhitespace": true,
-        "files.insertFinalNewline": true,
-        "files.encoding": "utf8",
-
-        // Git settings
-        "git.enableSmartCommit": true,
-        "git.confirmSync": false,
-        "git.autofetch": true,
-
-        // Docker settings
-        "docker.showStartPage": false
+        "workbench.colorTheme": "Default Dark+",
+        "workbench.startupEditor": "readme"
       }
     }
   },
