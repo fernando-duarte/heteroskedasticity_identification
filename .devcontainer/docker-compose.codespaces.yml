@@ -5,7 +5,8 @@ version: '3.8'
 
 services:
   hetid-dev:
-    # Override build context for Codespaces
+    # Use prebuilt image if available, otherwise build
+    image: ghcr.io/fernando-duarte/heteroskedasticity-codespaces:latest
     build:
       context: ..
       dockerfile: Dockerfile.dev
