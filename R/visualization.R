@@ -46,12 +46,12 @@ plot_estimator_distributions <- function(results_clean, config) {
     ggplot2::geom_vline(
       xintercept = config$gamma1,
       linetype = "dashed",
-      color = "red",
+      color = .hetid_strings()$plot_colors$REFERENCE_LINE_COLOR,
       linewidth = hetid_const("PLOT_LINE_WIDTH_THIN")
     ) +
     ggplot2::annotate("text",
       x = config$gamma1, y = Inf, label = paste("True =", config$gamma1),
-      color = "red", angle = 90, vjust = 1.5, hjust = 1.1
+      color = .hetid_strings()$plot_colors$REFERENCE_LINE_COLOR, angle = 90, vjust = 1.5, hjust = 1.1
     ) +
     ggplot2::labs(
       title = "Distribution of gamma1 Estimates",
@@ -105,9 +105,9 @@ plot_sample_size_consistency <- function(results_by_n, config) {
     plot_data,
     ggplot2::aes(x = factor(.data$sample_size), y = .data$tsls_gamma1)
   ) +
-    ggplot2::geom_boxplot(fill = "lightblue", alpha = 0.7) +
+    ggplot2::geom_boxplot(fill = .hetid_strings()$plot_colors$SAMPLE_SIZE_BOX_COLOR, alpha = 0.7) +
     ggplot2::geom_hline(
-      yintercept = config$gamma1, linetype = "dashed", color = "red"
+      yintercept = config$gamma1, linetype = "dashed", color = .hetid_strings()$plot_colors$REFERENCE_LINE_COLOR
     ) +
     ggplot2::labs(
       title = "2SLS Consistency: Estimates by Sample Size",
@@ -148,9 +148,9 @@ plot_het_sensitivity <- function(results_by_delta, config) {
     plot_data,
     ggplot2::aes(x = factor(.data$delta_het), y = .data$tsls_gamma1)
   ) +
-    ggplot2::geom_boxplot(fill = "lightgreen", alpha = 0.7) +
+    ggplot2::geom_boxplot(fill = .hetid_strings()$plot_colors$SENSITIVITY_BOX_COLOR, alpha = 0.7) +
     ggplot2::geom_hline(
-      yintercept = config$gamma1, linetype = "dashed", color = "red"
+      yintercept = config$gamma1, linetype = "dashed", color = .hetid_strings()$plot_colors$REFERENCE_LINE_COLOR
     ) +
     ggplot2::labs(
       title = "2SLS Performance by Heteroscedasticity Strength",
@@ -212,16 +212,16 @@ plot_first_stage_f_dist <- function(results_clean,
   ggplot2::ggplot(results_clean, ggplot2::aes(x = .data$first_stage_F)) +
     ggplot2::geom_histogram(
       bins = hetid_const("PLOT_HISTOGRAM_BINS"),
-      fill = "steelblue", alpha = 0.7
+      fill = .hetid_strings()$plot_colors$FIRST_STAGE_HIST_COLOR, alpha = 0.7
     ) +
     ggplot2::geom_vline(
       xintercept = hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"),
-      linetype = "dashed", color = "red"
+      linetype = "dashed", color = .hetid_strings()$plot_colors$REFERENCE_LINE_COLOR
     ) +
     ggplot2::annotate("text",
       x = hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), y = Inf,
       label = paste("F =", hetid_const("WEAK_INSTRUMENT_F_THRESHOLD")),
-      color = "red", angle = 90, vjust = 1.5, hjust = -0.5
+      color = .hetid_strings()$plot_colors$REFERENCE_LINE_COLOR, angle = 90, vjust = 1.5, hjust = -0.5
     ) +
     ggplot2::labs(
       title = "Distribution of First-Stage F-Statistics",
@@ -285,7 +285,7 @@ plot_bootstrap_ci <- function(bootstrap_examples, config) {
           hetid_const("Z_CRITICAL_95") * .data$bound_se_upper,
         y = .data$sim_id_ordered, yend = .data$sim_id_ordered
       ),
-      color = "lightgray",
+      color = .hetid_strings()$plot_colors$BOOTSTRAP_CI_BAND_COLOR,
       linewidth = hetid_const("PLOT_LINE_WIDTH_THICK"),
       alpha = 0.5
     ) +
@@ -294,18 +294,16 @@ plot_bootstrap_ci <- function(bootstrap_examples, config) {
         x = .data$bound_lower_tau_set, xend = .data$bound_upper_tau_set,
         y = .data$sim_id_ordered, yend = .data$sim_id_ordered
       ),
-      color = "steelblue", linewidth = hetid_const("PLOT_LINE_WIDTH_NORMAL")
+      color = .hetid_strings()$plot_colors$BOOTSTRAP_CI_COLOR, linewidth = hetid_const("PLOT_LINE_WIDTH_NORMAL")
     ) +
     ggplot2::geom_vline(
-      xintercept = config$gamma1, linetype = "dashed", color = "red"
+      xintercept = config$gamma1, linetype = "dashed", color = .hetid_strings()$plot_colors$REFERENCE_LINE_COLOR
     ) +
     ggplot2::labs(
       title = paste0(
         "Set Identification Bounds with Bootstrap Confidence Intervals"
       ),
-      subtitle = paste0(
-        "Blue: point estimates, Gray: 95% CIs based on bootstrap SEs"
-      ),
+      subtitle = "Point estimates with 95% bootstrap confidence intervals",
       x = "gamma1", y = "Example"
     ) +
     ggplot2::theme_minimal(base_size = hetid_const("PLOT_BASE_FONT_SIZE")) +

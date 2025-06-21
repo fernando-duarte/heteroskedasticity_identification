@@ -58,7 +58,13 @@
     # Plot colors (hex codes)
     plot_colors = list(
       OLS_COLOR = "#d95f02",
-      TSLS_COLOR = "#1b9e77"
+      TSLS_COLOR = "#1b9e77",
+      BOOTSTRAP_CI_COLOR = "steelblue",
+      BOOTSTRAP_CI_BAND_COLOR = "lightgray",
+      SAMPLE_SIZE_BOX_COLOR = "lightblue",
+      SENSITIVITY_BOX_COLOR = "lightgreen",
+      FIRST_STAGE_HIST_COLOR = "steelblue",
+      REFERENCE_LINE_COLOR = "red"
     ),
 
     # Environment variables
