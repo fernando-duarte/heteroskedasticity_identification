@@ -1,17 +1,5 @@
 # Test for Lewbel GMM implementation
 
-# Helper function to suppress expected GARCH NaN warnings
-suppress_garch_nan_warning <- function(expr) {
-  withCallingHandlers(
-    expr,
-    warning = function(w) {
-      if (grepl("NaNs produced", conditionMessage(w))) {
-        invokeRestart("muffleWarning")
-      }
-    }
-  )
-}
-
 test_that("lewbel_triangular_moments generates correct moment conditions", {
   skip_if_not_integration_test()
   skip_if_not_installed("gmm")
@@ -28,24 +16,13 @@ test_that("lewbel_triangular_moments generates correct moment conditions", {
   # Test parameters
   theta <- c(0.5, 1.0, -0.5, 1.5, 0.8) # beta1_0, beta1_1, gamma1, beta2_0, beta2_1
 
-  # Generate moment conditions
-  moments <- lewbel_triangular_moments(
-    theta = theta,
+  # Test moment conditions
+  moments <- test_moment_conditions(
     data = data,
-    y1_var = "Y1",
-    y2_var = "Y2",
-    x_vars = "Xk",
-    z_vars = NULL,
-    add_intercept = TRUE
+    theta = theta,
+    system = "triangular",
+    n_expected_moments = 5  # 2 for X*e1, 2 for X*e2, 1 for Z*e1*e2
   )
-
-  # Check dimensions
-  expect_equal(nrow(moments), n)
-  expect_equal(ncol(moments), 2 + 2 + 1) # 2 for X*e1, 2 for X*e2, 1 for Z*e1*e2
-
-  # Check that moments have zero mean under true parameters
-  # (This would be true if data were generated from the model)
-  expect_true(all(abs(colMeans(moments)) < 10)) # Loose check for random data
 })
 
 
@@ -54,35 +31,17 @@ test_that("lewbel_gmm estimates triangular system correctly", {
   skip_if_not_installed("gmm")
 
   # Generate data from known model
-  set.seed(42)
-  n <- 500
-  params <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
+  data <- create_lewbel_test_data(n = 500, seed = 42)
+
+  # Run standard Lewbel GMM test
+  gmm_result <- run_lewbel_gmm_test(
+    data = data,
+    system = "triangular",
+    expected_coef_names = c("gamma1", "beta1_(Intercept)", "beta1_Xk"),
+    check_gamma1 = TRUE,
+    true_gamma1 = -0.8,
+    tolerance = 0.5
   )
-
-  data <- generate_lewbel_data(n, params)
-
-  # Estimate using GMM
-  gmm_result <- lewbel_gmm(data, system = "triangular")
-
-  # Check class
-  expect_s3_class(gmm_result, "lewbel_gmm")
-  expect_s3_class(gmm_result, "gmm")
-
-  # Check attributes
-  expect_equal(attr(gmm_result, "hetid_system"), "triangular")
-
-  # Check coefficient names
-  coef_names <- names(coef(gmm_result))
-  expect_true("gamma1" %in% coef_names)
-  expect_true("beta1_(Intercept)" %in% coef_names)
-  expect_true("beta1_Xk" %in% coef_names)
-
-  # Check that gamma1 estimate is reasonable
-  gamma1_est <- coef(gmm_result)["gamma1"]
-  expect_true(abs(gamma1_est - params$gamma1) < 0.5) # Within 0.5 of true value
 })
 
 test_that("lewbel_gmm handles different GMM types", {
@@ -90,13 +49,7 @@ test_that("lewbel_gmm handles different GMM types", {
   skip_if_not_installed("gmm")
 
   # Generate small dataset for speed
-  set.seed(123)
-  n <- 200
-  params <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
-  )
+  data <- create_lewbel_test_data(n = 200, seed = 123)
 
   data <- generate_lewbel_data(n, params)
 
@@ -152,15 +105,7 @@ test_that("summary and print methods work correctly", {
   skip_if_not_installed("gmm")
 
   # Generate simple data
-  set.seed(123)
-  n <- 200
-  params <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
-  )
-
-  data <- generate_lewbel_data(n, params)
+  data <- create_lewbel_test_data(n = 200, seed = 123)
 
   # Estimate model
   gmm_result <- lewbel_gmm(data)
@@ -180,24 +125,16 @@ test_that("compare_gmm_2sls returns comparison data frame", {
   skip_if_not_installed("gmm")
 
   # Generate test data
-  set.seed(123)
-  n <- 300
-  params <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
-  )
-
-  data <- generate_lewbel_data(n, params)
+  data <- create_lewbel_test_data(n = 300, seed = 123)
 
   # Get comparison
   comparison <- compare_gmm_2sls(data)
 
   # Check structure
-  expect_true(is.data.frame(comparison))
-  expect_true("Estimator" %in% names(comparison))
-  expect_true("gamma1" %in% names(comparison))
-  expect_true("StdError" %in% names(comparison))
+  assert_valid_dataframe(
+    comparison,
+    required_cols = c("Estimator", "gamma1", "StdError")
+  )
 
   # Should have GMM row
   expect_true(any(grepl("GMM", comparison$Estimator)))
@@ -229,15 +166,7 @@ test_that("lewbel_gmm handles different vcov specifications", {
   skip_if_not_installed("gmm")
 
   # Generate test data
-  set.seed(123)
-  n <- 300
-  params <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
-  )
-
-  data <- generate_lewbel_data(n, params)
+  data <- create_lewbel_test_data(n = 300, seed = 123)
 
   # Test HAC (default)
   gmm_hac <- lewbel_gmm(data, vcov = "HAC")

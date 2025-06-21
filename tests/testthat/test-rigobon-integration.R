@@ -2,44 +2,31 @@
 
 test_that("generate_rigobon_data works correctly", {
   skip_if_not_integration_test()
+
   # Two-regime case
-  params_2reg <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = -0.5, alpha2 = 1.0,
+  params_2reg <- create_rigobon_params(
+    n_regimes = 2,
     regime_probs = c(0.4, 0.6),
     sigma2_regimes = c(1.0, 2.5)
   )
-
   data_2reg <- generate_rigobon_data(1000, params_2reg)
 
-  # Check basic structure
-  expect_s3_class(data_2reg, "data.frame")
-  expect_equal(nrow(data_2reg), 1000)
-  expect_true(all(c("Y1", "Y2", "epsilon1", "epsilon2", "regime", "Xk", "Z1", "Z2") %in% names(data_2reg)))
+  # Verify data structure
+  verify_rigobon_data(data_2reg, n_expected = 1000, n_regimes = 2)
 
-  # Check regime assignment
-  expect_true(all(data_2reg$regime %in% c(1, 2)))
-  regime_props <- table(data_2reg$regime) / 1000
-  expect_equal(as.numeric(regime_props[1]), 0.4, tolerance = 0.1) # Allow some randomness
-  expect_equal(as.numeric(regime_props[2]), 0.6, tolerance = 0.1)
-
-  # Check centered dummies
-  expect_equal(mean(data_2reg$Z1), 0, tolerance = 1e-10)
-  expect_equal(mean(data_2reg$Z2), 0, tolerance = 1e-10)
+  # Test regime assignment
+  test_regime_assignment(data_2reg, c(0.4, 0.6), tolerance = 0.1)
 
   # Three-regime case
-  params_3reg <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = -0.5, alpha2 = 1.0,
+  params_3reg <- create_rigobon_params(
+    n_regimes = 3,
     regime_probs = c(0.3, 0.4, 0.3),
     sigma2_regimes = c(0.5, 1.0, 2.0)
   )
-
   data_3reg <- generate_rigobon_data(500, params_3reg)
-  expect_true(all(c("Z1", "Z2", "Z3") %in% names(data_3reg)))
-  expect_true(all(data_3reg$regime %in% c(1, 2, 3)))
+
+  # Verify data structure
+  verify_rigobon_data(data_3reg, n_expected = 500, n_regimes = 3)
 })
 
 test_that("generate_rigobon_data validates inputs", {
@@ -76,47 +63,18 @@ test_that("generate_rigobon_data validates inputs", {
 
 test_that("run_rigobon_estimation works correctly", {
   skip_if_not_integration_test()
+
   # Generate test data
-  params <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = -0.5, alpha2 = 1.0,
-    regime_probs = c(0.4, 0.6),
-    sigma2_regimes = c(1.0, 3.0) # Strong heteroskedasticity
+  data <- create_rigobon_test_data(n = 1000, n_regimes = 2, seed = 42)
+
+  # Run standard test
+  result <- run_rigobon_test(
+    data = data,
+    method = "cue",
+    check_gamma1 = TRUE,
+    true_gamma1 = -0.8,
+    tolerance = 0.2
   )
-
-  set.seed(123)
-  data <- generate_rigobon_data(500, params)
-
-  # Run estimation
-  results <- run_rigobon_estimation(data)
-
-  # Check structure
-  expect_type(results, "list")
-  expect_true(all(c("ols", "tsls", "first_stage_f_stats") %in% names(results)))
-
-  # Check estimates exist
-  expect_true("gamma1" %in% names(results$ols$estimates))
-  expect_true("gamma1" %in% names(results$tsls$estimates))
-
-  # Check that 2SLS estimate is closer to truth than OLS (on average)
-  # Note: This is stochastic, so we use a loose check
-  ols_bias <- abs(results$ols$estimates["gamma1"] - params$gamma1)
-  tsls_bias <- abs(results$tsls$estimates["gamma1"] - params$gamma1)
-
-  # First-stage F should be reasonable
-  expect_true(all(results$first_stage_f_stats > 1)) # Very loose check
-
-  # With diagnostics
-  results_diag <- run_rigobon_estimation(data, return_diagnostics = TRUE)
-
-  expect_true("instruments" %in% names(results_diag))
-  expect_true("regime_props" %in% names(results_diag))
-  expect_true("heteroskedasticity_test" %in% names(results_diag))
-
-  # Check heteroskedasticity test
-  expect_type(results_diag$heteroskedasticity_test$p_value, "double")
-  expect_true(results_diag$heteroskedasticity_test$p_value < 0.05) # Should detect heteroskedasticity
 })
 
 test_that("run_rigobon_estimation handles edge cases", {

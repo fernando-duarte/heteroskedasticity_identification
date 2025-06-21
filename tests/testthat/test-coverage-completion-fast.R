@@ -3,27 +3,15 @@
 
 test_that("analyze_main_results print fallback without knitr (line 70)", {
   skip_if_not_fast_test()
-  # Create a simple test that doesn't rely on mocking
   config <- create_default_config()
-
-  # Create test results
-  results <- data.frame(
-    sim_id = 1:5,
-    ols_gamma1 = rnorm(5, 0.5, 0.1),
-    tsls_gamma1 = rnorm(5, 0.3, 0.05),
-    ols_coverage = sample(c(TRUE, FALSE), 5, replace = TRUE),
-    tsls_coverage = sample(c(TRUE, FALSE), 5, replace = TRUE),
-    first_stage_F = runif(5, 5, 20),
-    bound_lower_tau_set = rnorm(5, 0.2, 0.02),
-    bound_upper_tau_set = rnorm(5, 0.4, 0.02),
-    bound_lower_tau0 = rnorm(5, 0.25, 0.02),
-    bound_upper_tau0 = rnorm(5, 0.35, 0.02)
-  )
+  results <- create_mock_main_results(n_sim = 5)
 
   # Test with verbose = TRUE - this will exercise both knitr and print paths
-  expect_output(
-    analysis <- analyze_main_results(results, config, verbose = TRUE),
-    "Weak instrument diagnostic"
+  analysis <- test_verbose_output(
+    analyze_main_results,
+    results = results,
+    config = config,
+    expected_output = "Weak instrument diagnostic"
   )
 
   expect_type(analysis, "list")
@@ -33,30 +21,17 @@ test_that("analyze_bootstrap_results with verbose output", {
   skip_if_not_fast_test()
   config <- create_default_config()
 
-  # Create test results with bootstrap SEs
-  results_main <- data.frame(
-    sim_id = 1:3,
-    bound_lower_tau_set = rnorm(3, 0.2, 0.02),
-    bound_upper_tau_set = rnorm(3, 0.4, 0.02),
-    bound_se_lower = runif(3, 0.01, 0.05),
-    bound_se_upper = runif(3, 0.01, 0.05)
-  )
-
-  bootstrap_demo <- data.frame(
-    sim_id = 4:5,
-    bound_lower_tau_set = rnorm(2, 0.2, 0.02),
-    bound_upper_tau_set = rnorm(2, 0.4, 0.02),
-    bound_se_lower = runif(2, 0.01, 0.05),
-    bound_se_upper = runif(2, 0.01, 0.05)
-  )
+  results_main <- create_mock_bootstrap_results(n_sim = 3)
+  bootstrap_demo <- create_mock_bootstrap_results(n_sim = 2)
+  bootstrap_demo$sim_id <- 4:5  # Different sim_ids
 
   # Test with verbose = TRUE
-  expect_output(
-    analysis <- analyze_bootstrap_results(
-      results_main, bootstrap_demo, config,
-      verbose = TRUE
-    ),
-    "Bootstrap Standard Errors"
+  analysis <- test_verbose_output(
+    analyze_bootstrap_results,
+    results_main = results_main,
+    bootstrap_demo = bootstrap_demo,
+    config = config,
+    expected_output = "Bootstrap Standard Errors"
   )
 
   expect_s3_class(analysis, "data.frame")
@@ -65,21 +40,14 @@ test_that("analyze_bootstrap_results with verbose output", {
 test_that("analyze_sample_size_results with verbose output", {
   skip_if_not_fast_test()
   config <- create_default_config()
-
-  # Create test results by sample size
-  results_by_n <- data.frame(
-    sample_size = rep(c(500, 1000), each = 3),
-    tsls_gamma1 = rnorm(6, config$gamma1, 0.05),
-    first_stage_F = runif(6, 5, 20)
-  )
+  results_by_n <- create_mock_sample_size_data()
 
   # Test with verbose = TRUE
-  expect_output(
-    analysis <- analyze_sample_size_results(
-      results_by_n, config,
-      verbose = TRUE
-    ),
-    "Consistency Check"
+  analysis <- test_verbose_output(
+    analyze_sample_size_results,
+    results_by_n = results_by_n,
+    config = config,
+    expected_output = c("Sample Size Analysis", "Consistency Check")
   )
 
   expect_s3_class(analysis, "data.frame")
