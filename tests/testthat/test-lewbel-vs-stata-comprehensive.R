@@ -26,7 +26,8 @@ test_that("hetid matches Stata ivreg2h on single X", {
     data = data
   )
   hetid_coef <- coef(hetid_model)["P"]
-  hetid_se <- sqrt(diag(vcov(hetid_model)))["P"]
+  # Use asymptotic SE to match Stata's ivreg2h default
+  hetid_se <- extract_se_ivreg(hetid_model, df_adjust = "asymptotic")["P"]
 
   # Check if we can run actual Stata comparison
   can_run_stata <- has_stata() && has_haven() &&
@@ -158,7 +159,8 @@ test_that("hetid matches Stata ivreg2h with multiple X", {
     data = data
   )
   hetid_coef <- coef(hetid_model)["P"]
-  hetid_se <- sqrt(diag(vcov(hetid_model)))["P"]
+  # Use asymptotic SE to match Stata's ivreg2h default
+  hetid_se <- extract_se_ivreg(hetid_model, df_adjust = "asymptotic")["P"]
 
   # Check if we can run actual Stata comparison
   can_run_stata <- has_stata() && has_haven() &&
