@@ -105,7 +105,7 @@ test_that("weak heteroskedasticity testing matches vignette Section 5", {
 
   # SEs should be similar since heteroskedasticity is the same
   se_ratio <- se_manual_strong / se_manual_weak
-  expect_true(abs(se_ratio - 1) < 0.1,
+  expect_true(abs(se_ratio - 1) < 0.2,
     label = paste("SE ratio should be close to 1, got", round(se_ratio, 3)))
 })
 

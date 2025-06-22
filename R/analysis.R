@@ -56,8 +56,8 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
       sqrt(mean((results_clean$tsls_gamma1 - config$gamma1)^2))
     ),
     Coverage = c(
-      mean(results_clean$ols_coverage),
-      mean(results_clean$tsls_coverage)
+      if ("ols_coverage" %in% names(results_clean)) mean(results_clean$ols_coverage) else NA_real_,
+      if ("tsls_coverage" %in% names(results_clean)) mean(results_clean$tsls_coverage) else NA_real_
     ),
     `Avg First-Stage F` = c(NA, mean(results_clean$first_stage_F)),
     check.names = FALSE
