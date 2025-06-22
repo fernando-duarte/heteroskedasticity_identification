@@ -1184,6 +1184,7 @@ prono_gmm <- function(data,
 #'
 #' @param theta Numeric vector. Parameters to estimate.
 #' @param data Data frame containing the variables.
+#' @param system Character. The type of system, either "triangular" or "simultaneous".
 #' @param y1_var Character. Name of the first dependent variable.
 #' @param y2_var Character. Name of the second dependent variable.
 #' @param x_vars Character vector. Names of exogenous variables.
@@ -1197,25 +1198,8 @@ prono_gmm <- function(data,
 #' Review of Economics and Statistics, 85(4), 777-792.
 #'
 #' @export
-#' Define GMM Moment Conditions for Rigobon Systems (Unified)
-#'
-#' Creates a unified moment function for GMM estimation for both triangular and
-#' simultaneous systems using Rigobon's (2003) heteroskedasticity-based
-#' identification. This function replaces `rigobon_triangular_moments` and
-#' `rigobon_simultaneous_moments` with a single, more abstract implementation.
-#'
-#' @param theta Numeric vector. Parameters to estimate.
-#' @param data data.frame. The data for estimation.
-#' @param system Character. The type of system, either "triangular" or "simultaneous".
-#' @param y1_var,y2_var Character. Names of the dependent variables.
-#' @param x_vars Character vector. Names of exogenous variables.
-#' @param regime_var Character. Name of the regime indicator variable.
-#' @param add_intercept Logical. Whether to add an intercept.
-#'
-#' @return A matrix of moment conditions.
-#' @keywords internal
-#'
-rigobon_moment_conditions <- function(theta, data, system, y1_var, y2_var, x_vars,
+rigobon_moment_conditions <- function(theta, data, system,
+                                      y1_var, y2_var, x_vars,
                                       regime_var, add_intercept = TRUE) {
 
   # --- 1. Unified Setup ---

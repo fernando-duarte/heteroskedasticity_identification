@@ -18,7 +18,7 @@ rigobon_moment_conditions(
 \arguments{
 \item{theta}{Numeric vector. Parameters to estimate.}
 
-\item{data}{data.frame. The data for estimation.}
+\item{data}{Data frame containing the variables.}
 
 \item{system}{Character. The type of system, either "triangular" or "simultaneous".}
 
@@ -31,13 +31,9 @@ rigobon_moment_conditions(
 \item{regime_var}{Character. Name of the regime indicator variable.}
 
 \item{add_intercept}{Logical. Whether to add an intercept.}
-
-\item{y1_var, y2_var}{Character. Names of the dependent variables.}
 }
 \value{
 Matrix of moment conditions.
-
-A matrix of moment conditions.
 }
 \description{
 Creates the moment function for GMM estimation of a triangular system
@@ -47,4 +43,3 @@ using Rigobon's regime-based identification.
 Rigobon, R. (2003). Identification through heteroskedasticity.
 Review of Economics and Statistics, 85(4), 777-792.
 }
-\keyword{internal}
