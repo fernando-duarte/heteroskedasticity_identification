@@ -25,9 +25,20 @@
 #' @template details-error-structure
 #'
 #' @details
-#' where U, V_1 are independent standard normal, and V_2 ~ N(0, exp(\eqn{\delta}
-#' Z))
-#' with Z = \eqn{X^2 - E[X^2]} being the heteroscedasticity driver.
+#' For single X (n_x = 1), the data generating process is:
+#' \itemize{
+#'   \item Z_raw ~ Uniform(0, 1)
+#'   \item X = Z_raw
+#'   \item Z = Z_raw - mean(Z_raw) (centered for use as instrument)
+#'   \item V_2|Z_raw ~ N(0, 0.5 + 2*Z_raw) (variance equals 0.5 + 2*Z_raw)
+#' }
+#'
+#' For multiple X (n_x > 1), the original specification is used:
+#' \itemize{
+#'   \item X ~ N(0, 1)
+#'   \item Z = X^2 - E\[X^2\]
+#'   \item V_2 ~ N(0, exp(\eqn{\delta} Z))
+#' }
 #'
 #' @return A data.frame with columns Y1, Y2, epsilon1, epsilon2, and:
 #'   - If n_x = 1: Xk, Z
@@ -76,42 +87,96 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
 
   # Generate exogenous variables
   # nolint start: object_name_linter.
-  X_mat <- matrix(
-    stats::rnorm(
-      n_obs * n_x,
-      mean = .hetid_const("DEFAULT_X_MEAN"),
-      sd = .hetid_const("DEFAULT_X_SD")
-    ),
-    nrow = n_obs, ncol = n_x
-  )
 
-  # Generate Z instruments (one per X)
-  Z_mat <- matrix(NA, nrow = n_obs, ncol = n_x)
-  for (j in 1:n_x) {
-    Z_mat[, j] <- X_mat[, j]^2 - mean(X_mat[, j]^2)
+  # Z ~ Uniform(0, 1) and X = Z
+  if (n_x == 1) {
+    Z_raw <- stats::runif(n_obs, min = 0, max = 1)
+    X_mat <- matrix(Z_raw, nrow = n_obs, ncol = 1)
+    # Center Z to have mean 0 (this is the instrument)
+    Z_mat <- matrix(Z_raw - mean(Z_raw), nrow = n_obs, ncol = 1)
+    # Use raw Z for heteroskedasticity (variance function)
+    Z_het <- Z_raw
+  } else {
+    # For multiple X, keep the original approach for now
+    X_mat <- matrix(
+      stats::rnorm(
+        n_obs * n_x,
+        mean = .hetid_const("DEFAULT_X_MEAN"),
+        sd = .hetid_const("DEFAULT_X_SD")
+      ),
+      nrow = n_obs, ncol = n_x
+    )
+
+    # Generate Z instruments (one per X)
+    Z_mat <- matrix(NA, nrow = n_obs, ncol = n_x)
+    for (j in 1:n_x) {
+      Z_mat[, j] <- X_mat[, j]^2 - mean(X_mat[, j]^2)
+    }
+
+    # For heteroskedasticity, use the first Z by default
+    Z_het <- Z_mat[, 1]
   }
 
-  # For heteroskedasticity, use the first Z by default
-  # (can be extended to use multiple Z in future)
-  Z_het <- Z_mat[, 1]
+  # Generate error components following Lewbel (2012)
+  #
+  # Key assumptions from Lewbel (2012):
+  # 1. X is uncorrelated with (U, V1, V2)
+  # 2. Z is uncorrelated with (U^2, U*V1, U*V2, V1*V2)
+  # 3. Z is correlated with V2^2 (heteroskedasticity)
+  # 4. For simultaneous equations, Z is also correlated with V1^2
+  #
+  # Following Example 1 from the literature:
+  # - U and V1 are i.i.d. N(0,1) and independent of Z
+  # - V2|Z ~ N(0, sigma^2(Z)) where sigma^2(Z) depends on Z
+  # - This ensures E[V2|Z] = 0 but Var[V2|Z] depends on Z
 
-  # Generate mutually independent error components
+  # Generate common factor U independent of Z
   U <- stats::rnorm(n_obs)
+
+  # Generate V1 independent of Z and U
   V1 <- stats::rnorm(n_obs)
 
-  # Add safeguard for numerical stability
-  # Cap the exponent to prevent overflow
-  exponent <- params$delta_het * Z_het
-  # Cap between min and max exponent
-  exponent <- pmin(
-    pmax(exponent, .hetid_const("MIN_EXPONENT")),
-    .hetid_const("MAX_EXPONENT")
-  )
-  V2 <- stats::rnorm(n_obs) * sqrt(exp(exponent))
+  # Generate V2 with heteroskedastic variance
+  # V2|Z ~ N(0, 0.5 + 2*Z) for n_x = 1
+  if (n_x == 1) {
+    # V2|Z ~ N(0, 0.5 + 2*Z) - variance is 0.5 + 2*Z
+    # This ensures minimum variance of 0.5 and strong heteroskedasticity
+    # V2 = nu2 * sqrt(0.5 + 2*Z) where nu2 ~ N(0,1) independent of Z
+    nu2 <- stats::rnorm(n_obs)
+    V2 <- nu2 * sqrt(0.5 + 2 * Z_het)
+  } else {
+    # Original approach for multiple X
+    exponent <- params$delta_het * Z_het
+    exponent <- pmin(
+      pmax(exponent, .hetid_const("MIN_EXPONENT")),
+      .hetid_const("MAX_EXPONENT")
+    )
+    sigma_Z <- sqrt(exp(exponent))
 
-  # Construct structural errors using single-factor model
+    # Generate V2: mean zero conditional on Z, variance depends on Z
+    # V2 = nu2 * sigma(Z) where nu2 ~ N(0,1) independent of Z
+    nu2 <- stats::rnorm(n_obs)
+    V2 <- nu2 * sigma_Z
+  }
+
+  # Construct structural errors
   epsilon1 <- params$alpha1 * U + V1
   epsilon2 <- params$alpha2 * U + V2
+
+  # Verification of Lewbel's conditions:
+  # 1. U, V1 are independent of Z by construction: cov(Z, U) = cov(Z, V1) = 0
+  # 2. V2 has E[V2|Z] = 0, so E[V2] = 0
+  # 3. cov(Z, V2^2) = cov(Z, sigma^2(Z)) > 0 (heteroskedasticity)
+  #
+  # The cross-product conditions:
+  # - cov(Z, U^2): Since U is independent of Z, this equals 0
+  # - cov(Z, U*V1): Since U and V1 are independent of Z, this equals 0
+  # - cov(Z, U*V2) and cov(Z, V1*V2): These are theoretically 0 under
+  #   conditional independence, but with nonlinear variance functions
+  #   like exp(delta*Z), finite sample covariances may be non-zero.
+  #
+  # In practice, the method works well even with small deviations from
+  # the exact moment conditions, especially in large samples.
 
   # Generate endogenous variables using all X variables
   Y2 <- params$beta2_0 + as.vector(X_mat %*% params$beta2_1) + epsilon2
@@ -153,7 +218,7 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
 #'   parameter).
 #' @param n_obs Integer. Sample size for verification (default: 10000, used
 #'   with params).
-#' @param params List. Parameters for the DGP (same format as
+#' @param params List. Parameters for the data generating process (same format as
 #'   generate_lewbel_data).
 #' @template param-verbose
 #'

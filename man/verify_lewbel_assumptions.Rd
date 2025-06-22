@@ -22,7 +22,7 @@ parameter).}
 \item{n_obs}{Integer. Sample size for verification (default: 10000, used
 with params).}
 
-\item{params}{List. Parameters for the DGP (same format as
+\item{params}{List. Parameters for the data generating process (same format as
 generate_lewbel_data).}
 
 \item{verbose}{Logical. Whether to print progress messages (default: TRUE).}

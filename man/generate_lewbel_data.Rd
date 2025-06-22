@@ -53,9 +53,20 @@ The error structure follows a single-factor model:
 where U, V_1, and V_2 are mutually independent, and heteroskedasticity
 is introduced through the variance of V_2.
 
-where U, V_1 are independent standard normal, and V_2 ~ N(0, exp(\eqn{\delta}
-Z))
-with Z = \eqn{X^2 - E[X^2]} being the heteroscedasticity driver.
+For single X (n_x = 1), the new DGP uses:
+\itemize{
+\item Z_raw ~ Uniform(0, 1)
+\item X = Z_raw
+\item Z = Z_raw - mean(Z_raw) (centered for use as instrument)
+\item V_2|Z_raw ~ N(0, Z_raw) (variance equals Z_raw)
+}
+
+For multiple X (n_x > 1), the original specification is used:
+\itemize{
+\item X ~ N(0, 1)
+\item Z = X^2 - E[X^2]
+\item V_2 ~ N(0, exp(\eqn{\delta} Z))
+}
 }
 \examples{
 \dontrun{
