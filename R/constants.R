@@ -155,7 +155,7 @@
 .hetid_constants$INSTRUMENT_SD_THRESHOLD <- 1e-10
 .hetid_constants$WEAK_INSTRUMENT_F_THRESHOLD <- 10
 .hetid_constants$ALPHA_LEVEL <- 0.05
-.hetid_constants$DISPLAY_DIGITS <- 3
+.hetid_constants$DISPLAY_DIGITS <- 4
 .hetid_constants$Z_CRITICAL_95 <- 1.96
 .hetid_constants$BOOTSTRAP_TABLE_DISPLAY_LIMIT <- 20
 .hetid_constants$PLOT_BASE_FONT_SIZE <- 14

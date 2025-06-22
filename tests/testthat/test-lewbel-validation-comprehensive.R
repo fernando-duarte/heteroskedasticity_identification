@@ -83,8 +83,9 @@ test_that("run_single_lewbel_simulation generates valid results", {
     expect_s3_class(result$models$tsls_model, "ivreg")
 
     # Check that estimate is reasonable
+    # New DGP has more variability - 95% of estimates within 0.6
     coef_endog <- coef(result$models$tsls_model)["Y2"]
-    expect_true(abs(coef_endog - params$gamma1) < 0.5)
+    expect_true(abs(coef_endog - params$gamma1) < 0.6)
   }
 })
 

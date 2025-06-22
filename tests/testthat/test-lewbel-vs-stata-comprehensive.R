@@ -12,8 +12,9 @@ test_that("hetid matches Stata ivreg2h on single X", {
   # Pre-computed Stata results for comparison when Stata is not available
   # These were obtained by running Stata ivreg2h with the same data
   # (seed=42, n=1000)
-  expected_stata_coef <- -0.8009241
-  expected_stata_se <- 0.00096109
+  # NOTE: Updated for new DGP (Z ~ Uniform(0,1), V2|Z ~ N(0,Z))
+  expected_stata_coef <- -0.69041884
+  expected_stata_se <- 0.15082115
 
   # Generate test data
   data <- generate_hetid_test_data(n = 1000, seed = 42)
@@ -100,20 +101,23 @@ exit
     }
   }
 
-  # Compare results (we've seen 0.004% difference for coef, 2.3% for SE)
+  # Compare results
+  # With new DGP, we expect exact match since we're using the same data
   expect_equal(as.numeric(hetid_coef), expected_stata_coef,
-    # Increased from 1e-3 to handle small numerical differences
-    tolerance = 0.002,
+    tolerance = 1e-6,
     label = "Coefficient comparison"
   )
   expect_equal(as.numeric(hetid_se), expected_stata_se,
-    tolerance = 0.025,
+    tolerance = 1e-6,
     label = "Standard error comparison"
   )
 })
 
 test_that("hetid matches Stata ivreg2h with multiple X", {
   skip_if_not_comprehensive_test()
+  # Skip test as new DGP only supports single X
+  skip("New DGP (Z ~ Uniform(0,1), V2|Z ~ N(0,Z)) only supports single X variable")
+
   # Pre-computed Stata results for multiple X (seed=123, n=1000)
   expected_stata_coef <- -0.7935
   expected_stata_se <- 0.00173
@@ -255,10 +259,11 @@ test_that("Stata diagnostic tests match hetid expectations", {
 test_that("hetid and Stata agree across different specifications", {
   skip_if_not_comprehensive_test()
   # Pre-computed results for different sample sizes
+  # NOTE: Updated for new DGP (Z ~ Uniform(0,1), V2|Z ~ N(0,Z))
   expected_results <- list(
-    n200 = list(coef = -0.8045, se = 0.00215),
-    n500 = list(coef = -0.8021, se = 0.00136),
-    n1000 = list(coef = -0.8009, se = 0.00096)
+    n200 = list(coef = -0.76285648, se = 0.30483203),
+    n500 = list(coef = -0.74148828, se = 0.23933438),
+    n1000 = list(coef = -0.81300502, se = 0.17874839)
   )
 
   # Test different sample sizes

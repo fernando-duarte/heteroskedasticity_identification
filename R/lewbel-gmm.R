@@ -659,7 +659,8 @@ print.lewbel_gmm <- function(x, ...) {
 #'               For 2SLS via run_single_lewbel_simulation, it assumes a single "Xk" if
 #'               default simulation parameters are used. For GMM, can be multiple.
 #'               This function will try to match behavior. If multiple x_vars are given,
-#'               the 2SLS part might be less comparable if its underlying DGP assumes one X.
+#'               the 2SLS part might be less comparable if its underlying data generating process
+#'               assumes one X.
 #' @param add_intercept Logical. Whether to add an intercept for GMM (default: TRUE).
 #'                      2SLS via run_single_lewbel_simulation typically includes an intercept.
 #' @param true_gamma1 Numeric. Optional true value of gamma1 for bias calculation.
@@ -703,7 +704,7 @@ print.lewbel_gmm <- function(x, ...) {
 #'   tsls_sim_config = list(
 #'     lewbel_x_vars = c("X1", "X2") # Hypothetical
 #'     # Note: run_single_lewbel_simulation's internal
-#'     # DGP might not easily map to this if it assumes 1 Xk.
+#'     # Data generating process might not easily map to this if it assumes 1 Xk.
 #'     # This part is more illustrative for GMM side.
 #'   )
 #' )
@@ -766,10 +767,12 @@ compare_gmm_2sls <- function(data,
   sim_config_final$sample_size <- nrow(data) # Ensure sample size matches input data
 
   # Handle case where x_vars might be multiple for GMM, but run_single_lewbel_simulation
-  # might be hardcoded for a single 'Xk' in its internal DGP if data_override is not perfectly used.
-  # For data_override, we need to ensure the columns Y1, Y2, and what it expects as Xk are present.
-  # If x_vars contains "Xk", use that. If not, use the first of x_vars as "Xk" for the 2SLS part.
+  # might be hardcoded for a single 'Xk' in its internal data generating process if data_override
+  # is not perfectly used. For data_override, we need to ensure the columns Y1, Y2, and what it
+  # expects as Xk are present. If x_vars contains "Xk", use that.
+  # If not, use the first of x_vars as "Xk" for the 2SLS part.
   data_for_tsls <- data
+
   if (!("Xk" %in% names(data_for_tsls)) && length(x_vars) > 0) {
     if (verbose) messager(paste("Mapping", x_vars[1], "to Xk for 2SLS comparison."))
     names(data_for_tsls)[names(data_for_tsls) == x_vars[1]] <- "Xk"
