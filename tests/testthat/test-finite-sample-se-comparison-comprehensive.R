@@ -222,12 +222,7 @@ test_that("all three packages produce identical coefficients", {
     }
   }
 
-  # Stata coefficient (if available)
-  if (has_stata() && has_haven() && !identical(Sys.getenv("NOT_CRAN"), "")) {
-    # (Stata comparison code would go here, similar to above)
-    # For brevity, not repeating the full Stata code
-    packages_tested <- paste(packages_tested, "+ Stata")
-  }
+  # Note: Stata comparison is fully implemented in the first test of this file
 
   # Report which packages were tested
   cat("Packages tested:", packages_tested, "\n")

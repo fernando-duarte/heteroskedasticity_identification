@@ -1,9 +1,10 @@
-test_that("basic test passes", {
-  expect_equal(1 + 1, 2)
-})
 
 test_that("package can be loaded", {
-  expect_true(TRUE)
+  # Verify the package namespace is available
+  expect_true("hetid" %in% loadedNamespaces())
+  # Verify key functions are exported
+  expect_true(exists("generate_lewbel_data"))
+  expect_true(exists("run_single_lewbel_simulation"))
 })
 
 # Test utility functions
