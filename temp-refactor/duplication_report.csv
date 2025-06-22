@@ -1,9 +1,8 @@
 "file_a","file_b","block_a","block_b","line_a","line_b","score"
-"./R/lewbel-gmm.R","./R/lewbel-gmm.R",317,344,1198,1276,0.933774834437086
-"./R/simulation.R","./R/simulation.R",20,40,20,106,0.899159663865546
-"./R/simulation.R","./R/simulation.R",59,79,185,274,0.892307692307692
-"./R/lewbel-gmm.R","./R/lewbel-gmm.R",44,80,45,128,0.858024691358025
-"./R/visualization.R","./R/visualization.R",43,63,99,142,0.844036697247706
-"./R/analysis.R","./R/analysis.R",74,98,246,300,0.785714285714286
-"./R/data-generation.R","./R/data-generation.R",61,177,61,319,0.703056768558952
-"./R/lewbel-gmm.R","./R/lewbel-gmm.R",44,262,45,863,0.573333333333333
+"./R/lewbel-gmm.R","./R/lewbel-gmm.R",309,336,1200,1278,0.933774834437086
+"./R/lewbel-gmm.R","./R/lewbel-gmm.R",43,74,44,122,0.858895705521472
+"./R/visualization.R","./R/visualization.R",43,63,99,142,0.849557522123894
+"./R/analysis.R","./R/analysis.R",73,97,245,299,0.785714285714286
+"./R/simulation-helpers.R","./R/simulation-helpers.R",22,41,23,116,0.72202166064982
+"./R/data-generation.R","./R/data-generation.R",72,188,72,384,0.636893203883495
+"./R/lewbel-gmm.R","./R/lewbel-gmm.R",43,254,44,861,0.56953642384106

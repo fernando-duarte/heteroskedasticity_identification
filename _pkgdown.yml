@@ -75,8 +75,7 @@ reference:
   - lewbel_triangular_moments
   - lewbel_simultaneous_moments
   - rigobon_gmm
-  - rigobon_triangular_moments
-  - rigobon_simultaneous_moments
+  - rigobon_moment_conditions
   - prono_gmm
   - prono_triangular_moments
   - compare_gmm_2sls

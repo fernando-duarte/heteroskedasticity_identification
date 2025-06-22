@@ -182,7 +182,7 @@ test_that("lewbel_gmm handles different vcov specifications", {
 
 # Tests for Rigobon GMM
 
-test_that("rigobon_triangular_moments generates correct moment conditions", {
+test_that("rigobon_moment_conditions generates correct moment conditions for triangular system", {
   skip_if_not_integration_test()
   skip_if_not_installed("gmm")
 
@@ -202,9 +202,10 @@ test_that("rigobon_triangular_moments generates correct moment conditions", {
   theta <- c(0.5, 1.5, -0.8, 1.0, -1.0)
 
   # Generate moment conditions
-  moments <- rigobon_triangular_moments(
+  moments <- rigobon_moment_conditions(
     theta = theta,
     data = data,
+    system = "triangular",
     y1_var = "Y1",
     y2_var = "Y2",
     x_vars = "Xk",

@@ -258,7 +258,12 @@ cat("\n8. Creating diagnostic plots...\n")
 
 # Extract moment conditions at estimated parameters
 theta_hat <- rigobon_gmm_tri$gmm_result$coefficients
-moments <- rigobon_triangular_moments(theta_hat, data)
+moments <- rigobon_moment_conditions(
+  theta_hat, data,
+  system = "triangular",
+  y1_var = "Y1", y2_var = "Y2", x_vars = "Xk",
+  regime_var = "regime", add_intercept = TRUE
+)
 
 # Plot average moments
 avg_moments <- colMeans(moments)
