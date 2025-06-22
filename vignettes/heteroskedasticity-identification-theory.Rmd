@@ -178,7 +178,11 @@ When assumption (LW2) is weakened to allow for a small correlation, $|\text{Corr
 **Theorem 1** [Bounds for $\gamma_1$ with $\tau > 0$]. $\gamma_1$ is contained in the closed interval whose endpoints are the (real) roots of the quadratic equation in $\gamma_1$:
 
 $$
-\frac{\text{Cov}(Z,W_1W_2)^2}{\text{Cov}(Z,W_2^2)^2} - \frac{\text{Var}(W_1W_2)}{\text{Var}(W_2^2)}\tau^2 + 2\left(\frac{\text{Cov}(W_1W_2,W_2^2)}{\text{Var}(W_2^2)}\tau^2 - \frac{\text{Cov}(Z,W_1W_2)}{\text{Cov}(Z,W_2^2)}\right)\gamma_1 + (1-\tau^2)\gamma_1^2 = 0.
+\begin{align}
+&\frac{\text{Cov}(Z,W_1W_2)^2}{\text{Cov}(Z,W_2^2)^2} - \frac{\text{Var}(W_1W_2)}{\text{Var}(W_2^2)}\tau^2 \\
+&\quad + 2\left(\frac{\text{Cov}(W_1W_2,W_2^2)}{\text{Var}(W_2^2)}\tau^2 - \frac{\text{Cov}(Z,W_1W_2)}{\text{Cov}(Z,W_2^2)}\right)\gamma_1 \\
+&\quad + (1-\tau^2)\gamma_1^2 = 0.
+\end{align}
 $$
 
 The interval collapses to the point estimate from (1) when $\tau = 0$ and widens as $\tau \to 1$.
