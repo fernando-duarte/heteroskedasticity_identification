@@ -62,7 +62,9 @@ _Time-series note:_ in the [Time-Series Variant](#time-series-variant) section b
 **(LW2) Covariance restriction.** $\text{Cov}(Z, \varepsilon_1\varepsilon_2) = 0$. This holds automatically if the errors have a common factor structure $\varepsilon_j \coloneqq a_j u + \eta_j$ where the common factor $u$ is mean independent of $Z$, i.e., $\mathbb{E}[u \mid Z] = 0$.
 
 **(LW3) Instrument relevance via heteroskedasticity.**
+
 - _Triangular:_ $\text{Cov}(Z, \varepsilon_2^2) \neq 0$.
+
 - _Simultaneous:_ the $r \times 2$ matrix $\Phi_W \coloneqq [\text{Cov}(Z, W_1^2) \; \text{Cov}(Z, W_2^2)]$ has rank 2.
 
 **(LW4) Normalization (simultaneous case).** The parameter space for $(\gamma_1, \gamma_2)$ precludes the observationally equivalent pair $(1/\gamma_2, 1/\gamma_1)$.
