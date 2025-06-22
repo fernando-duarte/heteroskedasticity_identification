@@ -96,7 +96,7 @@ table(data_2reg$regime) / nrow(data_2reg)
 
 Let's visualize the key identifying variation - different error variances across regimes:
 
-```{r viz-heteroskedasticity}
+```{r viz-heteroskedasticity, fig.alt="Box plot comparing squared residuals across two regimes, showing Regime 1 in light blue with lower variance and Regime 2 in light coral with higher variance, demonstrating the heteroskedasticity pattern that enables identification"}
 # Estimate residuals from the second equation
 resid_model <- lm(Y2 ~ Xk, data = data_2reg)
 data_2reg$e2_hat <- residuals(resid_model)
@@ -227,7 +227,7 @@ cat(
 
 Let's compare Rigobon with OLS:
 
-```{r method-comparison}
+```{r method-comparison, fig.alt="Point plot comparing estimates of gamma1 across three identification methods (OLS, Rigobon, and Lewbel) with the true value shown as a red dashed horizontal line, demonstrating that heteroskedasticity-based methods correct for endogeneity bias"}
 # Compare OLS vs Rigobon
 comparison <- compare_rigobon_methods(
   data = data_2reg,
@@ -278,7 +278,7 @@ print(comparison_full[, c("Method", "Estimate", "StdError", "Bias", "FirstStageF
 
 Let's run a quick Monte Carlo to assess the finite sample properties:
 
-```{r monte-carlo, eval=FALSE}
+```{r monte-carlo, eval=FALSE, fig.alt="Density plot comparing the sampling distributions of OLS and Rigobon estimators across Monte Carlo simulations, with OLS shown in one color and Rigobon in another, and the true parameter value marked as a vertical red dashed line"}
 # Run 100 Monte Carlo replications
 n_mc <- 100
 mc_results <- vector("list", n_mc)
@@ -379,7 +379,7 @@ Rigobon's method is particularly suitable when:
 
 Here's an example using time periods as regimes:
 
-```{r time-regimes}
+```{r time-regimes, fig.alt="Box plot showing squared residuals across four quarters (Q1-Q4), with each quarter displayed in light green, illustrating seasonal volatility patterns where Q3 shows the highest variance and Q1 the lowest"}
 # Simulate financial data with volatility regimes
 n_obs <- 1200
 time_periods <- 4 # Quarterly data
@@ -502,7 +502,7 @@ brady_data$ret_mexico <- c(0, diff(brady_data$Mexico))
 
 Let's visualize the key identifying variation - the dramatic increase in volatility during crisis periods:
 
-```{r brady-volatility-viz}
+```{r brady-volatility-viz, fig.alt="Time series line plot showing rolling 20-day volatilities for Argentina and Mexico Brady bonds from 1994 to 1996, with volatility spikes highlighted during identified crisis periods including the Mexican peso crisis (December 1994) and Colosio assassination (March 1994)"}
 # Calculate rolling 20-day volatilities (as in Rigobon)
 library(zoo)
 window_size <- 20
