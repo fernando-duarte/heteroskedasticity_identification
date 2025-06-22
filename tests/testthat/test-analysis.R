@@ -186,6 +186,12 @@ test_that("analysis functions handle NA values", {
     first_stage_F = c(10, 15, NA)
   )
 
+  # Create config for this test
+  test_config_minimal <- create_test_config(
+    num_simulations = 5,
+    bootstrap_reps = 10
+  )
+
   analysis <- analyze_main_results(
     results_with_na,
     test_config_minimal,

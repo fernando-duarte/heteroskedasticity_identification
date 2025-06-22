@@ -28,7 +28,8 @@ dependent variables and any exogenous regressors specified in the model.}
 For 2SLS via run_single_lewbel_simulation, it assumes a single "Xk" if
 default simulation parameters are used. For GMM, can be multiple.
 This function will try to match behavior. If multiple x_vars are given,
-the 2SLS part might be less comparable if its underlying DGP assumes one X.}
+the 2SLS part might be less comparable if its underlying data generating process
+assumes one X.}
 
 \item{add_intercept}{Logical. Whether to add an intercept for GMM (default: TRUE).
 2SLS via run_single_lewbel_simulation typically includes an intercept.}
@@ -77,7 +78,7 @@ comparison_multi <- compare_gmm_2sls(data_multi_x,
   tsls_sim_config = list(
     lewbel_x_vars = c("X1", "X2") # Hypothetical
     # Note: run_single_lewbel_simulation's internal
-    # DGP might not easily map to this if it assumes 1 Xk.
+    # Data generating process might not easily map to this if it assumes 1 Xk.
     # This part is more illustrative for GMM side.
   )
 )

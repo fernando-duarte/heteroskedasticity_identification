@@ -20,8 +20,7 @@ or related configuration functions.}
 A data.frame with bootstrap examples.
 }
 \description{
-Analyzes and displays bootstrap standard error results for set
-identification bounds.
+Analyzes and displays bootstrap standard error results for identified sets.
 }
 \note{
 For enhanced table formatting in verbose output, install the knitr package.

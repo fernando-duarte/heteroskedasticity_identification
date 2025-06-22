@@ -4,6 +4,7 @@ destination: docs
 template:
   bootstrap: 5
   bootswatch: cosmo
+  math-rendering: katex
 
 home:
   title: "hetid: Identification Through Heteroskedasticity"
@@ -33,6 +34,8 @@ navbar:
       menu:
       - text: Getting Started
         href: articles/getting-started.html
+      - text: "Theory: Heteroskedasticity-Based Identification"
+        href: articles/heteroskedasticity-identification-theory.html
       - text: GMM Estimation with Lewbel (2012)
         href: articles/lewbel-gmm.html
       - text: Rigobon (2003) Method

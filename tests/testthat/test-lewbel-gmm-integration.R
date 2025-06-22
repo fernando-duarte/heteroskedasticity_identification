@@ -51,8 +51,6 @@ test_that("lewbel_gmm handles different GMM types", {
   # Generate small dataset for speed
   data <- create_lewbel_test_data(n = 200, seed = 123)
 
-  data <- generate_lewbel_data(n, params)
-
   # Test two-step GMM
   gmm_twostep <- lewbel_gmm(data, gmm_type = "twoStep")
   expect_s3_class(gmm_twostep, "gmm")

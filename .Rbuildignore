@@ -158,6 +158,7 @@
 ^cleanup-analysis-report\.md$
 ^code_to_do\.md$
 ^codecov\.yml$
+^comprehensive_test_summary\.md$
 ^coverage$
 ^cran-comments\.md$
 ^credentials$

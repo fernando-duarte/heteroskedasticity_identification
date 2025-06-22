@@ -3,7 +3,7 @@ NULL
 
 #' Analyze Main Simulation Results
 #'
-#' Provides comprehensive analysis of the main Monte Carlo simulation results,
+#' Provides analysis of the main Monte Carlo simulation results,
 #' including performance metrics for point estimators and set identification.
 #'
 #' @param results Data.frame. Results from run_main_simulation().
@@ -139,8 +139,7 @@ analyze_main_results <- function(results, config, verbose = TRUE) {
 
 #' Analyze Bootstrap Results
 #'
-#' Analyzes and displays bootstrap standard error results for set
-#' identification bounds.
+#' Analyzes and displays bootstrap standard error results for identified sets.
 #'
 #' @param results_main Data.frame. Main simulation results.
 #' @param bootstrap_demo Data.frame. Bootstrap demonstration results.

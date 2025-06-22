@@ -18,7 +18,7 @@ or related configuration functions.}
 A list containing summary tables and statistics.
 }
 \description{
-Provides comprehensive analysis of the main Monte Carlo simulation results,
+Provides analysis of the main Monte Carlo simulation results,
 including performance metrics for point estimators and set identification.
 }
 \note{

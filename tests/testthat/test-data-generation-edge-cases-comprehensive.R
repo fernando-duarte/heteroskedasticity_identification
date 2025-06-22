@@ -79,8 +79,15 @@ test_that("generate_lewbel_data handles edge sample sizes", {
   expect_equal(nrow(data_large), 10000)
 
   # Check statistical properties with large sample
-  expect_true(abs(mean(data_large$Xk) - 2) < 0.1) # Should be close to 2
-  expect_true(abs(sd(data_large$Xk) - 1) < 0.1) # Should be close to 1
+  # For new DGP with n_x = 1: X = Z ~ Uniform(0,1), so mean ≈ 0.5, sd ≈ 0.289
+  # For multiple X: X ~ N(0,1) as before
+  if (ncol(data_large) == 6) { # Single X case (Y1, Y2, epsilon1, epsilon2, Xk, Z)
+    expect_true(abs(mean(data_large$Xk) - 0.5) < 0.1) # Should be close to 0.5 for Uniform(0,1)
+    expect_true(abs(sd(data_large$Xk) - 0.289) < 0.05) # Should be close to sqrt(1/12) ≈ 0.289
+  } else { # Multiple X case
+    expect_true(abs(mean(data_large$X1) - 0) < 0.1) # Should be close to 0 (DEFAULT_X_MEAN)
+    expect_true(abs(sd(data_large$X1) - 1) < 0.1) # Should be close to 1 (DEFAULT_X_SD)
+  }
 
   # Test with extreme parameters for edge case testing
   params_extreme <- list(
