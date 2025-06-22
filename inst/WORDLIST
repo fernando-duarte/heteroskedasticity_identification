@@ -71,9 +71,7 @@ cmd
 CMD
 codebase
 codecov
-codespace
-Codespace
-Codespaces
+
 coef
 coeff
 collinear
@@ -111,8 +109,7 @@ deqn
 desc
 detectCores
 dev
-devcontainer
-DevContainer
+
 devtools
 df
 dfr

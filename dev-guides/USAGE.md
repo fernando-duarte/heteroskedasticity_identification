@@ -14,22 +14,6 @@ devtools::install_github("fernando-duarte/heteroskedasticity_identification")
 library(hetid)
 ```
 
-## GitHub Codespaces (Easiest) ☁️
-
-**Zero-setup cloud development**:
-
-1. **Launch**: Click "Code" → "Codespaces" → "Create codespace"
-2. **Access RStudio**: Click port 8787 in VS Code Ports tab
-3. **Start coding**: Package pre-loaded, all tools ready
-
-```bash
-# In Codespaces terminal - helpful shortcuts available:
-hetid_demo    # Run package demonstration
-hetid_test    # Run comprehensive tests
-hetid_sim     # Run quick Monte Carlo simulation
-rdev          # Load package in development mode
-```
-
 ## Local Installation
 
 ### Basic Usage Examples

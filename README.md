@@ -39,28 +39,17 @@ See the [package website](https://fernando-duarte.github.io/heteroskedasticity_i
 
 ## Quick Start Options
 
-### GitHub Codespaces
+### Development Environment
 
-Get started instantly with a fully configured cloud development environment:
+For development and contribution, you can use:
 
-**For Contributors & Developers:**
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/fernando-duarte/heteroskedasticity_identification?quickstart=1)
+**Docker (Recommended):**
+- Use the provided Docker setup for a consistent development environment
+- See [Development Guide](dev-guides/DEVELOPMENT.md) for Docker setup instructions
 
-**For Learners & Exploration:**
-[![Open Learning Environment](https://img.shields.io/badge/Open%20Learning%20Environment-blue?logo=github&logoColor=white)](https://codespaces.new/fernando-duarte/heteroskedasticity_identification?devcontainer_path=.devcontainer/devcontainer-codespaces.json)
-
-**What's Included:**
-- ✅ **RStudio Server** (port 8787) - Full IDE experience
-- ✅ **VS Code** with R extensions - Modern editor with IntelliSense
-- ✅ **Pre-installed dependencies** - All packages ready to use
-- ✅ **Interactive examples** - Run demos immediately
-- ✅ **Secure environment** - Private ports, authentication enabled
-
-**Getting Started in Codespaces:**
-1. Click one of the buttons above
-2. Wait 2-3 minutes for environment setup
-3. Access RStudio Server via the Ports tab (port 8787)
-4. Run `hetid_demo()` to test the package
+**Local R Installation:**
+- Install R 4.5.0 or later
+- Follow the local setup instructions in the [Development Guide](dev-guides/DEVELOPMENT.md)
 
 ### 📦 Local Installation
 

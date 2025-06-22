@@ -6,23 +6,7 @@ This package uses modern development practices to ensure code quality and consis
 
 Choose your preferred development environment:
 
-### Option 1: GitHub Codespaces (Recommended for Quick Start) ☁️
-
-**Zero setup required** - fully configured cloud development environment:
-
-1. **Launch Codespace**:
-   - Click "Code" → "Codespaces" → "Create codespace on main"
-   - Wait 2-3 minutes for automatic setup
-
-2. **Start Developing**:
-   - RStudio Server auto-opens on port 8787
-   - VS Code with R extensions ready to use
-   - Package pre-loaded and ready to use
-   - All tools and dependencies included
-
-**Features**: Devcontainer with R 4.5.0 available! Includes both VS Code and RStudio in one environment.
-
-### Option 2: Local Docker Development 🐳
+### Option 1: Local Docker Development 🐳 (Recommended)
 
 **Consistent environment** across all machines:
 
@@ -39,7 +23,7 @@ Choose your preferred development environment:
 - Production images: R 4.5.0
 - CI/CD testing: Both R 4.5.0 (release) and R 4.4.x (oldrel)
 
-### Option 3: Local R Installation 💻
+### Option 2: Local R Installation 💻
 
 **Traditional setup** for local development:
 

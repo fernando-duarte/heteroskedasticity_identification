@@ -112,7 +112,6 @@
 ^\.coverage$
 ^\.cursorignore$
 ^\.cursorrules$
-^\.devcontainer$
 ^\.dockerignore$
 ^\.env$
 ^\.env\..*$
