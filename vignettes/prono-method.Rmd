@@ -36,8 +36,10 @@ Prono's insight is that in time series data, conditional heteroskedasticity (tim
 
 Consider the triangular system:
 
-$$Y_{1t} = X_t'\beta_1 + \gamma_1 Y_{2t} + \varepsilon_{1t}$$
-$$Y_{2t} = X_t'\beta_2 + \varepsilon_{2t}$$
+$$\begin{aligned}
+Y_{1t} &= X_t'\beta_1 + \gamma_1 Y_{2t} + \varepsilon_{1t} \\
+Y_{2t} &= X_t'\beta_2 + \varepsilon_{2t}
+\end{aligned}$$
 
 where:
 - $Y_{2t}$ is endogenous (correlated with $\varepsilon_{1t}$)
@@ -45,8 +47,10 @@ where:
 - $\varepsilon_{2t}$ follows a GARCH(1,1) process
 
 The GARCH(1,1) specification for $\varepsilon_{2t}$ is:
-$$\varepsilon_{2t} = \sigma_{2t} z_{2t}$$
-$$\sigma_{2t}^2 = \omega + \alpha \varepsilon_{2,t-1}^2 + \beta \sigma_{2,t-1}^2$$
+$$\begin{aligned}
+\varepsilon_{2t} &= \sigma_{2t} z_{2t} \\
+\sigma_{2t}^2 &= \omega + \alpha \varepsilon_{2,t-1}^2 + \beta \sigma_{2,t-1}^2
+\end{aligned}$$
 
 where $z_{2t} \sim N(0,1)$.
 

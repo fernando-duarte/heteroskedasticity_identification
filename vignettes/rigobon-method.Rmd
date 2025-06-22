@@ -43,8 +43,10 @@ Rigobon's method is particularly useful when:
 
 Consider the same triangular system as in Lewbel:
 
-$$Y_1 = \beta_{1,0} + \beta_{1,1}X + \gamma_1 Y_2 + \epsilon_1$$
-$$Y_2 = \beta_{2,0} + \beta_{2,1}X + \epsilon_2$$
+$$\begin{aligned}
+Y_1 &= \beta_{1,0} + \beta_{1,1}X + \gamma_1 Y_2 + \epsilon_1 \\
+Y_2 &= \beta_{2,0} + \beta_{2,1}X + \epsilon_2
+\end{aligned}$$
 
 Rigobon's key insight: If the variance of $\epsilon_2$ differs across regimes while the covariance between $\epsilon_1$ and $\epsilon_2$ remains constant, we can use regime indicators to construct instruments.
 

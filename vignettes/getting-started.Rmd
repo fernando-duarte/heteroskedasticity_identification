@@ -30,8 +30,10 @@ The `hetid` package implements the identification through heteroskedasticity met
 
 Consider a triangular system of equations:
 
-$$Y_1 = \beta_{1,0} + \beta_{1,1}X + \gamma_1 Y_2 + \epsilon_1$$
-$$Y_2 = \beta_{2,0} + \beta_{2,1}X + \epsilon_2$$
+$$\begin{aligned}
+Y_1 &= \beta_{1,0} + \beta_{1,1}X + \gamma_1 Y_2 + \epsilon_1 \\
+Y_2 &= \beta_{2,0} + \beta_{2,1}X + \epsilon_2
+\end{aligned}$$
 
 Where:
 - $Y_2$ is endogenous in the first equation (i.e., $\text{Cov}(\epsilon_1, \epsilon_2) \neq 0$)

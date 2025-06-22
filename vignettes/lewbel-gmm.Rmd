@@ -33,8 +33,10 @@ This vignette demonstrates how to use the GMM (Generalized Method of Moments) im
 
 The triangular system is the most common case:
 
-$$Y_1 = X'\beta_1 + \gamma_1 Y_2 + \epsilon_1$$
-$$Y_2 = X'\beta_2 + \epsilon_2$$
+$$\begin{aligned}
+Y_1 &= X'\beta_1 + \gamma_1 Y_2 + \epsilon_1 \\
+Y_2 &= X'\beta_2 + \epsilon_2
+\end{aligned}$$
 
 ```{r triangular-example, eval=FALSE}
 # Generate example data
@@ -57,8 +59,10 @@ summary(gmm_result)
 
 For systems with bidirectional causality:
 
-$$Y_1 = X'\beta_1 + \gamma_1 Y_2 + \epsilon_1$$
-$$Y_2 = X'\beta_2 + \gamma_2 Y_1 + \epsilon_2$$
+$$\begin{aligned}
+Y_1 &= X'\beta_1 + \gamma_1 Y_2 + \epsilon_1 \\
+Y_2 &= X'\beta_2 + \gamma_2 Y_1 + \epsilon_2
+\end{aligned}$$
 
 Note: Requires $\gamma_1 \gamma_2 \neq 1$ for identification.
 
