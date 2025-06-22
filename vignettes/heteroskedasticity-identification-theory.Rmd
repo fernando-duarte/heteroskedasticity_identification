@@ -57,7 +57,7 @@ with the triangular case obtained by setting $\gamma_2 = 0$.
 The method relies on the following key assumptions:
 
 **(LW1) Strict exogeneity.** $\mathbb{E}[\varepsilon_j \mid X] = 0$ for $j = 1,2$.
-_Time-series note:_ in Section \@ref(time-series-variant) we weaken this to a martingale-difference assumption.
+_Time-series note:_ in the [Time-Series Variant](#time-series-variant) section below, we weaken this to a martingale-difference assumption.
 
 **(LW2) Covariance restriction.** $\text{Cov}(Z, \varepsilon_1\varepsilon_2) = 0$. This holds automatically if the errors have a common factor structure $\varepsilon_j \coloneqq a_j u + \eta_j$ where the common factor $u$ is mean independent of $Z$, i.e., $\mathbb{E}[u \mid Z] = 0$.
 
@@ -350,7 +350,7 @@ The fitted conditional variance from the GARCH model serves as the heteroskedast
 2. Fit a GARCH(1,1) model to the residuals $\hat{\varepsilon}_{2t}$ to obtain the series of fitted conditional variances, $\hat{\sigma}_{2t}^2$.
 3. This fitted variance is the heteroskedasticity driver: set $Z_t \coloneqq \hat{\sigma}_{2t}^2$.
 4. Construct the generated instrument: $IV_t \coloneqq (Z_t - \bar{Z})\hat{\varepsilon}_{2t}$.
-5. Proceed with 2SLS as in Section \@ref(feasible-2sls), using $[X_t, IV_t]$ as instruments for $Y_{2t}$ in the first structural equation. Use HAC-robust standard errors.
+5. Proceed with 2SLS as in the [Feasible Two-Step 2SLS](#feasible-2sls) section, using $[X_t, IV_t]$ as instruments for $Y_{2t}$ in the first structural equation. Use HAC-robust standard errors.
 
 ```{r prono-example, eval=FALSE}
 # Example with Prono method (requires tsgarch package)
@@ -499,7 +499,7 @@ The instruments are derived from the exogenous variables $X_t$. The terms inside
 - For the first two mean equations, the instruments are $X_t$.
 - For the error product and variance specification moments, the instrument is $Z_t \coloneqq X_t - \mathbb{E}[X_t]$, estimated in-sample as $X_t - \bar{X}$.
 
-Therefore, the sample average of $Q_t(\theta)$ is a computable criterion function for any candidate parameter values. As in Section \@ref(simultaneous-system), $Z_t$ must have at least 2 entries (including perhaps a constant, if Corollary 1 applies).
+Therefore, the sample average of $Q_t(\theta)$ is a computable criterion function for any candidate parameter values. As in the [Simultaneous system](#simultaneous-system) section, $Z_t$ must have at least 2 entries (including perhaps a constant, if Corollary 1 applies).
 
 ## Other Notes
 
