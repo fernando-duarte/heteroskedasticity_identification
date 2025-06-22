@@ -34,14 +34,14 @@ test_that("options system works correctly", {
   }
 })
 
-test_that("string constants function works", {
+test_that("constants access works via .hetid_const", {
   skip_if_not_integration_test()
-  strings <- .hetid_strings()
-  expect_equal(strings$df_adjust$ASYMPTOTIC, "asymptotic")
-  expect_equal(strings$df_adjust$FINITE, "finite")
-  expect_equal(strings$columns$STD_ERROR, "Std. Error")
-  expect_equal(strings$plot_labels$OLS_BIASED, "OLS (Biased)")
-  expect_equal(strings$plot_labels$TSLS_LEWBEL, "2SLS (Lewbel)")
+  # Test direct constant access
+  expect_equal(.hetid_const("df_adjust$ASYMPTOTIC"), "asymptotic")
+  expect_equal(.hetid_const("df_adjust$FINITE"), "finite")
+  expect_equal(.hetid_const("columns$STD_ERROR"), "Std. Error")
+  expect_equal(.hetid_const("plot$labels$OLS_BIASED"), "OLS (Biased)")
+  expect_equal(.hetid_const("plot$labels$TSLS_LEWBEL"), "2SLS (Lewbel)")
 })
 
 test_that("NSE variables work with .data pronoun", {

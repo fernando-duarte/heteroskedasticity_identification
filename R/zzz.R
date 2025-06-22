@@ -9,7 +9,6 @@ if (getRversion() >= "3.2.0") {
   utils::globalVariables(c(
     # Internal functions
     ".hetid_const",
-    ".hetid_strings",  # For backward compatibility
     # Internal environments
     ".hetid_constants"
   ))

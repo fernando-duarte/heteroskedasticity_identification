@@ -202,16 +202,3 @@ lockEnvironment(.hetid_constants, bindings = TRUE)
 
   value
 }
-
-# For backward compatibility during transition
-.hetid_strings <- function() {
-  list(
-    df_adjust = .hetid_constants$df_adjust,
-    columns = .hetid_constants$columns,
-    variables = .hetid_constants$variables,
-    stata = .hetid_constants$stata,
-    plot_labels = .hetid_constants$plot$labels,
-    plot_colors = .hetid_constants$plot$colors,
-    env_vars = .hetid_constants$env_vars
-  )
-}

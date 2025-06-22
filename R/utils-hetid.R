@@ -29,10 +29,10 @@ has_stata <- function() {
     FALSE
   } else {
     # Check for Stata executable
-    stata_paths <- .hetid_strings()$stata$EXECUTABLES_ALL
+    stata_paths <- .hetid_const("stata$EXECUTABLES_ALL")
 
     # Also check common Mac application paths
-    mac_paths <- .hetid_strings()$stata$MAC_PATHS
+    mac_paths <- .hetid_const("stata$MAC_PATHS")
 
     any(nzchar(Sys.which(stata_paths))) || any(file.exists(mac_paths))
   }
@@ -45,7 +45,7 @@ get_stata_path <- function() {
     NULL
   } else {
     # Try standard paths first
-    stata_paths <- .hetid_strings()$stata$EXECUTABLES_ALL
+    stata_paths <- .hetid_const("stata$EXECUTABLES_ALL")
 
     result <- NULL
 
@@ -59,7 +59,7 @@ get_stata_path <- function() {
 
     if (is.null(result)) {
       # Check Mac application paths
-      mac_paths <- .hetid_strings()$stata$MAC_PATHS
+      mac_paths <- .hetid_const("stata$MAC_PATHS")
 
       for (path in mac_paths) {
         if (file.exists(path)) {
@@ -81,7 +81,7 @@ ensure_stata_packages <- function() {
     FALSE
   } else {
     # Create a do file to check and install packages
-    temp_do <- tempfile(fileext = .hetid_strings()$stata$DO_EXTENSION)
+    temp_do <- tempfile(fileext = .hetid_const("stata$DO_EXTENSION"))
     writeLines(c(
       "capture which ranktest",
       "if _rc {",
@@ -103,7 +103,7 @@ ensure_stata_packages <- function() {
     ), temp_do)
 
     # Run the installation
-    temp_log <- tempfile(fileext = .hetid_strings()$stata$LOG_EXTENSION)
+    temp_log <- tempfile(fileext = .hetid_const("stata$LOG_EXTENSION"))
     cmd <- sprintf("%s -b do %s", stata_path, temp_do)
     result <- system(cmd, intern = FALSE, ignore.stdout = TRUE)
 
@@ -135,10 +135,9 @@ generate_hetid_test_data <- function(n = .hetid_const("N_DEFAULT"), seed = 42) {
   data <- generate_lewbel_data(n, params)
 
   # Rename columns for consistency across packages
-  strings <- .hetid_strings()
-  names(data)[names(data) == strings$columns$Y1] <- strings$columns$Y_MAPPED
-  names(data)[names(data) == strings$columns$Y2] <- strings$columns$P_MAPPED # endogenous variable
-  names(data)[names(data) == strings$columns$XK] <- strings$columns$X1_MAPPED # exogenous variable
+  names(data)[names(data) == .hetid_const("columns$Y1")] <- .hetid_const("columns$Y_MAPPED")
+  names(data)[names(data) == .hetid_const("columns$Y2")] <- .hetid_const("columns$P_MAPPED") # endogenous variable
+  names(data)[names(data) == .hetid_const("columns$XK")] <- .hetid_const("columns$X1_MAPPED") # exogenous variable
 
   # Generate the Lewbel instrument manually for transparency
   first_stage <- lm(P ~ X1, data = data)
