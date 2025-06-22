@@ -132,8 +132,8 @@ The parameter vector is $\theta \coloneqq (\beta_1^\top, \gamma_1, \beta_2^\top)
 
 $$
 Q_{\text{TRI}}(\theta) \coloneqq \begin{pmatrix}
-X \cdot \varepsilon_1(\theta) \\[3pt]
-X \cdot \varepsilon_2(\theta) \\[3pt]
+X \cdot \varepsilon_1(\theta) \\
+X \cdot \varepsilon_2(\theta) \\
 (Z - \bar{Z}) \cdot \varepsilon_1(\theta) \cdot \varepsilon_2(\theta)
 \end{pmatrix}. \tag{2}
 $$
@@ -151,8 +151,8 @@ The parameter vector is $\theta \coloneqq (\beta_1^\top, \gamma_1, \beta_2^\top,
 
 $$
 Q_{\text{SIM}}(\theta) \coloneqq \begin{pmatrix}
-X \cdot \varepsilon_1(\theta) \\[3pt]
-X \cdot \varepsilon_2(\theta) \\[3pt]
+X \cdot \varepsilon_1(\theta) \\
+X \cdot \varepsilon_2(\theta) \\
 (Z - \bar{Z}) \cdot \varepsilon_1(\theta) \cdot \varepsilon_2(\theta)
 \end{pmatrix}. \tag{3}
 $$
@@ -484,10 +484,10 @@ The full set of parameters is $\theta \coloneqq (\beta_1^\top, \beta_2^\top, \ga
 
 $$
 Q_t(\theta) \coloneqq \begin{pmatrix}
-X_t \cdot \varepsilon_{1t}(\theta) \\[2pt]
-X_t \cdot \varepsilon_{2t}(\theta) \\[2pt]
-Z_t \cdot \varepsilon_{1t}(\theta)\varepsilon_{2t}(\theta) \\[2pt]
-Z_t \cdot (\varepsilon_{1t}(\theta)^2 - e^{X_t^\top\delta_1}) \\[2pt]
+X_t \cdot \varepsilon_{1t}(\theta) \\
+X_t \cdot \varepsilon_{2t}(\theta) \\
+Z_t \cdot \varepsilon_{1t}(\theta)\varepsilon_{2t}(\theta) \\
+Z_t \cdot (\varepsilon_{1t}(\theta)^2 - e^{X_t^\top\delta_1}) \\
 Z_t \cdot (\varepsilon_{2t}(\theta)^2 - e^{X_t^\top\delta_2})
 \end{pmatrix}.
 $$
