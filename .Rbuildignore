@@ -180,6 +180,7 @@
 ^final_test_results\.txt$
 ^final_test_run\.txt$
 ^heteroskedasticity\.Rproj$
+^hetid-manual\.pdf$
 ^hetid\.Rcheck$
 ^hetid_.*\.tar\.gz$
 ^htmlcov$

@@ -53,12 +53,12 @@ The error structure follows a single-factor model:
 where U, V_1, and V_2 are mutually independent, and heteroskedasticity
 is introduced through the variance of V_2.
 
-For single X (n_x = 1), the new DGP uses:
+For single X (n_x = 1), the data generating process is:
 \itemize{
 \item Z_raw ~ Uniform(0, 1)
 \item X = Z_raw
 \item Z = Z_raw - mean(Z_raw) (centered for use as instrument)
-\item V_2|Z_raw ~ N(0, Z_raw) (variance equals Z_raw)
+\item V_2|Z_raw ~ N(0, 0.5 + 2\emph{Z_raw) (variance equals 0.5 + 2}Z_raw)
 }
 
 For multiple X (n_x > 1), the original specification is used:
