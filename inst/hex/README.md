@@ -2,7 +2,7 @@
 
 This directory contains the hex sticker design for the `hetid` package.
 
-## Design (`hex.png`)
+## Design
 
 ### Theme: Heteroskedasticity Visualization with Bias Correction
 
@@ -29,14 +29,17 @@ The dramatic difference between the two regression lines immediately communicate
 
 Add the hex sticker to your README:
 ```markdown
-<img src="inst/hex/hex.png" align="right" height="139" />
+<img src="man/figures/logo.png" align="right" height="139" alt="hetid hex sticker" />
 ```
 
 Or in package documentation:
 ```r
 #' @section Logo:
-#' \if{html}{\figure{hex.png}{options: width=120 alt="hetid hex sticker"}}
+#' \if{html}{\figure{logo.png}{options: width=120 alt="hetid hex sticker"}}
 ```
+
+The sticker is generated to `man/figures/logo.png` which is the standard location
+for R package logos and is automatically discovered by pkgdown.
 
 ## Regenerating the Sticker
 

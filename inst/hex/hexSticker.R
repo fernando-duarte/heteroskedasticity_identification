@@ -90,10 +90,10 @@ sticker(
   l_width = 3,
   l_height = 3,
   l_alpha = 0.1,
-  filename = here::here("inst/hex/hex.png"),
+  filename = here::here("man/figures/logo.png"),
   dpi = 300,
   asp = 1
 )
 
 cat("Hex sticker created successfully!\n")
-cat("File saved: inst/hex/hex.png\n")
+cat("File saved: man/figures/logo.png\n")

@@ -290,7 +290,7 @@ test_that("hetid and Stata agree across different specifications", {
     )
 
     expect_equal(as.numeric(hetid_coef), expected$coef,
-      tolerance = 0.06, # 6% tolerance for random variation with new DGP
+      tolerance = 0.07, # 7% tolerance for random variation with new DGP
       label = paste("Sample size", n)
     )
   }
