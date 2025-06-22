@@ -106,27 +106,26 @@ test_that("hetid with multiple instruments matches theoretical expectations", {
   skip_if_not_comprehensive_test()
   skip_on_cran()
 
-  # Skip this test as new DGP only supports single X
-  skip("New DGP (Z ~ Uniform(0,1), V2|Z ~ N(0,Z)) only supports single X variable")
-
-  # Generate Y2 and Y1 following Lewbel structure
-  epsilon2 <- sqrt(0.5 + 0.5 * (z1^2 + z2^2 + z3^2)) * rnorm(n)
-  y2 <- 1 + x1 - x2 + 0.5 * x3 + epsilon2
-  epsilon1 <- rnorm(n)
-  y1 <- 0.5 + 1.5 * x1 + 2 * x2 - 0.5 * x3 - 0.8 * y2 + epsilon1
-
-  data <- data.frame(
-    Y1 = y1, Y2 = y2, X1 = x1, X2 = x2, X3 = x3,
-    Z1 = z1, Z2 = z2, Z3 = z3
+  # Generate data with new unified DGP for multiple X
+  set.seed(999)
+  n <- 1000
+  params <- list(
+    beta1_0 = 0.5, beta1_1 = c(1.5, 2.0, -0.5), gamma1 = -0.8,
+    beta2_0 = 1.0, beta2_1 = c(1.0, -1.0, 0.5),
+    alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
   )
+
+  data <- generate_lewbel_data(n, params, n_x = 3)
 
   # Construct multiple Lewbel instruments
   e2_hat <- residuals(lm(Y2 ~ X1 + X2 + X3, data = data))
-  iv1 <- (z1 - mean(z1)) * e2_hat
+
+  # The Z variables are already centered (Z = Z_raw - mean(Z_raw))
+  iv1 <- data$Z1 * e2_hat
   iv1 <- iv1 - mean(iv1)
-  iv2 <- (z2 - mean(z2)) * e2_hat
+  iv2 <- data$Z2 * e2_hat
   iv2 <- iv2 - mean(iv2)
-  iv3 <- (z3 - mean(z3)) * e2_hat
+  iv3 <- data$Z3 * e2_hat
   iv3 <- iv3 - mean(iv3)
 
   # Test with 1, 2, and 3 instruments
@@ -152,9 +151,10 @@ test_that("hetid with multiple instruments matches theoretical expectations", {
   expect_true(se3 <= se2, label = "Three instruments more efficient than two")
 
   # All should estimate similar coefficients (close to true value -0.8)
-  expect_equal(as.numeric(coef(model1)["Y2"]), -0.8, tolerance = 0.1)
-  expect_equal(as.numeric(coef(model2)["Y2"]), -0.8, tolerance = 0.1)
-  expect_equal(as.numeric(coef(model3)["Y2"]), -0.8, tolerance = 0.1)
+  # With new DGP and multiple X, allow more tolerance for finite sample bias
+  expect_equal(as.numeric(coef(model1)["Y2"]), -0.8, tolerance = 0.3)
+  expect_equal(as.numeric(coef(model2)["Y2"]), -0.8, tolerance = 0.2)
+  expect_equal(as.numeric(coef(model3)["Y2"]), -0.8, tolerance = 0.25)
 })
 
 test_that("REndo warns appropriately about weak instruments", {

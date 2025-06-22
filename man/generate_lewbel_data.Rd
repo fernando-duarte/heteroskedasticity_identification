@@ -53,19 +53,17 @@ The error structure follows a single-factor model:
 where U, V_1, and V_2 are mutually independent, and heteroskedasticity
 is introduced through the variance of V_2.
 
-For single X (n_x = 1), the data generating process is:
+The data generating process uses a unified approach for both single and multiple X:
 \itemize{
-\item Z_raw ~ Uniform(0, 1)
-\item X = Z_raw
-\item Z = Z_raw - mean(Z_raw) (centered for use as instrument)
-\item V_2|Z_raw ~ N(0, 0.5 + 2\emph{Z_raw) (variance equals 0.5 + 2}Z_raw)
+\item For each j: Z_raw_j ~ Uniform(0, 1) independently
+\item X_j = Z_raw_j
+\item Z_j = Z_raw_j - mean(Z_raw_j) (centered for use as instrument)
+\item For heteroskedasticity:
+\itemize{
+\item If n_x = 1: Z_het = Z_raw
+\item If n_x > 1: Z_het = mean(Z_raw_1, ..., Z_raw_k)
 }
-
-For multiple X (n_x > 1), the original specification is used:
-\itemize{
-\item X ~ N(0, 1)
-\item Z = X^2 - E[X^2]
-\item V_2 ~ N(0, exp(\eqn{\delta} Z))
+\item V_2|Z_het ~ N(0, 0.5 + 2\emph{Z_het) (variance equals 0.5 + 2}Z_het)
 }
 }
 \examples{

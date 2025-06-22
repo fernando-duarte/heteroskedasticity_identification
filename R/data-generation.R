@@ -25,19 +25,17 @@
 #' @template details-error-structure
 #'
 #' @details
-#' For single X (n_x = 1), the data generating process is:
+#' The data generating process uses a unified approach for both single and multiple X:
 #' \itemize{
-#'   \item Z_raw ~ Uniform(0, 1)
-#'   \item X = Z_raw
-#'   \item Z = Z_raw - mean(Z_raw) (centered for use as instrument)
-#'   \item V_2|Z_raw ~ N(0, 0.5 + 2*Z_raw) (variance equals 0.5 + 2*Z_raw)
-#' }
-#'
-#' For multiple X (n_x > 1), the original specification is used:
-#' \itemize{
-#'   \item X ~ N(0, 1)
-#'   \item Z = X^2 - E\[X^2\]
-#'   \item V_2 ~ N(0, exp(\eqn{\delta} Z))
+#'   \item For each j: Z_raw_j ~ Uniform(0, 1) independently
+#'   \item X_j = Z_raw_j
+#'   \item Z_j = Z_raw_j - mean(Z_raw_j) (centered for use as instrument)
+#'   \item For heteroskedasticity:
+#'     \itemize{
+#'       \item If n_x = 1: Z_het = Z_raw
+#'       \item If n_x > 1: Z_het = mean(Z_raw_1, ..., Z_raw_k)
+#'     }
+#'   \item V_2|Z_het ~ N(0, 0.5 + 2*Z_het) (variance equals 0.5 + 2*Z_het)
 #' }
 #'
 #' @return A data.frame with columns Y1, Y2, epsilon1, epsilon2, and:
@@ -88,33 +86,31 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
   # Generate exogenous variables
   # nolint start: object_name_linter.
 
-  # Z ~ Uniform(0, 1) and X = Z
+  # New unified approach for both single and multiple X
+  # Each X_j is drawn from independent Uniform(0,1) distributions
+  # This extends the single X case naturally to multiple X
+
+  # Generate raw Z values (which equal X values)
+  Z_raw_mat <- matrix(
+    stats::runif(n_obs * n_x, min = 0, max = 1),
+    nrow = n_obs, ncol = n_x
+  )
+
+  # X = Z_raw (X equals the raw Z values)
+  X_mat <- Z_raw_mat
+
+  # Center Z to have mean 0 (these are the instruments)
+  Z_mat <- matrix(NA, nrow = n_obs, ncol = n_x)
+  for (j in 1:n_x) {
+    Z_mat[, j] <- Z_raw_mat[, j] - mean(Z_raw_mat[, j])
+  }
+
+  # For heteroskedasticity, use average of raw Z values
+  # This maintains the [0,1] range and combines information from all X's
   if (n_x == 1) {
-    Z_raw <- stats::runif(n_obs, min = 0, max = 1)
-    X_mat <- matrix(Z_raw, nrow = n_obs, ncol = 1)
-    # Center Z to have mean 0 (this is the instrument)
-    Z_mat <- matrix(Z_raw - mean(Z_raw), nrow = n_obs, ncol = 1)
-    # Use raw Z for heteroskedasticity (variance function)
-    Z_het <- Z_raw
+    Z_het <- Z_raw_mat[, 1]
   } else {
-    # For multiple X, keep the original approach for now
-    X_mat <- matrix(
-      stats::rnorm(
-        n_obs * n_x,
-        mean = .hetid_const("DEFAULT_X_MEAN"),
-        sd = .hetid_const("DEFAULT_X_SD")
-      ),
-      nrow = n_obs, ncol = n_x
-    )
-
-    # Generate Z instruments (one per X)
-    Z_mat <- matrix(NA, nrow = n_obs, ncol = n_x)
-    for (j in 1:n_x) {
-      Z_mat[, j] <- X_mat[, j]^2 - mean(X_mat[, j]^2)
-    }
-
-    # For heteroskedasticity, use the first Z by default
-    Z_het <- Z_mat[, 1]
+    Z_het <- rowMeans(Z_raw_mat)
   }
 
   # Generate error components following Lewbel (2012)
@@ -137,27 +133,11 @@ generate_lewbel_data <- function(n_obs, params, n_x = 1) {
   V1 <- stats::rnorm(n_obs)
 
   # Generate V2 with heteroskedastic variance
-  # V2|Z ~ N(0, 0.5 + 2*Z) for n_x = 1
-  if (n_x == 1) {
-    # V2|Z ~ N(0, 0.5 + 2*Z) - variance is 0.5 + 2*Z
-    # This ensures minimum variance of 0.5 and strong heteroskedasticity
-    # V2 = nu2 * sqrt(0.5 + 2*Z) where nu2 ~ N(0,1) independent of Z
-    nu2 <- stats::rnorm(n_obs)
-    V2 <- nu2 * sqrt(0.5 + 2 * Z_het)
-  } else {
-    # Original approach for multiple X
-    exponent <- params$delta_het * Z_het
-    exponent <- pmin(
-      pmax(exponent, .hetid_const("MIN_EXPONENT")),
-      .hetid_const("MAX_EXPONENT")
-    )
-    sigma_Z <- sqrt(exp(exponent))
-
-    # Generate V2: mean zero conditional on Z, variance depends on Z
-    # V2 = nu2 * sigma(Z) where nu2 ~ N(0,1) independent of Z
-    nu2 <- stats::rnorm(n_obs)
-    V2 <- nu2 * sigma_Z
-  }
+  # V2|Z ~ N(0, 0.5 + 2*Z_het) - unified approach for all n_x
+  # This ensures minimum variance of 0.5 and strong heteroskedasticity
+  # V2 = nu2 * sqrt(0.5 + 2*Z_het) where nu2 ~ N(0,1) independent of Z
+  nu2 <- stats::rnorm(n_obs)
+  V2 <- nu2 * sqrt(0.5 + 2 * Z_het)
 
   # Construct structural errors
   epsilon1 <- params$alpha1 * U + V1
