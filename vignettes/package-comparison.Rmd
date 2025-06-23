@@ -7,7 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r vignette-setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r load-required-packages, message=FALSE, warning=FALSE}
 library(hetid)
 library(AER)
 if (requireNamespace("REndo", quietly = TRUE)) {
@@ -65,7 +65,7 @@ We provide a simple demonstration followed by a comprehensive verification scrip
 
 ### Quick Demonstration
 
-```{r quick-demo}
+```{r quick-demonstration}
 # Generate test data
 set.seed(12345)
 params <- list(
@@ -114,7 +114,7 @@ ivregress 2sls Y1 Xk (Y2 = lewbel_iv)
 
 For reproducibility, here's a comprehensive function that runs all verifications and demonstrates the differences between implementations:
 
-```{r complete-verification}
+```{r comprehensive-verification-function}
 # Comprehensive function to verify all three implementations
 verify_lewbel_implementations <- function(n = 1000, seed = 12345, verbose = TRUE) {
   set.seed(seed)
@@ -341,7 +341,7 @@ results <- verify_lewbel_implementations()
 
 ### Matching Software Defaults
 
-```{r df-adjustments}
+```{r degrees-of-freedom-adjustments}
 # Note: run_single_lewbel_simulation is from the hetid package
 # hetid default: asymptotic (matches Stata)
 params <- list(
@@ -388,7 +388,7 @@ cat("Ratio (finite/asymptotic):", round(result_finite$tsls_se / result_asymp$tsl
 
 #### For Matching Software Results
 
-```{r matching-software}
+```{r matching-software-results}
 # To match Stata ivreg2h (asymptotic SEs):
 params <- list(
   sample_size = 1000, # Required parameter
@@ -433,6 +433,13 @@ For exact replication:
 - hetid with `df_adjust="asymptotic"` matches Stata exactly
 - REndo cannot be configured to match because it uses a different (but valid) Z
 - Researchers should document which implementation they use
+
+## See Also
+
+- [Getting Started](getting-started.html) - Basic usage of hetid
+- [Theory and Methods](heteroskedasticity-identification-theory.html) - Mathematical foundations
+- [GMM Estimation](lewbel-gmm.html) - Advanced estimation methods
+- [Rigobon Method](rigobon-method.html) and [Prono Method](prono-method.html) - Alternative approaches
 
 ## References
 

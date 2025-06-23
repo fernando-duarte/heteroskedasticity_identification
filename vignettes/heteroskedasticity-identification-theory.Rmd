@@ -25,6 +25,8 @@ library(hetid)
 
 This document summarizes the heteroskedasticity-based identification strategy for models with endogenous regressors, as developed by @lewbel2012, @klein2010estimating, @rigobon2003 and @prono2014, and proposes an application to a time-series context. The method provides a way to construct valid instruments from the model's data when traditional external instruments are unavailable and heteroskedasticity is present.
 
+> **Note**: For practical implementation guides, see the [Getting Started](getting-started.html) vignette. For method-specific details, see [Lewbel GMM](lewbel-gmm.html), [Rigobon](rigobon-method.html), or [Prono](prono-method.html) vignettes.
+
 ## Lewbel (2012) {#lewbel-2012}
 
 ### Structural Forms and Reduced-Form Residuals
@@ -115,7 +117,7 @@ z_demeaned <- data$Z - mean(data$Z)
 lewbel_iv <- z_demeaned * e2_hat
 
 # Step 3: Run 2SLS using ivreg
-library(ivreg)
+suppressPackageStartupMessages(library(ivreg))
 tsls_model <- ivreg(Y1 ~ Xk + Y2 | Xk + lewbel_iv, data = data)
 
 # Display results
@@ -508,6 +510,14 @@ The instruments are derived from the exogenous variables $X_t$. The terms inside
 Therefore, the sample average of $Q_t(\theta)$ is a computable criterion function for any candidate parameter values. As in the [Simultaneous system](#simultaneous-system) section, $Z_t$ must have at least 2 entries (including perhaps a constant, if Corollary 1 applies).
 
 ## Other Notes
+
+## See Also
+
+- [Getting Started with hetid](getting-started.html) - Basic usage and examples
+- [GMM Estimation](lewbel-gmm.html) - Advanced estimation techniques
+- [Rigobon Method](rigobon-method.html) - Regime-based identification
+- [Prono Method](prono-method.html) - GARCH-based identification
+- [Package Comparison](package-comparison.html) - Software validation
 
 - **Instrument relevance.** Report the first-stage F-statistic on the generated instrument(s); if F < 10, standard inference is unreliable, and weak-IV-robust tests should be used.
 - **Instrument validity.** If there are more heteroskedasticity drivers $Z$ than needed for identification (i.e., the model is overidentified), a Hansen J-test of overidentifying restrictions can be used to test the validity of the moment conditions.

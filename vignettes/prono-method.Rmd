@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, message=FALSE, warning=FALSE}
 library(hetid)
 library(ggplot2)
 ```
@@ -27,6 +27,8 @@ library(ggplot2)
 ## Introduction
 
 This vignette demonstrates the implementation of Prono (2014)'s method for using conditional heteroskedasticity to identify endogenous parameters in econometric models. This approach extends Lewbel (2012)'s heteroskedasticity-based identification to time series contexts where the heteroskedasticity follows a GARCH process.
+
+> **Related vignettes**: For theoretical background, see [Theory and Methods](heteroskedasticity-identification-theory.html). For cross-sectional methods, see [Getting Started](getting-started.html) (Lewbel) or [Rigobon Method](rigobon-method.html) (regime-based).
 
 ### The Basic Idea
 
@@ -106,7 +108,7 @@ head(data)
 
 Let's plot the conditional variance to see the GARCH effect:
 
-```{r plot-variance, fig.alt="Line plot showing conditional volatility over time with GARCH effect, displaying volatility percentage on y-axis ranging from 0 to 6 percent, with a blue line showing time-varying volatility and a red dashed horizontal line at 2% indicating typical weekly volatility"}
+```{r plot-variance, fig.alt="Line plot showing conditional volatility over time with GARCH effect, displaying volatility percentage on y-axis ranging from 0 to 6 percent, with a blue line showing time-varying volatility and a red dashed horizontal line at 2% indicating typical weekly volatility", fig.cap="Figure 1: Conditional volatility from GARCH(1,1) model. The time-varying volatility provides the heteroskedasticity needed for Prono identification."}
 # Note: sigma2_sq is variance of percent returns
 plot(data$time, sqrt(data$sigma2_sq),
   type = "l",
@@ -191,7 +193,7 @@ print(summary_stats, digits = 4)
 
 ### Visualizing Monte Carlo Results
 
-```{r plot-mc-results, eval=FALSE, fig.alt="Two-panel visualization: Top panel shows density plots comparing the sampling distributions of OLS (biased) and Prono IV (unbiased) estimators with the true value marked as a vertical dashed line. Bottom panel displays box plots of estimation bias for both methods, demonstrating that Prono IV centers around zero bias while OLS shows systematic negative bias"}
+```{r plot-mc-results, eval=FALSE, fig.alt="Two-panel visualization: Top panel shows density plots comparing the sampling distributions of OLS (biased) and Prono IV (unbiased) estimators with the true value marked as a vertical dashed line. Bottom panel displays box plots of estimation bias for both methods, demonstrating that Prono IV centers around zero bias while OLS shows systematic negative bias", fig.cap="Figure 2: Monte Carlo simulation results. (Top) Sampling distributions of estimates showing bias correction. (Bottom) Distribution of estimation bias for both methods."}
 # Prepare data for plotting
 plot_data <- data.frame(
   Method = rep(c("OLS", "Prono IV"), each = nrow(mc_results)),
@@ -265,7 +267,7 @@ Let's examine how the GARCH parameters affect identification strength:
 <!-- The following sensitivity analyses are computationally intensive.
      Run these locally to explore parameter sensitivity. -->
 
-```{r sensitivity-garch, eval=FALSE, fig.alt="Two-panel plot showing sensitivity analysis: Left panel displays absolute bias versus GARCH alpha parameter for both Prono IV (blue) and OLS (red) methods. Right panel shows first-stage F-statistic versus GARCH alpha parameter with a horizontal dashed line at F=10 indicating the weak instrument threshold. Results demonstrate that stronger GARCH effects improve instrument strength"}
+```{r sensitivity-garch, eval=FALSE, fig.alt="Two-panel plot showing sensitivity analysis: Left panel displays absolute bias versus GARCH alpha parameter for both Prono IV (blue) and OLS (red) methods. Right panel shows first-stage F-statistic versus GARCH alpha parameter with a horizontal dashed line at F=10 indicating the weak instrument threshold. Results demonstrate that stronger GARCH effects improve instrument strength", fig.cap="Figure 3: Sensitivity to GARCH parameters. (Left) Bias reduction improves with stronger GARCH effects. (Right) Instrument strength increases with GARCH persistence."}
 # Test different GARCH parameters
 alpha_values <- c(0.05, 0.1, 0.2, 0.3)
 results_list <- list()
@@ -318,7 +320,7 @@ abline(h = 10, lty = 2, col = "red")
 
 ### Effect of Sample Size
 
-```{r sensitivity-n, eval=FALSE, fig.alt="Line plot showing absolute bias versus sample size on a log scale, comparing OLS (showing persistent bias) and Prono IV (showing decreasing bias with sample size) methods. The plot demonstrates that while OLS bias remains constant regardless of sample size due to endogeneity, Prono IV bias decreases as sample size increases"}
+```{r sensitivity-n, eval=FALSE, fig.alt="Line plot showing absolute bias versus sample size on a log scale, comparing OLS (showing persistent bias) and Prono IV (showing decreasing bias with sample size) methods. The plot demonstrates that while OLS bias remains constant regardless of sample size due to endogeneity, Prono IV bias decreases as sample size increases", fig.cap="Figure 4: Sample size effects on estimation bias. OLS bias persists regardless of sample size, while Prono IV bias decreases with larger samples."}
 # Test different sample sizes
 n_values <- c(100, 200, 500, 1000)
 n_results <- list()
@@ -543,7 +545,7 @@ cat("This may be due to using simplified GARCH vs. full diagonal specification.\
 
 ### Visualizing the Replication Results
 
-```{r replication-plots, eval=FALSE, fig.alt="Faceted density plots comparing OLS and Prono estimator distributions across two levels of endogeneity (Low correlation ρ=0.20 and High correlation ρ=0.40). Each panel shows the sampling distribution of estimates with the true value marked as a vertical dashed line at 1.0, demonstrating that OLS bias increases with endogeneity while Prono remains unbiased"}
+```{r replication-plots, eval=FALSE, fig.alt="Faceted density plots comparing OLS and Prono estimator distributions across two levels of endogeneity (Low correlation ρ=0.20 and High correlation ρ=0.40). Each panel shows the sampling distribution of estimates with the true value marked as a vertical dashed line at 1.0, demonstrating that OLS bias increases with endogeneity while Prono remains unbiased", fig.cap="Figure 5: Replication of Prono (2014) results. Sampling distributions under different endogeneity levels show increasing OLS bias while Prono IV remains approximately unbiased."}
 # Combine results for plotting
 plot_data <- rbind(
   data.frame(
@@ -821,6 +823,13 @@ run_prono_asset_pricing <- function(data, window_size = 260) {
 ## Conclusion
 
 The Prono (2014) method provides a powerful alternative for identification in time series contexts where conditional heteroskedasticity is present. While it requires careful attention to GARCH modeling and diagnostic checking, it can substantially reduce endogeneity bias when properly applied.
+
+## See Also
+
+- [Theory and Methods](heteroskedasticity-identification-theory.html) - Mathematical foundations
+- [Getting Started](getting-started.html) - Basic Lewbel implementation
+- [Rigobon Method](rigobon-method.html) - Regime-based identification
+- [Package Comparison](package-comparison.html) - Software validation
 
 ## References
 

@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, message=FALSE, warning=FALSE}
 library(hetid)
 library(ggplot2)
 library(dplyr)
@@ -26,6 +26,8 @@ library(tidyr)
 ## Introduction
 
 The `hetid` package now includes an implementation of Rigobon's (2003) identification through heteroskedasticity method. While Lewbel (2012) uses continuous functions of exogenous variables to drive heteroskedasticity, Rigobon's approach exploits discrete regime changes that affect the variance of structural errors. This vignette demonstrates how to use the Rigobon method and compares it with other identification strategies.
+
+> **Related vignettes**: For theoretical foundations, see [Theory and Methods](heteroskedasticity-identification-theory.html). For the standard Lewbel approach, see [Getting Started](getting-started.html) or [GMM Estimation](lewbel-gmm.html).
 
 ### Rigobon (2003) vs Lewbel (2012)
 
@@ -278,13 +280,20 @@ print(comparison_full[, c("Method", "Estimate", "StdError", "Bias", "FirstStageF
 
 Let's run a quick Monte Carlo to assess the finite sample properties:
 
-```{r monte-carlo, eval=FALSE, fig.alt="Density plot comparing the sampling distributions of OLS and Rigobon estimators across Monte Carlo simulations, with OLS shown in one color and Rigobon in another, and the true parameter value marked as a vertical red dashed line"}
+```{r monte-carlo, eval=FALSE, fig.alt="Density plot comparing the sampling distributions of OLS and Rigobon estimators across Monte Carlo simulations, with OLS shown in one color and Rigobon in another, and the true parameter value marked as a vertical red dashed line", fig.cap="Figure 3: Monte Carlo simulation results. Sampling distributions of OLS and Rigobon estimators from 1000 simulations, showing bias reduction with heteroskedasticity-based identification."}
 # Run 100 Monte Carlo replications
+# Note: eval=FALSE because this is computationally intensive.
+# Increase n_mc to 1000 for publication-quality results.
 n_mc <- 100
 mc_results <- vector("list", n_mc)
 
 set.seed(123)
+cat("Running Monte Carlo simulation with", n_mc, "replications\n")
+
 for (i in 1:n_mc) {
+  # Progress indicator
+  if (i %% 20 == 0) cat("Progress:", i, "/", n_mc, "replications completed\n")
+
   # Generate new data
   data_mc <- generate_rigobon_data(n_obs = 1000, params = params_2reg)
 
@@ -504,7 +513,7 @@ Let's visualize the key identifying variation - the dramatic increase in volatil
 
 ```{r brady-volatility-viz, fig.alt="Time series line plot showing rolling 20-day volatilities for Argentina and Mexico Brady bonds from 1994 to 1996, with volatility spikes highlighted during identified crisis periods including the Mexican peso crisis (December 1994) and Colosio assassination (March 1994)"}
 # Calculate rolling 20-day volatilities (as in Rigobon)
-library(zoo)
+suppressPackageStartupMessages(library(zoo))
 window_size <- 20
 
 brady_data$vol_argentina <- rollapply(
@@ -834,6 +843,13 @@ The `hetid` package provides a complete implementation with:
 - `validate_rigobon_assumptions()`: Test the identifying assumptions
 - `run_rigobon_analysis()`: Complete workflow with diagnostics
 - `compare_rigobon_methods()`: Compare with other identification strategies
+
+## See Also
+
+- [Theory and Methods](heteroskedasticity-identification-theory.html) - Mathematical foundations
+- [Getting Started](getting-started.html) - Basic Lewbel implementation
+- [Prono Method](prono-method.html) - Time-series GARCH approach
+- [Package Comparison](package-comparison.html) - Software validation
 
 For theoretical details, see:
 - Rigobon, R. (2003). "Identification Through Heteroskedasticity." *The Review of Economics and Statistics*, 85(4), 777-792.

@@ -7,14 +7,14 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r vignette-setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-```{r setup}
+```{r load-packages, message=FALSE, warning=FALSE}
 library(hetid)
 library(gmm)
 ```
@@ -38,7 +38,7 @@ Y_1 &= X'\beta_1 + \gamma_1 Y_2 + \epsilon_1 \\
 Y_2 &= X'\beta_2 + \epsilon_2
 \end{aligned}$$
 
-```{r triangular-example, eval=FALSE}
+```{r gmm-triangular-system, eval=FALSE}
 # Generate example data
 set.seed(123)
 n <- 1000
@@ -71,7 +71,7 @@ heteroskedasticity patterns. They may fail to converge or produce unreliable
 estimates with insufficient heteroskedasticity variation. Consider using a
 triangular system when possible.
 
-```{r simultaneous-example, eval=FALSE}
+```{r gmm-simultaneous-system, eval=FALSE}
 # Generate data with multiple X variables
 n_sim <- 1000
 data_sim <- data.frame(
@@ -122,7 +122,7 @@ Three types of GMM estimators are available:
 
 Fast and reliable for most applications:
 
-```{r twostep, eval=FALSE}
+```{r gmm-twostep-estimation, eval=FALSE}
 gmm_twostep <- lewbel_gmm(data, gmm_type = "twostep")
 ```
 
@@ -130,7 +130,7 @@ gmm_twostep <- lewbel_gmm(data, gmm_type = "twostep")
 
 May improve finite sample properties:
 
-```{r iterative, eval=FALSE}
+```{r gmm-iterative-estimation, eval=FALSE}
 gmm_iter <- lewbel_gmm(data, gmm_type = "iterative")
 ```
 
@@ -138,7 +138,7 @@ gmm_iter <- lewbel_gmm(data, gmm_type = "iterative")
 
 Theoretically optimal but computationally intensive:
 
-```{r cue, eval=FALSE}
+```{r gmm-cue-estimation, eval=FALSE}
 gmm_cue <- lewbel_gmm(data, gmm_type = "cue")
 ```
 
@@ -146,7 +146,7 @@ gmm_cue <- lewbel_gmm(data, gmm_type = "cue")
 
 By default, centered X variables are used as heteroskedasticity drivers (Z). You can specify custom Z variables:
 
-```{r custom-z, eval=FALSE}
+```{r custom-heteroskedasticity-drivers, eval=FALSE}
 # Add custom Z variables
 data$Z1 <- data$Xk^2
 data$Z2 <- abs(data$Xk)
@@ -166,7 +166,7 @@ coef(gmm_custom)["gamma1"]
 
 Heteroskedasticity and Autocorrelation Consistent:
 
-```{r hac, eval=FALSE}
+```{r gmm-hac-vcov, eval=FALSE}
 gmm_hac <- lewbel_gmm(data, vcov = "HAC")
 ```
 
@@ -174,7 +174,7 @@ gmm_hac <- lewbel_gmm(data, vcov = "HAC")
 
 Assumes independent and identically distributed errors:
 
-```{r iid, eval=FALSE}
+```{r gmm-iid-vcov, eval=FALSE}
 gmm_iid <- lewbel_gmm(data, vcov = "iid")
 ```
 
@@ -182,7 +182,7 @@ gmm_iid <- lewbel_gmm(data, vcov = "iid")
 
 For grouped data:
 
-```{r cluster, eval=FALSE}
+```{r gmm-clustered-vcov, eval=FALSE}
 # Add cluster variable
 data$cluster <- rep(1:10, each = n_obs / 10)
 
@@ -197,7 +197,7 @@ gmm_cluster <- lewbel_gmm(
 
 The package provides a convenience function to compare GMM and 2SLS estimates:
 
-```{r compare, eval=FALSE}
+```{r compare-gmm-2sls, eval=FALSE}
 comparison <- compare_gmm_2sls(data)
 print(comparison)
 ```
@@ -208,7 +208,7 @@ print(comparison)
 
 The J-test checks the validity of moment conditions:
 
-```{r j-test, eval=FALSE}
+```{r j-test-overidentification, eval=FALSE}
 j_test <- gmm_result$test
 cat("J-statistic:", j_test$test[1], "\n")
 cat("p-value:", j_test$test[2], "\n")
@@ -219,7 +219,7 @@ cat("Degrees of freedom:", j_test$df, "\n")
 
 Check instrument relevance:
 
-```{r first-stage, eval=FALSE}
+```{r first-stage-diagnostics, eval=FALSE}
 # Manually construct Lewbel instruments
 e2_hat <- residuals(lm(Y2 ~ Xk, data = data))
 z_centered <- scale(data$Xk, center = TRUE, scale = FALSE)
@@ -235,7 +235,7 @@ cat("First-stage F-statistic:", round(f_stat, 2), "\n")
 
 For small samples, bootstrap inference may be preferred:
 
-```{r bootstrap, eval=FALSE}
+```{r bootstrap-inference, eval=FALSE, message=FALSE, warning=FALSE}
 library(boot)
 
 # Bootstrap function
@@ -285,6 +285,13 @@ print(boot_ci)
 5. **Model Selection**:
    - Use triangular system unless bidirectional causality is theoretically justified
    - For simultaneous systems, ensure identification condition holds
+
+## See Also
+
+- [Theory and Methods](heteroskedasticity-identification-theory.html) - Mathematical foundations
+- [Getting Started](getting-started.html) - Basic usage examples
+- [Package Comparison](package-comparison.html) - Validation against other software
+- [Rigobon Method](rigobon-method.html) - Alternative regime-based approach
 
 ## References
 
