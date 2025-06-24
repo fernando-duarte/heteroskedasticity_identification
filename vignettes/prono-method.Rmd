@@ -828,6 +828,7 @@ run_prono_asset_pricing <- function(data, window_size = 260) {
 
 - [Theory and Methods](heteroskedasticity-identification-theory.html) - Mathematical foundations
 - [Getting Started](getting-started.html) - Basic Lewbel implementation
+- [Klein & Vella Method](klein-vella-method.html) - Semiparametric control function approach
 - [Rigobon Method](rigobon-method.html) - Regime-based identification
 - [Package Comparison](package-comparison.html) - Software validation
 

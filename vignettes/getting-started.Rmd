@@ -244,7 +244,7 @@ The `hetid` package provides a complete implementation of Lewbel's (2012) identi
 
 - For theoretical background, see the [Theory and Methods](heteroskedasticity-identification-theory.html) vignette
 - For GMM estimation, see the [GMM Estimation](lewbel-gmm.html) vignette
-- For alternative methods, see [Rigobon](rigobon-method.html) and [Prono](prono-method.html) vignettes
+- For alternative methods, see [Klein & Vella](klein-vella-method.html), [Rigobon](rigobon-method.html) and [Prono](prono-method.html) vignettes
 - For software comparisons, see [Comparing Implementations](package-comparison.html)
 
 For more details on the original method, see Lewbel, A. (2012). "Using Heteroscedasticity to Identify and Estimate Mismeasured and Endogenous Regressor Models." *Journal of Business & Economic Statistics*, 30(1), 67-80.

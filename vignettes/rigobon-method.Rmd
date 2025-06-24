@@ -792,6 +792,7 @@ The replication above uses simulated data calibrated to match the key characteri
 
 - [Theory and Methods](heteroskedasticity-identification-theory.html) - Mathematical foundations
 - [Getting Started](getting-started.html) - Basic Lewbel implementation
+- [Klein & Vella Method](klein-vella-method.html) - Semiparametric control function approach
 - [Prono Method](prono-method.html) - Time-series GARCH approach
 - [Package Comparison](package-comparison.html) - Software validation
 

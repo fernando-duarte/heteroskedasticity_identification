@@ -289,6 +289,7 @@ print(boot_ci)
 
 - [Theory and Methods](heteroskedasticity-identification-theory.html) - Mathematical foundations
 - [Getting Started](getting-started.html) - Basic usage examples
+- [Klein & Vella Method](klein-vella-method.html) - Semiparametric control function approach
 - [Package Comparison](package-comparison.html) - Validation against other software
 - [Rigobon Method](rigobon-method.html) - Alternative regime-based approach
 
