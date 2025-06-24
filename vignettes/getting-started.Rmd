@@ -197,12 +197,6 @@ results <- map_dfr(1:n_sims, function(i) {
   run_single_lewbel_simulation(i, sim_params)
 })
 
-# Option 2: Using pbapply for progress bar (if available)
-# if (requireNamespace("pbapply", quietly = TRUE)) {
-#   results <- pbapply::pblapply(1:n_sims, function(i) {
-#     run_single_lewbel_simulation(i, sim_params)
-#   }) |> bind_rows()
-# }
 
 # Summarize performance metrics
 summary_stats <- results |>

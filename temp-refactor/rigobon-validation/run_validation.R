@@ -80,4 +80,4 @@ test_that("Refactored function matches original for SIMULTANEOUS system", {
 cat("\nRunning validation tests for refactored Rigobon moment functions...\n")
 # Use a "stop" reporter to halt on the first failure
 test_file("temp-refactor/rigobon-validation/run_validation.R", reporter = "stop")
-cat("\nValidation successful: The refactored function is equivalent to the originals.\n")
+cat("\n Validation successful: The refactored function is equivalent to the originals.\n")
