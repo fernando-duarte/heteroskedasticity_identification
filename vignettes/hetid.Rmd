@@ -1,0 +1,150 @@
+---
+title: "hetid: Heteroskedasticity-Based Identification"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{hetid: Heteroskedasticity-Based Identification}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Package Overview
+
+The `hetid` package provides a comprehensive R implementation of heteroskedasticity-based identification methods for econometric models with endogenous regressors. When traditional instrumental variables are unavailable, these methods exploit heteroskedasticity in the error terms to achieve identification.
+
+## Available Methods
+
+The package implements three major identification strategies:
+
+1. **Lewbel (2012)**: Uses continuous heteroskedasticity drivers
+2. **Rigobon (2003)**: Exploits discrete regime changes
+3. **Prono (2014)**: Leverages time-varying conditional heteroskedasticity (GARCH)
+
+## Vignette Guide
+
+### Getting Started
+
+- **[Getting Started with hetid](getting-started.html)**
+  - Basic introduction to the package
+  - Simple examples using Lewbel's method
+  - Data generation and assumption verification
+  - *Read this first if you're new to the package*
+
+### Theoretical Background
+
+- **[Heteroskedasticity-Based Identification: Theory and Methods](heteroskedasticity-identification-theory.html)**
+  - Mathematical foundations of all methods
+  - Detailed assumptions and identification conditions
+  - Klein & Vella (2010) control function approach
+  - *Essential reading for understanding the methods*
+
+### Method-Specific Guides
+
+- **[GMM Estimation for Lewbel (2012)](lewbel-gmm.html)**
+  - Advanced GMM implementation
+  - Efficiency considerations
+  - Both triangular and simultaneous systems
+  - *For users needing optimal estimation*
+
+- **[The Rigobon Method](rigobon-method.html)**
+  - Regime-based heteroskedasticity
+  - Financial contagion example
+  - Comparison with Lewbel approach
+  - *Best for discrete variance changes*
+
+- **[The Prono (2014) Method](prono-method.html)**
+  - GARCH-based identification
+  - Time series applications
+  - Asset pricing examples
+  - *Ideal for financial time series*
+
+### Validation and Comparison
+
+- **[Comparing Lewbel (2012) Implementations](package-comparison.html)**
+  - Empirical verification against Stata and REndo
+  - Implementation differences explained
+  - Matching results across software
+  - *Important for replication studies*
+
+## Suggested Reading Order
+
+### For Practitioners
+
+1. [Getting Started](getting-started.html) - Basic usage
+2. Choose your method:
+   - Cross-sectional data → [Lewbel GMM](lewbel-gmm.html)
+   - Regime changes → [Rigobon](rigobon-method.html)
+   - Time series → [Prono](prono-method.html)
+3. [Package Comparison](package-comparison.html) - Verify your results
+
+### For Researchers
+
+1. [Theory and Methods](heteroskedasticity-identification-theory.html) - Mathematical foundations
+2. [Getting Started](getting-started.html) - Implementation basics
+3. All method-specific vignettes for comprehensive understanding
+4. [Package Comparison](package-comparison.html) - Software validation
+
+## Quick Decision Guide
+
+```
+Which method should I use?
+│
+├─ Do you have time series data?
+│  ├─ Yes → Is volatility time-varying (GARCH-like)?
+│  │        ├─ Yes → Use Prono method
+│  │        └─ No → Use Lewbel method
+│  └─ No → Do you have discrete regime changes?
+│           ├─ Yes → Use Rigobon method
+│           └─ No → Use Lewbel method
+```
+
+## Key Functions by Method
+
+### Lewbel (2012)
+- `generate_lewbel_data()` - Generate test data
+- `verify_lewbel_assumptions()` - Check assumptions
+- `run_single_lewbel_simulation()` - Point estimation
+- `calculate_lewbel_bounds()` - Set identification
+- `lewbel_gmm()` - GMM estimation
+
+### Rigobon (2003)
+- `generate_rigobon_data()` - Generate regime-based data
+- `validate_rigobon_assumptions()` - Test assumptions
+- `run_rigobon_estimation()` - Estimate model
+- `compare_rigobon_methods()` - Compare with alternatives
+
+### Prono (2014)
+- `generate_prono_data()` - Generate GARCH data
+- `run_prono_demo()` - Quick demonstration
+- `run_single_prono_simulation()` - Single estimation
+- `run_prono_monte_carlo()` - Monte Carlo analysis
+
+## Installation
+
+```r
+# Install from CRAN (when available)
+install.packages("hetid")
+
+# Install development version from GitHub
+# install.packages("devtools")
+devtools::install_github("your-github/hetid")
+```
+
+## Getting Help
+
+- **Documentation**: Use `?function_name` for any function
+- **Examples**: Each major function includes runnable examples
+- **Issues**: Report bugs at [GitHub Issues](https://github.com/your-github/hetid/issues)
+- **Citation**: Use `citation("hetid")` for citing the package
+
+## See Also
+
+- [Package website](https://your-website.github.io/hetid/)
+- [GitHub repository](https://github.com/your-github/hetid)
+- Original papers: Lewbel (2012), Rigobon (2003), Prono (2014)

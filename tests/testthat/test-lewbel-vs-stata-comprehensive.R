@@ -15,7 +15,7 @@ test_that("hetid matches Stata ivreg2h on single X", {
   # NOTE: With new DGP using stronger variance function (0.5 + 2*Z)
   # the estimates will be more precise
   expected_stata_coef <- -0.743  # Updated for new DGP
-  expected_stata_se <- 0.092     # Updated for new DGP
+  expected_stata_se <- 0.09228749     # Updated for new DGP - exact match with ivreg2h
 
   # Generate test data
   data <- generate_hetid_test_data(n = 1000, seed = 42)
