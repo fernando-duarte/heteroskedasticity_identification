@@ -5,7 +5,7 @@
 #==============================================================================
 # Build Stage - Install dependencies and build package
 #==============================================================================
-FROM rocker/r-ver:4.5.0 AS builder
+FROM rocker/r-ver:4.5.1 AS builder
 
 # Metadata labels following OCI standards
 LABEL org.opencontainers.image.title="hetid R Package Builder"
@@ -187,7 +187,7 @@ RUN R CMD build . && \
 #==============================================================================
 # Production Stage - Minimal runtime image
 #==============================================================================
-FROM rocker/r-ver:4.5.0 AS production
+FROM rocker/r-ver:4.5.1 AS production
 
 # Production metadata
 LABEL org.opencontainers.image.title="hetid R Package"
@@ -252,7 +252,7 @@ CMD ["R", "--slave", "-e", "library(hetid); cat('hetid package loaded successful
 #==============================================================================
 # Development Stage - Full development environment
 #==============================================================================
-FROM rocker/rstudio:4.5.0 AS development
+FROM rocker/rstudio:4.5.1 AS development
 
 # Development metadata
 LABEL org.opencontainers.image.title="hetid R Package Development"
