@@ -115,6 +115,22 @@ reference:
   - prono_diagonal_garch
   - replicate_prono_table2
 
+- title: "Klein & Vella (2010) Method"
+  desc: "Functions for semiparametric control function approach"
+  contents:
+  - generate_klein_vella_data
+  - verify_klein_vella_assumptions
+  - create_klein_vella_config
+  - klein_vella_parametric
+  - klein_vella_semiparametric
+  - run_klein_vella_demo
+  - run_klein_vella_monte_carlo
+  - compare_klein_vella_methods
+  - summary.klein_vella_fit
+  - print.klein_vella_fit
+  - print.klein_vella_semipar
+  - print.summary.klein_vella_fit
+
 - title: "Analysis"
   desc: "Functions for analyzing simulation results"
   contents:
