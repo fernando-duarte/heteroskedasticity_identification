@@ -1,6 +1,10 @@
 ---
 title: "GMM Estimation for Lewbel (2012) Heteroskedasticity-Based Identification"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
+  pdf_document:
+    latex_engine: xelatex
 vignette: >
   %\VignetteIndexEntry{GMM Estimation for Lewbel (2012) Heteroskedasticity-Based Identification}
   %\VignetteEngine{knitr::rmarkdown}
@@ -66,13 +70,8 @@ Y_2 &= X'\beta_2 + \gamma_2 Y_1 + \epsilon_2
 
 Note: Requires $\gamma_1 \gamma_2 \neq 1$ for identification.
 
-**Warning**: Simultaneous systems are numerically challenging and require strong
-heteroskedasticity patterns. They may fail to converge or produce unreliable
-estimates with insufficient heteroskedasticity variation. Consider using a
-triangular system when possible.
-
 ```{r gmm-simultaneous-system, eval=FALSE}
-# Generate data with multiple X variables
+# Generate data with multiple $X$ variables
 n_sim <- 1000
 data_sim <- data.frame(
   X1 = rnorm(n_sim),
@@ -144,14 +143,14 @@ gmm_cue <- lewbel_gmm(data, gmm_type = "cue")
 
 ## Custom Heteroskedasticity Drivers
 
-By default, centered X variables are used as heteroskedasticity drivers (Z). You can specify custom Z variables:
+By default, centered $X$ variables are used as heteroskedasticity drivers ($Z$). You can specify custom $Z$ variables:
 
 ```{r custom-heteroskedasticity-drivers, eval=FALSE}
-# Add custom Z variables
+# Add custom $Z$ variables
 data$Z1 <- data$Xk^2
 data$Z2 <- abs(data$Xk)
 
-# Estimate with custom Z
+# Estimate with custom $Z$
 gmm_custom <- lewbel_gmm(
   data,
   z_vars = c("Z1", "Z2")
@@ -269,8 +268,8 @@ print(boot_ci)
    - Use CUE when optimal efficiency is crucial
 
 2. **Heteroskedasticity Drivers**:
-   - Default (centered X) works well in most cases
-   - Custom Z variables can improve efficiency if theory suggests specific drivers
+   - Default (centered $X$) works well in most cases
+   - Custom $Z$ variables can improve efficiency if theory suggests specific drivers
 
 3. **Variance-Covariance Matrix**:
    - Use HAC (default) for time series or when autocorrelation is suspected
@@ -278,8 +277,8 @@ print(boot_ci)
    - Use clustered for grouped data
 
 4. **Sample Size**:
-   - GMM performs well with n > 500
-   - Consider bootstrap for n < 500
+   - GMM performs well with $n > 500$
+   - Consider bootstrap for $n < 500$
    - Check first-stage F-statistic for weak instruments
 
 5. **Model Selection**:

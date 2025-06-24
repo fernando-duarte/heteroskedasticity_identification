@@ -1,10 +1,16 @@
 ---
 title: "Comparing Lewbel (2012) Implementations"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
+  pdf_document:
+    latex_engine: xelatex
 vignette: >
   %\VignetteIndexEntry{Comparing Lewbel (2012) Implementations}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: references.bib
+csl: https://www.zotero.org/styles/journal-of-econometrics
 ---
 
 ```{r vignette-setup, include = FALSE}
@@ -27,23 +33,24 @@ if (requireNamespace("REndo", quietly = TRUE)) {
 
 This vignette provides a rigorous comparison of three implementations of Lewbel (2012)'s heteroskedasticity-based identification method:
 
-- **hetid** (this package) and **Stata's ivreg2h**: Identical implementation
-- **REndo's hetErrorsIV**: Valid but different approach
+- **[hetid](https://github.com/fernandd/hetid)** (this package)
+- **[Stata's ivreg2h](https://ideas.repec.org/c/boc/bocode/s457555.html)**
+- **[REndo](https://CRAN.R-project.org/package=REndo)**
 
-Through empirical verification, we demonstrate that **hetid** and Stata produce **identical** results to machine precision when implementing standard Lewbel (2012). REndo's `hetErrorsIV` produces slightly different results, using X directly instead of Z = X² - E[X²] for instrument construction, resulting in standard errors that are typically 2-4% smaller.
+Through verification, we demonstrate that **hetid** and Stata produce **identical** results to machine precision when implementing standard Lewbel (2012). REndo's `hetErrorsIV` produces slightly different results, using $X$ directly instead of $Z = X^2 - E[X^2]$ for instrument construction, resulting in standard errors that are typically 2-4% smaller.
 
-This vignette serves as both educational material and **empirical verification** of the claims made about implementation differences, providing reproducible evidence for academic validation.
+This vignette serves as both educational material and **verification** of the claims made about implementation differences, providing reproducible evidence for academic validation.
 
 ## Theoretical Framework
 
 Lewbel (2012) proposes constructing instruments as:
 $$IV = (Z - \bar{Z}) \cdot \hat{e}_2$$
 
-where $\hat{e}_2$ are residuals from first-stage regression and **Z can be any function of exogenous variables X**.
+where $\hat{e}_2$ are residuals from first-stage regression and $Z$ can be any function of exogenous variables $X$.
 
 ### Key Implementation Differences
 
-Both **hetid** and Stata implement Lewbel (2012) identically:
+Both **hetid** and **Stata** implement Lewbel (2012) identically:
 
 1. Run first-stage regression: $Y_2 = \beta_{20} + \beta_{21}X + \varepsilon_2$
 2. Obtain residuals: $\hat{e}_2 = Y_2 - \hat{\beta}_{20} - \hat{\beta}_{21}X$
@@ -52,14 +59,15 @@ Both **hetid** and Stata implement Lewbel (2012) identically:
 5. Demean the instrument: $IV = IV - \overline{IV}$
 6. Run 2SLS with instruments $\{X, IV\}$
 
-**Key Finding**: hetid and Stata produce identical results to 8+ decimal places.
+**Key Finding**: $\texttt{hetid}$ and Stata produce identical results to 8+ decimal places.
 
 **REndo's Implementation** uses a simpler approach:
+
 - Instead of using $Z = X^2 - E[X^2]$, REndo uses $Z = X$ directly
 - This is theoretically valid but captures less heteroskedasticity signal
 - Results in slightly different (typically smaller) standard errors
 
-## Empirical Verification
+## Verification
 
 We provide a simple demonstration followed by a comprehensive verification script at the end of this vignette.
 
@@ -371,22 +379,13 @@ cat("Ratio (finite/asymptotic):", round(result_finite$tsls_se / result_asymp$tsl
 
 ### Key Findings
 
-1. **Exact Match**: hetid and Stata produce identical results to 8+ decimal places
-2. **Point Identification**: hetid implements both point and set identification
-3. **REndo Difference**: Uses X instead of Z = X² - E[X²] for instruments
+1. **Exact Match**: $\texttt{hetid}$ and Stata produce identical results to 8+ decimal places
+2. **Point Identification**: $\texttt{hetid}$ implements both point and set identification
+3. **REndo Difference**: Uses $X$ instead of $Z = X^2 - E[X^2]$ for instruments
 4. **Standard Errors**: REndo's SEs are typically 2-4% smaller due to different instrument
-5. **Multiple Instruments**: hetid and Stata handle multiple instruments identically
+5. **Multiple Instruments**: $\texttt{hetid}$ and Stata handle multiple instruments identically
 
-### Recommendations
-
-#### For Practitioners
-
-1. Use hetid or ivreg2h for standard Lewbel (2012) implementation
-2. Be aware that REndo's hetErrorsIV implements a different method
-3. Check instrument strength with first-stage F-statistics
-4. Verify heteroskedasticity assumptions are met
-
-#### For Matching Software Results
+### For Matching Software Results
 
 ```{r matching-software-results}
 # To match Stata ivreg2h (asymptotic SEs):
@@ -415,23 +414,24 @@ cat("  SE:", round(result$tsls_se, 6), "\n")
 
 ### Implementation Differences Summary
 
-- **hetid/Stata**: Use Z = X² - E[X²] to maximize heteroskedasticity signal
-- **REndo**: Uses Z = X directly, which is simpler but may capture less heteroskedasticity
+- **hetid/Stata**: Use $Z = X^2 - E[X^2]$ to maximize heteroskedasticity signal
+- **REndo**: Uses $Z = X$ directly, which is simpler but may capture less heteroskedasticity
 - Both approaches satisfy Lewbel's identification conditions
 
 ### Final Conclusion
 
 Our rigorous empirical analysis demonstrates:
 
-- hetid and Stata implement identical Lewbel (2012) methodology using Z = X² - E[X²]
+- $\texttt{hetid}$ and Stata implement identical Lewbel (2012) methodology using $Z = X^2 - E[X^2]$
 - Both produce exactly matching results to 8+ decimal places
-- REndo's hetErrorsIV validly implements Lewbel (2012) using Z = X
+- REndo's $\texttt{hetErrorsIV}$ validly implements Lewbel (2012) using $Z = X$
 - This difference results in slightly different standard errors (typically 2-4% smaller)
-- All three implementations are theoretically correct but use different Z functions
+- All three implementations are theoretically correct but use different $Z$ functions
 
 For exact replication:
-- hetid with `df_adjust="asymptotic"` matches Stata exactly
-- REndo cannot be configured to match because it uses a different (but valid) Z
+
+- $\texttt{hetid}$ with `df_adjust="asymptotic"` matches Stata exactly
+- REndo cannot be configured to match because it uses a different (but valid) $Z$
 - Researchers should document which implementation they use
 
 ## See Also
@@ -443,8 +443,8 @@ For exact replication:
 
 ## References
 
-Lewbel, A. (2012). Using heteroscedasticity to identify and estimate mismeasured and endogenous regressor models. *Journal of Business & Economic Statistics*, 30(1), 67-80.
+@lewbel2012
 
-Baum, C. F., & Schaffer, M. E. (2012). IVREG2H: Stata module to perform instrumental variables estimation using heteroscedasticity-based instruments. Statistical Software Components S457555, Boston College Department of Economics.
+@baum2012ivreg2h
 
-Gui, R., Meierer, M., Schilter, P., & Algesheimer, R. (2023). REndo: Internal instrumental variables to address endogeneity. *Journal of Statistical Software*, 107(3), 1-43.
+@gui2023rendo

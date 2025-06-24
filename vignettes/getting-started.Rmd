@@ -1,6 +1,10 @@
 ---
 title: "Getting Started with hetid"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
+  pdf_document:
+    latex_engine: xelatex
 vignette: >
   %\VignetteIndexEntry{Getting Started with hetid}
   %\VignetteEngine{knitr::rmarkdown}

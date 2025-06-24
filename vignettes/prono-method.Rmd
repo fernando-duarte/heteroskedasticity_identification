@@ -2,7 +2,11 @@
 title: "Using Conditional Heteroskedasticity for Identification: The Prono (2014) Method"
 author: "Fernando Duarte"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
+  pdf_document:
+    latex_engine: xelatex
 vignette: >
   %\VignetteIndexEntry{Using Conditional Heteroskedasticity for Identification: The Prono (2014) Method}
   %\VignetteEngine{knitr::rmarkdown}
@@ -28,7 +32,7 @@ library(ggplot2)
 
 This vignette demonstrates the implementation of Prono (2014)'s method for using conditional heteroskedasticity to identify endogenous parameters in econometric models. This approach extends Lewbel (2012)'s heteroskedasticity-based identification to time series contexts where the heteroskedasticity follows a GARCH process.
 
-> **Related vignettes**: For theoretical background, see [Theory and Methods](heteroskedasticity-identification-theory.html). For cross-sectional methods, see [Getting Started](getting-started.html) (Lewbel) or [Rigobon Method](rigobon-method.html) (regime-based).
+> **Related vignettes**: For theoretical background, see [Theory and Methods](heteroskedasticity-identification-theory.html). For related methods, see [Getting Started](getting-started.html) (Lewbel) or [Rigobon Method](rigobon-method.html) (regime-based).
 
 ### The Basic Idea
 
@@ -44,6 +48,7 @@ Y_{2t} &= X_t'\beta_2 + \varepsilon_{2t}
 \end{aligned}$$
 
 where:
+
 - $Y_{2t}$ is endogenous (correlated with $\varepsilon_{1t}$)
 - $X_t$ are exogenous variables
 - $\varepsilon_{2t}$ follows a GARCH(1,1) process
@@ -70,6 +75,7 @@ run_prono_demo(n = 300)
 ### Understanding the Output
 
 The demo shows:
+
 - **True γ1**: The actual parameter value used to generate the data
 - **OLS estimate**: Biased due to endogeneity
 - **Prono IV estimate**: Should be less biased when the method works
@@ -262,7 +268,7 @@ ggplot(mc_results, aes(x = f_stat)) +
 
 ### Effect of GARCH Parameters
 
-Let's examine how the GARCH parameters affect identification strength:
+Let's examine how the GARCH parameters affect the strength of identification:
 
 <!-- The following sensitivity analyses are computationally intensive.
      Run these locally to explore parameter sensitivity. -->
@@ -375,13 +381,6 @@ install.packages("tsgarch")
 
 Without `tsgarch`, the method falls back to using squared residuals as a proxy for conditional variance, which is less efficient.
 
-### 2. When to Use This Method
-
-The Prono method is most appropriate when:
-- You have time series data
-- You suspect the error variance changes over time (heteroskedasticity)
-- The heteroskedasticity follows a persistent pattern (GARCH-like)
-- Traditional instruments are not available
 
 ### 3. Limitations
 
@@ -393,6 +392,7 @@ The Prono method is most appropriate when:
 ### 4. Diagnostics to Check
 
 Always verify:
+
 - First-stage F-statistic > 10 (preferably > 30)
 - GARCH model fits well (check residuals)
 - Results are robust to GARCH specification
@@ -414,6 +414,7 @@ The Prono method differs from the standard Lewbel approach in several ways:
 ### Monte Carlo Design from the Paper
 
 Prono (2014) uses the following simulation design:
+
 - Sample size: T = 1000 observations (after dropping first 200 for initialization)
 - Number of simulations: 1000
 - Model: Y₁ₜ = β₁₀ + β₂Y₂ₜ + ε₁ₜ, Y₂ₜ = δ + ε₂ₜ
@@ -424,7 +425,7 @@ Prono (2014) uses the following simulation design:
   - Other β parameters = 0
 - Two correlation states: ρ = 0.20 (low) and ρ = 0.40 (high)
 
-### Replication Exercise
+### Replication
 
 <!-- This replication code matches Prono's Monte Carlo design but is computationally intensive.
      Run locally with n_sims = 1000 to fully replicate Table II results. -->
@@ -606,14 +607,15 @@ print(p_fstats)
 
 ### Key Findings from Replication
 
-1. **Bias Pattern**: Our replication confirms the key finding that OLS bias increases with the correlation between errors (from ~0.2 when ρ=0.20 to ~0.4 when ρ=0.40).
+1. **Bias Pattern**: Our replication confirms the key finding that OLS bias increases with the correlation between errors (from $\sim 0.2$ when $\rho = 0.20$ to $\sim 0.4$ when $\rho = 0.40$).
 
 2. **Bias Reduction**: The Prono method substantially reduces bias compared to OLS, though our implementation doesn't achieve the near-zero bias reported in the paper. This difference likely stems from:
+
    - Using a simplified GARCH(1,1) rather than the full diagonal GARCH specification
    - Different GMM implementation details
    - Potential differences in numerical optimization
 
-3. **Instrument Strength**: First-stage F-statistics are consistently strong (mostly > 100), indicating the GARCH-based instruments have good predictive power.
+3. **Instrument Strength**: First-stage F-statistics are consistently strong (mostly $> 100$), indicating the GARCH-based instruments have good predictive power.
 
 4. **Practical Implications**: Even with our simplified implementation, the Prono method offers substantial improvements over OLS in the presence of endogeneity and conditional heteroskedasticity.
 
@@ -624,11 +626,13 @@ print(p_fstats)
 Prono (2014) uses the following data in his empirical application:
 
 1. **Portfolio Returns**: Fama-French 25 Size-B/M portfolios and 30 Industry portfolios
-2. **Market Return**: CRSP value-weighted index (Note: Prono uses CRSP data which requires a subscription)
+2. **Market Return**: CRSP value-weighted index
 3. **Risk-Free Rate**: 1-month Treasury bill rate
 4. **Fama-French Factors**: SMB and HML factors
 
 All data except CRSP can be freely downloaded using R packages.
+
+Since CRSP data requires a subscription, we use the Fama-French market factor (Rm-Rf) as a free alternative for the market return.
 
 ### R Packages for Data Access
 
@@ -695,7 +699,7 @@ tb_rate_3m <- fredr(
 
 ### Market Return Proxy
 
-Since CRSP data requires a subscription, we can use alternatives:
+Since CRSP data requires a subscription, we use a free alternative:
 
 ```{r market-proxy, eval=FALSE}
 # Option 1: Use Fama-French market factor (Rm-Rf) + risk-free rate
@@ -819,10 +823,6 @@ run_prono_asset_pricing <- function(data, window_size = 260) {
 3. **Time Period**: The paper uses July 5, 1963 to December 31, 2004. When replicating, ensure your data covers this period or adjust accordingly.
 
 4. **Data Quality**: The Kenneth French data library is widely used in academic research and is considered high quality. It's regularly updated and maintained.
-
-## Conclusion
-
-The Prono (2014) method provides a powerful alternative for identification in time series contexts where conditional heteroskedasticity is present. While it requires careful attention to GARCH modeling and diagnostic checking, it can substantially reduce endogeneity bias when properly applied.
 
 ## See Also
 

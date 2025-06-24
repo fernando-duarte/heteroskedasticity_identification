@@ -1,6 +1,10 @@
 ---
 title: "Identification Through Regime-Based Heteroskedasticity: The Rigobon Method"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
+  pdf_document:
+    latex_engine: xelatex
 vignette: >
   %\VignetteIndexEntry{Identification Through Regime-Based Heteroskedasticity: The Rigobon Method}
   %\VignetteEngine{knitr::rmarkdown}
@@ -25,7 +29,7 @@ library(tidyr)
 
 ## Introduction
 
-The `hetid` package now includes an implementation of Rigobon's (2003) identification through heteroskedasticity method. While Lewbel (2012) uses continuous functions of exogenous variables to drive heteroskedasticity, Rigobon's approach exploits discrete regime changes that affect the variance of structural errors. This vignette demonstrates how to use the Rigobon method and compares it with other identification strategies.
+While Lewbel (2012) uses continuous functions of exogenous variables to drive heteroskedasticity, Rigobon's approach exploits discrete regime changes that affect the variance of structural errors. This vignette demonstrates how to use the Rigobon method and compares it with other identification strategies.
 
 > **Related vignettes**: For theoretical foundations, see [Theory and Methods](heteroskedasticity-identification-theory.html). For the standard Lewbel approach, see [Getting Started](getting-started.html) or [GMM Estimation](lewbel-gmm.html).
 
@@ -37,26 +41,27 @@ Both methods exploit heteroskedasticity for identification, but differ in their 
 - **Rigobon (2003)**: Uses discrete regime indicators (dummy variables) that capture different variance states
 
 Rigobon's method is particularly useful when:
+
 - You have natural regime changes (policy shifts, market conditions, time periods)
 - The variance structure changes discretely across identifiable states
 - Traditional instruments are unavailable
 
 ## Theoretical Background
 
-Consider the same triangular system as in Lewbel:
+Consider the same triangular system:
 
 $$\begin{aligned}
-Y_1 &= \beta_{1,0} + \beta_{1,1}X + \gamma_1 Y_2 + \epsilon_1 \\
-Y_2 &= \beta_{2,0} + \beta_{2,1}X + \epsilon_2
+Y_1 &= \beta_{1,0} + \beta_{1,1}X + \gamma_1 Y_2 + \varepsilon_1 \\
+Y_2 &= \beta_{2,0} + \beta_{2,1}X + \varepsilon_2
 \end{aligned}$$
 
-Rigobon's key insight: If the variance of $\epsilon_2$ differs across regimes while the covariance between $\epsilon_1$ and $\epsilon_2$ remains constant, we can use regime indicators to construct instruments.
+Rigobon's key insight: If the variance of $\varepsilon_2$ differs across regimes while the covariance between $\varepsilon_1$ and $\varepsilon_2$ remains constant, we can use regime indicators to construct instruments.
 
 ### Key Assumptions
 
-1. **Heteroskedasticity across regimes**: $\text{Var}(\epsilon_2|regime = s) = \sigma^2_{2,s}$ varies by regime
-2. **Constant covariance**: $\text{Cov}(\epsilon_1, \epsilon_2|regime = s) = \sigma_{12}$ is constant
-3. **Covariance restriction**: $\text{Cov}(Z_s, \epsilon_1\epsilon_2) = 0$ where $Z_s$ is the centered regime dummy
+1. **Heteroskedasticity across regimes**: $\text{Var}(\varepsilon_2|\text{regime} = s) = \sigma^2_{2,s}$ varies by regime
+2. **Constant covariance**: $\text{Cov}(\varepsilon_1, \varepsilon_2|\text{regime} = s) = \sigma_{12}$ is constant
+3. **Covariance restriction**: $\text{Cov}(Z_s, \varepsilon_1\varepsilon_2) = 0$ where $Z_s$ is the centered regime dummy
 
 ## Basic Example: Two Regimes
 
@@ -359,30 +364,6 @@ cat(
 )
 ```
 
-## Practical Considerations
-
-### When to Use Rigobon's Method
-
-Rigobon's method is particularly suitable when:
-
-1. **Natural regime changes exist**: Policy changes, market conditions, time periods
-2. **Discrete variance shifts**: Clear changes in volatility across identifiable states
-3. **No traditional instruments**: When excluded instruments are unavailable
-4. **Multiple regimes available**: More regimes generally improve identification
-
-### Limitations and Caveats
-
-1. **Constant covariance assumption**: The correlation between errors must remain stable across regimes
-2. **Sufficient heteroskedasticity**: Variance differences must be large enough for identification
-3. **Regime assignment**: Regimes must be correctly identified and exogenous
-4. **Sample size per regime**: Each regime needs sufficient observations
-
-### Best Practices
-
-1. **Test for heteroskedasticity**: Always verify that variances differ significantly across regimes
-2. **Validate assumptions**: Use `validate_rigobon_assumptions()` before trusting results
-3. **Check instrument strength**: Ensure first-stage F-statistics exceed conventional thresholds
-4. **Consider multiple specifications**: Try different regime definitions when possible
 
 ## Advanced Example: Time-Based Regimes
 
@@ -453,6 +434,7 @@ The identification challenge in measuring financial contagion is that asset pric
 - **Relative variance restrictions**: Hard to justify ex-ante assumptions about shock magnitudes
 
 However, financial crises create natural regimes of different volatility:
+
 - **Tranquil periods**: Low volatility, normal market conditions
 - **Crisis periods**: High volatility during Mexican crisis (1994-95), Asian crisis (1997-98), Russian crisis (1998)
 
@@ -804,45 +786,7 @@ These results highlight how heteroskedasticity-based identification can solve ch
 
 ### Note on Data Availability
 
-The replication above uses **simulated data** calibrated to match the key characteristics documented in Rigobon's paper. The actual Brady bond price data from the 1990s is not publicly available because:
-
-1. **Proprietary Sources**: The original data came from commercial providers:
-   - JPMorgan's EMBI (Emerging Markets Bond Index)
-   - Salomon Brothers trading desks
-   - Bloomberg terminals
-   - IMF's proprietary SMPBASE database
-
-2. **Access Restrictions**: These historical datasets require expensive subscriptions and are typically only available to institutional investors and researchers with commercial data access.
-
-3. **No Public Archives**: Unlike some financial data, Brady bond prices from the 1990s have not been made publicly available through open data initiatives.
-
-If you need to work with actual Brady bond data for research purposes, you would need to:
-- Subscribe to commercial data services (Bloomberg, Refinitiv, etc.)
-- Contact JPMorgan for historical EMBI data
-- Check if your institution has access to these databases
-- Explore whether the IMF or World Bank can provide access for academic research
-
-Despite using simulated data, our replication captures the essential features of Rigobon's methodology and demonstrates how heteroskedasticity-based identification can detect financial contagion between sovereign bond markets.
-
-## Conclusion
-
-The Rigobon (2003) method provides a powerful alternative to traditional instrumental variables when:
-- Natural regime changes create heteroskedasticity
-- The variance structure changes discretely
-- Traditional instruments are unavailable
-
-Key takeaways:
-- Rigobon is a special case of Lewbel where Z variables are discrete regime indicators
-- The method requires significant variance differences across regimes
-- Multiple regimes can strengthen identification
-- Always validate the key assumptions before trusting results
-
-The `hetid` package provides a complete implementation with:
-- `generate_rigobon_data()`: Generate data with regime-based heteroskedasticity
-- `run_rigobon_estimation()`: Estimate the model using regime indicators
-- `validate_rigobon_assumptions()`: Test the identifying assumptions
-- `run_rigobon_analysis()`: Complete workflow with diagnostics
-- `compare_rigobon_methods()`: Compare with other identification strategies
+The replication above uses simulated data calibrated to match the key characteristics documented in Rigobon's paper, as the actual Brady bond price data from the 1990s is proprietary and not publicly available.
 
 ## See Also
 
@@ -854,12 +798,3 @@ The `hetid` package provides a complete implementation with:
 For theoretical details, see:
 - Rigobon, R. (2003). "Identification Through Heteroskedasticity." *The Review of Economics and Statistics*, 85(4), 777-792.
 - Lewbel, A. (2012). "Using Heteroscedasticity to Identify and Estimate Mismeasured and Endogenous Regressor Models." *Journal of Business & Economic Statistics*, 30(1), 67-80.
-
-# Example showing potential coefficient of variation for estimates if run in MC
-# This is a conceptual calculation
-# Example data: alpha_estimates <- rnorm(100, mean = 0.6, sd = 0.1) # from MC
-# beta_estimates <- rnorm(100, mean = 0.2, sd = 0.05)
-# if (exists("alpha_estimates") && exists("beta_estimates")) {
-# cat("CV for alpha estimates: ", round(sd(alpha_estimates) / mean(alpha_estimates), 3), "\n")
-# cat("CV for beta estimates: ", round(sd(beta_estimates) / mean(beta_estimates), 3), "\n")
-# }
