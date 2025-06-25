@@ -13,7 +13,7 @@ rigobon_gmm(
   regime_var = "regime",
   add_intercept = TRUE,
   gmm_type = "twoStep",
-  vcov = "HAC",
+  vcov = .hetid_const("VCOV_HAC"),
   initial_values = NULL,
   verbose = TRUE,
   ...

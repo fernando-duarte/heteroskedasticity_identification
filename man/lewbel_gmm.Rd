@@ -14,7 +14,7 @@ lewbel_gmm(
   add_intercept = TRUE,
   gmm_type = c("twoStep", "iterative", "cue"),
   initial_values = NULL,
-  vcov = c("HAC", "iid", "cluster"),
+  vcov = c(.hetid_const("VCOV_HAC"), "iid", "cluster"),
   cluster_var = NULL,
   compute_se = TRUE,
   verbose = FALSE,

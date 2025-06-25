@@ -4,7 +4,7 @@
 \alias{run_prono_demo}
 \title{Run Prono demonstration}
 \usage{
-run_prono_demo(n = 500, print_results = TRUE)
+run_prono_demo(n = .hetid_const("N_SMALL"), print_results = TRUE)
 }
 \arguments{
 \item{n}{Sample size}

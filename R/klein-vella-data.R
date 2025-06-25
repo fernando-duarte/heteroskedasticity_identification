@@ -188,8 +188,8 @@ generate_klein_vella_data <- function(config, return_true_values = FALSE) {
   log_var2 <- X %*% delta2
 
   # Cap extreme values to prevent numerical issues
-  log_var1 <- pmax(pmin(log_var1, 10), -10)
-  log_var2 <- pmax(pmin(log_var2, 10), -10)
+  log_var1 <- pmax(pmin(log_var1, .hetid_const("LOG_BOUND_MAX")), .hetid_const("LOG_BOUND_MIN"))
+  log_var2 <- pmax(pmin(log_var2, .hetid_const("LOG_BOUND_MAX")), .hetid_const("LOG_BOUND_MIN"))
 
   var1 <- exp(log_var1)
   var2 <- exp(log_var2)
@@ -295,7 +295,7 @@ verify_klein_vella_assumptions <- function(data, config = NULL, verbose = TRUE) 
   results$heteroskedasticity <- list(
     bp_y1 = bp_test1,
     bp_y2 = bp_test2,
-    passed = bp_test1$p.value < 0.05 && bp_test2$p.value < 0.05
+    passed = bp_test1$p.value < .hetid_const("ALPHA_DEFAULT") && bp_test2$p.value < .hetid_const("ALPHA_DEFAULT")
   )
 
   # Test 3: Check variance ratio variation
@@ -344,7 +344,7 @@ verify_klein_vella_assumptions <- function(data, config = NULL, verbose = TRUE) 
     results$constant_correlation <- list(
       correlations = correlations,
       sd = corr_sd,
-      passed = corr_sd < 0.2 # Somewhat arbitrary threshold
+      passed = corr_sd < .hetid_const("COV_VARIATION_THRESHOLD") # Somewhat arbitrary threshold
     )
   }
 
@@ -359,12 +359,12 @@ verify_klein_vella_assumptions <- function(data, config = NULL, verbose = TRUE) 
     message(sprintf(
       "   Y1 equation: BP stat = %.2f, p = %.4f %s",
       bp_test1$statistic, bp_test1$p.value,
-      ifelse(bp_test1$p.value < 0.05, "[PASS]", "[FAIL]")
+      ifelse(bp_test1$p.value < .hetid_const("ALPHA_DEFAULT"), "[PASS]", "[FAIL]")
     ))
     message(sprintf(
       "   Y2 equation: BP stat = %.2f, p = %.4f %s",
       bp_test2$statistic, bp_test2$p.value,
-      ifelse(bp_test2$p.value < 0.05, "[PASS]", "[FAIL]")
+      ifelse(bp_test2$p.value < .hetid_const("ALPHA_DEFAULT"), "[PASS]", "[FAIL]")
     ))
 
     if (!is.null(results$variance_ratio)) {
