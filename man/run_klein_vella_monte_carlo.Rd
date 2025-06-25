@@ -6,7 +6,7 @@
 \usage{
 run_klein_vella_monte_carlo(
   config,
-  n_sims = 500,
+  n_sims = .hetid_const("N_SMALL"),
   methods = c("ols", "klein_vella_param"),
   parallel = FALSE,
   n_cores = NULL,

@@ -24,7 +24,7 @@
 #' # Requires np package
 #' if (requireNamespace("np", quietly = TRUE)) {
 #'   config <- create_klein_vella_config(
-#'     n = 500,
+#'     n = .hetid_const("N_SMALL"),
 #'     beta1 = c(0.5, 1.5),
 #'     beta2 = c(1.0, -1.0),
 #'     gamma1 = -0.8,
@@ -44,8 +44,8 @@ klein_vella_semiparametric <- function(data,
                                        x_vars = NULL,
                                        bandwidth_method = "cv.aic",
                                        kernel_type = "gaussian",
-                                       max_iter = 50,
-                                       tol = 1e-6,
+                                       max_iter = .hetid_const("MAX_ITERATIONS_KLEIN_VELLA"),
+                                       tol = .hetid_const("EPSILON_TOLERANCE"),
                                        verbose = TRUE) {
   # Check if np package is available
   if (!requireNamespace("np", quietly = TRUE)) {
@@ -122,7 +122,7 @@ klein_vella_semiparametric <- function(data,
       # Estimate conditional variance
       np_fit2 <- np::npreg(bw2)
       s2_squared <- fitted(np_fit2)
-      s2_squared <- pmax(s2_squared, 1e-6) # Ensure positivity
+      s2_squared <- pmax(s2_squared, .hetid_const("EPSILON_TOLERANCE")) # Ensure positivity
       s2 <- sqrt(s2_squared)
     },
     error = function(e) {
@@ -182,7 +182,7 @@ klein_vella_semiparametric <- function(data,
 
         np_fit1 <- np::npreg(bw1)
         s1_squared <- fitted(np_fit1)
-        s1_squared <- pmax(s1_squared, 1e-6)
+        s1_squared <- pmax(s1_squared, .hetid_const("EPSILON_TOLERANCE"))
         s1 <- sqrt(s1_squared)
       },
       error = function(e) {
@@ -497,7 +497,7 @@ compare_klein_vella_methods <- function(data,
 #' @return Data frame with Monte Carlo results
 #' @export
 run_klein_vella_monte_carlo <- function(config,
-                                        n_sims = 500,
+                                        n_sims = .hetid_const("N_SMALL"),
                                         methods = c("ols", "klein_vella_param"),
                                         parallel = FALSE,
                                         n_cores = NULL,

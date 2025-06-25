@@ -139,7 +139,7 @@ lewbel_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars, z_v
   gamma2 <- theta[2 * k + 2]
 
   # Check identification condition
-  if (abs(gamma1 * gamma2 - 1) < 0.1) {
+  if (abs(gamma1 * gamma2 - 1) < .hetid_const("IDENTIFICATION_TOLERANCE")) {
     warning("gamma1 * gamma2 is close to 1, which may lead to identification problems")
   }
 
@@ -260,7 +260,7 @@ lewbel_gmm <- function(data,
                        add_intercept = TRUE,
                        gmm_type = c("twoStep", "iterative", "cue"),
                        initial_values = NULL,
-                       vcov = c("HAC", "iid", "cluster"),
+                       vcov = c(.hetid_const("VCOV_HAC"), "iid", "cluster"),
                        cluster_var = NULL,
                        compute_se = TRUE,
                        verbose = FALSE,
@@ -359,7 +359,7 @@ lewbel_gmm <- function(data,
     if (system == .hetid_const("SYSTEM$TRIANGULAR")) {
       initial_values <- c(beta1_init_vec, gamma1_init_val, beta2_init_vec)
     } else { # simultaneous
-      gamma2_init_val <- 0.1 # Small initial value for gamma2
+      gamma2_init_val <- .hetid_const("IDENTIFICATION_TOLERANCE") # Small initial value for gamma2
       initial_values <- c(beta1_init_vec, gamma1_init_val, beta2_init_vec, gamma2_init_val)
     }
 
@@ -628,7 +628,7 @@ print.lewbel_gmm <- function(x, ...) {
     cat("  ", gamma2_name, " (Y2 on Y1) = ", round(gamma2, 4), "\n", sep = "")
     if (!is.na(gamma1) && !is.na(gamma2)) {
       cat("  Product (gamma1 * gamma2) = ", round(gamma1 * gamma2, 4), "\n")
-      if (abs(gamma1 * gamma2 - 1) < 0.1) {
+      if (abs(gamma1 * gamma2 - 1) < .hetid_const("IDENTIFICATION_TOLERANCE")) {
         cat("  Warning: gamma1 * gamma2 is close to 1, check identification.\n")
       }
     }
@@ -973,7 +973,7 @@ prono_gmm <- function(data,
                       fit_garch = TRUE,
                       add_intercept = TRUE,
                       gmm_type = "twoStep",
-                      vcov = "HAC",
+                      vcov = .hetid_const("VCOV_HAC"),
                       initial_values = NULL,
                       compute_se = TRUE,
                       verbose = TRUE,
@@ -1295,7 +1295,7 @@ rigobon_gmm <- function(data,
                         regime_var = "regime",
                         add_intercept = TRUE,
                         gmm_type = "twoStep",
-                        vcov = "HAC",
+                        vcov = .hetid_const("VCOV_HAC"),
                         initial_values = NULL,
                         verbose = TRUE,
                         ...) {
@@ -1337,7 +1337,7 @@ rigobon_gmm <- function(data,
       initial_values <- c(coef(ols1)[-2], coef(ols1)[2], coef(ols2))
     } else {
       # For simultaneous, add gamma2
-      initial_values <- c(coef(ols1)[-2], coef(ols1)[2], coef(ols2), 0.1)
+      initial_values <- c(coef(ols1)[-2], coef(ols1)[2], coef(ols2), .hetid_const("IDENTIFICATION_TOLERANCE"))
     }
   }
 

@@ -42,12 +42,12 @@
 #' \code{\link{run_prono_monte_carlo}} for Monte Carlo analysis
 #'
 #' @export
-generate_prono_data <- function(n = 500,
+generate_prono_data <- function(n = .hetid_const("N_SMALL"),
                                 beta1 = c(0.05, 0.01),
                                 beta2 = c(0.097, -0.005),
                                 gamma1 = 1.0,
                                 k = 1,
-                                garch_params = list(omega = 0.2, alpha = 0.1, beta = 0.85),
+                                garch_params = list(omega = .hetid_const("GARCH$OMEGA_DEFAULT"), alpha = .hetid_const("GARCH$ALPHA_DEFAULT"), beta = .hetid_const("GARCH$BETA_DEFAULT")),
                                 sigma1 = 1.5,
                                 rho = 0.3,
                                 seed = NULL) {
@@ -334,7 +334,7 @@ run_single_prono_simulation <- function(config, return_details = FALSE) {
 #' @importFrom utils txtProgressBar setTxtProgressBar
 #' @export
 run_prono_monte_carlo <- function(config,
-                                  n_sims = 1000,
+                                  n_sims = .hetid_const("N_DEFAULT"),
                                   parallel = FALSE,
                                   n_cores = NULL,
                                   progress = TRUE) {
@@ -427,7 +427,7 @@ run_prono_monte_carlo <- function(config,
 #'
 #' @return Configuration list with parameters scaled for percent returns
 #' @export
-create_prono_config <- function(n = 500, k = 1, ...) {
+create_prono_config <- function(n = .hetid_const("N_SMALL"), k = 1, ...) {
   # Default configuration for percent-scale returns matching Prono (2014)
   config <- list(
     # Sample size
@@ -441,9 +441,9 @@ create_prono_config <- function(n = 500, k = 1, ...) {
 
     # GARCH parameters for percent returns
     garch_params = list(
-      omega = 0.2, # For ~2% weekly volatility: 0.2/(1-0.1-0.85) = 4, sqrt(4) = 2%
-      alpha = 0.1, # ARCH coefficient
-      beta = 0.85 # GARCH coefficient (alpha + beta < 1)
+      omega = .hetid_const("GARCH$OMEGA_DEFAULT"), # For ~2% weekly volatility: 0.2/(1-0.1-0.85) = 4, sqrt(4) = 2%
+      alpha = .hetid_const("GARCH$ALPHA_DEFAULT"), # ARCH coefficient
+      beta = .hetid_const("GARCH$BETA_DEFAULT") # GARCH coefficient (alpha + beta < 1)
     ),
 
     # Error parameters
@@ -492,7 +492,7 @@ create_prono_config <- function(n = 500, k = 1, ...) {
 #' }
 #'
 #' @export
-run_prono_demo <- function(n = 500, print_results = TRUE) {
+run_prono_demo <- function(n = .hetid_const("N_SMALL"), print_results = TRUE) {
   cat("==================================================\n")
   cat("Prono (2014) GARCH-Based Identification Demo\n")
   cat("==================================================\n\n")
