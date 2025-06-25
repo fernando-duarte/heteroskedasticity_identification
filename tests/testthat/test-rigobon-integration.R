@@ -115,18 +115,15 @@ test_that("run_rigobon_demo runs without error", {
   expect_true(all(c("data", "params", "results", "comparison") %in% names(demo)))
 
   # Check comparison data frame
-  expect_s3_class(demo$comparison, "data.frame")
-  expect_equal(nrow(demo$comparison), 2) # OLS and Rigobon
+  assert_valid_dataframe(demo$comparison, expected_rows = 2)
   expect_true(all(c("Method", "Estimate", "StdError", "Bias", "RMSE") %in% names(demo$comparison)))
 })
 
 test_that("Rigobon method integrates with existing Lewbel framework", {
   skip_if_not_integration_test()
   # Generate Rigobon data
-  params <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = -0.5, alpha2 = 1.0,
+  params <- create_rigobon_params(
+    n_regimes = 2,
     regime_probs = c(0.5, 0.5),
     sigma2_regimes = c(1.0, 2.0)
   )

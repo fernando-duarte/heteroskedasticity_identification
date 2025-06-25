@@ -2,14 +2,11 @@
 
 test_that("calculate_lewbel_bounds handles weak identification", {
   # Create data where cov_z_w2sq is very small
-  params <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = 0, alpha2 = 0, delta_het = 0 # No heteroskedasticity
-  )
+  params <- create_test_params(delta_het = 0)
+  params$alpha1 <- 0
+  params$alpha2 <- 0
 
-  set.seed(123)
-  data <- generate_lewbel_data(50, params)
+  data <- create_test_data(n = 50, params = params)
   # Manually set Z to be constant to trigger weak identification
   data$Z <- rep(1, nrow(data))
 
@@ -22,15 +19,11 @@ test_that("calculate_lewbel_bounds handles weak identification", {
 
 test_that("calculate_lewbel_bounds handles negative discriminant", {
   # Create a small dataset that might produce negative discriminant
-  params <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = -0.5, alpha2 = 1.0, delta_het = 0.1
-  )
+  params <- create_test_params(delta_het = 0.1)
 
   # Use very small sample size and high tau
   set.seed(456)
-  data <- generate_lewbel_data(10, params)
+  data <- create_test_data(n = 10, params = params)
 
   bounds <- calculate_lewbel_bounds(data, tau = 0.99)
 
@@ -42,15 +35,11 @@ test_that("calculate_lewbel_bounds handles negative discriminant", {
 
 test_that("calculate_lewbel_bounds handles bootstrap failures", {
   # Create data that causes bootstrap to fail
-  params <- list(
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    alpha1 = -0.5, alpha2 = 1.0, delta_het = 1.2
-  )
+  params <- create_test_params()
 
   # Very small dataset
   set.seed(789)
-  data <- generate_lewbel_data(5, params)
+  data <- create_test_data(n = 5, params = params)
 
   # Try to compute bootstrap SE with very small data
   bounds <- calculate_lewbel_bounds(
@@ -87,14 +76,13 @@ test_that("run_single_lewbel_simulation handles OLS failures", {
 
 test_that("run_single_lewbel_simulation handles weak instruments", {
   # Create params that lead to weak instruments
-  params <- list(
-    sample_size = 20, # Small sample size
-    beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
-    beta2_0 = 1.0, beta2_1 = -1.0,
-    # Very weak heteroskedasticity
-    alpha1 = 0.01, alpha2 = 0.01, delta_het = 0.01,
-    tau_set_id = 0.2, bootstrap_reps = 5
+  base_params <- create_test_params(delta_het = 0.01)
+  params <- c(
+    list(sample_size = 20, tau_set_id = 0.2, bootstrap_reps = 5),
+    base_params
   )
+  params$alpha1 <- 0.01
+  params$alpha2 <- 0.01
 
   set.seed(222)
   result <- run_single_lewbel_simulation(1, params)

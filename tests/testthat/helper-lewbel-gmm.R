@@ -1,17 +1,5 @@
 # Helper functions for Lewbel GMM tests
 
-# Suppress expected GARCH NaN warnings
-suppress_garch_nan_warning <- function(expr) {
-  withCallingHandlers(
-    expr,
-    warning = function(w) {
-      if (grepl("NaNs produced", conditionMessage(w))) {
-        invokeRestart("muffleWarning")
-      }
-    }
-  )
-}
-
 # Generate test data for Lewbel GMM
 create_lewbel_test_data <- function(n = 500, seed = 42, params = NULL) {
   set.seed(seed)

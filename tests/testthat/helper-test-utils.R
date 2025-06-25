@@ -175,3 +175,89 @@ expect_error_pattern <- function(expr, pattern) {
   }
   expect_error(expr, pattern)
 }
+
+#' Assert that a plot object is valid ggplot
+#' @param plot_obj The plot object to check
+#' @param required_layers Optional vector of required layer types
+assert_valid_ggplot <- function(plot_obj, required_layers = NULL) {
+  expect_s3_class(plot_obj, "ggplot")
+  expect_true("data" %in% names(plot_obj))
+  expect_true("layers" %in% names(plot_obj))
+
+  if (!is.null(required_layers)) {
+    layer_types <- sapply(plot_obj$layers, function(l) class(l$geom)[1])
+    for (layer in required_layers) {
+      expect_true(layer %in% layer_types)
+    }
+  }
+}
+
+#' Create small test config for fast testing
+#' @param ... Additional parameters to override defaults
+#' @return Configuration list with small values for fast tests
+create_small_test_config <- function(num_simulations = 5,
+                                    main_sample_size = 50,
+                                    bootstrap_reps = 10,
+                                    ...) {
+  create_default_config(
+    num_simulations = num_simulations,
+    main_sample_size = main_sample_size,
+    bootstrap_reps = bootstrap_reps,
+    ...
+  )
+}
+
+#' Run a simulation and check basic properties
+#' @param config Configuration object
+#' @param seeds Seeds object
+#' @param sim_function Simulation function to run
+#' @param expected_cols Expected column names in results
+#' @param suppress_messages Whether to suppress messages
+run_and_check_simulation <- function(config, seeds,
+                                    sim_function = run_main_simulation,
+                                    expected_cols = NULL,
+                                    suppress_messages = TRUE) {
+  if (suppress_messages) {
+    results <- suppressMessages(sim_function(config, seeds))
+  } else {
+    results <- sim_function(config, seeds)
+  }
+
+  assert_valid_dataframe(results)
+
+  if (!is.null(expected_cols)) {
+    expect_true(all(expected_cols %in% names(results)))
+  }
+
+  results
+}
+
+#' Assert that estimation results have expected structure
+#' @param result Estimation result object
+#' @param method Method name (e.g., "ols", "tsls", "gmm")
+#' @param expected_coefs Expected coefficient names
+assert_valid_estimation_result <- function(result, method = NULL,
+                                          expected_coefs = NULL) {
+  expect_type(result, "list")
+
+  # Check for common components
+  expect_true("estimates" %in% names(result) || "coefficients" %in% names(result))
+
+  if (!is.null(method)) {
+    if (method %in% c("ols", "tsls")) {
+      expect_true("se" %in% names(result))
+      expect_true("model" %in% names(result))
+    }
+  }
+
+  if (!is.null(expected_coefs)) {
+    coef_names <- if ("estimates" %in% names(result)) {
+      names(result$estimates)
+    } else {
+      names(result$coefficients)
+    }
+    for (coef in expected_coefs) {
+      expect_true(coef %in% coef_names)
+    }
+  }
+}
