@@ -17,13 +17,14 @@ klein_vella_semiparametric(
 )
 }
 \arguments{
-\item{data}{Data frame containing Y1, Y2, and X variables}
+\item{data}{Data frame containing all required variables. Must include the
+dependent variables and any exogenous regressors specified in the model.}
 
-\item{y1_var}{Name of first endogenous variable (default: "Y1")}
+\item{y1_var}{Character. Name of first endogenous variable (default: "Y1").}
 
-\item{y2_var}{Name of second endogenous variable (default: "Y2")}
+\item{y2_var}{Character. Name of second endogenous variable (default: "Y2").}
 
-\item{x_vars}{Names of exogenous variables (default: auto-detect)}
+\item{x_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 
 \item{bandwidth_method}{Method for bandwidth selection ("cv.aic", "cv.ls", "rule.of.thumb")}
 
@@ -33,7 +34,7 @@ klein_vella_semiparametric(
 
 \item{tol}{Convergence tolerance}
 
-\item{verbose}{Whether to print progress information}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 List containing estimation results

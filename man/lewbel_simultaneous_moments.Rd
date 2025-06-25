@@ -27,9 +27,9 @@ dependent variables and any exogenous regressors specified in the model.}
 
 \item{x_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 
-\item{z_vars}{Character vector. Names of heteroskedasticity drivers (default: NULL).}
+\item{z_vars}{Character vector. Names of heteroskedasticity drivers (default: NULL, uses centered X).}
 
-\item{add_intercept}{Logical. Whether to add an intercept to the exogenous variables.}
+\item{add_intercept}{Logical. Whether to add an intercept to the exogenous variables (default: TRUE).}
 
 \item{z_sq}{Logical. Whether to include squared terms in the Z matrix for simultaneous equations.}
 }
@@ -45,8 +45,10 @@ For the simultaneous system:
 \deqn{Y_1 = X'\beta_1 + \gamma_1 Y_2 + \epsilon_1}
 \deqn{Y_2 = X'\beta_2 + \gamma_2 Y_1 + \epsilon_2}
 
+where \eqn{\epsilon_1} and \eqn{\epsilon_2} are the structural errors.
+Note: Requires \eqn{\gamma_1 \gamma_2 \neq 1} for identification.
+
 The moment conditions are the same as the triangular system.
-Note: Requires gamma1 * gamma2 != 1 for identification.
 }
 \references{
 Lewbel, A. (2012). Using heteroscedasticity to identify and estimate

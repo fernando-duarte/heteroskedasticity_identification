@@ -28,7 +28,7 @@ dependent variables and any exogenous regressors specified in the model.}
 
 \item{z_vars}{Character vector. Names of heteroskedasticity drivers (default: NULL, uses centered X).}
 
-\item{add_intercept}{Logical. Whether to add an intercept to the exogenous variables.}
+\item{add_intercept}{Logical. Whether to add an intercept to the exogenous variables (default: TRUE).}
 }
 \value{
 Matrix of moment conditions (n x q).
@@ -41,6 +41,8 @@ using Lewbel's heteroskedasticity-based identification.
 For the triangular system:
 \deqn{Y_1 = X'\beta_1 + \gamma_1 Y_2 + \epsilon_1}
 \deqn{Y_2 = X'\beta_2 + \epsilon_2}
+
+where \eqn{\epsilon_1} and \eqn{\epsilon_2} are the structural errors.
 
 The moment conditions are:
 \itemize{

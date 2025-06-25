@@ -18,13 +18,17 @@ run_rigobon_estimation(
 
 \item{endog_var}{Character. Name of endogenous variable (default: "Y2").}
 
-\item{exog_vars}{Character vector. Names of exogenous variables (default: "Xk").}
-
 \item{regime_var}{Character. Name of regime indicator variable (default: "regime").}
 
-\item{df_adjust}{Character. Degrees of freedom adjustment: "asymptotic" or "finite" (default: "asymptotic").}
+\item{df_adjust}{Character. Method for degrees of freedom adjustment:
+\itemize{
+\item "asymptotic": No adjustment (default)
+\item "finite": Finite sample adjustment using HC2 formula
+}}
 
 \item{return_diagnostics}{Logical. Whether to return additional diagnostic information (default: FALSE).}
+
+\item{x_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 }
 \value{
 If return_diagnostics = FALSE: A list with:

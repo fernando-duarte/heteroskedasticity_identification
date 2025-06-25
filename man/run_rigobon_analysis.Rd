@@ -24,16 +24,16 @@ parameters suitable for demonstration.}
 \item{data}{Data.frame. Optional. Pre-existing data with regime indicators.
 If provided, skips data generation.}
 
-\item{regime_var}{Character. Name of regime variable in data (default: "regime").}
+\item{regime_var}{Character. Name of regime indicator variable (default: "regime").}
 
 \item{endog_var}{Character. Name of endogenous variable (default: "Y2").}
-
-\item{exog_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 
 \item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 
 \item{return_all}{Logical. Whether to return all intermediate results
 (default: FALSE).}
+
+\item{x_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 }
 \value{
 A list containing:

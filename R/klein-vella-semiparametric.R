@@ -1,14 +1,14 @@
 #' Semiparametric Klein & Vella estimation
 #'
-#' @param data Data frame containing Y1, Y2, and X variables
-#' @param y1_var Name of first endogenous variable (default: "Y1")
-#' @param y2_var Name of second endogenous variable (default: "Y2")
-#' @param x_vars Names of exogenous variables (default: auto-detect)
+#' @template param-data
+#' @template param-y1-var
+#' @template param-y2-var
+#' @template param-x-vars
 #' @param bandwidth_method Method for bandwidth selection ("cv.aic", "cv.ls", "rule.of.thumb")
 #' @param kernel_type Kernel type for nonparametric regression
 #' @param max_iter Maximum iterations for the nested optimization
 #' @param tol Convergence tolerance
-#' @param verbose Whether to print progress information
+#' @template param-verbose
 #'
 #' @return List containing estimation results
 #' @export

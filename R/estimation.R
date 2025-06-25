@@ -132,8 +132,7 @@ calculate_lewbel_bounds <- function(data,
 #' @param sim_id Integer. Simulation run identifier.
 #' @param params List. Parameters for data generation and estimation.
 #' @param endog_var Character. Name of endogenous variable (default: "Y2").
-#' @param exog_vars Character vector. Names of exogenous variables
-#'   (default: "Xk").
+#' @template param-x-vars
 #' @param compute_bounds_se Logical. Whether to compute bootstrap SE for bounds
 #'   (default: FALSE).
 #' @param return_models Logical. Whether to return the fitted model objects
@@ -450,9 +449,9 @@ run_single_lewbel_simulation <- function(sim_id,
 #'
 #' @param data Data.frame. Must contain Y1, Y2, X variables, and regime indicator.
 #' @param endog_var Character. Name of endogenous variable (default: "Y2").
-#' @param exog_vars Character vector. Names of exogenous variables (default: "Xk").
-#' @param regime_var Character. Name of regime indicator variable (default: "regime").
-#' @param df_adjust Character. Degrees of freedom adjustment: "asymptotic" or "finite" (default: "asymptotic").
+#' @template param-x-vars
+#' @template param-regime-var
+#' @template param-df-adjust
 #' @param return_diagnostics Logical. Whether to return additional diagnostic information (default: FALSE).
 #'
 #' @return If return_diagnostics = FALSE: A list with:

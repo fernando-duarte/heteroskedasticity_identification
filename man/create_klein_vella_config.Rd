@@ -39,7 +39,7 @@ create_klein_vella_config(
 
 \item{seed}{Random seed}
 
-\item{verbose}{Whether to print information}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 List containing configuration parameters

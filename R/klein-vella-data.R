@@ -10,7 +10,7 @@
 #' @param delta2 Variance function parameters for epsilon2 (length k+1)
 #' @param x_dist Distribution of X variables ("normal", "uniform", "mixed")
 #' @param seed Random seed
-#' @param verbose Whether to print information
+#' @template param-verbose
 #'
 #' @return List containing configuration parameters
 #' @export
@@ -252,7 +252,7 @@ generate_klein_vella_data <- function(config, return_true_values = FALSE) {
 #'
 #' @param data Data frame with Y1, Y2, and X variables
 #' @param config Optional configuration object for comparison
-#' @param verbose Whether to print detailed results
+#' @template param-verbose
 #'
 #' @return List with test results
 #' @export

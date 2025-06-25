@@ -11,7 +11,7 @@ verify_klein_vella_assumptions(data, config = NULL, verbose = TRUE)
 
 \item{config}{Optional configuration object for comparison}
 
-\item{verbose}{Whether to print detailed results}
+\item{verbose}{Logical. Whether to print progress messages (default: TRUE).}
 }
 \value{
 List with test results

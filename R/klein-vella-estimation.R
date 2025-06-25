@@ -1,12 +1,12 @@
 #' Parametric Klein & Vella estimation
 #'
-#' @param data Data frame containing Y1, Y2, and X variables
-#' @param y1_var Name of first endogenous variable (default: "Y1")
-#' @param y2_var Name of second endogenous variable (default: "Y2")
-#' @param x_vars Names of exogenous variables (default: auto-detect)
+#' @template param-data
+#' @template param-y1-var
+#' @template param-y2-var
+#' @template param-x-vars
 #' @param variance_type Type of variance function ("exponential", "power", "linear")
 #' @param optimization_method Optimization method for nonlinear least squares
-#' @param verbose Whether to print progress information
+#' @template param-verbose
 #'
 #' @return List containing estimation results
 #' @export

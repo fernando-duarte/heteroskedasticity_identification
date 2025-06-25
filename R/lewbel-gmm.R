@@ -91,17 +91,15 @@ NULL
 #' @param theta Numeric vector. Parameters to estimate: c(beta1, gamma1, beta2).
 #' @template param-data
 #' @template param-y-vars
-#' @param x_vars Character vector. Names of exogenous variables (default: "Xk").
-#' @param z_vars Character vector. Names of heteroskedasticity drivers (default: NULL, uses centered X).
-#' @param add_intercept Logical. Whether to add an intercept to the exogenous variables.
+#' @template param-x-vars
+#' @template param-z-vars
+#' @template param-add-intercept
 #'
 #' @return Matrix of moment conditions (n x q).
 #'
-#' @details
-#' For the triangular system:
-#' \deqn{Y_1 = X'\beta_1 + \gamma_1 Y_2 + \epsilon_1}
-#' \deqn{Y_2 = X'\beta_2 + \epsilon_2}
+#' @template details-triangular-system
 #'
+#' @details
 #' The moment conditions are:
 #' \itemize{
 #'   \item \eqn{E[X \times \epsilon_1] = 0}
@@ -131,20 +129,17 @@ lewbel_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars, z_var
 #' @param theta Numeric vector. Parameters: c(beta1, gamma1, beta2, gamma2).
 #' @template param-data
 #' @template param-y-vars
-#' @param x_vars Character vector. Names of exogenous variables (default: "Xk").
-#' @param z_vars Character vector. Names of heteroskedasticity drivers (default: NULL).
-#' @param add_intercept Logical. Whether to add an intercept to the exogenous variables.
+#' @template param-x-vars
+#' @template param-z-vars
+#' @template param-add-intercept
 #' @param z_sq Logical. Whether to include squared terms in the Z matrix for simultaneous equations.
 #'
 #' @return Matrix of moment conditions (n x q).
 #'
-#' @details
-#' For the simultaneous system:
-#' \deqn{Y_1 = X'\beta_1 + \gamma_1 Y_2 + \epsilon_1}
-#' \deqn{Y_2 = X'\beta_2 + \gamma_2 Y_1 + \epsilon_2}
+#' @template details-simultaneous-system
 #'
+#' @details
 #' The moment conditions are the same as the triangular system.
-#' Note: Requires gamma1 * gamma2 != 1 for identification.
 #'
 #' @seealso
 #' \code{\link{lewbel_gmm}} for the main GMM estimation function.
@@ -169,9 +164,9 @@ lewbel_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars, z_v
 #'   Note: Simultaneous systems require strong identification conditions - either many
 #'   regimes (4+) or large variance differences across regimes for numerical stability.
 #' @template param-y-vars
-#' @param x_vars Character vector. Names of exogenous variables (default: "Xk").
-#' @param z_vars Character vector. Names of heteroskedasticity drivers (default: NULL).
-#' @param add_intercept Logical. Whether to add an intercept to the exogenous variables (default: TRUE).
+#' @template param-x-vars
+#' @template param-z-vars
+#' @template param-add-intercept
 #' @param gmm_type Character. GMM type: "twoStep", "iterative", or "cue" (default: "twoStep").
 #' @param initial_values Numeric vector. Initial parameter values (default: NULL, uses OLS).
 #' @param vcov Character. Type of variance-covariance matrix: "HAC", "iid", or "cluster" (default: "HAC").

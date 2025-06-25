@@ -25,9 +25,9 @@
 #'   parameters suitable for demonstration.
 #' @param data Data.frame. Optional. Pre-existing data with regime indicators.
 #'   If provided, skips data generation.
-#' @param regime_var Character. Name of regime variable in data (default: "regime").
+#' @template param-regime-var
 #' @param endog_var Character. Name of endogenous variable (default: "Y2").
-#' @param exog_vars Character vector. Names of exogenous variables (default: "Xk").
+#' @template param-x-vars
 #' @template param-verbose
 #' @param return_all Logical. Whether to return all intermediate results
 #'   (default: FALSE).

@@ -35,7 +35,7 @@ regimes (4+) or large variance differences across regimes for numerical stabilit
 
 \item{x_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 
-\item{z_vars}{Character vector. Names of heteroskedasticity drivers (default: NULL).}
+\item{z_vars}{Character vector. Names of heteroskedasticity drivers (default: NULL, uses centered X).}
 
 \item{add_intercept}{Logical. Whether to add an intercept to the exogenous variables (default: TRUE).}
 

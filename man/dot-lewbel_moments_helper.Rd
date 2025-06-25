@@ -30,7 +30,7 @@ dependent variables and any exogenous regressors specified in the model.}
 
 \item{z_vars}{Character vector. Names of heteroskedasticity drivers (default: NULL, uses centered X).}
 
-\item{add_intercept}{Logical. Whether to add an intercept to the exogenous variables.}
+\item{add_intercept}{Logical. Whether to add an intercept to the exogenous variables (default: TRUE).}
 
 \item{system}{Character. "triangular" or "simultaneous"}
 

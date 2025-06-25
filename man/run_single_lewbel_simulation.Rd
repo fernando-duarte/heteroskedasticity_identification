@@ -21,9 +21,6 @@ run_single_lewbel_simulation(
 
 \item{endog_var}{Character. Name of endogenous variable (default: "Y2").}
 
-\item{exog_vars}{Character vector. Names of exogenous variables
-(default: "Xk").}
-
 \item{compute_bounds_se}{Logical. Whether to compute bootstrap SE for bounds
 (default: FALSE).}
 
@@ -35,6 +32,8 @@ run_single_lewbel_simulation(
 \item "asymptotic": No adjustment (default)
 \item "finite": Finite sample adjustment using HC2 formula
 }}
+
+\item{x_vars}{Character vector. Names of exogenous variables (default: "Xk").}
 }
 \value{
 If return_models = FALSE: A data.frame with one row containing
