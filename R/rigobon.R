@@ -174,7 +174,7 @@ run_rigobon_analysis <- function(n_obs = .hetid_const("N_DEFAULT"),
 
     # Instrument strength assessment
     avg_f <- mean(estimation_results$first_stage_f_stats)
-    if (avg_f < 10) {
+    if (avg_f < .hetid_const("WEAK_INSTRUMENT_F_THRESHOLD")) {
       cat(
         "\nWARNING: Average first-stage F =", round(avg_f, 2),
         "< 10 (weak instruments)\n"
@@ -325,7 +325,7 @@ validate_rigobon_assumptions <- function(data,
 
   # Simple test: coefficient of variation
   cv_covariances <- sd(covariances) / abs(mean(covariances))
-  constant_cov_valid <- cv_covariances < 0.2 # Less than 20% variation
+  constant_cov_valid <- cv_covariances < .hetid_const("COV_VARIATION_THRESHOLD") # Less than 20% variation
 
   # Compile results
   results <- list(

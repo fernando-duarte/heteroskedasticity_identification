@@ -5,12 +5,13 @@
 \title{Prono (2014) Heteroskedasticity-Based Identification with GARCH}
 \usage{
 generate_prono_data(
-  n = 500,
+  n = .hetid_const("N_SMALL"),
   beta1 = c(0.05, 0.01),
   beta2 = c(0.097, -0.005),
   gamma1 = 1,
   k = 1,
-  garch_params = list(omega = 0.2, alpha = 0.1, beta = 0.85),
+  garch_params = list(omega = .hetid_const("GARCH$OMEGA_DEFAULT"), alpha =
+    .hetid_const("GARCH$ALPHA_DEFAULT"), beta = .hetid_const("GARCH$BETA_DEFAULT")),
   sigma1 = 1.5,
   rho = 0.3,
   seed = NULL

@@ -48,9 +48,10 @@ Note: This parameter currently only affects the
 interpretation of bootstrap SEs, not the bounds calculation itself.
 
 Under the relaxed assumption
-\eqn{|\mathrm{Corr}(Z, \epsilon_1 \epsilon_2)| \le \tau\,|\mathrm{Corr}(Z, \epsilon_2^2)|},
-the parameter \eqn{\gamma_1} is set-identified. The bounds are computed as the
-real roots of a quadratic equation in \eqn{\gamma_1}.
+\eqn{|\mathrm{Corr}(Z, \epsilon_1 \epsilon_2)| \le
+       \tau\,|\mathrm{Corr}(Z, \epsilon_2^2)|},
+the parameter \eqn{\gamma_1} is set-identified. The bounds are computed as
+the real roots of a quadratic equation in \eqn{\gamma_1}.
 }
 \examples{
 \dontrun{
