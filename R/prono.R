@@ -47,7 +47,11 @@ generate_prono_data <- function(n = .hetid_const("N_SMALL"),
                                 beta2 = c(0.097, -0.005),
                                 gamma1 = 1.0,
                                 k = 1,
-                                garch_params = list(omega = .hetid_const("GARCH$OMEGA_DEFAULT"), alpha = .hetid_const("GARCH$ALPHA_DEFAULT"), beta = .hetid_const("GARCH$BETA_DEFAULT")),
+                                garch_params = list(
+                                  omega = .hetid_const("GARCH$OMEGA_DEFAULT"),
+                                  alpha = .hetid_const("GARCH$ALPHA_DEFAULT"),
+                                  beta = .hetid_const("GARCH$BETA_DEFAULT")
+                                ),
                                 sigma1 = 1.5,
                                 rho = 0.3,
                                 seed = NULL) {
