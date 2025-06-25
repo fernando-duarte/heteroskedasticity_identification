@@ -9,13 +9,13 @@ test_that("generate_rigobon_data works correctly", {
     regime_probs = c(0.4, 0.6),
     sigma2_regimes = c(1.0, 2.5)
   )
-  data_2reg <- generate_rigobon_data(1000, params_2reg)
+  data_2reg <- generate_rigobon_data(n_large * 2, params_2reg)
 
   # Verify data structure
-  verify_rigobon_data(data_2reg, n_expected = 1000, n_regimes = 2)
+  verify_rigobon_data(data_2reg, n_expected = n_large * 2, n_regimes = 2)
 
   # Test regime assignment
-  test_regime_assignment(data_2reg, c(0.4, 0.6), tolerance = 0.1)
+  test_regime_assignment(data_2reg, c(0.4, 0.6), tolerance = test_tolerance_tight)
 
   # Three-regime case
   params_3reg <- create_rigobon_params(
@@ -23,10 +23,10 @@ test_that("generate_rigobon_data works correctly", {
     regime_probs = c(0.3, 0.4, 0.3),
     sigma2_regimes = c(0.5, 1.0, 2.0)
   )
-  data_3reg <- generate_rigobon_data(500, params_3reg)
+  data_3reg <- generate_rigobon_data(n_large, params_3reg)
 
   # Verify data structure
-  verify_rigobon_data(data_3reg, n_expected = 500, n_regimes = 3)
+  verify_rigobon_data(data_3reg, n_expected = n_large, n_regimes = 3)
 })
 
 test_that("generate_rigobon_data validates inputs", {
@@ -38,7 +38,7 @@ test_that("generate_rigobon_data validates inputs", {
     alpha1 = -0.5, alpha2 = 1.0
   )
   expect_error(
-    generate_rigobon_data(100, params_bad),
+    generate_rigobon_data(n_medium, params_bad),
     "params must contain 'regime_probs' and 'sigma2_regimes'"
   )
 
@@ -47,7 +47,7 @@ test_that("generate_rigobon_data validates inputs", {
   params_mismatch$regime_probs <- c(0.5, 0.5)
   params_mismatch$sigma2_regimes <- c(1.0)
   expect_error(
-    generate_rigobon_data(100, params_mismatch),
+    generate_rigobon_data(n_medium, params_mismatch),
     "Length of sigma2_regimes must match"
   )
 
@@ -56,7 +56,7 @@ test_that("generate_rigobon_data validates inputs", {
   params_bad_probs$regime_probs <- c(0.3, 0.4)
   params_bad_probs$sigma2_regimes <- c(1.0, 2.0)
   expect_error(
-    generate_rigobon_data(100, params_bad_probs),
+    generate_rigobon_data(n_medium, params_bad_probs),
     "regime_probs must sum to 1"
   )
 })
@@ -65,15 +65,15 @@ test_that("run_rigobon_estimation works correctly", {
   skip_if_not_integration_test()
 
   # Generate test data
-  data <- create_rigobon_test_data(n = 1000, n_regimes = 2, seed = 42)
+  data <- create_rigobon_test_data(n = n_large * 2, n_regimes = 2, seed = seed_alt)
 
   # Run standard test
   result <- run_rigobon_test(
     data = data,
     method = "cue",
     check_gamma1 = TRUE,
-    true_gamma1 = -0.8,
-    tolerance = 0.2
+    true_gamma1 = test_gamma1_true,
+    tolerance = test_tolerance_normal
   )
 })
 
@@ -81,10 +81,10 @@ test_that("run_rigobon_estimation handles edge cases", {
   skip_if_not_integration_test()
   # Only one regime (should fail)
   data_single <- data.frame(
-    Y1 = rnorm(100),
-    Y2 = rnorm(100),
-    Xk = rnorm(100),
-    regime = rep(1, 100)
+    Y1 = rnorm(n_medium),
+    Y2 = rnorm(n_medium),
+    Xk = rnorm(n_medium),
+    regime = rep(1, n_medium)
   )
   expect_error(
     run_rigobon_estimation(data_single),
@@ -93,9 +93,9 @@ test_that("run_rigobon_estimation handles edge cases", {
 
   # Missing variables
   data_missing <- data.frame(
-    Y1 = rnorm(100),
-    Xk = rnorm(100),
-    regime = sample(1:2, 100, replace = TRUE)
+    Y1 = rnorm(n_medium),
+    Xk = rnorm(n_medium),
+    regime = sample(1:2, n_medium, replace = TRUE)
   )
   expect_error(
     run_rigobon_estimation(data_missing),
@@ -107,16 +107,15 @@ test_that("run_rigobon_demo runs without error", {
   skip_if_not_integration_test()
   # Capture output to avoid test noise
   expect_no_error({
-    demo <- run_rigobon_demo(n_obs = 100, verbose = FALSE)
+    demo <- run_rigobon_demo(n_obs = n_medium, verbose = FALSE)
   })
 
   # Check return structure
-  expect_type(demo, "list")
-  expect_true(all(c("data", "params", "results", "comparison") %in% names(demo)))
+  assert_list_structure(demo, c("data", "params", "results", "comparison"))
 
   # Check comparison data frame
-  assert_valid_dataframe(demo$comparison, expected_rows = 2)
-  expect_true(all(c("Method", "Estimate", "StdError", "Bias", "RMSE") %in% names(demo$comparison)))
+  assert_valid_dataframe(demo$comparison, expected_rows = 2,
+                        required_cols = c("Method", "Estimate", "StdError", "Bias", "RMSE"))
 })
 
 test_that("Rigobon method integrates with existing Lewbel framework", {
@@ -128,7 +127,7 @@ test_that("Rigobon method integrates with existing Lewbel framework", {
     sigma2_regimes = c(1.0, 2.0)
   )
 
-  data <- generate_rigobon_data(200, params)
+  data <- generate_rigobon_data(n_medium * 2, params)
 
   # The centered regime dummies (Z1, Z2) should work as heteroskedasticity drivers
   # similar to Lewbel's Z = X^2 - E[X^2]
@@ -138,15 +137,15 @@ test_that("Rigobon method integrates with existing Lewbel framework", {
   cov_z1_e1e2 <- cov(data$Z1, data$epsilon1 * data$epsilon2)
   cov_z2_e1e2 <- cov(data$Z2, data$epsilon1 * data$epsilon2)
 
-  expect_true(abs(cov_z1_e1e2) < 0.1) # Should be close to 0
-  expect_true(abs(cov_z2_e1e2) < 0.1)
+  expect_true(abs(cov_z1_e1e2) < test_tolerance_tight) # Should be close to 0
+  expect_true(abs(cov_z2_e1e2) < test_tolerance_tight)
 
   # Check that we have heteroskedasticity: Cov(Z, epsilon2^2) != 0
   cov_z1_e2sq <- cov(data$Z1, data$epsilon2^2)
   cov_z2_e2sq <- cov(data$Z2, data$epsilon2^2)
 
   # At least one should be significantly different from 0
-  expect_true(abs(cov_z1_e2sq) > 0.1 || abs(cov_z2_e2sq) > 0.1)
+  expect_true(abs(cov_z1_e2sq) > test_tolerance_tight || abs(cov_z2_e2sq) > test_tolerance_tight)
 })
 
 test_that("Rigobon handles multiple X variables", {
@@ -176,30 +175,27 @@ test_that("Rigobon handles multiple X variables", {
 # Tests for run_rigobon_analysis
 test_that("run_rigobon_analysis works with default parameters", {
   skip_if_not_integration_test()
-  set.seed(123)
+  set.seed(seed_default)
 
   # Test with generated data
-  results <- run_rigobon_analysis(n_obs = 200, verbose = FALSE)
+  results <- run_rigobon_analysis(n_obs = n_medium * 2, verbose = FALSE)
 
-  expect_type(results, "list")
-  expect_true(all(c("estimates", "diagnostics", "data") %in% names(results)))
+  assert_list_structure(results, c("estimates", "diagnostics", "data"))
 
   # Check estimates structure
-  expect_s3_class(results$estimates, "data.frame")
-  expect_equal(nrow(results$estimates), 2)
-  expect_true(all(c("Method", "Estimate", "StdError") %in% names(results$estimates)))
+  assert_valid_dataframe(results$estimates, expected_rows = 2,
+                        required_cols = c("Method", "Estimate", "StdError"))
 
   # Check diagnostics
-  expect_true(all(c(
+  assert_list_structure(results$diagnostics, c(
     "heteroskedasticity_test", "first_stage_F",
     "regime_proportions", "n_regimes"
-  ) %in% names(results$diagnostics)))
+  ))
   expect_type(results$diagnostics$heteroskedasticity_test$p_value, "double")
   expect_type(results$diagnostics$first_stage_F, "double")
 
   # Check data
-  expect_s3_class(results$data, "data.frame")
-  expect_equal(nrow(results$data), 200)
+  assert_valid_dataframe(results$data, expected_rows = n_medium * 2)
 })
 
 test_that("run_rigobon_analysis works with custom parameters", {
@@ -234,7 +230,7 @@ test_that("run_rigobon_analysis works with existing data", {
     sigma2_regimes = c(1.0, 2.0)
   )
 
-  test_data <- generate_rigobon_data(300, params)
+  test_data <- generate_rigobon_data(n_medium * 3, params)
 
   # Run analysis with existing data
   results <- run_rigobon_analysis(
@@ -243,13 +239,13 @@ test_that("run_rigobon_analysis works with existing data", {
   )
 
   expect_identical(results$data, test_data)
-  expect_s3_class(results$estimates, "data.frame")
+  assert_valid_dataframe(results$estimates)
 })
 
 test_that("run_rigobon_analysis with return_all option", {
   skip_if_not_integration_test()
   results <- run_rigobon_analysis(
-    n_obs = 100,
+    n_obs = n_medium,
     verbose = FALSE,
     return_all = TRUE
   )
@@ -257,13 +253,13 @@ test_that("run_rigobon_analysis with return_all option", {
   # Check additional components
   expect_true("models" %in% names(results))
   expect_true("instruments" %in% names(results))
-  expect_true(all(c("ols", "tsls") %in% names(results$models)))
+  assert_list_structure(results$models, c("ols", "tsls"))
 })
 
 test_that("run_rigobon_analysis handles custom variable names", {
   skip_if_not_integration_test()
   # Generate data with custom structure
-  n <- 200
+  n <- n_medium * 2
   data <- data.frame(
     outcome = rnorm(n),
     endog = rnorm(n),
@@ -284,7 +280,7 @@ test_that("run_rigobon_analysis handles custom variable names", {
     verbose = FALSE
   )
 
-  expect_s3_class(results$estimates, "data.frame")
+  assert_valid_dataframe(results$estimates)
   expect_equal(results$diagnostics$n_regimes, 3)
 })
 
@@ -300,16 +296,15 @@ test_that("validate_rigobon_assumptions detects valid assumptions", {
     sigma2_regimes = c(0.5, 3.0) # Stronger heteroskedasticity difference
   )
 
-  set.seed(123) # Different seed for more reliable results
-  data <- generate_rigobon_data(1500, params) # Larger sample
+  set.seed(seed_default) # Different seed for more reliable results
+  data <- generate_rigobon_data(n_large * 3, params) # Larger sample
 
   validation <- validate_rigobon_assumptions(data, verbose = FALSE)
 
-  expect_type(validation, "list")
-  expect_true(all(c(
+  assert_list_structure(validation, c(
     "regime_heteroskedasticity", "covariance_restriction",
     "constant_covariance", "all_valid"
-  ) %in% names(validation)))
+  ))
 
   # Should detect heteroskedasticity in equation2
   expect_true(validation$regime_heteroskedasticity$equation2$significant)
@@ -325,7 +320,7 @@ test_that("validate_rigobon_assumptions detects valid assumptions", {
 test_that("validate_rigobon_assumptions detects violations", {
   skip_if_not_integration_test()
   # Create data with no heteroskedasticity
-  n <- 500
+  n <- n_large
   data <- data.frame(
     Y1 = rnorm(n),
     Y2 = rnorm(n),
@@ -376,21 +371,20 @@ test_that("validate_rigobon_assumptions returns correct structure", {
     sigma2_regimes = c(0.5, 3.0) # Stronger heteroskedasticity difference
   )
 
-  set.seed(123)
-  data <- generate_rigobon_data(1500, params)
+  set.seed(seed_default)
+  data <- generate_rigobon_data(n_large * 3, params)
 
   validation <- validate_rigobon_assumptions(data, verbose = FALSE)
 
   # Test structure
-  expect_type(validation, "list")
-  expect_true(all(c(
+  assert_list_structure(validation, c(
     "regime_heteroskedasticity", "covariance_restriction",
     "constant_covariance", "all_valid"
-  ) %in% names(validation)))
+  ))
 
   # Check heteroskedasticity test structure
   expect_type(validation$regime_heteroskedasticity, "list")
-  expect_true(all(c("equation1", "equation2") %in% names(validation$regime_heteroskedasticity)))
+  assert_list_structure(validation$regime_heteroskedasticity, c("equation1", "equation2"))
   expect_true("p_value" %in% names(validation$regime_heteroskedasticity$equation1))
   expect_true("significant" %in% names(validation$regime_heteroskedasticity$equation1))
 
@@ -399,12 +393,12 @@ test_that("validate_rigobon_assumptions returns correct structure", {
   expect_true(length(validation$covariance_restriction) > 0)
   # Each regime should have test results
   for (regime_test in validation$covariance_restriction) {
-    expect_true(all(c("covariance", "t_stat", "p_value", "valid") %in% names(regime_test)))
+    assert_list_structure(regime_test, c("covariance", "t_stat", "p_value", "valid"))
   }
 
   # Check constant covariance structure
   expect_type(validation$constant_covariance, "list")
-  expect_true(all(c("covariances", "cv", "valid") %in% names(validation$constant_covariance)))
+  assert_list_structure(validation$constant_covariance, c("covariances", "cv", "valid"))
 
   # Should detect heteroskedasticity in equation2
   expect_true(validation$regime_heteroskedasticity$equation2$significant)
@@ -439,13 +433,11 @@ test_that("compare_rigobon_methods works with all methods", {
     verbose = FALSE
   )
 
-  expect_s3_class(comparison, "data.frame")
-  expect_equal(nrow(comparison), 3) # OLS, Rigobon, Lewbel
-  expect_true(all(c(
+  assert_valid_dataframe(comparison, expected_rows = 3) # OLS, Rigobon, Lewbel
+  assert_list_structure(comparison, c(
     "Method", "Estimate", "StdError", "TrueValue",
     "Bias", "RelativeBias_pct", "FirstStageF", "Details"
-  )
-  %in% names(comparison)))
+  ))
 
   # Check that all estimates are numeric
   expect_true(all(is.numeric(comparison$Estimate)))
@@ -467,7 +459,7 @@ test_that("compare_rigobon_methods works with subset of methods", {
     sigma2_regimes = c(1.0, 2.0)
   )
 
-  data <- generate_rigobon_data(300, params)
+  data <- generate_rigobon_data(n_medium * 3, params)
 
   # Only OLS and Rigobon
   comparison <- compare_rigobon_methods(
@@ -512,7 +504,7 @@ test_that("compare_rigobon_methods handles data without Lewbel Z", {
     sigma2_regimes = c(1.0, 2.0)
   )
 
-  data <- generate_rigobon_data(200, params)
+  data <- generate_rigobon_data(n_medium * 2, params)
   # No Z variable, so Lewbel should be skipped
 
   comparison <- compare_rigobon_methods(
@@ -529,7 +521,7 @@ test_that("compare_rigobon_methods handles data without Lewbel Z", {
 
 test_that("compare_rigobon_methods verbose output works", {
   skip_if_not_integration_test()
-  data <- generate_rigobon_data(100, list(
+  data <- generate_rigobon_data(n_medium, list(
     beta1_0 = 0.5, beta1_1 = 1.5, gamma1 = -0.8,
     beta2_0 = 1.0, beta2_1 = -1.0,
     alpha1 = -0.5, alpha2 = 1.0,

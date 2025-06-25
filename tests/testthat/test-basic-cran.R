@@ -10,11 +10,10 @@ test_that("package can be loaded", {
 test_that("create_default_config works", {
   config <- create_default_config()
 
-  expect_type(config, "list")
-  expect_true(all(c(
+  assert_list_structure(config, c(
     "num_simulations", "main_sample_size", "gamma1", "beta1_0", "beta1_1",
     "beta2_0", "beta2_1", "alpha1", "alpha2", "delta_het"
-  ) %in% names(config)))
+  ))
   expect_equal(config$gamma1, -0.8)
   expect_equal(config$main_sample_size, 1000) # Default from constants
 })
@@ -43,10 +42,8 @@ test_that("generate_all_seeds works", {
   config <- create_default_config(num_simulations = 5)
   all_seeds <- generate_all_seeds(config)
 
-  expect_type(all_seeds, "list")
-  # Correct expected names based on actual function implementation
-  expect_true(all(
-    c("main", "by_n", "by_delta", "bootstrap_demo") %in% names(all_seeds)
-  ))
+  assert_list_structure(all_seeds,
+    c("main", "by_n", "by_delta", "bootstrap_demo")
+  )
   expect_equal(length(all_seeds$main), 5)
 })

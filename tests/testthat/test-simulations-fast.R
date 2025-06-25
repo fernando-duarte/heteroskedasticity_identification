@@ -10,14 +10,14 @@ test_that("run_single_lewbel_simulation works", {
     single_sim <- run_single_lewbel_simulation(1, config)
   })
 
-  expect_s3_class(single_sim, "data.frame")
-  expect_true(all(c(
+  assert_valid_dataframe(single_sim)
+  assert_list_structure(single_sim, c(
     "ols_gamma1", "tsls_gamma1", "first_stage_F", "bound_lower_tau_set",
     "bound_upper_tau_set"
-  ) %in% names(single_sim)))
-  expect_type(single_sim$ols_gamma1, "double")
-  expect_type(single_sim$tsls_gamma1, "double")
-  expect_type(single_sim$first_stage_F, "double")
+  ))
+  assert_valid_numeric(single_sim$ols_gamma1)
+  assert_valid_numeric(single_sim$tsls_gamma1)
+  assert_valid_numeric(single_sim$first_stage_F)
   # Check that all values in first_stage_F are numeric
   expect_true(all(is.numeric(single_sim$first_stage_F)))
 })
@@ -32,11 +32,10 @@ test_that("run_main_simulation works", {
     main_results <- run_main_simulation(config_small, seeds_small)
   })
 
-  expect_s3_class(main_results, "data.frame")
-  expect_equal(nrow(main_results), 3)
-  expect_true(all(c(
+  assert_valid_dataframe(main_results, expected_rows = 3)
+  assert_list_structure(main_results, c(
     "ols_gamma1", "tsls_gamma1", "first_stage_F"
-  ) %in% names(main_results)))
+  ))
   expect_true(all(!is.na(main_results$ols_gamma1)))
 
   # 2SLS results depend on availability of AER or ivreg packages
@@ -52,7 +51,7 @@ test_that("run_main_simulation works", {
 test_that("run_sample_size_analysis works", {
   skip_if_not_fast_test()
   config_tiny <- create_default_config(
-    n_reps_by_n = 2, sample_sizes = c(100, 200)
+    n_reps_by_n = 2, sample_sizes = c(n_medium, n_medium * 2)
   )
   seeds_tiny <- generate_all_seeds(config_tiny)
 
@@ -60,16 +59,16 @@ test_that("run_sample_size_analysis works", {
     sample_results <- run_sample_size_analysis(config_tiny, seeds_tiny)
   })
 
-  expect_s3_class(sample_results, "data.frame")
-  expect_true("sample_size" %in% names(sample_results))
-  expect_true(all(sample_results$sample_size %in% c(100, 200)))
+  assert_valid_dataframe(sample_results)
+  assert_list_structure(sample_results, "sample_size")
+  expect_true(all(sample_results$sample_size %in% c(n_medium, n_medium * 2)))
   expect_true(nrow(sample_results) >= 4) # At least 2 reps * 2 sample sizes
 })
 
 test_that("run_sensitivity_analysis works", {
   skip_if_not_fast_test()
   config_sens <- create_default_config(
-    n_reps_by_delta = 2, delta_het_values = c(0.8, 1.2)
+    n_reps_by_delta = 2, delta_het_values = c(test_gamma1_true, delta_het_moderate)
   )
   seeds_sens <- generate_all_seeds(config_sens)
 
@@ -77,16 +76,16 @@ test_that("run_sensitivity_analysis works", {
     sens_results <- run_sensitivity_analysis(config_sens, seeds_sens)
   })
 
-  expect_s3_class(sens_results, "data.frame")
-  expect_true("delta_het" %in% names(sens_results))
-  expect_true(all(sens_results$delta_het %in% c(0.8, 1.2)))
+  assert_valid_dataframe(sens_results)
+  assert_list_structure(sens_results, "delta_het")
+  expect_true(all(sens_results$delta_het %in% c(test_gamma1_true, delta_het_moderate)))
   expect_true(nrow(sens_results) >= 4) # At least 2 reps * 2 delta values
 })
 
 test_that("run_bootstrap_demonstration works", {
   skip_if_not_fast_test()
   config_boot <- create_default_config(
-    bootstrap_demo_size = 2, bootstrap_reps = 5
+    bootstrap_demo_size = 2, bootstrap_reps = n_boot_tiny
   )
   seeds_boot <- generate_all_seeds(config_boot)
 
@@ -94,12 +93,12 @@ test_that("run_bootstrap_demonstration works", {
     bootstrap_demo <- run_bootstrap_demonstration(config_boot, seeds_boot)
   })
 
-  expect_s3_class(bootstrap_demo, "data.frame")
-  expect_true("sim_id" %in% names(bootstrap_demo))
+  assert_valid_dataframe(bootstrap_demo)
+  assert_list_structure(bootstrap_demo, "sim_id")
   expect_true(nrow(bootstrap_demo) >= 2) # At least 2 demo_size
-  expect_true(all(c(
+  assert_list_structure(bootstrap_demo, c(
     "bound_lower_tau_set", "bound_upper_tau_set"
-  ) %in% names(bootstrap_demo)))
+  ))
 })
 
 test_that("run_lewbel_demo works", {
@@ -108,10 +107,9 @@ test_that("run_lewbel_demo works", {
     demo_results <- run_lewbel_demo(num_simulations = 2, verbose = FALSE)
   })
 
-  expect_type(demo_results, "list")
-  expect_true(all(c(
+  assert_list_structure(demo_results, c(
     "config", "results_main", "analysis"
-  ) %in% names(demo_results)))
-  expect_s3_class(demo_results$results_main, "data.frame")
-  expect_type(demo_results$analysis, "list")
+  ))
+  assert_valid_dataframe(demo_results$results_main)
+  assert_list_structure(demo_results$analysis, names(demo_results$analysis))
 })

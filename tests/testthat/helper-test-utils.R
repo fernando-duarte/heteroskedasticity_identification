@@ -261,3 +261,16 @@ assert_valid_estimation_result <- function(result, method = NULL,
     }
   }
 }
+
+#' Assert that a list has expected structure
+#' @param obj The object to check
+#' @param required_names Required names in the list
+#' @param exact If TRUE, the list must have exactly these names
+assert_list_structure <- function(obj, required_names, exact = FALSE) {
+  expect_type(obj, "list")
+  if (exact) {
+    expect_setequal(names(obj), required_names)
+  } else {
+    expect_true(all(required_names %in% names(obj)))
+  }
+}

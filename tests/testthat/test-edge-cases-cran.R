@@ -22,24 +22,21 @@ test_that("generate_lewbel_data with small sample size works", {
   )
 
   # Test with very small sample size
-  data <- generate_lewbel_data(5, params)
-  expect_equal(nrow(data), 5)
-  expect_s3_class(data, "data.frame")
+  data <- generate_lewbel_data(n_tiny / 2, params)
+  assert_valid_dataframe(data, expected_rows = n_tiny / 2)
 })
 
 test_that("calculate_lewbel_bounds with extreme tau values works", {
   config <- create_default_config()
-  data <- generate_lewbel_data(50, config)
+  data <- generate_lewbel_data(n_small, config)
 
   # Test with very small tau
-  bounds_small <- calculate_lewbel_bounds(data, tau = 0.01)
-  expect_type(bounds_small, "list")
-  expect_true("bounds" %in% names(bounds_small))
+  bounds_small <- calculate_lewbel_bounds(data, tau = alpha_conservative)
+  assert_list_structure(bounds_small, "bounds")
 
   # Test with larger tau
-  bounds_large <- calculate_lewbel_bounds(data, tau = 0.5)
-  expect_type(bounds_large, "list")
-  expect_true("bounds" %in% names(bounds_large))
+  bounds_large <- calculate_lewbel_bounds(data, tau = test_tolerance_loose)
+  assert_list_structure(bounds_large, "bounds")
 })
 
 test_that("create_default_config with extreme values works", {
@@ -48,21 +45,21 @@ test_that("create_default_config with extreme values works", {
   expect_equal(config_small$num_simulations, 1)
 
   # Test with very small sample size
-  config_tiny_n <- create_default_config(main_sample_size = 10)
-  expect_equal(config_tiny_n$main_sample_size, 10)
+  config_tiny_n <- create_default_config(main_sample_size = n_tiny)
+  expect_equal(config_tiny_n$main_sample_size, n_tiny)
 })
 
 test_that("generate_seed_matrix with edge cases works", {
   # Test with single row
-  seeds_single <- generate_seed_matrix(123, 1, 5)
-  expect_equal(dim(seeds_single), c(1, 5))
+  seeds_single <- generate_seed_matrix(seed_default, 1, n_sim_tiny)
+  expect_equal(dim(seeds_single), c(1, n_sim_tiny))
 
   # Test with single column
-  seeds_col <- generate_seed_matrix(123, 3, 1)
+  seeds_col <- generate_seed_matrix(seed_default, 3, 1)
   expect_equal(dim(seeds_col), c(3, 1))
 
   # Test with 1x1 matrix
-  seeds_one <- generate_seed_matrix(123, 1, 1)
+  seeds_one <- generate_seed_matrix(seed_default, 1, 1)
   expect_equal(dim(seeds_one), c(1, 1))
 })
 
@@ -76,8 +73,7 @@ test_that("simulation functions handle minimal configurations", {
   suppressWarnings({
     single_result <- run_single_lewbel_simulation(1, config_minimal)
   })
-  expect_type(single_result, "list")
-  expect_true(all(c("ols_gamma1", "tsls_gamma1") %in% names(single_result)))
+  assert_list_structure(single_result, c("ols_gamma1", "tsls_gamma1"))
 
   # Test main simulation with 1 run
   seeds_minimal <- generate_all_seeds(config_minimal)
