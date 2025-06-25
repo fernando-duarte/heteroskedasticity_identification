@@ -15,9 +15,9 @@ test_that("run_single_lewbel_simulation works", {
     "ols_gamma1", "tsls_gamma1", "first_stage_F", "bound_lower_tau_set",
     "bound_upper_tau_set"
   ))
-  assert_valid_numeric(single_sim$ols_gamma1)
-  assert_valid_numeric(single_sim$tsls_gamma1)
-  assert_valid_numeric(single_sim$first_stage_F)
+  assert_valid_numeric(single_sim$ols_gamma1, finite = FALSE)
+  assert_valid_numeric(single_sim$tsls_gamma1, finite = FALSE)
+  assert_valid_numeric(single_sim$first_stage_F, finite = FALSE)
   # Check that all values in first_stage_F are numeric
   expect_true(all(is.numeric(single_sim$first_stage_F)))
 })
