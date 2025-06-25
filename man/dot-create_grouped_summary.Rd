@@ -2,7 +2,7 @@
 % Please edit documentation in R/analysis.R
 \name{.create_grouped_summary}
 \alias{.create_grouped_summary}
-\title{Internal helper for creating summary statistics}
+\title{Internal helper for creating summary statistics for different grouping variables}
 \usage{
 .create_grouped_summary(
   results_data,
@@ -30,6 +30,6 @@
 Data frame with summary statistics
 }
 \description{
-Unified function to create summary statistics for different grouping variables
+Internal helper for creating summary statistics for different grouping variables
 }
 \keyword{internal}
