@@ -30,9 +30,9 @@ create_test_data <- function(n = 100, params = create_test_params()) {
 #' @param ... Additional parameters to pass to create_default_config()
 #' @return Configuration list
 create_test_config <- function(num_simulations = 10,
-                                main_sample_size = 100,
-                                bootstrap_reps = 20,
-                                ...) {
+                               main_sample_size = 100,
+                               bootstrap_reps = 20,
+                               ...) {
   # Use smaller values for testing
   create_default_config(
     num_simulations = num_simulations,

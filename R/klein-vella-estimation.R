@@ -38,13 +38,12 @@
 #' print(results)
 #'
 klein_vella_parametric <- function(data,
-                                  y1_var = "Y1",
-                                  y2_var = "Y2",
-                                  x_vars = NULL,
-                                  variance_type = "exponential",
-                                  optimization_method = "BFGS",
-                                  verbose = TRUE) {
-
+                                   y1_var = "Y1",
+                                   y2_var = "Y2",
+                                   x_vars = NULL,
+                                   variance_type = "exponential",
+                                   optimization_method = "BFGS",
+                                   verbose = TRUE) {
   # Auto-detect X variables if not provided
   if (is.null(x_vars)) {
     x_vars <- names(data)[grepl("^X", names(data))]
@@ -59,9 +58,9 @@ klein_vella_parametric <- function(data,
   # Extract data
   Y1 <- data[[y1_var]]
   Y2 <- data[[y2_var]]
-  X <- as.matrix(cbind(1, data[, x_vars, drop = FALSE]))  # Add intercept
+  X <- as.matrix(cbind(1, data[, x_vars, drop = FALSE])) # Add intercept
   n <- nrow(data)
-  k <- ncol(X) - 1  # Number of X variables (excluding intercept)
+  k <- ncol(X) - 1 # Number of X variables (excluding intercept)
 
   if (verbose) {
     message("\n=== Klein & Vella Parametric Estimation ===")
@@ -86,12 +85,12 @@ klein_vella_parametric <- function(data,
   } else if (variance_type == "power") {
     variance_function <- function(X, delta) {
       linear_combo <- X %*% delta
-      pmax(linear_combo^2, 1e-6)  # Ensure positivity
+      pmax(linear_combo^2, 1e-6) # Ensure positivity
     }
   } else if (variance_type == "linear") {
     variance_function <- function(X, delta) {
       linear_combo <- X %*% delta
-      pmax(linear_combo, 1e-6)  # Ensure positivity
+      pmax(linear_combo, 1e-6) # Ensure positivity
     }
   } else {
     stop("Unknown variance_type. Choose 'exponential', 'power', or 'linear'.")
@@ -107,7 +106,7 @@ klein_vella_parametric <- function(data,
     delta2 <- params[(2 * k + 5):(3 * k + 5)]
 
     # Ensure rho is in valid range
-    rho <- tanh(rho)  # Transform to [-1, 1]
+    rho <- tanh(rho) # Transform to [-1, 1]
 
     # Calculate variances
     var1 <- variance_function(X, delta1)
@@ -126,14 +125,15 @@ klein_vella_parametric <- function(data,
   # Step 3: Initial values
   # Start with OLS estimates ignoring endogeneity
   lm1_init <- lm(as.formula(paste(y1_var, "~", paste(c(x_vars, y2_var), collapse = " + "))),
-                 data = data)
+    data = data
+  )
 
   init_params <- c(
-    coef(lm1_init)[1:(k + 1)],           # beta1 initial
-    coef(lm1_init)[k + 2],                # gamma1 initial
-    0,                                    # rho initial (transformed)
-    rep(0.1, k + 1),                      # delta1 initial
-    rep(0.1, k + 1)                       # delta2 initial
+    coef(lm1_init)[1:(k + 1)], # beta1 initial
+    coef(lm1_init)[k + 2], # gamma1 initial
+    0, # rho initial (transformed)
+    rep(0.1, k + 1), # delta1 initial
+    rep(0.1, k + 1) # delta2 initial
   )
 
   # Step 4: Optimize
@@ -154,7 +154,7 @@ klein_vella_parametric <- function(data,
   final_params <- opt_result$par
   beta1_est <- final_params[1:(k + 1)]
   gamma1_est <- final_params[k + 2]
-  rho_est <- tanh(final_params[k + 3])  # Transform back
+  rho_est <- tanh(final_params[k + 3]) # Transform back
   delta1_est <- final_params[(k + 4):(2 * k + 4)]
   delta2_est <- final_params[(2 * k + 5):(3 * k + 5)]
 
@@ -228,7 +228,7 @@ klein_vella_parametric <- function(data,
     se = c(
       setNames(se_all[1:(k + 1)], paste0("se_beta1_", 0:k)),
       se_gamma1 = se_all[k + 2],
-      se_rho = se_all[k + 3] * (1 - rho_est^2)  # Delta method for tanh transform
+      se_rho = se_all[k + 3] * (1 - rho_est^2) # Delta method for tanh transform
     ),
     fitted_values = as.vector(y1_fitted),
     residuals = as.vector(residuals_final),
@@ -279,17 +279,23 @@ print.klein_vella_fit <- function(x, ...) {
   # Print beta1 coefficients
   beta1_names <- names(x$estimates)[!names(x$estimates) %in% c("gamma1", "rho")]
   for (i in seq_along(beta1_names)) {
-    cat(sprintf("%-12s %8.4f  (SE: %6.4f)\n",
-                beta1_names[i], x$estimates[i], x$se[i]))
+    cat(sprintf(
+      "%-12s %8.4f  (SE: %6.4f)\n",
+      beta1_names[i], x$estimates[i], x$se[i]
+    ))
   }
 
   # Print gamma1
-  cat(sprintf("%-12s %8.4f  (SE: %6.4f) ***\n",
-              "gamma1", x$estimates[gamma1_idx], x$se[gamma1_idx]))
+  cat(sprintf(
+    "%-12s %8.4f  (SE: %6.4f) ***\n",
+    "gamma1", x$estimates[gamma1_idx], x$se[gamma1_idx]
+  ))
 
   # Print rho
-  cat(sprintf("%-12s %8.4f  (SE: %6.4f)\n",
-              "rho", x$estimates[rho_idx], x$se[rho_idx + 1]))
+  cat(sprintf(
+    "%-12s %8.4f  (SE: %6.4f)\n",
+    "rho", x$estimates[rho_idx], x$se[rho_idx + 1]
+  ))
 
   cat("\n*** Endogenous parameter\n")
 
@@ -306,12 +312,12 @@ summary.klein_vella_fit <- function(object, ...) {
   # Calculate additional statistics
   rss <- sum(object$residuals^2)
   tss <- sum((object$fitted_values + object$residuals -
-              mean(object$fitted_values + object$residuals))^2)
+    mean(object$fitted_values + object$residuals))^2)
   r_squared <- 1 - rss / tss
 
   # Variance ratio statistics
   var_ratio <- sqrt(object$variance_functions$S1_squared) /
-               sqrt(object$variance_functions$S2_squared)
+    sqrt(object$variance_functions$S2_squared)
 
   summary_obj <- list(
     call = object$call,
@@ -365,13 +371,19 @@ print.summary.klein_vella_fit <- function(x, ...) {
     se <- x$se[i]
     t_val <- estimate / se
 
-    cat(sprintf("%-12s %8.4f  %8.4f %7.2f",
-                param_name, estimate, se, t_val))
+    cat(sprintf(
+      "%-12s %8.4f  %8.4f %7.2f",
+      param_name, estimate, se, t_val
+    ))
 
     # Add significance stars
-    if (abs(t_val) > 2.576) cat(" ***")
-    else if (abs(t_val) > 1.96) cat(" **")
-    else if (abs(t_val) > 1.645) cat(" *")
+    if (abs(t_val) > 2.576) {
+      cat(" ***")
+    } else if (abs(t_val) > 1.96) {
+      cat(" **")
+    } else if (abs(t_val) > 1.645) {
+      cat(" *")
+    }
 
     cat("\n")
   }
@@ -381,12 +393,18 @@ print.summary.klein_vella_fit <- function(x, ...) {
   # Variance ratio information
   cat("\nVariance Ratio S1(X)/S2(X) Summary:\n")
   var_stats <- x$var_ratio_summary
-  cat(sprintf("   Min: %.3f   Q1: %.3f   Median: %.3f\n",
-              var_stats["Min"], var_stats["Q1"], var_stats["Median"]))
-  cat(sprintf("   Mean: %.3f  Q3: %.3f   Max: %.3f\n",
-              var_stats["Mean"], var_stats["Q3"], var_stats["Max"]))
-  cat(sprintf("   SD: %.3f     CV: %.3f\n",
-              var_stats["SD"], var_stats["CV"]))
+  cat(sprintf(
+    "   Min: %.3f   Q1: %.3f   Median: %.3f\n",
+    var_stats["Min"], var_stats["Q1"], var_stats["Median"]
+  ))
+  cat(sprintf(
+    "   Mean: %.3f  Q3: %.3f   Max: %.3f\n",
+    var_stats["Mean"], var_stats["Q3"], var_stats["Max"]
+  ))
+  cat(sprintf(
+    "   SD: %.3f     CV: %.3f\n",
+    var_stats["SD"], var_stats["CV"]
+  ))
 
   if (var_stats["CV"] < 0.1) {
     cat("\nWarning: Low variation in variance ratio (CV < 0.1).\n")
@@ -443,11 +461,15 @@ run_klein_vella_demo <- function(n = 500, verbose = TRUE) {
   if (verbose) {
     cat("\n\n=== RESULTS COMPARISON ===\n")
     cat(sprintf("True gamma1:        %8.4f\n", config$gamma1))
-    cat(sprintf("OLS estimate:       %8.4f (bias: %+.4f)\n",
-                ols_gamma1, ols_gamma1 - config$gamma1))
-    cat(sprintf("K&V estimate:       %8.4f (bias: %+.4f)\n",
-                kv_results$estimates["gamma1"],
-                kv_results$estimates["gamma1"] - config$gamma1))
+    cat(sprintf(
+      "OLS estimate:       %8.4f (bias: %+.4f)\n",
+      ols_gamma1, ols_gamma1 - config$gamma1
+    ))
+    cat(sprintf(
+      "K&V estimate:       %8.4f (bias: %+.4f)\n",
+      kv_results$estimates["gamma1"],
+      kv_results$estimates["gamma1"] - config$gamma1
+    ))
 
     cat("\nTrue rho:           ", sprintf("%8.4f", config$rho), "\n")
     cat("K&V rho estimate:   ", sprintf("%8.4f", kv_results$estimates["rho"]), "\n")

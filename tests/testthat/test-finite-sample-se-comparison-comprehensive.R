@@ -20,24 +20,28 @@ test_that("finite sample SEs match across REndo, ivreg2h, and hetid", {
     data = data
   )
   hetid_coef <- coef(hetid_model)["P"]
-  hetid_se_finite <- sqrt(diag(vcov(hetid_model)))["P"]  # Default is finite sample
+  hetid_se_finite <- sqrt(diag(vcov(hetid_model)))["P"] # Default is finite sample
 
   # Verify this is indeed finite sample SE
   hetid_se_check <- extract_se_ivreg(hetid_model, df_adjust = "finite")["P"]
   expect_equal(as.numeric(hetid_se_finite), as.numeric(hetid_se_check),
-               tolerance = 1e-10, label = "hetid finite SE check")
+    tolerance = 1e-10, label = "hetid finite SE check"
+  )
 
   # 2. REndo comparison (if available)
   if (has_rendo()) {
     library(REndo)
 
     # REndo's hetErrorsIV
-    rendo_model <- tryCatch({
-      hetErrorsIV(
-        y ~ X1 + P | X1 | IIV(Z),
-        data = data
-      )
-    }, error = function(e) NULL)
+    rendo_model <- tryCatch(
+      {
+        hetErrorsIV(
+          y ~ X1 + P | X1 | IIV(Z),
+          data = data
+        )
+      },
+      error = function(e) NULL
+    )
 
     if (!is.null(rendo_model)) {
       rendo_summ <- summary(rendo_model)
@@ -47,11 +51,13 @@ test_that("finite sample SEs match across REndo, ivreg2h, and hetid", {
       # REndo uses finite sample SEs by default
       # Check coefficient match (they should be identical)
       expect_equal(as.numeric(hetid_coef), as.numeric(rendo_coef),
-                   tolerance = 0.001, label = "REndo coefficient match")
+        tolerance = 0.001, label = "REndo coefficient match"
+      )
 
       # Check SE match (should be very close for finite sample)
       expect_equal(as.numeric(hetid_se_finite), as.numeric(rendo_se),
-                   tolerance = 0.001, label = "REndo finite SE match")
+        tolerance = 0.001, label = "REndo finite SE match"
+      )
     }
   }
 
@@ -138,12 +144,14 @@ exit
 
         # Compare finite sample results
         expect_equal(as.numeric(hetid_coef), stata_coef_finite,
-                     tolerance = 0.001,
-                     label = "Coefficient matches Stata (finite sample)")
+          tolerance = 0.001,
+          label = "Coefficient matches Stata (finite sample)"
+        )
 
         expect_equal(as.numeric(hetid_se_finite), stata_se_finite,
-                     tolerance = 0.001,
-                     label = "SE matches Stata (finite sample)")
+          tolerance = 0.001,
+          label = "SE matches Stata (finite sample)"
+        )
       }
 
       # Clean up
@@ -178,12 +186,15 @@ test_that("finite sample SE calculations are consistent", {
   actual_ratio <- as.numeric(se_finite_default / se_asymptotic)
 
   # Verify the mathematical relationship
-  expect_equal(actual_ratio, expected_ratio, tolerance = 1e-10,
-               label = "Finite/Asymptotic SE ratio")
+  expect_equal(actual_ratio, expected_ratio,
+    tolerance = 1e-10,
+    label = "Finite/Asymptotic SE ratio"
+  )
 
   # Verify finite sample SE is larger (for small samples)
   expect_gt(se_finite_default, se_asymptotic,
-            label = "Finite SE > Asymptotic SE")
+    label = "Finite SE > Asymptotic SE"
+  )
 })
 
 test_that("all three packages produce identical coefficients when using same instruments", {
@@ -251,23 +262,28 @@ test_that("all three packages produce identical coefficients when using same ins
   cat("   Std Error:", round(hetid_x_se, 6), "\n")
   cat("   t-statistic:", round(hetid_x_coef / hetid_x_se, 3), "\n")
 
-  results$manual_x <- list(coef = hetid_x_coef, se = hetid_x_se,
-                           method = "Manual (Z = X)")
+  results$manual_x <- list(
+    coef = hetid_x_coef, se = hetid_x_se,
+    method = "Manual (Z = X)"
+  )
 
   # 3. REndo coefficient (if available)
   if (has_rendo()) {
     library(REndo)
 
     # REndo uses X directly as the heteroskedasticity source
-    rendo_model <- tryCatch({
-      hetErrorsIV(
-        y ~ X1 + P | P | IIV(X1),
-        data = data
-      )
-    }, error = function(e) {
-      cat("\n", "Error:", e$message, "\n")
-      NULL
-    })
+    rendo_model <- tryCatch(
+      {
+        hetErrorsIV(
+          y ~ X1 + P | P | IIV(X1),
+          data = data
+        )
+      },
+      error = function(e) {
+        cat("\n", "Error:", e$message, "\n")
+        NULL
+      }
+    )
 
     if (!is.null(rendo_model)) {
       rendo_coef <- coef(rendo_model)["P"]
@@ -282,8 +298,9 @@ test_that("all three packages produce identical coefficients when using same ins
 
       # Test that REndo matches our manual X implementation exactly
       expect_equal(as.numeric(rendo_coef), as.numeric(hetid_x_coef),
-                   tolerance = 0.001,
-                   label = "REndo coefficient matches manual X implementation")
+        tolerance = 0.001,
+        label = "REndo coefficient matches manual X implementation"
+      )
     }
   }
 
@@ -307,15 +324,17 @@ test_that("all three packages produce identical coefficients when using same ins
 
   # These should match exactly (within numerical precision)
   expect_equal(as.numeric(hetid_z_coef), as.numeric(hetid_x_coef),
-               tolerance = 1e-10,
-               label = "Z-based and X-based instruments give identical coefficients")
+    tolerance = 1e-10,
+    label = "Z-based and X-based instruments give identical coefficients"
+  )
 
   # All coefficients should be on the same side of zero as the true value
   true_sign <- sign(params$gamma1)
   for (method in names(results)) {
     est_sign <- sign(results[[method]]$coef)
     expect_equal(as.numeric(est_sign), as.numeric(true_sign),
-                 label = paste(method, "has correct sign"))
+      label = paste(method, "has correct sign")
+    )
   }
 
   # Report number of methods tested

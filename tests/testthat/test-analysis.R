@@ -35,7 +35,7 @@ test_that("analyze_main_results produces valid output", {
 
   # Check summary table has expected structure
   expect_true("Estimator" %in% names(analysis$summary_table))
-  expect_true(nrow(analysis$summary_table) >= 2)  # OLS and 2SLS
+  expect_true(nrow(analysis$summary_table) >= 2) # OLS and 2SLS
 })
 
 test_that("analyze_main_results handles knitr formatting", {
@@ -227,7 +227,8 @@ test_that("full analysis pipeline works end-to-end", {
     sample_analysis <- analyze_sample_size_results(sample_results, config, verbose = FALSE)
     delta_analysis <- analyze_sensitivity_results(delta_results, config, verbose = FALSE)
     boot_analysis <- analyze_bootstrap_results(
-      main_results, boot_results, config, verbose = FALSE
+      main_results, boot_results, config,
+      verbose = FALSE
     )
   })
 

@@ -38,11 +38,13 @@ test_that("hetid matches Stata approach exactly", {
 
   # Check coefficient is reasonable (within typical range for this DGP)
   expect_true(coef_y2 > -0.85 && coef_y2 < -0.65,
-    label = paste("Coefficient", coef_y2, "should be between -0.85 and -0.65"))
+    label = paste("Coefficient", coef_y2, "should be between -0.85 and -0.65")
+  )
 
   # Check SE is reasonable (typically 0.08 to 0.12 for n=1000)
   expect_true(se_y2 > 0.07 && se_y2 < 0.13,
-    label = paste("SE", se_y2, "should be between 0.07 and 0.13"))
+    label = paste("SE", se_y2, "should be between 0.07 and 0.13")
+  )
 })
 
 test_that("REndo uses X instead of Z for instruments", {
@@ -204,20 +206,25 @@ test_that("REndo warns appropriately about weak instruments", {
 
   # With new DGP, REndo may have different warning behavior
   # The test should complete successfully regardless of warnings
-  result_strong <- tryCatch({
-    suppressMessages(
-      hetErrorsIV(y ~ x + p | p | IIV(x), data = test_data_strong)
-    )
-  }, warning = function(w) {
-    suppressWarnings(suppressMessages(
-      hetErrorsIV(y ~ x + p | p | IIV(x), data = test_data_strong)
-    ))
-  }, error = function(e) {
-    NULL
-  })
+  result_strong <- tryCatch(
+    {
+      suppressMessages(
+        hetErrorsIV(y ~ x + p | p | IIV(x), data = test_data_strong)
+      )
+    },
+    warning = function(w) {
+      suppressWarnings(suppressMessages(
+        hetErrorsIV(y ~ x + p | p | IIV(x), data = test_data_strong)
+      ))
+    },
+    error = function(e) {
+      NULL
+    }
+  )
 
   expect_false(is.null(result_strong),
-    label = "REndo completes with strong heteroskedasticity")
+    label = "REndo completes with strong heteroskedasticity"
+  )
 })
 
 test_that("Both hetid and REndo handle edge cases appropriately", {

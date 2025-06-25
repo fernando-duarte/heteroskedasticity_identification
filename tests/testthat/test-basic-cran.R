@@ -1,4 +1,3 @@
-
 test_that("package can be loaded", {
   # Verify the package namespace is available
   expect_true("hetid" %in% loadedNamespaces())

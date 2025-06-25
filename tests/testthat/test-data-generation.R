@@ -67,8 +67,8 @@ test_that("generate_lewbel_data handles mismatched n_x and parameter lengths", {
   skip_if_not_test_level("fast")
 
   params_bad <- create_test_params()
-  params_bad$beta1_1 <- c(1.5, -0.8)  # Length 2
-  params_bad$beta2_1 <- -1.0  # Length 1, mismatched!
+  params_bad$beta1_1 <- c(1.5, -0.8) # Length 2
+  params_bad$beta2_1 <- -1.0 # Length 1, mismatched!
 
   expect_error(
     generate_lewbel_data(100, params_bad, n_x = 2),
@@ -131,7 +131,7 @@ test_that("verify_lewbel_assumptions with large samples", {
   skip_if_not_test_level("comprehensive")
 
   # Set seed for reproducibility
-  set.seed(123)  # Different seed that works better
+  set.seed(123) # Different seed that works better
 
   test_params_standard <- create_test_params()
 
@@ -311,7 +311,7 @@ test_that("generate_rigobon_data validates regime parameters", {
 
   # Mismatched lengths
   params_bad3 <- test_regime_params_2
-  params_bad3$sigma2_regimes <- c(1.0)  # Only one value
+  params_bad3$sigma2_regimes <- c(1.0) # Only one value
   expect_error(
     generate_rigobon_data(100, params_bad3),
     "Length of sigma2_regimes must match"

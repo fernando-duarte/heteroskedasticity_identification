@@ -64,7 +64,7 @@ run_bootstrap_demonstration <- function(config, seeds, verbose = TRUE) {
     n_simulations = config$bootstrap_demo_size,
     config = config,
     sim_function = run_single_lewbel_simulation,
-    compute_bounds_se_rule = TRUE,  # Always compute bounds SE for demo
+    compute_bounds_se_rule = TRUE, # Always compute bounds SE for demo
     verbose = verbose,
     progress_message = "Running separate bootstrap SE demonstration..."
   )
