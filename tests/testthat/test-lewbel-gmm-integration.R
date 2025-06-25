@@ -21,7 +21,7 @@ test_that("lewbel_triangular_moments generates correct moment conditions", {
     data = data,
     theta = theta,
     system = "triangular",
-    n_expected_moments = 5  # 2 for X*e1, 2 for X*e2, 1 for Z*e1*e2
+    n_expected_moments = 5 # 2 for X*e1, 2 for X*e2, 1 for Z*e1*e2
   )
 })
 

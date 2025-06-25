@@ -24,7 +24,7 @@
 #' # Requires np package
 #' if (requireNamespace("np", quietly = TRUE)) {
 #'   config <- create_klein_vella_config(
-#'     n = 500,
+#'     n = .hetid_const("N_SMALL"),
 #'     beta1 = c(0.5, 1.5),
 #'     beta2 = c(1.0, -1.0),
 #'     gamma1 = -0.8,
@@ -39,19 +39,20 @@
 #' }
 #'
 klein_vella_semiparametric <- function(data,
-                                      y1_var = "Y1",
-                                      y2_var = "Y2",
-                                      x_vars = NULL,
-                                      bandwidth_method = "cv.aic",
-                                      kernel_type = "gaussian",
-                                      max_iter = 50,
-                                      tol = 1e-6,
-                                      verbose = TRUE) {
-
+                                       y1_var = "Y1",
+                                       y2_var = "Y2",
+                                       x_vars = NULL,
+                                       bandwidth_method = "cv.aic",
+                                       kernel_type = "gaussian",
+                                       max_iter = .hetid_const("MAX_ITERATIONS_KLEIN_VELLA"),
+                                       tol = .hetid_const("EPSILON_TOLERANCE"),
+                                       verbose = TRUE) {
   # Check if np package is available
   if (!requireNamespace("np", quietly = TRUE)) {
-    stop("The 'np' package is required for semiparametric estimation.\n",
-         "Please install it with: install.packages('np')")
+    stop(
+      "The 'np' package is required for semiparametric estimation.\n",
+      "Please install it with: install.packages('np')"
+    )
   }
 
   # Auto-detect X variables if not provided
@@ -69,7 +70,7 @@ klein_vella_semiparametric <- function(data,
   Y1 <- data[[y1_var]]
   Y2 <- data[[y2_var]]
   x_data <- as.matrix(data[, x_vars, drop = FALSE])
-  X <- as.matrix(cbind(1, x_data))  # Add intercept for parametric part
+  X <- as.matrix(cbind(1, x_data)) # Add intercept for parametric part
   n <- nrow(data)
   k <- ncol(X) - 1
 
@@ -92,46 +93,54 @@ klein_vella_semiparametric <- function(data,
   e2_squared <- e2^2
 
   # Estimate E[e2^2 | X] nonparametrically
-  tryCatch({
-    # Create bandwidth object
-    if (k == 1) {
-      # Single X variable
-      bw2 <- np::npregbw(
-        formula = e2_squared ~ x_data,
-        regtype = "ll",  # Local linear
-        bwmethod = bandwidth_method,
-        ckertype = kernel_type
-      )
-    } else {
-      # Multiple X variables
-      x_formula <- as.formula(paste("e2_squared ~",
-                                   paste(x_vars, collapse = " + ")))
-      bw2 <- np::npregbw(
-        formula = x_formula,
-        data = cbind(data[x_vars], e2_squared = e2_squared),
-        regtype = "ll",
-        bwmethod = bandwidth_method,
-        ckertype = kernel_type
-      )
+  tryCatch(
+    {
+      # Create bandwidth object
+      if (k == 1) {
+        # Single X variable
+        bw2 <- np::npregbw(
+          formula = e2_squared ~ x_data,
+          regtype = "ll", # Local linear
+          bwmethod = bandwidth_method,
+          ckertype = kernel_type
+        )
+      } else {
+        # Multiple X variables
+        x_formula <- as.formula(paste(
+          "e2_squared ~",
+          paste(x_vars, collapse = " + ")
+        ))
+        bw2 <- np::npregbw(
+          formula = x_formula,
+          data = cbind(data[x_vars], e2_squared = e2_squared),
+          regtype = "ll",
+          bwmethod = bandwidth_method,
+          ckertype = kernel_type
+        )
+      }
+
+      # Estimate conditional variance
+      np_fit2 <- np::npreg(bw2)
+      s2_squared <- fitted(np_fit2)
+      s2_squared <- pmax(s2_squared, .hetid_const("EPSILON_TOLERANCE")) # Ensure positivity
+      s2 <- sqrt(s2_squared)
+    },
+    error = function(e) {
+      stop("Error in nonparametric variance estimation: ", e$message)
     }
-
-    # Estimate conditional variance
-    np_fit2 <- np::npreg(bw2)
-    s2_squared <- fitted(np_fit2)
-    s2_squared <- pmax(s2_squared, 1e-6)  # Ensure positivity
-    s2 <- sqrt(s2_squared)
-
-  }, error = function(e) {
-    stop("Error in nonparametric variance estimation: ", e$message)
-  })
+  )
 
   # Step 3: Iterative estimation of main equation
   if (verbose) message("\nIterative estimation of main equation...")
 
   # Initial values from OLS
-  lm1_init <- lm(as.formula(paste(y1_var, "~",
-                                 paste(c(x_vars, y2_var), collapse = " + "))),
-                data = data)
+  lm1_init <- lm(
+    as.formula(paste(
+      y1_var, "~",
+      paste(c(x_vars, y2_var), collapse = " + ")
+    )),
+    data = data
+  )
 
   beta1_old <- coef(lm1_init)[1:(k + 1)]
   gamma1_old <- coef(lm1_init)[k + 2]
@@ -148,40 +157,44 @@ klein_vella_semiparametric <- function(data,
     e1_squared <- e1^2
 
     # Estimate conditional variance of e1 nonparametrically
-    tryCatch({
-      if (k == 1) {
-        bw1 <- np::npregbw(
-          formula = e1_squared ~ x_data,
-          regtype = "ll",
-          bwmethod = bandwidth_method,
-          ckertype = kernel_type
-        )
-      } else {
-        x_formula <- as.formula(paste("e1_squared ~",
-                                     paste(x_vars, collapse = " + ")))
-        bw1 <- np::npregbw(
-          formula = x_formula,
-          data = cbind(data[x_vars], e1_squared = e1_squared),
-          regtype = "ll",
-          bwmethod = bandwidth_method,
-          ckertype = kernel_type
-        )
+    tryCatch(
+      {
+        if (k == 1) {
+          bw1 <- np::npregbw(
+            formula = e1_squared ~ x_data,
+            regtype = "ll",
+            bwmethod = bandwidth_method,
+            ckertype = kernel_type
+          )
+        } else {
+          x_formula <- as.formula(paste(
+            "e1_squared ~",
+            paste(x_vars, collapse = " + ")
+          ))
+          bw1 <- np::npregbw(
+            formula = x_formula,
+            data = cbind(data[x_vars], e1_squared = e1_squared),
+            regtype = "ll",
+            bwmethod = bandwidth_method,
+            ckertype = kernel_type
+          )
+        }
+
+        np_fit1 <- np::npreg(bw1)
+        s1_squared <- fitted(np_fit1)
+        s1_squared <- pmax(s1_squared, .hetid_const("EPSILON_TOLERANCE"))
+        s1 <- sqrt(s1_squared)
+      },
+      error = function(e) {
+        stop("Error in nonparametric variance estimation: ", e$message)
       }
-
-      np_fit1 <- np::npreg(bw1)
-      s1_squared <- fitted(np_fit1)
-      s1_squared <- pmax(s1_squared, 1e-6)
-      s1 <- sqrt(s1_squared)
-
-    }, error = function(e) {
-      stop("Error in nonparametric variance estimation: ", e$message)
-    })
+    )
 
     # Calculate control function
     control_function <- (s1 / s2) * e2
 
     # Update parameters by OLS with control function
-    y1_augmented <- lm(Y1 ~ X[, -1] + Y2 + control_function - 1)  # -1 to exclude automatic intercept
+    y1_augmented <- lm(Y1 ~ X[, -1] + Y2 + control_function - 1) # -1 to exclude automatic intercept
 
     new_coefs <- coef(y1_augmented)
     beta1_new <- new_coefs[1:(k + 1)]
@@ -190,8 +203,8 @@ klein_vella_semiparametric <- function(data,
 
     # Check convergence
     param_change <- sqrt(sum((beta1_new - beta1_old)^2) +
-                        (gamma1_new - gamma1_old)^2 +
-                        (rho_new - rho_old)^2)
+      (gamma1_new - gamma1_old)^2 +
+      (rho_new - rho_old)^2)
 
     if (verbose && iter %% 10 == 0) {
       message(sprintf("  Iteration %d: parameter change = %.6f", iter, param_change))
@@ -299,17 +312,23 @@ print.klein_vella_semipar <- function(x, ...) {
   # Print beta1 coefficients
   beta1_names <- names(x$estimates)[!names(x$estimates) %in% c("gamma1", "rho")]
   for (i in seq_along(beta1_names)) {
-    cat(sprintf("%-12s %8.4f  (SE: %6.4f)\n",
-                beta1_names[i], x$estimates[i], x$se[i]))
+    cat(sprintf(
+      "%-12s %8.4f  (SE: %6.4f)\n",
+      beta1_names[i], x$estimates[i], x$se[i]
+    ))
   }
 
   # Print gamma1
-  cat(sprintf("%-12s %8.4f  (SE: %6.4f) ***\n",
-              "gamma1", x$estimates[gamma1_idx], x$se[gamma1_idx]))
+  cat(sprintf(
+    "%-12s %8.4f  (SE: %6.4f) ***\n",
+    "gamma1", x$estimates[gamma1_idx], x$se[gamma1_idx]
+  ))
 
   # Print rho
-  cat(sprintf("%-12s %8.4f  (SE: %6.4f)\n",
-              "rho", x$estimates[rho_idx], x$se[rho_idx + 1]))
+  cat(sprintf(
+    "%-12s %8.4f  (SE: %6.4f)\n",
+    "rho", x$estimates[rho_idx], x$se[rho_idx + 1]
+  ))
 
   cat("\n*** Endogenous parameter\n")
 
@@ -334,10 +353,9 @@ print.klein_vella_semipar <- function(x, ...) {
 #' @return Data frame with comparison results
 #' @export
 compare_klein_vella_methods <- function(data,
-                                       true_values = NULL,
-                                       methods = c("ols", "kv_parametric", "kv_semiparametric", "lewbel"),
-                                       verbose = TRUE) {
-
+                                        true_values = NULL,
+                                        methods = c("ols", "kv_parametric", "kv_semiparametric", "lewbel"),
+                                        verbose = TRUE) {
   results <- list()
 
   # Identify variables
@@ -351,9 +369,13 @@ compare_klein_vella_methods <- function(data,
   # OLS
   if ("ols" %in% methods) {
     if (verbose) message("Running OLS...")
-    ols_model <- lm(as.formula(paste(y1_var, "~",
-                                    paste(c(x_vars, y2_var), collapse = " + "))),
-                   data = data)
+    ols_model <- lm(
+      as.formula(paste(
+        y1_var, "~",
+        paste(c(x_vars, y2_var), collapse = " + ")
+      )),
+      data = data
+    )
     results$ols <- list(
       gamma1 = coef(ols_model)[y2_var],
       se = summary(ols_model)$coefficients[y2_var, "Std. Error"]
@@ -396,16 +418,24 @@ compare_klein_vella_methods <- function(data,
     }
 
     # Lewbel estimation
-    e2_lewbel <- residuals(lm(as.formula(paste(y2_var, "~",
-                                              paste(x_vars, collapse = " + "))),
-                            data = data))
+    e2_lewbel <- residuals(lm(
+      as.formula(paste(
+        y2_var, "~",
+        paste(x_vars, collapse = " + ")
+      )),
+      data = data
+    ))
     iv_lewbel <- data$Z * e2_lewbel
 
-    lewbel_model <- AER::ivreg(as.formula(paste(y1_var, "~",
-                                               paste(c(x_vars, y2_var), collapse = " + "),
-                                               "|",
-                                               paste(c(x_vars, "iv_lewbel"), collapse = " + "))),
-                              data = cbind(data, iv_lewbel = iv_lewbel))
+    lewbel_model <- AER::ivreg(
+      as.formula(paste(
+        y1_var, "~",
+        paste(c(x_vars, y2_var), collapse = " + "),
+        "|",
+        paste(c(x_vars, "iv_lewbel"), collapse = " + ")
+      )),
+      data = cbind(data, iv_lewbel = iv_lewbel)
+    )
 
     results$lewbel <- list(
       gamma1 = coef(lewbel_model)[y2_var],
@@ -467,13 +497,12 @@ compare_klein_vella_methods <- function(data,
 #' @return Data frame with Monte Carlo results
 #' @export
 run_klein_vella_monte_carlo <- function(config,
-                                       n_sims = 500,
-                                       methods = c("ols", "klein_vella_param"),
-                                       parallel = FALSE,
-                                       n_cores = NULL,
-                                       progress = TRUE,
-                                       seed = NULL) {
-
+                                        n_sims = .hetid_const("N_SMALL"),
+                                        methods = c("ols", "klein_vella_param"),
+                                        parallel = FALSE,
+                                        n_cores = NULL,
+                                        progress = TRUE,
+                                        seed = NULL) {
   if (!is.null(seed)) set.seed(seed)
 
   # Function to run one simulation
@@ -506,59 +535,66 @@ run_klein_vella_monte_carlo <- function(config,
 
     # Klein & Vella parametric
     if ("klein_vella_param" %in% methods) {
-      tryCatch({
-        kv_result <- klein_vella_parametric(data_sim, verbose = FALSE)
-        sim_results <- rbind(sim_results, data.frame(
-          sim_id = sim_id,
-          method = "klein_vella_param",
-          gamma1_est = kv_result$estimates["gamma1"],
-          gamma1_se = kv_result$se["se_gamma1"],
-          converged = kv_result$convergence == 0,
-          stringsAsFactors = FALSE
-        ))
-      }, error = function(e) {
-        sim_results <- rbind(sim_results, data.frame(
-          sim_id = sim_id,
-          method = "klein_vella_param",
-          gamma1_est = NA,
-          gamma1_se = NA,
-          converged = FALSE,
-          stringsAsFactors = FALSE
-        ))
-      })
+      tryCatch(
+        {
+          kv_result <- klein_vella_parametric(data_sim, verbose = FALSE)
+          sim_results <- rbind(sim_results, data.frame(
+            sim_id = sim_id,
+            method = "klein_vella_param",
+            gamma1_est = kv_result$estimates["gamma1"],
+            gamma1_se = kv_result$se["se_gamma1"],
+            converged = kv_result$convergence == 0,
+            stringsAsFactors = FALSE
+          ))
+        },
+        error = function(e) {
+          sim_results <- rbind(sim_results, data.frame(
+            sim_id = sim_id,
+            method = "klein_vella_param",
+            gamma1_est = NA,
+            gamma1_se = NA,
+            converged = FALSE,
+            stringsAsFactors = FALSE
+          ))
+        }
+      )
     }
 
     # Lewbel
     if ("lewbel" %in% methods && requireNamespace("AER", quietly = TRUE)) {
-      tryCatch({
-        # Add Z if needed
-        if (!"Z" %in% names(data_sim)) {
-          data_sim$Z <- data_sim$X^2 - mean(data_sim$X^2)
+      tryCatch(
+        {
+          # Add Z if needed
+          if (!"Z" %in% names(data_sim)) {
+            data_sim$Z <- data_sim$X^2 - mean(data_sim$X^2)
+          }
+
+          e2 <- residuals(lm(Y2 ~ X, data = data_sim))
+          iv <- data_sim$Z * e2
+          lewbel_model <- AER::ivreg(Y1 ~ X + Y2 | X + iv,
+            data = cbind(data_sim, iv = iv)
+          )
+
+          sim_results <- rbind(sim_results, data.frame(
+            sim_id = sim_id,
+            method = "lewbel",
+            gamma1_est = coef(lewbel_model)["Y2"],
+            gamma1_se = summary(lewbel_model)$coefficients["Y2", "Std. Error"],
+            converged = TRUE,
+            stringsAsFactors = FALSE
+          ))
+        },
+        error = function(e) {
+          sim_results <- rbind(sim_results, data.frame(
+            sim_id = sim_id,
+            method = "lewbel",
+            gamma1_est = NA,
+            gamma1_se = NA,
+            converged = FALSE,
+            stringsAsFactors = FALSE
+          ))
         }
-
-        e2 <- residuals(lm(Y2 ~ X, data = data_sim))
-        iv <- data_sim$Z * e2
-        lewbel_model <- AER::ivreg(Y1 ~ X + Y2 | X + iv,
-                                  data = cbind(data_sim, iv = iv))
-
-        sim_results <- rbind(sim_results, data.frame(
-          sim_id = sim_id,
-          method = "lewbel",
-          gamma1_est = coef(lewbel_model)["Y2"],
-          gamma1_se = summary(lewbel_model)$coefficients["Y2", "Std. Error"],
-          converged = TRUE,
-          stringsAsFactors = FALSE
-        ))
-      }, error = function(e) {
-        sim_results <- rbind(sim_results, data.frame(
-          sim_id = sim_id,
-          method = "lewbel",
-          gamma1_est = NA,
-          gamma1_se = NA,
-          converged = FALSE,
-          stringsAsFactors = FALSE
-        ))
-      })
+      )
     }
 
     sim_results
@@ -571,13 +607,15 @@ run_klein_vella_monte_carlo <- function(config,
     }
 
     cl <- parallel::makeCluster(n_cores)
-    parallel::clusterExport(cl, c("config", "methods", "generate_klein_vella_data",
-                                 "klein_vella_parametric"),
-                           envir = environment())
+    parallel::clusterExport(cl, c(
+      "config", "methods", "generate_klein_vella_data",
+      "klein_vella_parametric"
+    ),
+    envir = environment()
+    )
 
     results_list <- parallel::parLapply(cl, 1:n_sims, run_one_sim)
     parallel::stopCluster(cl)
-
   } else {
     # Sequential processing
     results_list <- list()

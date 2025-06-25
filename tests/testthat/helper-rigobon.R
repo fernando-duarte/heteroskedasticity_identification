@@ -117,8 +117,10 @@ test_regime_assignment <- function(data, expected_probs, tolerance = 0.1) {
     expect_equal(
       regime_props[i], expected_probs[i],
       tolerance = tolerance,
-      info = sprintf("Regime %d proportion: expected %f, got %f",
-                     i, expected_probs[i], regime_props[i])
+      info = sprintf(
+        "Regime %d proportion: expected %f, got %f",
+        i, expected_probs[i], regime_props[i]
+      )
     )
   }
 }
@@ -146,7 +148,7 @@ run_rigobon_comprehensive <- function(n_sim = 10, n_obs = 1000,
       results[[paste(n_regimes, method, sep = "_")]] <- list(
         mean_estimate = mean(estimates),
         sd_estimate = sd(estimates),
-        bias = mean(estimates) - (-0.8)  # True gamma1 = -0.8
+        bias = mean(estimates) - (-0.8) # True gamma1 = -0.8
       )
     }
   }

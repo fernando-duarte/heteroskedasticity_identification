@@ -4,7 +4,7 @@
 \alias{run_klein_vella_demo}
 \title{Run Klein & Vella demonstration}
 \usage{
-run_klein_vella_demo(n = 500, verbose = TRUE)
+run_klein_vella_demo(n = .hetid_const("N_SMALL"), verbose = TRUE)
 }
 \arguments{
 \item{n}{Sample size (default: 500)}

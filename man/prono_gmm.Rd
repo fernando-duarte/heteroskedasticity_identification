@@ -14,7 +14,7 @@ prono_gmm(
   fit_garch = TRUE,
   add_intercept = TRUE,
   gmm_type = "twoStep",
-  vcov = "HAC",
+  vcov = .hetid_const("VCOV_HAC"),
   initial_values = NULL,
   compute_se = TRUE,
   verbose = TRUE,

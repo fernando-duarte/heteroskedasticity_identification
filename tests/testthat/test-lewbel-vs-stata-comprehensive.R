@@ -14,8 +14,8 @@ test_that("hetid matches Stata ivreg2h on single X", {
   # (seed=42, n=1000)
   # NOTE: With new DGP using stronger variance function (0.5 + 2*Z)
   # the estimates will be more precise
-  expected_stata_coef <- -0.743  # Updated for new DGP
-  expected_stata_se <- 0.09228749     # Updated for new DGP - exact match with ivreg2h
+  expected_stata_coef <- -0.743 # Updated for new DGP
+  expected_stata_se <- 0.09228749 # Updated for new DGP - exact match with ivreg2h
 
   # Generate test data
   data <- generate_hetid_test_data(n = 1000, seed = 42)
@@ -88,8 +88,25 @@ exit
       # Run Stata
       stata_path <- get_stata_path()
       temp_log <- tempfile(fileext = ".log")
-      cmd <- sprintf("%s -b do %s", stata_path, temp_do)
-      result <- system(cmd, intern = FALSE, ignore.stdout = TRUE)
+
+      # Use processx if available, otherwise fall back to system()
+      if (requireNamespace("processx", quietly = TRUE)) {
+        result <- tryCatch({
+          p <- processx::run(
+            command = stata_path,
+            args = c("-b", "do", temp_do),
+            error_on_status = FALSE
+          )
+          p$status
+        }, error = function(e) {
+          # Fall back to system() if processx fails
+          cmd <- sprintf("%s -b do %s", stata_path, temp_do)
+          system(cmd, intern = FALSE, ignore.stdout = TRUE)
+        })
+      } else {
+        cmd <- sprintf("%s -b do %s", stata_path, temp_do)
+        result <- system(cmd, intern = FALSE, ignore.stdout = TRUE)
+      }
 
       # Read results if available
       if (result == 0 && file.exists(temp_results)) {
@@ -121,8 +138,8 @@ test_that("hetid matches Stata ivreg2h with multiple X", {
   # Expected results for new unified DGP with multiple X
   # True value is -0.8, expect similar performance to single X case
   # Standard errors may be smaller due to multiple instruments
-  expected_coef_range <- c(-0.85, -0.75)  # Reasonable range around -0.8
-  expected_se_range <- c(0.05, 0.15)      # Reasonable SE range for n=1000
+  expected_coef_range <- c(-0.85, -0.75) # Reasonable range around -0.8
+  expected_se_range <- c(0.05, 0.15) # Reasonable SE range for n=1000
 
   # Generate data with 2 X variables
   set.seed(123)
@@ -206,8 +223,25 @@ exit
       # Run Stata
       stata_path <- get_stata_path()
       temp_log <- tempfile(fileext = ".log")
-      cmd <- sprintf("%s -b do %s", stata_path, temp_do)
-      result <- system(cmd, intern = FALSE, ignore.stdout = TRUE)
+
+      # Use processx if available, otherwise fall back to system()
+      if (requireNamespace("processx", quietly = TRUE)) {
+        result <- tryCatch({
+          p <- processx::run(
+            command = stata_path,
+            args = c("-b", "do", temp_do),
+            error_on_status = FALSE
+          )
+          p$status
+        }, error = function(e) {
+          # Fall back to system() if processx fails
+          cmd <- sprintf("%s -b do %s", stata_path, temp_do)
+          system(cmd, intern = FALSE, ignore.stdout = TRUE)
+        })
+      } else {
+        cmd <- sprintf("%s -b do %s", stata_path, temp_do)
+        result <- system(cmd, intern = FALSE, ignore.stdout = TRUE)
+      }
 
       # Read results if available
       if (result == 0 && file.exists(temp_results)) {
@@ -224,17 +258,21 @@ exit
   # Compare results - check they are in reasonable ranges
   expect_true(
     as.numeric(hetid_coef) >= expected_coef_range[1] &&
-    as.numeric(hetid_coef) <= expected_coef_range[2],
-    label = paste("Coefficient", round(as.numeric(hetid_coef), 3),
-                  "should be between", expected_coef_range[1],
-                  "and", expected_coef_range[2])
+      as.numeric(hetid_coef) <= expected_coef_range[2],
+    label = paste(
+      "Coefficient", round(as.numeric(hetid_coef), 3),
+      "should be between", expected_coef_range[1],
+      "and", expected_coef_range[2]
+    )
   )
   expect_true(
     as.numeric(hetid_se) >= expected_se_range[1] &&
-    as.numeric(hetid_se) <= expected_se_range[2],
-    label = paste("Standard error", round(as.numeric(hetid_se), 3),
-                  "should be between", expected_se_range[1],
-                  "and", expected_se_range[2])
+      as.numeric(hetid_se) <= expected_se_range[2],
+    label = paste(
+      "Standard error", round(as.numeric(hetid_se), 3),
+      "should be between", expected_se_range[1],
+      "and", expected_se_range[2]
+    )
   )
 
   # If we can get actual Stata results, update expected values
@@ -283,8 +321,8 @@ test_that("hetid and Stata agree across different specifications", {
   # NOTE: With new DGP using stronger variance function (0.5 + 2*Z)
   # Results will be more precise and closer to true value of -0.8
   expected_results <- list(
-    n200 = list(coef = -0.798, se = 0.20),  # Updated for new DGP
-    n500 = list(coef = -0.795, se = 0.12),  # Updated for new DGP
+    n200 = list(coef = -0.798, se = 0.20), # Updated for new DGP
+    n500 = list(coef = -0.795, se = 0.12), # Updated for new DGP
     n1000 = list(coef = -0.797, se = 0.085) # Updated for new DGP
   )
 

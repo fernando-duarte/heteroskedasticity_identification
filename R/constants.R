@@ -23,8 +23,14 @@
 )
 
 # Numerical tolerances and thresholds
-.hetid_constants$IDENTIFICATION_TOLERANCE <- 0.1  # For abs(gamma1 * gamma2 - 1) check
-.hetid_constants$COV_VARIATION_THRESHOLD <- 0.2   # 20% covariance variation threshold
+.hetid_constants$IDENTIFICATION_TOLERANCE <- 0.1 # For abs(gamma1 * gamma2 - 1) check
+.hetid_constants$COV_VARIATION_THRESHOLD <- 0.2 # 20% covariance variation threshold
+.hetid_constants$EPSILON_TOLERANCE <- 1e-6 # General numerical tolerance
+.hetid_constants$CONVERGENCE_TOLERANCE <- 1e-8 # Optimization convergence
+.hetid_constants$LOG_BOUND_MAX <- 10 # Maximum value for log transformations
+.hetid_constants$LOG_BOUND_MIN <- -10 # Minimum value for log transformations
+.hetid_constants$MAX_ITERATIONS_DEFAULT <- 1000 # Default max iterations for optimization
+.hetid_constants$MAX_ITERATIONS_KLEIN_VELLA <- 50 # Max iterations for Klein-Vella semiparametric
 
 # System types
 .hetid_constants$SYSTEM <- list(
@@ -175,6 +181,20 @@
 .hetid_constants$GMM_HAC_KERNEL <- "Quadratic Spectral"
 .hetid_constants$GMM_HAC_PREWHITE <- 1
 .hetid_constants$GMM_HAC_AR_METHOD <- "ols"
+
+# Estimation methods
+.hetid_constants$methods <- list(
+  OLS = "OLS",
+  TSLS = "2SLS",
+  IV = "IV",
+  GMM = "GMM",
+  LEWBEL = "Lewbel",
+  KLEIN_VELLA_PARAM = "Klein-Vella Parametric",
+  KLEIN_VELLA_SEMIPARAM = "Klein-Vella Semiparametric",
+  RIGOBON = "Rigobon",
+  PRONO = "Prono",
+  PRONO_GARCH = "Prono-GARCH"
+)
 
 # Lock the environment to prevent modifications
 lockEnvironment(.hetid_constants, bindings = TRUE)

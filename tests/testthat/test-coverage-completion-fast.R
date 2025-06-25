@@ -4,7 +4,7 @@
 test_that("analyze_main_results print fallback without knitr (line 70)", {
   skip_if_not_fast_test()
   config <- create_default_config()
-  results <- create_mock_main_results(n_sim = 5)
+  results <- create_mock_main_results(n_sim = n_sim_tiny)
 
   # Test with verbose = TRUE - this will exercise both knitr and print paths
   analysis <- test_verbose_output(
@@ -14,7 +14,7 @@ test_that("analyze_main_results print fallback without knitr (line 70)", {
     expected_output = "Weak instrument diagnostic"
   )
 
-  expect_type(analysis, "list")
+  assert_list_structure(analysis, names(analysis))
 })
 
 test_that("analyze_bootstrap_results with verbose output", {
@@ -23,7 +23,7 @@ test_that("analyze_bootstrap_results with verbose output", {
 
   results_main <- create_mock_bootstrap_results(n_sim = 3)
   bootstrap_demo <- create_mock_bootstrap_results(n_sim = 2)
-  bootstrap_demo$sim_id <- 4:5  # Different sim_ids
+  bootstrap_demo$sim_id <- 4:5 # Different sim_ids
 
   # Test with verbose = TRUE
   analysis <- test_verbose_output(
@@ -34,7 +34,7 @@ test_that("analyze_bootstrap_results with verbose output", {
     expected_output = "Bootstrap Standard Errors"
   )
 
-  expect_s3_class(analysis, "data.frame")
+  assert_valid_dataframe(analysis)
 })
 
 test_that("analyze_sample_size_results with verbose output", {
@@ -50,7 +50,7 @@ test_that("analyze_sample_size_results with verbose output", {
     expected_output = c("Consistency Check", "Performance by Sample Size")
   )
 
-  expect_s3_class(analysis, "data.frame")
+  assert_valid_dataframe(analysis)
 })
 
 test_that("analyze_sensitivity_results with verbose output", {
@@ -59,11 +59,11 @@ test_that("analyze_sensitivity_results with verbose output", {
 
   # Create test results by delta_het
   results_by_delta <- data.frame(
-    delta_het = rep(c(0.5, 1.0), each = 3),
-    tsls_gamma1 = rnorm(6, config$gamma1, 0.05),
+    delta_het = rep(c(test_tolerance_loose, 1.0), each = 3),
+    tsls_gamma1 = rnorm(6, config$gamma1, alpha_default),
     first_stage_F = runif(6, 5, 20),
-    bound_lower_tau_set = rnorm(6, 0.2, 0.02),
-    bound_upper_tau_set = rnorm(6, 0.4, 0.02)
+    bound_lower_tau_set = rnorm(6, test_tolerance_normal, 0.02),
+    bound_upper_tau_set = rnorm(6, test_tolerance_normal * 2, 0.02)
   )
 
   # Test with verbose = TRUE
@@ -75,7 +75,7 @@ test_that("analyze_sensitivity_results with verbose output", {
     "Sensitivity to Heteroscedasticity"
   )
 
-  expect_s3_class(analysis, "data.frame")
+  assert_valid_dataframe(analysis)
 })
 
 test_that("verify_lewbel_assumptions basic functionality", {
@@ -85,35 +85,35 @@ test_that("verify_lewbel_assumptions basic functionality", {
 
   # Test with params approach
   params <- list(
-    beta1_0 = 0.5, beta1_1 = 0.8, gamma1 = 0.3,
+    beta1_0 = 0.5, beta1_1 = test_gamma1_true, gamma1 = 0.3,
     beta2_0 = 0.2, beta2_1 = 0.6,
-    alpha1 = 0.5, alpha2 = 0.3,
+    alpha1 = test_tolerance_loose, alpha2 = 0.3,
     delta_het = 1.0
   )
 
   # This should run without warning
   expect_output(
     result <- verify_lewbel_assumptions(
-      params = params, n_obs = 1000, verbose = TRUE
+      params = params, n_obs = n_large * 2, verbose = TRUE
     ),
     "Verifying Lewbel's Key Assumptions"
   )
 
-  expect_type(result, "list")
+  assert_list_structure(result, names(result))
 })
 
 test_that("calculate_lewbel_bounds negative discriminant case (line 88)", {
   skip_if_not_fast_test()
   # Create data that will result in negative discriminant
   bad_data <- data.frame(
-    Y1 = rep(0, 10), # Constant values
-    Y2 = rep(0, 10), # Constant values
-    Z = rep(0, 10), # Constant values
-    Xk = rep(0, 10) # Constant values
+    Y1 = rep(0, n_tiny), # Constant values
+    Y2 = rep(0, n_tiny), # Constant values
+    Z = rep(0, n_tiny), # Constant values
+    Xk = rep(0, n_tiny) # Constant values
   )
 
   # This should trigger the negative discriminant case (line 88)
-  result <- calculate_lewbel_bounds(bad_data, tau = 0.1)
+  result <- calculate_lewbel_bounds(bad_data, tau = test_tolerance_tight)
   expect_true(all(is.na(result$bounds)))
 })
 
@@ -123,21 +123,20 @@ test_that("run_single_lewbel_simulation error cases", {
 
   # Create params that will cause issues
   bad_params <- list(
-    sample_size = 5, # Very small sample
+    sample_size = n_tiny / 2, # Very small sample
     beta1_0 = 0, beta1_1 = 0, gamma1 = 0,
     beta2_0 = 0, beta2_1 = 0,
     alpha1 = 0, alpha2 = 0,
-    delta_het = 0,
-    tau_set_id = 0.1,
-    bootstrap_reps = 5
+    delta_het = delta_het_none,
+    tau_set_id = test_tolerance_tight,
+    bootstrap_reps = n_boot_tiny
   )
 
   # This should trigger various error handling paths
   result <- run_single_lewbel_simulation(1, bad_params)
 
   # Should return a data.frame even with errors
-  expect_s3_class(result, "data.frame")
-  expect_equal(nrow(result), 1)
+  assert_valid_dataframe(result, expected_rows = 1)
 })
 
 test_that("plot_bootstrap_ci with insufficient data (line 240)", {
@@ -147,10 +146,10 @@ test_that("plot_bootstrap_ci with insufficient data (line 240)", {
   # Create bootstrap examples with < 5 rows to trigger line 240
   small_bootstrap <- data.frame(
     sim_id = 1:3,
-    bound_lower_tau_set = c(0.1, 0.2, 0.3),
-    bound_upper_tau_set = c(0.4, 0.5, 0.6),
-    bound_se_lower = c(0.01, 0.02, 0.03),
-    bound_se_upper = c(0.01, 0.02, 0.03)
+    bound_lower_tau_set = c(test_tolerance_tight, test_tolerance_normal, 0.3),
+    bound_upper_tau_set = c(0.4, test_tolerance_loose, 0.6),
+    bound_se_lower = c(alpha_conservative, 0.02, 0.03),
+    bound_se_upper = c(alpha_conservative, 0.02, 0.03)
   )
 
   # This should return NULL (line 240)
@@ -164,29 +163,29 @@ test_that("generate_all_plots verbose output and null bootstrap", {
 
   # Create minimal test data
   results_main <- data.frame(
-    sim_id = 1:5,
-    first_stage_F = runif(5, 5, 20),
-    ols_gamma1 = rnorm(5, 0.5, 0.1),
-    tsls_gamma1 = rnorm(5, 0.3, 0.05)
+    sim_id = 1:n_sim_tiny,
+    first_stage_F = runif(n_sim_tiny, 5, 20),
+    ols_gamma1 = rnorm(n_sim_tiny, test_tolerance_loose, test_tolerance_tight),
+    tsls_gamma1 = rnorm(n_sim_tiny, 0.3, alpha_default)
   )
 
   results_by_n <- data.frame(
-    sample_size = rep(c(500, 1000), each = 2),
-    tsls_gamma1 = rnorm(4, 0.3, 0.05)
+    sample_size = rep(c(n_large, n_large * 2), each = 2),
+    tsls_gamma1 = rnorm(4, 0.3, alpha_default)
   )
 
   results_by_delta <- data.frame(
-    delta_het = rep(c(0.5, 1.0), each = 2),
-    tsls_gamma1 = rnorm(4, 0.3, 0.05)
+    delta_het = rep(c(test_tolerance_loose, 1.0), each = 2),
+    tsls_gamma1 = rnorm(4, 0.3, alpha_default)
   )
 
   # Small bootstrap examples (< 5 rows) to trigger NULL bootstrap plot
   bootstrap_examples <- data.frame(
     sim_id = 1:3,
-    bound_lower_tau_set = c(0.1, 0.2, 0.3),
-    bound_upper_tau_set = c(0.4, 0.5, 0.6),
-    bound_se_lower = c(0.01, 0.02, 0.03),
-    bound_se_upper = c(0.01, 0.02, 0.03)
+    bound_lower_tau_set = c(test_tolerance_tight, test_tolerance_normal, 0.3),
+    bound_upper_tau_set = c(0.4, test_tolerance_loose, 0.6),
+    bound_se_lower = c(alpha_conservative, 0.02, 0.03),
+    bound_se_upper = c(alpha_conservative, 0.02, 0.03)
   )
 
   # Test with verbose = TRUE to trigger line 324 and 344-349
@@ -199,7 +198,7 @@ test_that("generate_all_plots verbose output and null bootstrap", {
     "Generating enhanced plots"
   )
 
-  expect_type(plots, "list")
+  assert_list_structure(plots, names(plots))
   expect_null(plots$bootstrap_ci) # Should be NULL due to insufficient data
 })
 
@@ -222,8 +221,8 @@ test_that("run_lewbel_monte_carlo verification path (line 78)", {
     "Key assumptions"
   )
 
-  expect_type(result, "list")
-  expect_true("config" %in% names(result))
+  assert_list_structure(result, names(result))
+  assert_list_structure(result, "config")
 })
 
 test_that("run_lewbel_monte_carlo optional analyses (lines 173, 176, 179)", {
@@ -242,7 +241,7 @@ test_that("run_lewbel_monte_carlo optional analyses (lines 173, 176, 179)", {
     verbose = FALSE
   )
 
-  expect_type(result, "list")
+  assert_list_structure(result, names(result))
   expect_true(!is.null(result$results_by_n))
   expect_true(!is.null(result$results_by_delta))
   expect_true(!is.null(result$bootstrap_demo))
@@ -267,7 +266,7 @@ test_that("run_lewbel_monte_carlo summary print (line 194)", {
     "SIMULATION COMPLETE"
   )
 
-  expect_type(result, "list")
+  assert_list_structure(result, names(result))
 })
 
 test_that("run_lewbel_demo verbose output (line 248)", {
@@ -278,8 +277,8 @@ test_that("run_lewbel_demo verbose output (line 248)", {
     "Running Lewbel Monte Carlo Demo"
   )
 
-  expect_type(result, "list")
-  expect_true("config" %in% names(result))
+  assert_list_structure(result, names(result))
+  assert_list_structure(result, "config")
 })
 
 test_that("run_single_lewbel_simulation error handling paths", {
@@ -288,12 +287,12 @@ test_that("run_single_lewbel_simulation error handling paths", {
 
   # Create params that will cause estimation errors
   error_params <- list(
-    sample_size = 10, # Very small sample
+    sample_size = n_tiny, # Very small sample
     beta1_0 = 0, beta1_1 = 0, gamma1 = 0,
     beta2_0 = 0, beta2_1 = 0,
     alpha1 = 0, alpha2 = 0,
-    delta_het = 0,
-    tau_set_id = 0.1,
+    delta_het = delta_het_none,
+    tau_set_id = test_tolerance_tight,
     bootstrap_reps = 2
   )
 

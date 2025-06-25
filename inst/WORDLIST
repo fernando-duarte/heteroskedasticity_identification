@@ -265,6 +265,7 @@ ij
 importFrom
 inferrable
 infty
+inheritParams
 integrations
 IntelliSense
 intercep
@@ -849,3 +850,7 @@ tss
 vella
 X'delta
 lmtest
+SEMIPARAM
+le
+mathrm
+processx

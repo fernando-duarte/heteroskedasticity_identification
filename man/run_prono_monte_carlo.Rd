@@ -6,7 +6,7 @@
 \usage{
 run_prono_monte_carlo(
   config,
-  n_sims = 1000,
+  n_sims = .hetid_const("N_DEFAULT"),
   parallel = FALSE,
   n_cores = NULL,
   progress = TRUE

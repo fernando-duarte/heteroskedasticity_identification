@@ -11,8 +11,8 @@ klein_vella_semiparametric(
   x_vars = NULL,
   bandwidth_method = "cv.aic",
   kernel_type = "gaussian",
-  max_iter = 50,
-  tol = 1e-06,
+  max_iter = .hetid_const("MAX_ITERATIONS_KLEIN_VELLA"),
+  tol = .hetid_const("EPSILON_TOLERANCE"),
   verbose = TRUE
 )
 }
@@ -52,7 +52,7 @@ Requires the 'np' package for nonparametric regression.
 # Requires np package
 if (requireNamespace("np", quietly = TRUE)) {
   config <- create_klein_vella_config(
-    n = 500,
+    n = .hetid_const("N_SMALL"),
     beta1 = c(0.5, 1.5),
     beta2 = c(1.0, -1.0),
     gamma1 = -0.8,

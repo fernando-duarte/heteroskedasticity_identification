@@ -4,7 +4,7 @@
 \alias{create_prono_config}
 \title{Create default configuration for Prono simulations}
 \usage{
-create_prono_config(n = 500, k = 1, ...)
+create_prono_config(n = .hetid_const("N_SMALL"), k = 1, ...)
 }
 \arguments{
 \item{n}{Sample size}
