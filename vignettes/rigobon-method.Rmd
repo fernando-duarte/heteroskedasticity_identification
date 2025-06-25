@@ -9,6 +9,8 @@ vignette: >
   %\VignetteIndexEntry{Identification Through Regime-Based Heteroskedasticity: The Rigobon Method}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: references.bib
+csl: https://www.zotero.org/styles/journal-of-econometrics
 ---
 
 ```{r, include = FALSE}
@@ -796,6 +798,4 @@ The replication above uses simulated data calibrated to match the key characteri
 - [Prono Method](prono-method.html) - Time-series GARCH approach
 - [Package Comparison](package-comparison.html) - Software validation
 
-For theoretical details, see:
-- Rigobon, R. (2003). "Identification Through Heteroskedasticity." *The Review of Economics and Statistics*, 85(4), 777-792.
-- Lewbel, A. (2012). "Using Heteroscedasticity to Identify and Estimate Mismeasured and Endogenous Regressor Models." *Journal of Business & Economic Statistics*, 30(1), 67-80.
+For theoretical details, see [@rigobon2003; @lewbel2012].

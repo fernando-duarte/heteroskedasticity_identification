@@ -11,6 +11,8 @@ vignette: >
   %\VignetteIndexEntry{Using Conditional Heteroskedasticity for Identification: The Prono (2014) Method}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+bibliography: references.bib
+csl: https://www.zotero.org/styles/journal-of-econometrics
 ---
 
 ```{r, include = FALSE}
@@ -380,7 +382,6 @@ install.packages("tsgarch")
 ```
 
 Without `tsgarch`, the method falls back to using squared residuals as a proxy for conditional variance, which is less efficient.
-
 
 ### 3. Limitations
 
@@ -834,6 +835,6 @@ run_prono_asset_pricing <- function(data, window_size = 260) {
 
 ## References
 
-Prono, T. (2014). "The Role of Conditional Heteroskedasticity in Identifying and Estimating Linear Triangular Systems, with Applications to Asset Pricing Models That Include a Mismeasured Factor." *Journal of Applied Econometrics*, 29(5), 800-824.
+@prono2014
 
-Lewbel, A. (2012). "Using Heteroscedasticity to Identify and Estimate Mismeasured and Endogenous Regressor Models." *Journal of Business & Economic Statistics*, 30(1), 67-80.
+@lewbel2012
