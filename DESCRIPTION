@@ -48,6 +48,7 @@ Suggests:
     np,
     oysteR,
     pkgdepends,
+    processx,
     REndo (>= 2.4.0),
     rmarkdown,
     RStata,

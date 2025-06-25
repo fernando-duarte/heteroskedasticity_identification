@@ -133,8 +133,25 @@ exit
       # Run Stata
       stata_path <- get_stata_path()
       temp_log <- tempfile(fileext = ".log")
-      cmd <- sprintf("%s -b do %s", stata_path, temp_do)
-      result <- system(cmd, intern = FALSE, ignore.stdout = TRUE)
+
+      # Use processx if available, otherwise fall back to system()
+      if (requireNamespace("processx", quietly = TRUE)) {
+        result <- tryCatch({
+          p <- processx::run(
+            command = stata_path,
+            args = c("-b", "do", temp_do),
+            error_on_status = FALSE
+          )
+          p$status
+        }, error = function(e) {
+          # Fall back to system() if processx fails
+          cmd <- sprintf("%s -b do %s", stata_path, temp_do)
+          system(cmd, intern = FALSE, ignore.stdout = TRUE)
+        })
+      } else {
+        cmd <- sprintf("%s -b do %s", stata_path, temp_do)
+        result <- system(cmd, intern = FALSE, ignore.stdout = TRUE)
+      }
 
       # Read results if available
       if (result == 0 && file.exists(temp_results)) {

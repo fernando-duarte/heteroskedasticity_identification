@@ -104,8 +104,25 @@ ensure_stata_packages <- function() {
 
     # Run the installation
     temp_log <- tempfile(fileext = .hetid_const("stata$LOG_EXTENSION"))
-    cmd <- sprintf("%s -b do %s", stata_path, temp_do)
-    result <- system(cmd, intern = FALSE, ignore.stdout = TRUE)
+
+    # Use processx if available, otherwise fall back to system()
+    if (requireNamespace("processx", quietly = TRUE)) {
+      result <- tryCatch({
+        p <- processx::run(
+          command = stata_path,
+          args = c("-b", "do", temp_do),
+          error_on_status = FALSE
+        )
+        p$status
+      }, error = function(e) {
+        # Fall back to system() if processx fails
+        cmd <- sprintf("%s -b do %s", stata_path, temp_do)
+        system(cmd, intern = FALSE, ignore.stdout = TRUE)
+      })
+    } else {
+      cmd <- sprintf("%s -b do %s", stata_path, temp_do)
+      result <- system(cmd, intern = FALSE, ignore.stdout = TRUE)
+    }
 
     # Clean up
     unlink(temp_do)
