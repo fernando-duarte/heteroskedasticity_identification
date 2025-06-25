@@ -23,8 +23,8 @@
 )
 
 # Numerical tolerances and thresholds
-.hetid_constants$IDENTIFICATION_TOLERANCE <- 0.1  # For abs(gamma1 * gamma2 - 1) check
-.hetid_constants$COV_VARIATION_THRESHOLD <- 0.2   # 20% covariance variation threshold
+.hetid_constants$IDENTIFICATION_TOLERANCE <- 0.1 # For abs(gamma1 * gamma2 - 1) check
+.hetid_constants$COV_VARIATION_THRESHOLD <- 0.2 # 20% covariance variation threshold
 
 # System types
 .hetid_constants$SYSTEM <- list(

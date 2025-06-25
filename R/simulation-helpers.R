@@ -21,12 +21,11 @@ NULL
 #' @keywords internal
 #' @noRd
 .run_parallel_simulation <- function(n_simulations,
-                                    config,
-                                    sim_function,
-                                    compute_bounds_se_rule,
-                                    verbose = TRUE,
-                                    progress_message = "Starting simulation...") {
-
+                                     config,
+                                     sim_function,
+                                     compute_bounds_se_rule,
+                                     verbose = TRUE,
+                                     progress_message = "Starting simulation...") {
   if (verbose) {
     cat(sprintf("\n%s\n", progress_message))
   }
@@ -114,14 +113,13 @@ NULL
 #' @keywords internal
 #' @noRd
 .run_parameter_sweep <- function(param_values,
-                                param_name,
-                                n_reps,
-                                config,
-                                seeds,
-                                sim_function,
-                                verbose = TRUE,
-                                progress_prefix = "Parameter") {
-
+                                 param_name,
+                                 n_reps,
+                                 config,
+                                 seeds,
+                                 sim_function,
+                                 verbose = TRUE,
+                                 progress_prefix = "Parameter") {
   if (verbose) {
     cat(sprintf("\nRunning %s analysis...\n", progress_prefix))
   }

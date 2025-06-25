@@ -23,7 +23,7 @@ test_that("analyze_bootstrap_results with verbose output", {
 
   results_main <- create_mock_bootstrap_results(n_sim = 3)
   bootstrap_demo <- create_mock_bootstrap_results(n_sim = 2)
-  bootstrap_demo$sim_id <- 4:5  # Different sim_ids
+  bootstrap_demo$sim_id <- 4:5 # Different sim_ids
 
   # Test with verbose = TRUE
   analysis <- test_verbose_output(

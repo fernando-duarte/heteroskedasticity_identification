@@ -162,9 +162,11 @@ test_that("vignette Method 3 direct comparison works", {
 
   # Both should be reasonable estimates of true value -0.8
   expect_true(abs(coef_z - (-0.8)) < 0.3,
-    label = paste("Z-based estimate", coef_z, "should be within 0.3 of -0.8"))
+    label = paste("Z-based estimate", coef_z, "should be within 0.3 of -0.8")
+  )
   expect_true(abs(coef_x - (-0.8)) < 0.3,
-    label = paste("X-based estimate", coef_x, "should be within 0.3 of -0.8"))
+    label = paste("X-based estimate", coef_x, "should be within 0.3 of -0.8")
+  )
 
   # REndo comparison if available
   if (requireNamespace("REndo", quietly = TRUE)) {

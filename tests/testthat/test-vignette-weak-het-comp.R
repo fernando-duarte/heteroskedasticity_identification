@@ -99,14 +99,17 @@ test_that("weak heteroskedasticity testing matches vignette Section 5", {
   # Both weak and strong will have same heteroskedasticity pattern
   # Just verify both produce valid standard errors
   expect_true(se_manual_strong > 0,
-    label = "Strong het SE should be positive")
+    label = "Strong het SE should be positive"
+  )
   expect_true(se_manual_weak > 0,
-    label = "Weak het SE should be positive")
+    label = "Weak het SE should be positive"
+  )
 
   # SEs should be similar since heteroskedasticity is the same
   se_ratio <- se_manual_strong / se_manual_weak
   expect_true(abs(se_ratio - 1) < 0.2,
-    label = paste("SE ratio should be close to 1, got", round(se_ratio, 3)))
+    label = paste("SE ratio should be close to 1, got", round(se_ratio, 3))
+  )
 })
 
 test_that("summary statistics generation matches vignette Section 6", {

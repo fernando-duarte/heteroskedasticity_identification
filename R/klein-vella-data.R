@@ -28,38 +28,46 @@
 #' )
 #'
 create_klein_vella_config <- function(n,
-                                     k = 1,
-                                     beta1,
-                                     beta2,
-                                     gamma1,
-                                     rho,
-                                     delta1,
-                                     delta2,
-                                     x_dist = "normal",
-                                     seed = NULL,
-                                     verbose = TRUE) {
+                                      k = 1,
+                                      beta1,
+                                      beta2,
+                                      gamma1,
+                                      rho,
+                                      delta1,
+                                      delta2,
+                                      x_dist = "normal",
+                                      seed = NULL,
+                                      verbose = TRUE) {
   # Input validation
   if (n <= 0) stop("Sample size must be positive")
   if (k < 1) stop("Must have at least one exogenous variable")
   if (abs(rho) >= 1) stop("Correlation must be between -1 and 1")
 
   # Check coefficient lengths
-  expected_length <- k + 1  # +1 for intercept
+  expected_length <- k + 1 # +1 for intercept
   if (length(beta1) != expected_length) {
-    stop(sprintf("beta1 must have length %d (intercept + %d X coefficients)",
-                 expected_length, k))
+    stop(sprintf(
+      "beta1 must have length %d (intercept + %d X coefficients)",
+      expected_length, k
+    ))
   }
   if (length(beta2) != expected_length) {
-    stop(sprintf("beta2 must have length %d (intercept + %d X coefficients)",
-                 expected_length, k))
+    stop(sprintf(
+      "beta2 must have length %d (intercept + %d X coefficients)",
+      expected_length, k
+    ))
   }
   if (length(delta1) != expected_length) {
-    stop(sprintf("delta1 must have length %d (intercept + %d X coefficients)",
-                 expected_length, k))
+    stop(sprintf(
+      "delta1 must have length %d (intercept + %d X coefficients)",
+      expected_length, k
+    ))
   }
   if (length(delta2) != expected_length) {
-    stop(sprintf("delta2 must have length %d (intercept + %d X coefficients)",
-                 expected_length, k))
+    stop(sprintf(
+      "delta2 must have length %d (intercept + %d X coefficients)",
+      expected_length, k
+    ))
   }
 
   config <- list(
@@ -144,7 +152,7 @@ generate_klein_vella_data <- function(config, return_true_values = FALSE) {
   }
 
   # Generate X variables
-  X <- matrix(1, nrow = n, ncol = k + 1)  # First column is intercept
+  X <- matrix(1, nrow = n, ncol = k + 1) # First column is intercept
 
   if (k == 1) {
     # Single X variable
@@ -206,7 +214,7 @@ generate_klein_vella_data <- function(config, return_true_values = FALSE) {
     result <- data.frame(
       Y1 = as.vector(Y1),
       Y2 = as.vector(Y2),
-      X = X[, 2]  # Exclude intercept column
+      X = X[, 2] # Exclude intercept column
     )
   } else {
     result <- data.frame(
@@ -261,9 +269,11 @@ verify_klein_vella_assumptions <- function(data, config = NULL, verbose = TRUE) 
 
   # Test 1: Exogeneity (should have E[epsilon|X] = 0)
   lm1 <- lm(as.formula(paste(y1_var, "~", paste(c(x_vars, y2_var), collapse = " + "))),
-            data = data)
+    data = data
+  )
   lm2 <- lm(as.formula(paste(y2_var, "~", paste(x_vars, collapse = " + "))),
-            data = data)
+    data = data
+  )
 
   e1 <- residuals(lm1)
   e2 <- residuals(lm2)
@@ -275,7 +285,7 @@ verify_klein_vella_assumptions <- function(data, config = NULL, verbose = TRUE) 
   results$exogeneity <- list(
     p_value_y1 = summary(exog_test1)$fstatistic,
     p_value_y2 = summary(exog_test2)$fstatistic,
-    passed = TRUE  # Simplified - in practice use proper test
+    passed = TRUE # Simplified - in practice use proper test
   )
 
   # Test 2: Heteroskedasticity (both errors should be heteroskedastic)
@@ -311,7 +321,7 @@ verify_klein_vella_assumptions <- function(data, config = NULL, verbose = TRUE) 
     results$variance_ratio <- list(
       ratios = var_by_bin$ratio,
       cv = ratio_cv,
-      passed = ratio_cv > 0.1  # Require at least 10% coefficient of variation
+      passed = ratio_cv > 0.1 # Require at least 10% coefficient of variation
     )
   }
 
@@ -334,7 +344,7 @@ verify_klein_vella_assumptions <- function(data, config = NULL, verbose = TRUE) 
     results$constant_correlation <- list(
       correlations = correlations,
       sd = corr_sd,
-      passed = corr_sd < 0.2  # Somewhat arbitrary threshold
+      passed = corr_sd < 0.2 # Somewhat arbitrary threshold
     )
   }
 
@@ -346,33 +356,44 @@ verify_klein_vella_assumptions <- function(data, config = NULL, verbose = TRUE) 
     message("   [Simplified test - residuals uncorrelated with X]")
 
     message("\n2. Heteroskedasticity:")
-    message(sprintf("   Y1 equation: BP stat = %.2f, p = %.4f %s",
-                   bp_test1$statistic, bp_test1$p.value,
-                   ifelse(bp_test1$p.value < 0.05, "[PASS]", "[FAIL]")))
-    message(sprintf("   Y2 equation: BP stat = %.2f, p = %.4f %s",
-                   bp_test2$statistic, bp_test2$p.value,
-                   ifelse(bp_test2$p.value < 0.05, "[PASS]", "[FAIL]")))
+    message(sprintf(
+      "   Y1 equation: BP stat = %.2f, p = %.4f %s",
+      bp_test1$statistic, bp_test1$p.value,
+      ifelse(bp_test1$p.value < 0.05, "[PASS]", "[FAIL]")
+    ))
+    message(sprintf(
+      "   Y2 equation: BP stat = %.2f, p = %.4f %s",
+      bp_test2$statistic, bp_test2$p.value,
+      ifelse(bp_test2$p.value < 0.05, "[PASS]", "[FAIL]")
+    ))
 
     if (!is.null(results$variance_ratio)) {
       message("\n3. Variance Ratio Variation:")
-      message(sprintf("   Coefficient of variation: %.2f %s",
-                     results$variance_ratio$cv,
-                     ifelse(results$variance_ratio$passed, "[PASS]", "[FAIL]")))
+      message(sprintf(
+        "   Coefficient of variation: %.2f %s",
+        results$variance_ratio$cv,
+        ifelse(results$variance_ratio$passed, "[PASS]", "[FAIL]")
+      ))
     }
 
     if (!is.null(results$constant_correlation)) {
       message("\n4. Constant Correlation:")
-      message(sprintf("   SD of correlations: %.3f %s",
-                     results$constant_correlation$sd,
-                     ifelse(results$constant_correlation$passed, "[PASS]", "[FAIL]")))
+      message(sprintf(
+        "   SD of correlations: %.3f %s",
+        results$constant_correlation$sd,
+        ifelse(results$constant_correlation$passed, "[PASS]", "[FAIL]")
+      ))
     }
 
     # Overall assessment
     all_passed <- all(sapply(results, function(x) x$passed))
-    message(sprintf("\nOverall: %s",
-                   ifelse(all_passed,
-                          "[OK] Data appears suitable for Klein & Vella",
-                          "[WARNING] Some assumptions may be violated")))
+    message(sprintf(
+      "\nOverall: %s",
+      ifelse(all_passed,
+        "[OK] Data appears suitable for Klein & Vella",
+        "[WARNING] Some assumptions may be violated"
+      )
+    ))
   }
 
   return(results)

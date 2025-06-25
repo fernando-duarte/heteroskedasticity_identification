@@ -178,9 +178,10 @@ test_that("hetid performs well on simulated data with realistic properties", {
 
   # If OLS is biased upward, TSLS should be less biased upward
   # If OLS is biased downward, TSLS should be less biased downward
-  improvement <- abs(tsls_bias) <= abs(ols_bias) * 1.1  # Allow 10% margin
+  improvement <- abs(tsls_bias) <= abs(ols_bias) * 1.1 # Allow 10% margin
   expect_true(improvement || result$results$first_stage_F < 5,
-    label = "TSLS should improve on OLS bias unless instruments are very weak")
+    label = "TSLS should improve on OLS bias unless instruments are very weak"
+  )
 })
 
 test_that("hetid handles edge cases in real-world style data", {

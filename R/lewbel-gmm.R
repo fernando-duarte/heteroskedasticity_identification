@@ -1201,7 +1201,6 @@ prono_gmm <- function(data,
 rigobon_moment_conditions <- function(theta, data, system,
                                       y1_var, y2_var, x_vars,
                                       regime_var, add_intercept = TRUE) {
-
   # --- 1. Unified Setup ---
   n <- nrow(data)
   k <- length(x_vars) + if (add_intercept) 1 else 0
