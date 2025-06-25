@@ -4,6 +4,29 @@
 #' @keywords internal
 NULL
 
+#' Internal helper to build parameter list from config
+#'
+#' Creates a consistent parameter list for simulations
+#'
+#' @param config List. Configuration object
+#' @return List with simulation parameters
+#' @keywords internal
+.build_params_list <- function(config) {
+  list(
+    sample_size = config$main_sample_size,
+    beta1_0 = config$beta1_0,
+    beta1_1 = config$beta1_1,
+    gamma1 = config$gamma1,
+    beta2_0 = config$beta2_0,
+    beta2_1 = config$beta2_1,
+    alpha1 = config$alpha1,
+    alpha2 = config$alpha2,
+    delta_het = config$delta_het,
+    tau_set_id = config$tau_set_id,
+    bootstrap_reps = config$bootstrap_reps
+  )
+}
+
 #' Run Parallel Simulation with Common Setup
 #'
 #' Internal helper that encapsulates the common pattern for running
@@ -34,19 +57,7 @@ NULL
   future::plan(future::multisession, workers = future::availableCores() - 1)
 
   # Build parameter list once (same for all iterations)
-  params_list <- list(
-    sample_size = config$main_sample_size,
-    beta1_0 = config$beta1_0,
-    beta1_1 = config$beta1_1,
-    gamma1 = config$gamma1,
-    beta2_0 = config$beta2_0,
-    beta2_1 = config$beta2_1,
-    alpha1 = config$alpha1,
-    alpha2 = config$alpha2,
-    delta_het = config$delta_het,
-    tau_set_id = config$tau_set_id,
-    bootstrap_reps = config$bootstrap_reps
-  )
+  params_list <- .build_params_list(config)
 
   # Run simulations in parallel
   results <- furrr::future_map_dfr(
@@ -145,19 +156,7 @@ NULL
         seq_len(n_reps),
         function(j) {
           # Build parameter list with the varying parameter
-          params_list <- list(
-            sample_size = config$main_sample_size,
-            beta1_0 = config$beta1_0,
-            beta1_1 = config$beta1_1,
-            gamma1 = config$gamma1,
-            beta2_0 = config$beta2_0,
-            beta2_1 = config$beta2_1,
-            alpha1 = config$alpha1,
-            alpha2 = config$alpha2,
-            delta_het = config$delta_het,
-            tau_set_id = config$tau_set_id,
-            bootstrap_reps = config$bootstrap_reps
-          )
+          params_list <- .build_params_list(config)
 
           # Override the varying parameter
           params_list[[param_name]] <- param_val

@@ -1,6 +1,62 @@
 #' @importFrom rlang .data
 NULL
 
+#' Internal helper for creating summary statistics
+#'
+#' Unified function to create summary statistics for different grouping variables
+#'
+#' @param results_data Data frame with results
+#' @param group_var Character. Name of grouping variable
+#' @param config List. Configuration object
+#' @param include_bounds Logical. Whether to include bounds width in summary
+#' @param verbose Logical. Whether to print output
+#' @param title Character. Title for verbose output
+#' @return Data frame with summary statistics
+#' @keywords internal
+.create_grouped_summary <- function(results_data, group_var, config,
+                                   include_bounds = FALSE, verbose = TRUE,
+                                   title = "") {
+  # Group and summarize
+  grouped_data <- dplyr::group_by(results_data, .data[[group_var]])
+
+  summary_data <- if (include_bounds) {
+    dplyr::summarise(
+      grouped_data,
+      `2SLS Bias` = mean(.data$tsls_gamma1, na.rm = TRUE) - config$gamma1,
+      `2SLS RMSE` = sqrt(
+        mean((.data$tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)
+      ),
+      `Avg First-Stage F` = mean(.data$first_stage_F, na.rm = TRUE),
+      `Bounds Width` = mean(
+        .data$bound_upper_tau_set - .data$bound_lower_tau_set,
+        na.rm = TRUE
+      ),
+      .groups = "drop"
+    )
+  } else {
+    dplyr::summarise(
+      grouped_data,
+      `2SLS Bias` = mean(.data$tsls_gamma1, na.rm = TRUE) - config$gamma1,
+      `2SLS RMSE` = sqrt(
+        mean((.data$tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)
+      ),
+      `Avg First-Stage F` = mean(.data$first_stage_F, na.rm = TRUE),
+      .groups = "drop"
+    )
+  }
+
+  if (verbose) {
+    cat(paste0("\n--- ", title, " ---\n"))
+    if (requireNamespace("knitr", quietly = TRUE)) {
+      print(knitr::kable(summary_data, digits = hetid_opt("display_digits")))
+    } else {
+      print(summary_data)
+    }
+  }
+
+  summary_data
+}
+
 #' Analyze Main Simulation Results
 #'
 #' Provides analysis of the main Monte Carlo simulation results,
@@ -245,31 +301,14 @@ analyze_bootstrap_results <- function(results_main,
 analyze_sample_size_results <- function(results_by_n,
                                         config,
                                         verbose = TRUE) {
-  # Group by sample size and summarize
-  grouped_n <- dplyr::group_by(results_by_n, .data$sample_size)
-  n_summary <- dplyr::summarise(
-    grouped_n,
-    `2SLS Bias` = mean(.data$tsls_gamma1, na.rm = TRUE) - config$gamma1,
-    `2SLS RMSE` = sqrt(
-      mean((.data$tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)
-    ),
-    `Avg First-Stage F` = mean(.data$first_stage_F, na.rm = TRUE),
-    .groups = "drop"
+  .create_grouped_summary(
+    results_data = results_by_n,
+    group_var = "sample_size",
+    config = config,
+    include_bounds = FALSE,
+    verbose = verbose,
+    title = "Consistency Check: Performance by Sample Size"
   )
-
-  if (verbose) {
-    cat(paste0(
-      "\n--- Consistency Check: Performance by Sample Size ---",
-      "\n"
-    ))
-    if (requireNamespace("knitr", quietly = TRUE)) {
-      print(knitr::kable(n_summary, digits = hetid_opt("display_digits")))
-    } else {
-      print(n_summary)
-    }
-  }
-
-  n_summary
 }
 
 
@@ -299,35 +338,14 @@ analyze_sample_size_results <- function(results_by_n,
 analyze_sensitivity_results <- function(results_by_delta,
                                         config,
                                         verbose = TRUE) {
-  # Group by delta_het and summarize
-  grouped_delta <- dplyr::group_by(results_by_delta, .data$delta_het)
-  delta_summary <- dplyr::summarise(
-    grouped_delta,
-    `2SLS Bias` = mean(.data$tsls_gamma1, na.rm = TRUE) - config$gamma1,
-    `2SLS RMSE` = sqrt(
-      mean((.data$tsls_gamma1 - config$gamma1)^2, na.rm = TRUE)
-    ),
-    `Avg First-Stage F` = mean(.data$first_stage_F, na.rm = TRUE),
-    `Bounds Width` = mean(
-      .data$bound_upper_tau_set - .data$bound_lower_tau_set,
-      na.rm = TRUE
-    ),
-    .groups = "drop"
+  .create_grouped_summary(
+    results_data = results_by_delta,
+    group_var = "delta_het",
+    config = config,
+    include_bounds = TRUE,
+    verbose = verbose,
+    title = "Sensitivity to Heteroscedasticity Strength"
   )
-
-  if (verbose) {
-    cat(paste0(
-      "\n--- Sensitivity to Heteroscedasticity Strength ---",
-      "\n"
-    ))
-    if (requireNamespace("knitr", quietly = TRUE)) {
-      print(knitr::kable(delta_summary, digits = hetid_opt("display_digits")))
-    } else {
-      print(delta_summary)
-    }
-  }
-
-  delta_summary
 }
 
 

@@ -7,6 +7,82 @@
 #' @import stats
 NULL
 
+#' Internal helper for Lewbel moment conditions
+#'
+#' Unified function to calculate moment conditions for both triangular
+#' and simultaneous systems in Lewbel's framework.
+#'
+#' @inheritParams lewbel_triangular_moments
+#' @param system Character. "triangular" or "simultaneous"
+#' @param z_sq Logical. For simultaneous systems, whether to include squared Z terms
+#' @return Matrix of moment conditions
+#' @keywords internal
+.lewbel_moments_helper <- function(theta, data, y1_var, y2_var, x_vars, z_vars,
+                                   add_intercept, system = "triangular", z_sq = FALSE) {
+  n <- nrow(data)
+  k <- length(x_vars)
+  if (add_intercept) k <- k + 1
+
+  y1_data <- data[[y1_var]]
+  y2_data <- data[[y2_var]]
+  x_matrix <- as.matrix(data[, x_vars, drop = FALSE])
+
+  if (add_intercept) {
+    x_matrix <- cbind(1, x_matrix)
+  }
+
+  # Extract parameters based on system type
+  beta1 <- theta[1:k]
+  gamma1 <- theta[k + 1]
+  beta2 <- theta[(k + 2):(2 * k + 1)]
+
+  # Calculate structural errors
+  if (system == "triangular") {
+    eps1 <- y1_data - x_matrix %*% beta1 - y2_data * gamma1
+    eps2 <- y2_data - x_matrix %*% beta2
+  } else {  # simultaneous
+    gamma2 <- theta[2 * k + 2]
+
+    # Check identification condition for simultaneous system
+    if (abs(gamma1 * gamma2 - 1) < .hetid_const("IDENTIFICATION_TOLERANCE")) {
+      warning("gamma1 * gamma2 is close to 1, which may lead to identification problems")
+    }
+
+    eps1 <- y1_data - x_matrix %*% beta1 - y2_data * gamma1
+    eps2 <- y2_data - x_matrix %*% beta2 - y1_data * gamma2
+  }
+
+  # Construct Z matrix for instruments
+  if (is.null(z_vars)) {
+    if (add_intercept && ncol(x_matrix) > 1) {
+      z_matrix <- scale(x_matrix[, -1, drop = FALSE], center = TRUE, scale = FALSE)
+    } else if (!add_intercept && ncol(x_matrix) > 0) {
+      z_matrix <- scale(x_matrix, center = TRUE, scale = FALSE)
+    } else {
+      stop(ifelse(system == "triangular",
+                  .hetid_const("messages$CANNOT_AUTO_CONSTRUCT_Z_NO_X"),
+                  .hetid_const("messages$CANNOT_AUTO_CONSTRUCT_Z_SIMUL")))
+    }
+
+    # For simultaneous equations, optionally add squared terms
+    if (system == "simultaneous" && z_sq) {
+      z_matrix <- cbind(z_matrix, z_matrix^2)
+      z_matrix <- scale(z_matrix, center = TRUE, scale = FALSE)
+    }
+  } else {
+    z_matrix <- as.matrix(data[, z_vars, drop = FALSE])
+    z_matrix <- scale(z_matrix, center = TRUE, scale = FALSE)
+  }
+
+  # Moment conditions
+  m1 <- x_matrix * c(eps1)
+  m2 <- x_matrix * c(eps2)
+  m3 <- z_matrix * c(eps1 * eps2)
+
+  moments <- cbind(m1, m2, m3)
+  moments
+}
+
 #' Define GMM Moment Conditions for Lewbel Triangular System
 #'
 #' Creates the moment function for GMM estimation of a triangular system
@@ -42,50 +118,8 @@ NULL
 #'
 #' @export
 lewbel_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars, z_vars, add_intercept) {
-  n <- nrow(data)
-  k <- length(x_vars)
-  if (add_intercept) k <- k + 1
-
-  y1_data <- data[[y1_var]]
-  y2_data <- data[[y2_var]]
-  x_matrix <- as.matrix(data[, x_vars, drop = FALSE])
-
-  if (add_intercept) {
-    x_matrix <- cbind(1, x_matrix)
-  }
-
-  # Parameters: (beta1_0, beta1_1, ..., gamma1, beta2_0, beta2_1, ...)
-  beta1 <- theta[1:k]
-  gamma1 <- theta[k + 1]
-  beta2 <- theta[(k + 2):(2 * k + 1)]
-
-
-  # Structural errors
-  eps1 <- y1_data - x_matrix %*% beta1 - y2_data * gamma1
-  eps2 <- y2_data - x_matrix %*% beta2
-
-  # Construct Z matrix for instruments
-  # Default Z: demeaned X (excluding intercept if present)
-  if (is.null(z_vars)) {
-    if (add_intercept && ncol(x_matrix) > 1) {
-      z_matrix <- scale(x_matrix[, -1, drop = FALSE], center = TRUE, scale = FALSE)
-    } else if (!add_intercept && ncol(x_matrix) > 0) {
-      z_matrix <- scale(x_matrix, center = TRUE, scale = FALSE)
-    } else {
-      stop(.hetid_const("messages$CANNOT_AUTO_CONSTRUCT_Z_NO_X"))
-    }
-  } else {
-    z_matrix <- as.matrix(data[, z_vars, drop = FALSE])
-    z_matrix <- scale(z_matrix, center = TRUE, scale = FALSE)
-  }
-
-  # Moment conditions
-  m1 <- x_matrix * c(eps1)
-  m2 <- x_matrix * c(eps2)
-  m3 <- z_matrix * c(eps1 * eps2)
-
-  moments <- cbind(m1, m2, m3)
-  moments
+  .lewbel_moments_helper(theta, data, y1_var, y2_var, x_vars, z_vars,
+                         add_intercept, system = "triangular", z_sq = FALSE)
 }
 
 
@@ -120,64 +154,8 @@ lewbel_triangular_moments <- function(theta, data, y1_var, y2_var, x_vars, z_var
 #'
 #' @export
 lewbel_simultaneous_moments <- function(theta, data, y1_var, y2_var, x_vars, z_vars, add_intercept, z_sq) {
-  n <- nrow(data)
-  k <- length(x_vars)
-  if (add_intercept) k <- k + 1
-
-  y1_data <- data[[y1_var]]
-  y2_data <- data[[y2_var]]
-  x_matrix <- as.matrix(data[, x_vars, drop = FALSE])
-
-  if (add_intercept) {
-    x_matrix <- cbind(1, x_matrix)
-  }
-
-  # Parameters: (beta1_0, beta1_1, ..., gamma1, beta2_0, beta2_1, ..., gamma2)
-  beta1 <- theta[1:k]
-  gamma1 <- theta[k + 1]
-  beta2 <- theta[(k + 2):(2 * k + 1)]
-  gamma2 <- theta[2 * k + 2]
-
-  # Check identification condition
-  if (abs(gamma1 * gamma2 - 1) < .hetid_const("IDENTIFICATION_TOLERANCE")) {
-    warning("gamma1 * gamma2 is close to 1, which may lead to identification problems")
-  }
-
-  # Structural errors
-  eps1 <- y1_data - x_matrix %*% beta1 - y2_data * gamma1
-  eps2 <- y2_data - x_matrix %*% beta2 - y1_data * gamma2
-
-  # Construct Z matrix for instruments
-  if (is.null(z_vars)) {
-    if (add_intercept && ncol(x_matrix) > 1) {
-      z_matrix <- scale(x_matrix[, -1, drop = FALSE], center = TRUE, scale = FALSE)
-    } else if (!add_intercept && ncol(x_matrix) > 0) {
-      z_matrix <- scale(x_matrix, center = TRUE, scale = FALSE)
-    } else {
-      stop(.hetid_const("messages$CANNOT_AUTO_CONSTRUCT_Z_SIMUL"))
-    }
-    if (z_sq) { # If TRUE, Z = [Z, Z^2] for simultaneous eq, as per Lewbel (2012) p.70, for Cov(Z,eps_i^2) != 0
-      z_matrix <- cbind(z_matrix, z_matrix^2)
-      z_matrix <- scale(z_matrix, center = TRUE, scale = FALSE) # Re-center after adding Z^2
-    }
-  } else {
-    z_matrix <- as.matrix(data[, z_vars, drop = FALSE])
-    z_matrix <- scale(z_matrix, center = TRUE, scale = FALSE)
-  }
-
-  if (ncol(z_matrix) < 2 && is.null(z_vars)) {
-    # Lewbel (2012) notes that for simultaneous equations, Z needs at least 2 elements if constructed from X.
-    # This is to ensure the rank condition for identification (Phi_W has rank 2).
-    # Since this is the simultaneous moments function, this warning applies.
-  }
-
-  # Moment conditions
-  m1 <- x_matrix * c(eps1)
-  m2 <- x_matrix * c(eps2)
-  m3 <- z_matrix * c(eps1 * eps2)
-
-  moments <- cbind(m1, m2, m3)
-  moments
+  .lewbel_moments_helper(theta, data, y1_var, y2_var, x_vars, z_vars,
+                         add_intercept, system = "simultaneous", z_sq = z_sq)
 }
 
 

@@ -265,6 +265,7 @@ ij
 importFrom
 inferrable
 infty
+inheritParams
 integrations
 IntelliSense
 intercep
