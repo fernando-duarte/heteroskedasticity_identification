@@ -16,7 +16,7 @@ calculate_lewbel_bounds(
 \item{data}{Data.frame. Dataset containing Y1, Y2, Xk, Z variables.}
 
 \item{tau}{Numeric. Relaxation parameter for covariance restriction
-(0 <= tau < 1). When tau = 0, gives point identification.}
+\eqn{0 \le \tau < 1}. When \eqn{\tau = 0}, gives point identification.}
 
 \item{compute_se}{Logical. Whether to compute bootstrap standard errors
 (default: FALSE).}
@@ -48,9 +48,9 @@ Note: This parameter currently only affects the
 interpretation of bootstrap SEs, not the bounds calculation itself.
 
 Under the relaxed assumption
-|Corr(Z, \eqn{\epsilon_1 \epsilon_2})| <= tau |Corr(Z, \eqn{\epsilon_2^2})|,
-the parameter gamma_1 is set-identified. The bounds are computed as the
-real roots of a quadratic equation in gamma_1.
+\eqn{|\mathrm{Corr}(Z, \epsilon_1 \epsilon_2)| \le \tau\,|\mathrm{Corr}(Z, \epsilon_2^2)|},
+the parameter \eqn{\gamma_1} is set-identified. The bounds are computed as the
+real roots of a quadratic equation in \eqn{\gamma_1}.
 }
 \examples{
 \dontrun{
