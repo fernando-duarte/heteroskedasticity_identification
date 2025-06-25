@@ -1,3 +1,40 @@
+#' Internal helper for creating boxplot visualizations
+#'
+#' Creates standardized boxplot for 2SLS estimates across different factors
+#'
+#' @param plot_data Data frame with plotting data
+#' @param x_var Character. Name of x-axis variable
+#' @param y_var Character. Name of y-axis variable
+#' @param true_value Numeric. True parameter value for reference line
+#' @param fill_color Character. Color for boxplot fill
+#' @param title Character. Plot title
+#' @param subtitle Character. Plot subtitle
+#' @param x_label Character. X-axis label
+#' @param y_label Character. Y-axis label
+#' @return ggplot object
+#' @keywords internal
+.create_boxplot_visualization <- function(plot_data, x_var, y_var, true_value,
+                                         fill_color, title, subtitle,
+                                         x_label, y_label) {
+  ggplot2::ggplot(
+    plot_data,
+    ggplot2::aes(x = factor(.data[[x_var]]), y = .data[[y_var]])
+  ) +
+    ggplot2::geom_boxplot(fill = fill_color, alpha = 0.7) +
+    ggplot2::geom_hline(
+      yintercept = true_value,
+      linetype = "dashed",
+      color = .hetid_const("plot$colors$REFERENCE_LINE")
+    ) +
+    ggplot2::labs(
+      title = title,
+      subtitle = subtitle,
+      x = x_label,
+      y = y_label
+    ) +
+    ggplot2::theme_minimal(base_size = .hetid_const("PLOT_BASE_FONT_SIZE"))
+}
+
 #' Create Distribution Plot of Estimators
 #'
 #' Creates a density plot comparing the distributions of OLS and 2SLS
@@ -100,23 +137,18 @@ plot_sample_size_consistency <- function(results_by_n, config) {
   # Filter data
   plot_data <- dplyr::filter(results_by_n, !is.na(.data$tsls_gamma1))
 
-  # Create plot
-  ggplot2::ggplot(
-    plot_data,
-    ggplot2::aes(x = factor(.data$sample_size), y = .data$tsls_gamma1)
-  ) +
-    ggplot2::geom_boxplot(fill = .hetid_const("plot$colors$SAMPLE_SIZE_BOX"), alpha = 0.7) +
-    ggplot2::geom_hline(
-      yintercept = config$gamma1, linetype = "dashed", color = .hetid_const("plot$colors$REFERENCE_LINE")
-    ) +
-    ggplot2::labs(
-      title = "2SLS Consistency: Estimates by Sample Size",
-      subtitle = paste0(
-        "Estimates should concentrate around true value as N increases"
-      ),
-      x = "Sample Size", y = "2SLS Estimate of gamma1"
-    ) +
-    ggplot2::theme_minimal(base_size = .hetid_const("PLOT_BASE_FONT_SIZE"))
+  # Use helper function
+  .create_boxplot_visualization(
+    plot_data = plot_data,
+    x_var = "sample_size",
+    y_var = "tsls_gamma1",
+    true_value = config$gamma1,
+    fill_color = .hetid_const("plot$colors$SAMPLE_SIZE_BOX"),
+    title = "2SLS Consistency: Estimates by Sample Size",
+    subtitle = "Estimates should concentrate around true value as N increases",
+    x_label = "Sample Size",
+    y_label = "2SLS Estimate of gamma1"
+  )
 }
 
 
@@ -143,22 +175,18 @@ plot_het_sensitivity <- function(results_by_delta, config) {
   # Filter data
   plot_data <- dplyr::filter(results_by_delta, !is.na(.data$tsls_gamma1))
 
-  # Create plot
-  ggplot2::ggplot(
-    plot_data,
-    ggplot2::aes(x = factor(.data$delta_het), y = .data$tsls_gamma1)
-  ) +
-    ggplot2::geom_boxplot(fill = .hetid_const("plot$colors$SENSITIVITY_BOX"), alpha = 0.7) +
-    ggplot2::geom_hline(
-      yintercept = config$gamma1, linetype = "dashed", color = .hetid_const("plot$colors$REFERENCE_LINE")
-    ) +
-    ggplot2::labs(
-      title = "2SLS Performance by Heteroscedasticity Strength",
-      subtitle = "Stronger heteroscedasticity should improve precision",
-      x = "Delta (Heteroscedasticity Parameter)",
-      y = "2SLS Estimate of gamma1"
-    ) +
-    ggplot2::theme_minimal(base_size = .hetid_const("PLOT_BASE_FONT_SIZE"))
+  # Use helper function
+  .create_boxplot_visualization(
+    plot_data = plot_data,
+    x_var = "delta_het",
+    y_var = "tsls_gamma1",
+    true_value = config$gamma1,
+    fill_color = .hetid_const("plot$colors$SENSITIVITY_BOX"),
+    title = "2SLS Performance by Heteroscedasticity Strength",
+    subtitle = "Stronger heteroscedasticity should improve precision",
+    x_label = "Delta (Heteroscedasticity Parameter)",
+    y_label = "2SLS Estimate of gamma1"
+  )
 }
 
 
