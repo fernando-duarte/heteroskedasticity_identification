@@ -137,18 +137,15 @@ install.packages("hetid")
 
 # Install development version from GitHub
 # install.packages("devtools")
-devtools::install_github("your-github/hetid")
+devtools::install_github("fernando-duarte/heteroskedasticity_identification")
 ```
 
 ## Getting Help
 
 - **Documentation**: Use `?function_name` for any function
 - **Examples**: Each major function includes runnable examples
-- **Issues**: Report bugs at [GitHub Issues](https://github.com/your-github/hetid/issues)
 - **Citation**: Use `citation("hetid")` for citing the package
 
 ## See Also
 
-- [Package website](https://your-website.github.io/hetid/)
-- [GitHub repository](https://github.com/your-github/hetid)
 - Original papers: Lewbel (2012), Rigobon (2003), Prono (2014)

@@ -33,7 +33,7 @@ if (requireNamespace("REndo", quietly = TRUE)) {
 
 This vignette provides a rigorous comparison of three implementations of Lewbel (2012)'s heteroskedasticity-based identification method:
 
-- **[hetid](https://github.com/fernandd/hetid)** (this package)
+- **hetid** (this package)
 - **[Stata's ivreg2h](https://ideas.repec.org/c/boc/bocode/s457555.html)**
 - **[REndo](https://CRAN.R-project.org/package=REndo)**
 

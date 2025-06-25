@@ -19,6 +19,10 @@ The `hetid` package implements identification through heteroskedasticity methods
   - GMM (Generalized Method of Moments) estimation for both triangular and simultaneous systems
   - Traditional 2SLS (Two-Stage Least Squares) estimation
   - Set identification when point identification assumptions are relaxed
+- **Klein and Vella (2010)**: Control function approach using heteroskedasticity
+  - Parametric and semiparametric control function methods
+  - Heteroskedasticity-based identification without exclusion restrictions
+  - Support for triangular systems
 - **Rigobon (2003)**: Identification using discrete regime indicators
   - GMM estimation for regime-based heteroskedasticity
   - 2SLS with regime-based instruments
@@ -179,6 +183,8 @@ See the [Makefile](Makefile) for all available test commands.
 **[Troubleshooting](dev-guides/TROUBLESHOOTING.md)**.
 
 ## References
+
+- Klein, R., & Vella, F. (2010). Estimating a class of triangular simultaneous equations models without exclusion restrictions. *Journal of Econometrics*, 154(2), 154-164. https://doi.org/10.1016/j.jeconom.2009.05.005
 
 - Lewbel, A. (2012). Using heteroscedasticity to identify and estimate mismeasured and endogenous regressor models. *Journal of Business & Economic Statistics*, 30(1), 67-80. https://doi.org/10.1080/07350015.2012.643126
 

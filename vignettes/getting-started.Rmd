@@ -28,7 +28,7 @@ library(hetid)
 
 ## Introduction
 
-The `hetid` package implements the identification through heteroskedasticity method developed by Lewbel (2012) for time-series models with endogenous regressors. This method provides a way to identify and estimate causal effects when traditional instrumental variables are not available, using heteroskedasticity in the error terms as a source of identification.
+The `hetid` package implements identification through heteroskedasticity methods for models with endogenous regressors. These methods provide ways to identify and estimate causal effects when traditional instrumental variables are not available, using heteroskedasticity in the error terms as a source of identification. The package includes implementations of Klein and Vella (2010), Lewbel (2012), Rigobon (2003), and Prono (2014) methods.
 
 ### The Lewbel (2012) Method
 

@@ -36,6 +36,8 @@ navbar:
         href: articles/heteroskedasticity-identification-theory.html
       - text: GMM Estimation with Lewbel (2012)
         href: articles/lewbel-gmm.html
+      - text: Klein and Vella (2010) Method
+        href: articles/klein-vella-method.html
       - text: Rigobon (2003) Method
         href: articles/rigobon-method.html
       - text: Prono (2014) Method
