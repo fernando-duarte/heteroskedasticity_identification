@@ -84,9 +84,10 @@ test_that("messager prints messages based on verbose setting", {
 test_that("messager handles parallel mode", {
   skip_if_not_test_level("cran")
 
-  # In parallel mode, output goes to system echo
-  # We can't capture it easily, but ensure no errors
-  expect_silent(
+  # In parallel mode, now uses message() instead of system()
+  # The try() wrapper in messager might suppress messages in some contexts
+  # so we just check it doesn't throw an error
+  expect_no_error(
     hetid:::messager("Parallel message", v = TRUE, parallel = TRUE)
   )
 
