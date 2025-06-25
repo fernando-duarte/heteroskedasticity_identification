@@ -79,18 +79,18 @@ klein_vella_parametric <- function(data,
     variance_function <- function(X, delta) {
       log_var <- X %*% delta
       # Cap extreme values
-      log_var <- pmax(pmin(log_var, 10), -10)
+      log_var <- pmax(pmin(log_var, .hetid_const("LOG_BOUND_MAX")), .hetid_const("LOG_BOUND_MIN"))
       exp(log_var)
     }
   } else if (variance_type == "power") {
     variance_function <- function(X, delta) {
       linear_combo <- X %*% delta
-      pmax(linear_combo^2, 1e-6) # Ensure positivity
+      pmax(linear_combo^2, .hetid_const("EPSILON_TOLERANCE")) # Ensure positivity
     }
   } else if (variance_type == "linear") {
     variance_function <- function(X, delta) {
       linear_combo <- X %*% delta
-      pmax(linear_combo, 1e-6) # Ensure positivity
+      pmax(linear_combo, .hetid_const("EPSILON_TOLERANCE")) # Ensure positivity
     }
   } else {
     stop("Unknown variance_type. Choose 'exponential', 'power', or 'linear'.")
@@ -132,8 +132,8 @@ klein_vella_parametric <- function(data,
     coef(lm1_init)[1:(k + 1)], # beta1 initial
     coef(lm1_init)[k + 2], # gamma1 initial
     0, # rho initial (transformed)
-    rep(0.1, k + 1), # delta1 initial
-    rep(0.1, k + 1) # delta2 initial
+    rep(.hetid_const("IDENTIFICATION_TOLERANCE"), k + 1), # delta1 initial
+    rep(.hetid_const("IDENTIFICATION_TOLERANCE"), k + 1) # delta2 initial
   )
 
   # Step 4: Optimize
@@ -143,7 +143,7 @@ klein_vella_parametric <- function(data,
     par = init_params,
     fn = objective_function,
     method = optimization_method,
-    control = list(maxit = 1000, reltol = 1e-8)
+    control = list(maxit = .hetid_const("MAX_ITERATIONS_DEFAULT"), reltol = .hetid_const("CONVERGENCE_TOLERANCE"))
   )
 
   if (opt_result$convergence != 0) {
@@ -174,7 +174,7 @@ klein_vella_parametric <- function(data,
 
   # Numerical gradient
   grad_fn <- function(params) {
-    eps <- 1e-6
+    eps <- .hetid_const("EPSILON_TOLERANCE")
     grad <- numeric(n_params)
     f0 <- objective_function(params)
 
@@ -189,7 +189,7 @@ klein_vella_parametric <- function(data,
 
   # Hessian approximation
   hessian <- matrix(0, n_params, n_params)
-  eps <- 1e-6
+  eps <- .hetid_const("EPSILON_TOLERANCE")
   for (i in 1:n_params) {
     params_plus <- final_params
     params_plus[i] <- final_params[i] + eps
@@ -377,11 +377,11 @@ print.summary.klein_vella_fit <- function(x, ...) {
     ))
 
     # Add significance stars
-    if (abs(t_val) > 2.576) {
+    if (abs(t_val) > qnorm(1 - .hetid_const("ALPHA_STRICT") / 2)) {
       cat(" ***")
-    } else if (abs(t_val) > 1.96) {
+    } else if (abs(t_val) > .hetid_const("Z_CRITICAL_95")) {
       cat(" **")
-    } else if (abs(t_val) > 1.645) {
+    } else if (abs(t_val) > qnorm(1 - .hetid_const("ALPHA_DEFAULT") / 2)) {
       cat(" *")
     }
 
@@ -406,8 +406,8 @@ print.summary.klein_vella_fit <- function(x, ...) {
     var_stats["SD"], var_stats["CV"]
   ))
 
-  if (var_stats["CV"] < 0.1) {
-    cat("\nWarning: Low variation in variance ratio (CV < 0.1).\n")
+  if (var_stats["CV"] < .hetid_const("IDENTIFICATION_TOLERANCE")) {
+    cat(sprintf("\nWarning: Low variation in variance ratio (CV < %.1f).\n", .hetid_const("IDENTIFICATION_TOLERANCE")))
     cat("         Identification may be weak.\n")
   }
 
@@ -425,7 +425,7 @@ print.summary.klein_vella_fit <- function(x, ...) {
 #' @examples
 #' run_klein_vella_demo()
 #'
-run_klein_vella_demo <- function(n = 500, verbose = TRUE) {
+run_klein_vella_demo <- function(n = .hetid_const("N_SMALL"), verbose = TRUE) {
   if (verbose) {
     cat("\n====================================\n")
     cat("Klein & Vella (2010) Demonstration\n")
