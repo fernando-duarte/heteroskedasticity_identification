@@ -1,9 +1,7 @@
 #' @importFrom rlang .data
 NULL
 
-#' Internal helper for creating summary statistics
-#'
-#' Unified function to create summary statistics for different grouping variables
+#' Internal helper for creating summary statistics for different grouping variables
 #'
 #' @param results_data Data frame with results
 #' @param group_var Character. Name of grouping variable
@@ -14,8 +12,8 @@ NULL
 #' @return Data frame with summary statistics
 #' @keywords internal
 .create_grouped_summary <- function(results_data, group_var, config,
-                                   include_bounds = FALSE, verbose = TRUE,
-                                   title = "") {
+                                    include_bounds = FALSE, verbose = TRUE,
+                                    title = "") {
   # Group and summarize
   grouped_data <- dplyr::group_by(results_data, .data[[group_var]])
 

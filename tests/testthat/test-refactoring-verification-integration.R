@@ -1,18 +1,11 @@
-test_that("constants environment exists and has expected values", {
+test_that("constants access works via .hetid_const", {
   skip_if_not_integration_test()
-  # Test that constants environment exists in package namespace
-  expect_true(exists("constants_env", envir = asNamespace("hetid")))
-
-  # Get constants from package namespace
-  constants_env <- get("constants_env", envir = asNamespace("hetid"))
-  expect_true(environmentIsLocked(constants_env))
-
-  # Test that constants have expected values
-  expect_equal(constants_env$WEAK_INSTRUMENT_F_THRESHOLD, 10)
-  expect_equal(constants_env$ALPHA_LEVEL, 0.05)
-  expect_equal(constants_env$Z_CRITICAL_95, 1.96)
-  expect_equal(constants_env$DISPLAY_DIGITS, 4)
-  expect_equal(constants_env$PLOT_BASE_FONT_SIZE, 14)
+  # Test that constants have expected values through .hetid_const
+  expect_equal(.hetid_const("WEAK_INSTRUMENT_F_THRESHOLD"), 10)
+  expect_equal(.hetid_const("ALPHA_LEVEL"), 0.05)
+  expect_equal(.hetid_const("Z_CRITICAL_95"), 1.96)
+  expect_equal(.hetid_const("DISPLAY_DIGITS"), 4)
+  expect_equal(.hetid_const("PLOT_BASE_FONT_SIZE"), 14)
 })
 
 test_that("options system works correctly", {
@@ -34,9 +27,9 @@ test_that("options system works correctly", {
   }
 })
 
-test_that("constants access works via .hetid_const", {
+test_that("nested constants access works via .hetid_const", {
   skip_if_not_integration_test()
-  # Test direct constant access
+  # Test nested constant access
   expect_equal(.hetid_const("df_adjust$ASYMPTOTIC"), "asymptotic")
   expect_equal(.hetid_const("df_adjust$FINITE"), "finite")
   expect_equal(.hetid_const("columns$STD_ERROR"), "Std. Error")
@@ -56,16 +49,4 @@ test_that("NSE variables work with .data pronoun", {
   # Test grouping with .data
   grouped_result <- dplyr::group_by(test_data, .data$x)
   expect_s3_class(grouped_result, "grouped_df")
-})
-
-test_that("constants are accessible in package functions", {
-  skip_if_not_integration_test()
-  # Test that constants can be accessed in the package context
-  expect_true(exists("constants_env", envir = asNamespace("hetid")))
-
-  # Get constants from package namespace
-  constants_env <- get("constants_env", envir = asNamespace("hetid"))
-  expect_equal(constants_env$DISPLAY_DIGITS, 4)
-  expect_equal(constants_env$WEAK_INSTRUMENT_F_THRESHOLD, 10)
-  expect_equal(constants_env$PLOT_BASE_FONT_SIZE, 14)
 })
